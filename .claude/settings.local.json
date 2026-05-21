@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_figma_figma__get_design_context",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "Bash(curl -sS -o makai.png \"https://www.figma.com/api/mcp/asset/b84aa9a9-e07d-485f-a37a-5be315c6b0ad\")",
+      "Bash(curl -sS -o naviva.png \"https://www.figma.com/api/mcp/asset/e5deba7b-771b-495d-8561-0c505bd9bdfb\")",
+      "Bash(curl -sS -o liv.png \"https://www.figma.com/api/mcp/asset/5525c98f-1a79-468e-bf13-c674aae91608\")",
+      "mcp__plugin_figma_figma__use_figma",
+      "Bash(curl -sS -o hero_clean.png \"https://www.figma.com/api/mcp/asset/7b05d557-51b3-476b-abd5-e4152a7bea69\")",
+      "mcp__plugin_figma_figma__get_metadata",
+      "Bash(awk '/^[[:space:]]*\\\\.fg-toggle/,/^[[:space:]]*\\\\}/' /home/kira/Escritorio/projects/launchbase/launchbase/resources/views/home.blade.php)",
+      "Bash(grep -oP 'UNIDADES DISPONIBLES.{0,800}|PISO[^\"\\\\\\\\]{0,400}' /home/kira/.claude/projects/-home-kira-Escritorio-projects-launchbase-launchbase/4c9d04c1-8cb9-421a-8e97-4a4a02788a59/tool-results/toolu_01A46BhGzz5WWXgoftkPypT1.json)",
+      "Bash(grep -A 20 'protected \\\\$fillable' app/Models/__TRACKED_VAR__.php)",
+      "Bash(grep -A 60 'protected \\\\$fillable' app/Models/Unit.php)",
+      "Bash(php artisan *)",
+      "Read(//tmp/figma_hd/**)",
+      "Bash(magick admin-dashboard.png -crop 1200x150+0+95 +repage top-alert.png)",
+      "Bash(magick admin-dashboard.png -crop 1200x180+0+135 +repage kpi-row.png)",
+      "Bash(magick admin-dashboard.png -crop 850x500+0+285 +repage proy-card.png)",
+      "Bash(magick admin-dashboard.png -crop 380x500+850+285 +repage exp-card.png)"
+    ]
+  }
+}
