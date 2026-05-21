@@ -26,15 +26,11 @@ class HomeController extends Controller
             ->orderBy('id')
             ->get();
 
-        // Calculate real units sold count
+        // Calculate real units sold count (only sold status)
         $soldCount = Unit::where('public', true)
             ->where(function($query) {
                 $query->where('status', 'sold')
-                      ->orWhere('status', 'SOLD')
-                      ->orWhere('status', 'reserved')
-                      ->orWhere('status', 'RESERVED')
-                      ->orWhere('status', 'pending')
-                      ->orWhere('status', 'PENDING');
+                      ->orWhere('status', 'SOLD');
             })
             ->count();
 
