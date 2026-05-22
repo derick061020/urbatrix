@@ -664,7 +664,13 @@
                 <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Samuel' }}</span>
                 <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? 'Admin' : 'Agente' }}</span>
               </span>
-              <span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:#ebebeb url('https://i.pravatar.cc/72?img=12') center/cover no-repeat;flex-shrink:0;" aria-hidden="true"></span>
+              @if(auth()->check() && auth()->user()->avatar)
+                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="display:inline-block;width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" aria-hidden="true">
+              @else
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--brand);color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
+                  {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
+                </span>
+              @endif
             </button>
 
             <!-- PROFILE DROPDOWN -->
@@ -673,7 +679,13 @@
               <!-- User Info Section -->
               <div style="display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;background:white;border-radius:10px;width:100%;flex-shrink:0;">
                 <div style="position:relative;border-radius:999px;width:40px;height:40px;flex-shrink:0;overflow:hidden;">
-                  <img src="https://i.pravatar.cc/80?img=12" alt="User Avatar" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
+                  @if(auth()->check() && auth()->user()->avatar)
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
+                  @else
+                    <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--brand);color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
+                      {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
+                    </span>
+                  @endif
                 </div>
                 <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
                   <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;white-space:nowrap;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
@@ -1162,7 +1174,7 @@
                   </span>
                 @elseif($isSecond)
                   <span class="fg-status-badge second">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     2ND CHANCE
                   </span>
                 @else
@@ -1296,24 +1308,32 @@
 
           @if($isHighDem)
             <div class="fg-card-status-strip">
+              <span class="fg-card-status-dot"></span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>{{ $shortlistedCount }} people shortlisted this unit</span>
+              <span>{{ (int)($unit->views_today ?? 0) ?: $shortlistedCount }} people viewed this unit today</span>
             </div>
           @elseif($isPending)
             <div class="fg-card-status-strip">
+              <span class="fg-card-status-dot"></span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span>Pending review · Hold expires soon</span>
             </div>
           @elseif($isSecond)
             <div class="fg-card-status-strip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-              <span>Released back to market · 3 days ago</span>
+              <span class="fg-card-status-dot"></span>
+              @php
+                $releasedDays = $unit->released_at ? \Carbon\Carbon::parse($unit->released_at)->diffInDays(now()) : null;
+              @endphp
+              <span>This unit was released {{ $releasedDays !== null ? ($releasedDays === 0 ? 'today' : $releasedDays.' '.\Illuminate\Support\Str::plural('day', $releasedDays).' ago') : 'recently' }}</span>
             </div>
           @elseif($isReserved)
-            <div class="fg-card-status-strip" style="background:#f3f4f6;color:#4b5563;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V5a3 3 0 1 1 6 0v3"/></svg>
-              @if(!empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture())
-                <span>Reserved · Hold expires {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</span>
+            @php
+              $reservedFuture = !empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture();
+            @endphp
+            <div class="fg-card-status-strip is-reserved-strip" @if($reservedFuture) data-reserved-until="{{ \Carbon\Carbon::parse($unit->reserved_until)->toIso8601String() }}" @endif>
+              <span class="fg-card-status-dot"></span>
+              @if($reservedFuture)
+                <span>Reserved for <span class="fg-countdown" data-countdown>00:00:00</span> remaining</span>
               @else
                 <span>Reserved · Awaiting deposit</span>
               @endif
@@ -3040,6 +3060,29 @@
         document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
       }
     });
+
+    // ============================
+    // RESERVED CARD COUNTDOWN (HH:MM:SS)
+    // ============================
+    (function initReservedCountdowns(){
+      function pad(n){ return n.toString().padStart(2, '0'); }
+      function tick(){
+        const now = Date.now();
+        document.querySelectorAll('[data-reserved-until]').forEach(el => {
+          const until = Date.parse(el.getAttribute('data-reserved-until'));
+          const target = el.querySelector('[data-countdown]');
+          if (!target || isNaN(until)) return;
+          let diff = Math.max(0, Math.floor((until - now) / 1000));
+          const h = Math.floor(diff / 3600);
+          const m = Math.floor((diff % 3600) / 60);
+          const s = diff % 60;
+          target.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+          if (diff === 0) el.removeAttribute('data-reserved-until');
+        });
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
 
     // ============================
     // GRID / LIST / PLAN TOGGLE

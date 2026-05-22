@@ -84,6 +84,10 @@ class Unit extends Model
         'project_id',
         'reserved_until',
         'reserved_by_reservation_id',
+        'is_high_demand',
+        'is_second_chance',
+        'released_at',
+        'views_today',
     ];
 
     public function project()
@@ -136,6 +140,9 @@ class Unit extends Model
         'public' => 'boolean',
         'pre_arranged' => 'boolean',
         'reserved_until' => 'datetime',
+        'released_at' => 'datetime',
+        'is_high_demand'   => 'boolean',
+        'is_second_chance' => 'boolean',
         'discount' => 'decimal:2',
         'price_adjustment' => 'decimal:2',
         'purchase_price' => 'decimal:2',
