@@ -93,6 +93,7 @@ Route::post('/api/update-last-seen', [ActiveUserController::class, 'updateLastSe
 
 // Home page API routes
 Route::get('/api/units/{unitId}', [HomeController::class, 'getUnitDetails']);
+Route::post('/api/units/{unitId}/view', [HomeController::class, 'recordView']);
 Route::post('/api/units/filter', [HomeController::class, 'filterUnits']);
 
 // Admin routes

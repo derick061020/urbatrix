@@ -88,11 +88,26 @@ class Unit extends Model
         'is_second_chance',
         'released_at',
         'views_today',
+        'views_total',
+        'for_investment_text',
+        'for_living_text',
+        'projected_value',
+        'projected_value_year',
+        'roi_percent',
+        'comparison_text',
+        'amenities_text',
+        'walk_score',
+        'school_proximity',
     ];
 
     public function project()
     {
         return $this->belongsTo(\App\Models\Project::class);
+    }
+
+    public function views()
+    {
+        return $this->hasMany(\App\Models\UnitView::class)->orderByDesc('viewed_at');
     }
 
     public function reservedByReservation()
@@ -143,6 +158,8 @@ class Unit extends Model
         'released_at' => 'datetime',
         'is_high_demand'   => 'boolean',
         'is_second_chance' => 'boolean',
+        'projected_value'  => 'decimal:2',
+        'roi_percent'      => 'decimal:2',
         'discount' => 'decimal:2',
         'price_adjustment' => 'decimal:2',
         'purchase_price' => 'decimal:2',

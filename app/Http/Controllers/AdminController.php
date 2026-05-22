@@ -93,6 +93,7 @@ class AdminController extends Controller
             'public', 'pre_arranged', 'plot', 'guaranteed_rental', 'override_action',
             'aircon', 'bypass_launch_date', 'display_on_home_page', 'show_enquire_button',
             'set_discount_globally', 'hide_original_price', 'show_price_alternative',
+            'is_high_demand', 'is_second_chance',
         ];
 
         foreach ($booleanFields as $field) {
@@ -168,6 +169,24 @@ class AdminController extends Controller
             'set_discount_globally' => 'boolean',
             'hide_original_price'   => 'boolean',
             'show_price_alternative'=> 'boolean',
+
+            // Availability & demand
+            'reserved_until'        => 'nullable|date',
+            'released_at'           => 'nullable|date',
+            'views_today'           => 'nullable|integer|min:0',
+            'is_high_demand'        => 'boolean',
+            'is_second_chance'      => 'boolean',
+
+            // For Investment / For Living content
+            'for_investment_text'   => 'nullable|string|max:5000',
+            'for_living_text'       => 'nullable|string|max:5000',
+            'projected_value'       => 'nullable|numeric|min:0',
+            'projected_value_year'  => 'nullable|string|max:10',
+            'roi_percent'           => 'nullable|numeric|min:0|max:999',
+            'comparison_text'       => 'nullable|string|max:500',
+            'amenities_text'        => 'nullable|string|max:500',
+            'walk_score'            => 'nullable|integer|min:0|max:100',
+            'school_proximity'      => 'nullable|string|max:255',
         ]);
 
         if (array_key_exists('agent_id', $validated) && $validated['agent_id'] === '') {

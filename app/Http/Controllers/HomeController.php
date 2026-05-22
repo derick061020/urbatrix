@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Unit;
+use App\Models\UnitView;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -51,6 +54,50 @@ class HomeController extends Controller
             ->findOrFail($unitId);
 
         return response()->json($unit);
+    }
+
+    /**
+     * Log a view of the unit (called when the info modal opens).
+     * Deduplicates within a 15-minute window per session/user to avoid spam.
+     */
+    public function recordView(Request $request, $unitId)
+    {
+        $unit = Unit::where('public', true)->findOrFail($unitId);
+
+        $userId    = Auth::id();
+        $sessionId = $request->session()->getId();
+
+        $recent = UnitView::where('unit_id', $unit->id)
+            ->where(function ($q) use ($userId, $sessionId) {
+                if ($userId) {
+                    $q->where('user_id', $userId);
+                } else {
+                    $q->where('session_id', $sessionId);
+                }
+            })
+            ->where('viewed_at', '>=', now()->subMinutes(15))
+            ->exists();
+
+        if (! $recent) {
+            UnitView::create([
+                'unit_id'    => $unit->id,
+                'user_id'    => $userId,
+                'session_id' => $sessionId,
+                'ip'         => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 255),
+                'viewed_at'  => now(),
+            ]);
+
+            $unit->forceFill([
+                'views_today' => DB::raw('COALESCE(views_today, 0) + 1'),
+                'views_total' => DB::raw('COALESCE(views_total, 0) + 1'),
+            ])->save();
+        }
+
+        return response()->json([
+            'views_today' => (int) $unit->fresh()->views_today,
+            'views_total' => (int) $unit->fresh()->views_total,
+        ]);
     }
 
     /**

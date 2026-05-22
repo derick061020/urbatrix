@@ -133,7 +133,7 @@
             </div>
 
             <!-- Financial table (For Investment) — pulled from DB; rows hidden when data is missing -->
-            <div class="mt-fin-table" id="mtFinTable">
+            <div class="mt-fin-table" id="mtFinTable" data-buyer-view="investment">
               <div class="row">
                 <div class="cell" id="modalRowLevies" style="display:none;">
                   <span class="k">HOA Levies</span>
@@ -156,26 +156,73 @@
               </div>
             </div>
 
-            <!-- Projected value highlight -->
-            <div class="mt-projected">
+            <!-- Financial table (For Living) — costs only, no rental income -->
+            <div class="mt-fin-table" id="mtFinTableLiving" data-buyer-view="living" style="display:none;">
+              <div class="row">
+                <div class="cell" id="modalRowLeviesL" style="display:none;">
+                  <span class="k">HOA Levies</span>
+                  <span class="v"><b id="modalLeviesL">—</b><i>/mo</i></span>
+                </div>
+                <div class="cell" id="modalRowRatesL" style="display:none;">
+                  <span class="k">Rates</span>
+                  <span class="v"><b id="modalRatesL">—</b><i>/mo</i></span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="cell" id="modalRowFeesL" style="display:none;">
+                  <span class="k">Monthly Fees</span>
+                  <span class="v"><b id="modalFeesL">—</b><i>/mo</i></span>
+                </div>
+                <div class="cell" id="modalRowTotalCost" style="display:none;">
+                  <span class="k">Total Monthly Cost</span>
+                  <span class="v"><b id="modalTotalCost">—</b><i>/mo</i></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- For-living extras: amenities + walk score + school -->
+            <div class="mt-living-extras" data-buyer-view="living" style="display:none;">
+              <div class="mt-living-row" id="modalRowAmen" style="display:none;">
+                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-7 9 7"/><path d="M5 10V21h14V10"/><polyline points="2 10 12 3 22 10"/></svg></span>
+                <span class="txt" id="modalAmenities">—</span>
+              </div>
+              <div class="mt-living-row" id="modalRowWalk" style="display:none;">
+                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M11 8l-4 6 4 3 0 5"/><path d="M14 13l3-1"/></svg></span>
+                <span class="txt"><b id="modalWalkScore">—</b><span class="muted"> walkability score</span></span>
+              </div>
+              <div class="mt-living-row" id="modalRowSchool" style="display:none;">
+                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5L2 10l10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+                <span class="txt" id="modalSchool">—</span>
+              </div>
+            </div>
+
+            <!-- Projected value highlight (investment) -->
+            <div class="mt-projected" id="modalProjected" data-buyer-view="investment" style="display:none;">
               <div class="mt-projected-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
               </div>
               <div>
                 <p class="mt-projected-label">PROJECTED VALUE AT DELIVERY</p>
                 <div class="mt-projected-row">
-                  <span class="now">$431,000 today</span>
+                  <span class="now" id="modalProjectedNow">$0 today</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  <span class="future">$490,000+</span>
-                  <span class="hint">est. 2027</span>
+                  <span class="future" id="modalProjectedFuture">—</span>
+                  <span class="hint" id="modalProjectedHint">—</span>
                 </div>
               </div>
             </div>
 
-            <div class="mt-compare">
+            <!-- Investment commentary -->
+            <div class="mt-compare" id="modalCompare" data-buyer-view="investment" style="display:none;">
               <span class="bullet"></span>
-              <span>Miami Beach reference: <b>$900/sqft</b> · Makai offers <b>$450/sqft</b> — 50% less for comparable luxury.</span>
+              <span id="modalCompareText">—</span>
             </div>
+
+            <!-- For-investment longform description -->
+            <p class="mt-section-text" id="modalInvestmentText" data-buyer-view="investment" style="display:none;"></p>
+
+            <!-- For-living longform description -->
+            <p class="mt-section-text" id="modalLivingText" data-buyer-view="living" style="display:none;"></p>
 
             <div class="mt-divider"></div>
 
@@ -1734,11 +1781,66 @@
                   row.style.display = 'none';
               }
           };
+          // Investment view
           toggleRow('modalRowLevies', 'modalLevies', unit.levies);
           toggleRow('modalRowRental', 'modalRental', unit.est_rental);
-          toggleRow('modalRowFees',   'modalFees',
-              [unit.expense_1, unit.expense_2, unit.expense_3].reduce((a, b) => Number(a||0) + Number(b||0), 0));
-          toggleRow('modalRowRates',  'modalRates',  unit.rates);
+          const feesSum = [unit.expense_1, unit.expense_2, unit.expense_3].reduce((a, b) => Number(a||0) + Number(b||0), 0);
+          toggleRow('modalRowFees',   'modalFees',  feesSum);
+          toggleRow('modalRowRates',  'modalRates', unit.rates);
+
+          // Living view (no rental, plus total monthly cost)
+          toggleRow('modalRowLeviesL', 'modalLeviesL', unit.levies);
+          toggleRow('modalRowFeesL',   'modalFeesL',   feesSum);
+          toggleRow('modalRowRatesL',  'modalRatesL',  unit.rates);
+          const totalCost = Number(unit.levies || 0) + Number(unit.rates || 0) + Number(feesSum || 0);
+          toggleRow('modalRowTotalCost', 'modalTotalCost', totalCost);
+
+          // Living extras
+          const setTextRow = (rowId, valId, value) => {
+              const row = document.getElementById(rowId);
+              const val = document.getElementById(valId);
+              if (!row || !val) return;
+              if (value !== null && value !== undefined && value !== '') {
+                  val.textContent = value;
+                  row.style.display = '';
+              } else { row.style.display = 'none'; }
+          };
+          setTextRow('modalRowAmen',   'modalAmenities', unit.amenities_text);
+          setTextRow('modalRowWalk',   'modalWalkScore', unit.walk_score);
+          setTextRow('modalRowSchool', 'modalSchool',    unit.school_proximity);
+
+          // Investment longform + Living longform
+          const showText = (id, text) => {
+              const el = document.getElementById(id);
+              if (!el) return;
+              if (text && String(text).trim() !== '') { el.textContent = text; el.style.display = ''; }
+              else { el.style.display = 'none'; }
+          };
+          showText('modalInvestmentText', unit.for_investment_text);
+          showText('modalLivingText',     unit.for_living_text);
+
+          // Projected value + ROI (investment)
+          const proj      = Number(unit.projected_value || 0);
+          const projYear  = unit.projected_value_year || '';
+          const roi       = unit.roi_percent ? Number(unit.roi_percent) : null;
+          const projBox   = document.getElementById('modalProjected');
+          if (projBox) {
+              if (proj > 0) {
+                  document.getElementById('modalProjectedNow').textContent    = '$' + number_format(unit.price || 0, 0, ',', ',') + ' today';
+                  document.getElementById('modalProjectedFuture').textContent = '$' + number_format(proj, 0, ',', ',') + '+';
+                  document.getElementById('modalProjectedHint').textContent   = projYear ? ('est. ' + projYear) : (roi !== null ? roi + '% ROI' : '');
+                  projBox.style.display = '';
+              } else { projBox.style.display = 'none'; }
+          }
+
+          // Comparison text (investment)
+          const cmpBox = document.getElementById('modalCompare');
+          if (cmpBox) {
+              if (unit.comparison_text && String(unit.comparison_text).trim() !== '') {
+                  document.getElementById('modalCompareText').textContent = unit.comparison_text;
+                  cmpBox.style.display = '';
+              } else { cmpBox.style.display = 'none'; }
+          }
 
           // Reflect availability — disable Reserve Online if the unit is on hold or sold
           const statusRaw = (unit.status || 'AVAILABLE').toString().toLowerCase();
@@ -1804,6 +1906,12 @@
           currentModalImg = 0;
           updateModalImage();
 
+          // Re-apply current buyer mode to hide/show the right blocks
+          if (typeof window.applyBuyerMode === 'function') {
+            const activeBtn = document.querySelector('.mt-buyer-toggle button.active');
+            window.applyBuyerMode(activeBtn?.dataset.buyer || 'investment');
+          }
+
           // Show modal
           const modal = document.getElementById('moreInfoModal');
           if (modal) {
@@ -1813,6 +1921,16 @@
           } else {
             console.error('Modal element not found!');
           }
+
+          // Track this view (fire-and-forget; dedupe handled server-side)
+          try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+            fetch(`/api/units/${unit.id}/view`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+              credentials: 'same-origin',
+            }).catch(() => {});
+          } catch(e) {}
         })
         .catch(error => {
           console.error('Error fetching unit data:', error);
@@ -1892,11 +2010,37 @@
           this.classList.add('active');
         });
       });
-      // Buyer toggle
+      // Buyer toggle — swap visibility of buyer-specific blocks
+      function applyBuyerMode(mode) {
+        document.querySelectorAll('[data-buyer-view]').forEach(el => {
+          const match = el.getAttribute('data-buyer-view') === mode;
+          // Respect inline displays that mark a section as hidden (no data) — only toggle
+          // when an item is meant to be visible. Use a private flag to remember it.
+          if (match) {
+            // Restore previous display only if it was hidden because of mode mismatch
+            if (el.dataset.hiddenByMode === '1') {
+              el.style.display = el.dataset.prevDisplay || '';
+              el.dataset.hiddenByMode = '0';
+            }
+          } else {
+            if (el.style.display !== 'none' || el.dataset.hiddenByMode === '1') {
+              el.dataset.prevDisplay = el.style.display;
+              el.dataset.hiddenByMode = '1';
+              el.style.display = 'none';
+            }
+          }
+        });
+      }
+      window.applyBuyerMode = applyBuyerMode;
+      // Initialize from the active button
+      const activeBuyerBtn = document.querySelector('.mt-buyer-toggle button.active');
+      if (activeBuyerBtn) applyBuyerMode(activeBuyerBtn.dataset.buyer || 'investment');
+
       document.querySelectorAll('.mt-buyer-toggle button').forEach(function (b) {
         b.addEventListener('click', function () {
           this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
           this.classList.add('active');
+          applyBuyerMode(this.dataset.buyer || 'investment');
         });
       });
       // No / With dimensions toggle

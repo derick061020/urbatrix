@@ -87,6 +87,92 @@
     </div>
 </div>
 
+{{-- ===================== AVAILABILITY & DEMAND ===================== --}}
+<div class="crm-card">
+    <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
+        <i class="pi pi-bolt text-ink-500"></i>
+        <div class="text-[13px] font-bold text-ink-700">Disponibilidad &amp; demanda</div>
+    </div>
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+            <label class="text-[12px] font-semibold text-ink-700">Reservada hasta</label>
+            <input type="datetime-local" name="reserved_until"
+                   value="{{ old('reserved_until', $u && $u->reserved_until ? \Carbon\Carbon::parse($u->reserved_until)->format('Y-m-d\TH:i') : '') }}"
+                   class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">Aparece como contador en la card del front.</p>
+        </div>
+        <div>
+            <label class="text-[12px] font-semibold text-ink-700">Liberada el</label>
+            <input type="datetime-local" name="released_at"
+                   value="{{ old('released_at', $u && $u->released_at ? \Carbon\Carbon::parse($u->released_at)->format('Y-m-d\TH:i') : '') }}"
+                   class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">Usado por el texto "released N days ago" de 2nd Chance.</p>
+        </div>
+        <div>
+            <label class="text-[12px] font-semibold text-ink-700">Vistas hoy</label>
+            <input type="number" min="0" name="views_today" value="{{ old('views_today', $u->views_today ?? 0) }}" class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">Total acumulado: <b>{{ (int)($u->views_total ?? 0) }}</b>. Click para reiniciar el contador del día.</p>
+        </div>
+        <div class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-6 pt-1">
+            @include('admin.units._partials.toggle', ['name' => 'is_high_demand',   'label' => 'High Demand',  'checked' => old('is_high_demand',   $u->is_high_demand   ?? false)])
+            @include('admin.units._partials.toggle', ['name' => 'is_second_chance', 'label' => '2nd Chance',   'checked' => old('is_second_chance', $u->is_second_chance ?? false)])
+        </div>
+    </div>
+</div>
+
+{{-- ===================== FOR INVESTMENT / FOR LIVING ===================== --}}
+<div class="crm-card">
+    <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
+        <i class="pi pi-chart-line text-ink-500"></i>
+        <div class="text-[13px] font-bold text-ink-700">Contenido segmentado · Investment / Living</div>
+    </div>
+    <div class="p-5 space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">Texto "For Investment"</label>
+                <textarea name="for_investment_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
+                          placeholder="Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
+            </div>
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">Texto "For Living"</label>
+                <textarea name="for_living_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
+                          placeholder="Mensaje orientado a residentes. Ej: barrio, escuelas, lifestyle, terraza...">{{ old('for_living_text', $u->for_living_text ?? '') }}</textarea>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">Valor proyectado ($)</label>
+                <input type="number" step="0.01" min="0" name="projected_value" value="{{ old('projected_value', $u->projected_value ?? '') }}" class="crm-input pl-3 mt-1">
+            </div>
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">Año proyección</label>
+                <input type="text" maxlength="10" name="projected_value_year" value="{{ old('projected_value_year', $u->projected_value_year ?? '') }}" class="crm-input pl-3 mt-1" placeholder="2027">
+            </div>
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">ROI (%)</label>
+                <input type="number" step="0.01" min="0" max="999" name="roi_percent" value="{{ old('roi_percent', $u->roi_percent ?? '') }}" class="crm-input pl-3 mt-1" placeholder="10.3">
+            </div>
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">Walk score (0-100)</label>
+                <input type="number" min="0" max="100" name="walk_score" value="{{ old('walk_score', $u->walk_score ?? '') }}" class="crm-input pl-3 mt-1">
+            </div>
+            <div class="sm:col-span-2 lg:col-span-4">
+                <label class="text-[12px] font-semibold text-ink-700">Comentario comparativo</label>
+                <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="Miami Beach reference: $900/sqft · Makai $450/sqft — 50% menos">
+            </div>
+            <div class="sm:col-span-2 lg:col-span-2">
+                <label class="text-[12px] font-semibold text-ink-700">Amenities (For Living)</label>
+                <input type="text" maxlength="500" name="amenities_text" value="{{ old('amenities_text', $u->amenities_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="Pool, gym, beach club, restaurants…">
+            </div>
+            <div class="sm:col-span-2 lg:col-span-2">
+                <label class="text-[12px] font-semibold text-ink-700">Cercanía a escuelas</label>
+                <input type="text" maxlength="255" name="school_proximity" value="{{ old('school_proximity', $u->school_proximity ?? '') }}" class="crm-input pl-3 mt-1" placeholder="International School – 1.2 km">
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- ===================== RESERVATION DETAILS ===================== --}}
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
