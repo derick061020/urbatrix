@@ -19,6 +19,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -1732,5 +1735,66 @@ class AdminController extends Controller
     {
         $project->delete();
         return back()->with('success', 'Proyecto eliminado.');
+    }
+
+    /* ─────────────── Profile (admin) ─────────────── */
+
+    public function editProfile()
+    {
+        return view('admin.crm.profile', [
+            'user' => Auth::user(),
+            'activeRoute' => 'crm.profile',
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $data = $request->validate([
+            'first_name' => ['nullable', 'string', 'max:80'],
+            'last_name'  => ['nullable', 'string', 'max:80'],
+            'name'       => ['nullable', 'string', 'max:160'],
+            'email'      => ['required', 'email', 'max:160', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone'      => ['nullable', 'string', 'max:30'],
+            'country'    => ['nullable', 'string', 'max:10'],
+            'avatar'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_avatar' => ['nullable', 'boolean'],
+            'password'         => ['nullable', 'string', 'min:8', 'confirmed'],
+            'current_password' => ['nullable', 'required_with:password', 'string'],
+        ]);
+
+        if (!empty($data['password'])) {
+            if (!$user->password || !Hash::check($data['current_password'] ?? '', $user->password)) {
+                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.'])->withInput();
+            }
+            $user->password = $data['password'];
+        }
+
+        if ($request->boolean('remove_avatar') && $user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->first_name = $data['first_name'] ?? $user->first_name;
+        $user->last_name  = $data['last_name']  ?? $user->last_name;
+        $user->email      = $data['email'];
+        $user->phone      = $data['phone']   ?? $user->phone;
+        $user->country    = $data['country'] ?? $user->country;
+
+        $composed = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        $user->name = !empty($data['name']) ? $data['name'] : ($composed !== '' ? $composed : $user->name);
+
+        $user->save();
+
+        return back()->with('success', 'Perfil actualizado correctamente.');
     }
 }

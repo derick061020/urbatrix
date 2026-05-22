@@ -206,18 +206,23 @@
                 @endphp
                 @if($unreadMsgs > 0)<span class="badge-count">{{ $unreadMsgs }}</span>@endif
             </a>
+
+            <div class="cli-nav-section">Cuenta</div>
+            <a href="{{ route('dashboard.profile.edit') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'profile' ? 'active' : '' }}">
+                <i class="pi pi-user-edit"></i> Mi perfil
+            </a>
         </nav>
 
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <div class="cli-avatar" style="background:#5c7c68">
-                    {{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}
-                </div>
-                <div class="flex-1 min-w-0 leading-tight">
+                <a href="{{ route('dashboard.profile.edit') }}" class="cli-avatar shrink-0" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil">
+                    @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
+                </a>
+                <a href="{{ route('dashboard.profile.edit') }}" class="flex-1 min-w-0 leading-tight no-underline text-ink-950" title="Editar perfil">
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Cliente' }}</div>
                     <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Cliente' }}</div>
-                </div>
+                </a>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión"><i class="pi pi-arrow-up-right text-xs"></i></button>
@@ -249,9 +254,9 @@
                 <i class="pi pi-bell"></i>
                 <span class="dot-indicator"></span>
             </button>
-            <button type="button" class="topbar-icon-btn shrink-0" title="Ajustes">
+            <a href="{{ route('dashboard.profile.edit') }}" class="topbar-icon-btn shrink-0" title="Editar perfil">
                 <i class="pi pi-cog"></i>
-            </button>
+            </a>
         </header>
 
         <main class="flex-1 overflow-auto bg-white">

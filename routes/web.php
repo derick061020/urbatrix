@@ -81,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
     
     // Message routes (client)
     Route::post('/dashboard/messages/send', [DashboardController::class, 'sendMessage'])->name('dashboard.messages.send');
+
+    // Profile (client)
+    Route::get('/dashboard/profile',  [DashboardController::class, 'editProfile'])->name('dashboard.profile.edit');
+    Route::post('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('dashboard.profile.update');
 });
 
 // Active users routes
@@ -130,6 +134,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/cta-cards', [AdminController::class, 'ctaCards'])->name('admin.cta-cards');
     Route::get('/theme', [AdminController::class, 'theme'])->name('admin.theme');
     Route::get('/account', [AdminController::class, 'account'])->name('admin.account');
+
+    // Profile (admin)
+    Route::get('/profile',  [AdminController::class, 'editProfile'])->name('admin.profile.edit');
+    Route::post('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');

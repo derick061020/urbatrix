@@ -741,15 +741,17 @@
                 </div>
               </a>
 
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
+              <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.profile.edit') : route('dashboard.profile.edit') }}" style="text-decoration:none;display:block;width:100%">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
-              </div>
+              </a>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
                 <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
@@ -780,15 +782,17 @@
                 <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Tech Support</div>
               </div>
 
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+              <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.crm.avance-obra') : route('dashboard.progress') }}" style="text-decoration:none;display:block;width:100%">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Construction Progress</div>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Construction Progress</div>
-              </div>
+              </a>
 
               <!-- Divider -->
               <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
@@ -933,10 +937,55 @@
     <div class="fg-hero-spacer" aria-hidden="true"></div>
 
     <!-- Main Content -->
-    <div id="main-unit-reserve-list" style="min-height:100vh;background:rgb(239,235,230);">
+    <div id="main-unit-reserve-list" style="min-height:100vh;background:#f2f5f8;">
 
-      <!-- Filter Bar -->
-      <div class="fg-filter-bar">
+      <!-- Grid/List/Planta Toggle -->
+      <div class="fg-toggle-bar">
+        <div class="fg-toggle-container" role="tablist" aria-label="View mode">
+          <div class="fg-toggle" data-node-id="171:10199">
+            <button type="button" class="active" data-view="grid" role="tab" aria-selected="true">
+              <div class="fg-icon-grid">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                </svg>
+              </div>
+              <span>Grid</span>
+            </button>
+            <button type="button" data-view="list" role="tab" aria-selected="false">
+              <div class="fg-icon-list">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="4" y1="6" x2="4" y2="6"></line>
+                  <line x1="4" y1="12" x2="4" y2="12"></line>
+                  <line x1="4" y1="18" x2="4" y2="18"></line>
+                </svg>
+              </div>
+              <span>List</span>
+            </button>
+            <div class="fg-toggle-bg-active" aria-hidden="true"></div>
+          </div>
+
+          <!-- Floating Map-Pin (Planta) Button -->
+          <div class="fg-location-button">
+            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="Planta view">
+              <div class="fg-icon-location">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar — placed below the view toggle, visible only in Grid view -->
+      <div class="fg-filter-bar" data-grid-only>
         <div class="fg-filters-left">
           <label class="fg-search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1067,52 +1116,6 @@
           102 Matches
         </button>
       </div>
-
-      <!-- Grid/List/Planta Toggle -->
-      <div class="fg-toggle-bar">
-        <div class="fg-toggle-container" role="tablist" aria-label="View mode">
-          <div class="fg-toggle" data-node-id="171:10199">
-            <button type="button" class="active" data-view="grid" role="tab" aria-selected="true">
-              <div class="fg-icon-grid">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="7" height="7"></rect>
-                  <rect x="14" y="3" width="7" height="7"></rect>
-                  <rect x="3" y="14" width="7" height="7"></rect>
-                  <rect x="14" y="14" width="7" height="7"></rect>
-                </svg>
-              </div>
-              <span>Grid</span>
-            </button>
-            <button type="button" data-view="list" role="tab" aria-selected="false">
-              <div class="fg-icon-list">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="8" y1="6" x2="21" y2="6"></line>
-                  <line x1="8" y1="12" x2="21" y2="12"></line>
-                  <line x1="8" y1="18" x2="21" y2="18"></line>
-                  <line x1="4" y1="6" x2="4" y2="6"></line>
-                  <line x1="4" y1="12" x2="4" y2="12"></line>
-                  <line x1="4" y1="18" x2="4" y2="18"></line>
-                </svg>
-              </div>
-              <span>List</span>
-            </button>
-            <div class="fg-toggle-bg-active" aria-hidden="true"></div>
-          </div>
-
-          <!-- Floating Map-Pin (Planta) Button -->
-          <div class="fg-location-button">
-            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="Planta view">
-              <div class="fg-icon-location">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Cards Grid -->
       <div class="fg-units-grid">
         @foreach($units as $unit)

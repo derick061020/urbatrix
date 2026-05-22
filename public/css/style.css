@@ -597,8 +597,8 @@
       z-index: 5;
     }
     .fg-hero-spacer {
-      height: 24px;
-      background: #ffffff;
+      height: 80px;
+      background: linear-gradient(180deg, #ffffff 0%, #f2f5f8 100%);
     }
 
     @keyframes hero-text-enter {
@@ -621,23 +621,23 @@
       .fg-hero-building { animation: none !important; opacity: 1; transform: none; }
     }
 
-    /* FILTER BAR (v2) */
+    /* FILTER BAR (v2) — sits below the toggle, aligned with the cards grid */
     .fg-filter-bar {
-      background: #ffffff;
-      border-bottom: 1px solid #ebebeb;
-      border-bottom-left-radius: 24px;
-      border-bottom-right-radius: 24px;
+      background: #f2f5f8;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 20px;
+      width: 100%;
+      max-width: 1366px;
+      margin: 0 auto;
+      padding: 8px 24px 20px;
       position: relative;
       z-index: 30;
     }
     .fg-filter-bar > .fg-filters-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       flex: 1 1 auto;
       min-width: 0;
       flex-wrap: wrap;
@@ -833,10 +833,10 @@
       padding: 20px;
     }
     .fg-toggle-bar {
-      display: flex; 
+      display: flex;
       justify-content: center;
-      padding: 24px 0;
-      background: rgb(239,235,230);
+      padding: 28px 24px 16px;
+      background: #f2f5f8;
     }
     
     .fg-toggle-container {
@@ -1807,6 +1807,11 @@
     }
     body[data-view="grid"] .fg-units-grid { opacity: 1; transform: none; }
 
+    /* Filter bar is exclusive to Grid view (hidden in List / Plan) */
+    body[data-view="grid"] .fg-filter-bar[data-grid-only] { display: flex; }
+    body[data-view="list"] .fg-filter-bar[data-grid-only],
+    body[data-view="plan"] .fg-filter-bar[data-grid-only] { display: none !important; }
+
     body[data-view="list"] .fg-units-grid { opacity: 0; transform: translateY(6px); pointer-events: none; position: absolute; left: -99999px; }
     body[data-view="list"] .fg-list-wrap {
         opacity: 1; transform: none; pointer-events: auto;
@@ -2093,7 +2098,8 @@
     }
 
     @media (max-width: 900px) {
-      .fg-filter-bar { padding: 16px 24px; gap: 8px; }
+      .fg-toggle-bar { padding: 20px 16px 12px; }
+      .fg-filter-bar { padding: 4px 16px 16px; gap: 8px; }
       .fg-units-grid { padding: 0 16px 32px 16px; gap: 12px; }
       .fg-stat svg { width: 18px; height: 18px; }
       .fg-card-title-row .name { font-size: 16px; }
