@@ -1129,7 +1129,7 @@
         </button>
       </div>
       <!-- Cards Grid -->
-      <div class="fg-units-grid">
+      <div class="fg-units-grid" style="padding-top:10px">
         @foreach($units as $unit)
         @php
           $st = strtolower($unit->status ?? '');
