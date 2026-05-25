@@ -210,8 +210,7 @@
 @push('scripts')
 <script>
 // Documents data passed from server
-window.__acuerdos = @json(
-    $pending->merge($completed)->map(function($d) use ($typeMeta, $advisorName) {
+window.__acuerdos = @json($pending->merge($completed)->map(function($d) use ($typeMeta, $advisorName) {
         [$typeLabel] = $typeMeta[$d->document_type] ?? ['Documento'];
         $observations = data_get($d->metadata, 'observations', []);
         return [
@@ -232,8 +231,7 @@ window.__acuerdos = @json(
             'download'  => route('documents.download', $d->id),
             'can_sign'  => in_array($d->status, ['pending','generated','awaiting_signature','in_review']),
         ];
-    })->values()
-);
+    })->values());
 
 function openAcuerdoModal(id) {
     const doc = (window.__acuerdos || []).find(x => String(x.id) === String(id));
