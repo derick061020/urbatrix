@@ -49,6 +49,73 @@
     {{-- Delete form (outside main form to avoid nesting) --}}
     <form id="unit-delete-form" method="POST" action="{{ route('admin.units.delete', $unit->id) }}" class="hidden">@csrf @method('DELETE')</form>
 
+    {{-- ===================== VIEW HISTORY ===================== --}}
+    <div class="crm-card">
+        <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
+            <i class="pi pi-eye text-ink-500"></i>
+            <div class="text-[13px] font-bold text-ink-700">Historial de vistas</div>
+            <span class="ml-auto text-[11px] text-ink-500">Última actualización: {{ now()->format('d/m/Y H:i') }}</span>
+        </div>
+
+        <div class="p-5 space-y-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @php
+                    $stats = [
+                        ['Hoy',          $viewStats['today']  ?? 0, '#5c7c68'],
+                        ['Últimos 7d',   $viewStats['week']   ?? 0, '#335cff'],
+                        ['Últimos 30d',  $viewStats['month']  ?? 0, '#fa7319'],
+                        ['Total',        $viewStats['total']  ?? 0, '#717784'],
+                    ];
+                @endphp
+                @foreach($stats as [$label, $val, $color])
+                    <div class="rounded-xl border border-ink-200 bg-white p-4">
+                        <div class="text-[10px] uppercase font-semibold tracking-wide text-ink-500">{{ $label }}</div>
+                        <div class="text-[22px] font-bold mt-1" style="color:{{ $color }}">{{ number_format($val) }}</div>
+                    </div>
+                @endforeach
+            </div>
+
+            @if(($recentViews ?? collect())->isEmpty())
+                <div class="text-center py-6 text-[12px] text-ink-500">
+                    <i class="pi pi-info-circle"></i> Esta unidad aún no registra vistas.
+                </div>
+            @else
+                <div class="overflow-x-auto rounded-xl border border-ink-200">
+                    <table class="crm-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>IP</th>
+                                <th class="text-right">User agent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($recentViews as $v)
+                                <tr>
+                                    <td>
+                                        <div class="text-[12px] text-ink-900">{{ \Carbon\Carbon::parse($v->viewed_at)->format('d/m/Y H:i:s') }}</div>
+                                        <div class="text-[10px] text-ink-500">{{ \Carbon\Carbon::parse($v->viewed_at)->diffForHumans() }}</div>
+                                    </td>
+                                    <td>
+                                        @if($v->user)
+                                            <div class="text-[12px] font-semibold text-ink-900">{{ $v->user->name }}</div>
+                                            <div class="text-[10px] text-ink-500">{{ $v->user->email }}</div>
+                                        @else
+                                            <span class="text-[12px] text-ink-500 italic">Anónimo · sesión {{ \Illuminate\Support\Str::limit($v->session_id, 8, '') }}…</span>
+                                        @endif
+                                    </td>
+                                    <td><code class="text-[11px] text-ink-700">{{ $v->ip ?? '—' }}</code></td>
+                                    <td class="text-right text-[11px] text-ink-500 max-w-[260px] truncate" title="{{ $v->user_agent }}">{{ $v->user_agent ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- ===================== IMAGES ===================== --}}
     <div class="crm-card">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">

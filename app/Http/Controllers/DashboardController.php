@@ -377,6 +377,97 @@ class DashboardController extends Controller
         }
     }
 
+    /* ─────────────── Wishlist / Guardados ─────────────── */
+
+    public function guardados()
+    {
+        $units = \App\Models\Unit::whereIn('id', function ($q) {
+                $q->select('unit_id')->from('wishlists')->where('user_id', Auth::id());
+            })
+            ->with(['images' => fn($q) => $q->orderBy('sort_order')])
+            ->where('public', true)
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return view('dashboard.guardados', [
+            'units' => $units,
+            'activeRoute' => 'guardados',
+        ]);
+    }
+
+    /* ─────────────── Calendario ─────────────── */
+
+    public function calendario(Request $request)
+    {
+        $reservation = $this->resolveReservation($request);
+        $userId = Auth::id();
+
+        // Build a unified event list from tasks/messages/payments related to this client
+        $events = collect();
+
+        // Tasks assigned to or about this client's reservation
+        if ($reservation) {
+            $tasks = \App\Models\Task::where('reservation_id', $reservation->id)
+                ->whereNotNull('due_date')
+                ->get();
+            foreach ($tasks as $t) {
+                $events->push((object) [
+                    'id'    => 't-'.$t->id,
+                    'title' => $t->title ?? 'Tarea',
+                    'start' => \Carbon\Carbon::parse($t->due_date),
+                    'end'   => \Carbon\Carbon::parse($t->due_date)->addMinutes(30),
+                    'type'  => 'task',
+                    'meta'  => $t->status ?? 'pendiente',
+                ]);
+            }
+
+            // Upcoming payments
+            foreach ($reservation->payments->whereIn('status', ['pending', 'overdue']) as $p) {
+                if (! $p->due_date) continue;
+                $events->push((object) [
+                    'id'    => 'p-'.$p->id,
+                    'title' => 'Pago programado · $'.number_format((float) $p->amount, 0),
+                    'start' => \Carbon\Carbon::parse($p->due_date)->startOfDay(),
+                    'end'   => \Carbon\Carbon::parse($p->due_date)->startOfDay()->addHour(),
+                    'type'  => 'payment',
+                    'meta'  => $p->status,
+                ]);
+            }
+        }
+
+        return view('dashboard.calendario', [
+            'events'      => $events->sortBy('start')->values(),
+            'reservation' => $reservation,
+            'activeRoute' => 'calendario',
+        ]);
+    }
+
+    /* ─────────────── Acuerdos ─────────────── */
+
+    public function acuerdos(Request $request)
+    {
+        $reservation = $this->resolveReservation($request);
+        if (! $reservation) {
+            return view('dashboard.acuerdos', [
+                'reservation' => null,
+                'pending'     => collect(),
+                'completed'   => collect(),
+                'activeRoute' => 'acuerdos',
+            ]);
+        }
+
+        $docs = $reservation->documents()->orderByDesc('created_at')->get();
+        $pending   = $docs->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']));
+        $completed = $docs->filter(fn($d) => in_array($d->status, ['signed', 'approved', 'completed']));
+
+        return view('dashboard.acuerdos', [
+            'reservation' => $reservation,
+            'pending'     => $pending,
+            'completed'   => $completed,
+            'activeRoute' => 'acuerdos',
+        ]);
+    }
+
     /* ─────────────── Profile (client) ─────────────── */
 
     public function editProfile()

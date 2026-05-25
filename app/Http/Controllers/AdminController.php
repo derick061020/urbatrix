@@ -59,7 +59,18 @@ class AdminController extends Controller
     {
         $unit->load(['images', 'histories', 'dealHistories', 'paymentHistories']);
         $agents = Agent::where('active', true)->orderBy('name')->get();
-        return view('admin.units.edit', compact('unit', 'agents'));
+        $recentViews = \App\Models\UnitView::with('user')
+            ->where('unit_id', $unit->id)
+            ->orderByDesc('viewed_at')
+            ->limit(25)
+            ->get();
+        $viewStats = [
+            'today'  => \App\Models\UnitView::where('unit_id', $unit->id)->whereDate('viewed_at', today())->count(),
+            'week'   => \App\Models\UnitView::where('unit_id', $unit->id)->where('viewed_at', '>=', now()->subDays(7))->count(),
+            'month'  => \App\Models\UnitView::where('unit_id', $unit->id)->where('viewed_at', '>=', now()->subDays(30))->count(),
+            'total'  => \App\Models\UnitView::where('unit_id', $unit->id)->count(),
+        ];
+        return view('admin.units.edit', compact('unit', 'agents', 'recentViews', 'viewStats'));
     }
 
     public function createUnit()
@@ -184,6 +195,8 @@ class AdminController extends Controller
             'projected_value_year'  => 'nullable|string|max:10',
             'roi_percent'           => 'nullable|numeric|min:0|max:999',
             'comparison_text'       => 'nullable|string|max:500',
+            'amenities'             => 'nullable|array',
+            'amenities.*'           => 'string|in:pool,gym,beach_club,restaurant,spa,tennis,golf,security,parking,concierge,playground,bbq',
             'amenities_text'        => 'nullable|string|max:500',
             'walk_score'            => 'nullable|integer|min:0|max:100',
             'school_proximity'      => 'nullable|string|max:255',

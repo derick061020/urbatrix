@@ -39,7 +39,12 @@ class HomeController extends Controller
 
         $totalUnits = Unit::where('public', true)->count();
 
-        return view('home', compact('units', 'soldCount', 'totalUnits'));
+        // Wishlisted unit IDs for the current user (empty array for guests)
+        $wishlistIds = Auth::check()
+            ? \App\Models\Wishlist::where('user_id', Auth::id())->pluck('unit_id')->all()
+            : [];
+
+        return view('home', compact('units', 'soldCount', 'totalUnits', 'wishlistIds'));
     }
 
     /**
@@ -54,6 +59,53 @@ class HomeController extends Controller
             ->findOrFail($unitId);
 
         return response()->json($unit);
+    }
+
+    /**
+     * Render a printable property PDF for the given unit. Opens in a new tab
+     * and auto-triggers the browser print dialog so the user can "Save as PDF".
+     */
+    public function propertyPdf($unitId)
+    {
+        $unit = Unit::with([
+                'images' => function ($q) { $q->orderBy('sort_order'); },
+                'project',
+            ])
+            ->where('public', true)
+            ->findOrFail($unitId);
+
+        return view('property-pdf', compact('unit'));
+    }
+
+    /**
+     * Toggle the current user's wishlist for a unit.
+     * Returns the new state + total count for the user.
+     */
+    public function toggleWishlist(Request $request, $unitId)
+    {
+        if (! Auth::check()) {
+            return response()->json(['success' => false, 'message' => 'Necesitás iniciar sesión.'], 401);
+        }
+
+        $unit = Unit::where('public', true)->findOrFail($unitId);
+        $row  = \App\Models\Wishlist::where('user_id', Auth::id())->where('unit_id', $unit->id)->first();
+
+        if ($row) {
+            $row->delete();
+            Unit::where('id', $unit->id)->where('shortlisted_count', '>', 0)->decrement('shortlisted_count');
+            $state = false;
+        } else {
+            \App\Models\Wishlist::create(['user_id' => Auth::id(), 'unit_id' => $unit->id]);
+            Unit::where('id', $unit->id)->increment('shortlisted_count');
+            $state = true;
+        }
+
+        return response()->json([
+            'success'     => true,
+            'wishlisted'  => $state,
+            'total'       => \App\Models\Wishlist::where('user_id', Auth::id())->count(),
+            'unit_count'  => (int) Unit::where('id', $unit->id)->value('shortlisted_count'),
+        ]);
     }
 
     /**

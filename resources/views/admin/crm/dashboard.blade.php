@@ -4,6 +4,18 @@
 @section('page_breadcrumb', 'Vista global · todos los proyectos')
 @php $activeRoute = 'crm.dashboard'; @endphp
 
+@push('styles')
+<style>
+    .kpi-card { background:#fff; }
+    .kpi-card .kpi-card-top {
+        background-image: radial-gradient(circle at top right, color-mix(in srgb, var(--kpi-color) 14%, transparent), transparent 55%);
+    }
+    @supports not (background: color-mix(in srgb, red, blue)) {
+        .kpi-card .kpi-card-top { background-image: radial-gradient(circle at top right, var(--kpi-color), transparent 55%); opacity: 1; }
+    }
+</style>
+@endpush
+
 @section('content')
 @php
     $expedientesActivos     = $stats['expedientes_activos']     ?? 0;
@@ -19,14 +31,14 @@
 <div class="p-4 sm:p-6 lg:p-8 space-y-5">
 
     {{-- Alerta superior --}}
-    <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-err-soft border border-err/20 text-[12px] text-ink-700">
-        <i class="pi pi-exclamation-circle text-err"></i>
-        <span>
+    <div class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-err-soft border border-err/20 text-[12px] text-ink-700">
+        <i class="pi pi-exclamation-triangle text-err text-[14px]"></i>
+        <span class="leading-tight">
             <span class="font-bold text-ink-950">{{ $aprobCola + $docsPendientes + $tareasVencidas }} alertas activas</span> &mdash;
             {{ $aprobCola }} verificaciones pendientes · {{ $tareasVencidas }} tareas vencidas · {{ $docsPendientes }} documentos sin gestionar. Requieren atención inmediata.
         </span>
-        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-brand font-semibold hover:underline flex items-center gap-1">Ver todas <i class="pi pi-arrow-right text-[10px]"></i></a>
-        <button type="button" class="text-ink-400 hover:text-ink-600" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[10px]"></i></button>
+        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-err font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">Ver todas <i class="pi pi-arrow-right text-[10px]"></i></a>
+        <button type="button" class="text-ink-400 hover:text-ink-700 shrink-0" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[11px]"></i></button>
     </div>
 
     {{-- KPI cards con punto en esquina superior derecha --}}
@@ -40,11 +52,14 @@
             ];
         @endphp
         @foreach($kpis as $k)
-            <a href="{{ $k['href'] }}" class="crm-card p-5 block hover:shadow-card transition-shadow relative">
-                <span class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full" style="background:{{ $k['dot'] }}"></span>
-                <div class="font-display text-[36px] font-bold text-ink-950 leading-none">{{ $k['n'] }}</div>
-                <div class="text-[13px] font-medium text-ink-700 mt-2">{{ $k['label'] }}</div>
-                <div class="text-[10px] text-ink-400 mt-3 pt-3 border-t border-ink-100 tracking-wider font-semibold uppercase">{{ $k['sub'] }}</div>
+            <a href="{{ $k['href'] }}" class="crm-card kpi-card block hover:shadow-card transition-shadow relative overflow-hidden"
+               style="--kpi-color: {{ $k['dot'] }};">
+                <span class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full z-10" style="background:{{ $k['dot'] }}"></span>
+                <div class="kpi-card-top px-4 pt-4 pb-3">
+                    <div class="font-display text-[26px] font-bold text-ink-950 leading-none">{{ $k['n'] }}</div>
+                    <div class="text-[13px] font-medium text-ink-700 mt-2">{{ $k['label'] }}</div>
+                </div>
+                <div class="px-4 py-1.5 bg-ink-50 border-t border-ink-100 text-[10px] text-ink-500 tracking-wider font-semibold uppercase truncate">{{ $k['sub'] }}</div>
             </a>
         @endforeach
     </div>

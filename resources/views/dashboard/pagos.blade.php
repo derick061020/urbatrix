@@ -51,15 +51,32 @@
 
     {{-- Progress --}}
     <div class="cli-card p-5">
-        <div class="flex items-center justify-between text-[13px] mb-2">
+        <div class="flex items-center justify-between text-[13px] mb-3">
             <span class="font-semibold text-ink-950">Progreso del plan de pagos</span>
             <span class="font-bold text-ok-dark text-[16px]">{{ $pct }}%</span>
         </div>
-        <div class="cli-progress h-2"><span class="bg-ok" style="width:{{ $pct }}%"></span></div>
-        <div class="grid grid-cols-3 gap-2 text-[10px] uppercase tracking-wider font-semibold text-ink-400 mt-2">
-            <span>0%</span>
-            <span class="text-center">5% Reserva &nbsp;·&nbsp; 20% Fin construcción</span>
-            <span class="text-right">100% Entrega</span>
+        <div class="relative h-2 rounded-full bg-ink-100 overflow-visible">
+            <div class="absolute inset-y-0 left-0 rounded-full bg-ok transition-all" style="width:{{ $pct }}%"></div>
+            {{-- Milestone markers --}}
+            @foreach([['0%', 0], ['5% Reserva', 5], ['20% Fin construcción', 20], ['100% Entrega', 100]] as [$label, $val])
+                @php
+                    $reached = $pct >= $val;
+                    $clr = $reached ? '#1fc16b' : '#cacfd8';
+                @endphp
+                <div class="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border-2 border-white"
+                     style="left:calc({{ $val }}% - 5px); background:{{ $clr }}; box-shadow:0 0 0 1px {{ $clr }};">
+                </div>
+            @endforeach
+        </div>
+        <div class="relative mt-3 text-[10px] uppercase tracking-wider font-semibold text-ink-400" style="height:14px;">
+            @foreach([['0%', 0, 'left-0'], ['5% Reserva', 5, ''], ['20% Fin construcción', 20, ''], ['100% Entrega', 100, 'right-0']] as $i => [$label, $val, $align])
+                @php
+                    $reached = $pct >= $val;
+                    $transform = $val === 0 ? '' : ($val === 100 ? 'transform:translateX(-100%);' : 'transform:translateX(-50%);');
+                @endphp
+                <span class="absolute whitespace-nowrap {{ $reached ? 'text-ok-dark' : '' }}"
+                      style="left:{{ $val }}%; {{ $transform }}">{{ $label }}</span>
+            @endforeach
         </div>
     </div>
 

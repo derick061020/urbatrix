@@ -133,7 +133,7 @@
             </div>
 
             <!-- Financial table (For Investment) — pulled from DB; rows hidden when data is missing -->
-            <div class="mt-fin-table" id="mtFinTable" data-buyer-view="investment">
+            <div class="mt-fin-table mt-investment-only" id="mtFinTable">
               <div class="row">
                 <div class="cell" id="modalRowLevies" style="display:none;">
                   <span class="k">HOA Levies</span>
@@ -157,7 +157,7 @@
             </div>
 
             <!-- Financial table (For Living) — costs only, no rental income -->
-            <div class="mt-fin-table" id="mtFinTableLiving" data-buyer-view="living" style="display:none;">
+            <div class="mt-fin-table mt-living-only" id="mtFinTableLiving">
               <div class="row">
                 <div class="cell" id="modalRowLeviesL" style="display:none;">
                   <span class="k">HOA Levies</span>
@@ -181,7 +181,7 @@
             </div>
 
             <!-- For-living extras: amenities + walk score + school -->
-            <div class="mt-living-extras" data-buyer-view="living" style="display:none;">
+            <div class="mt-living-extras mt-living-only">
               <div class="mt-living-row" id="modalRowAmen" style="display:none;">
                 <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-7 9 7"/><path d="M5 10V21h14V10"/><polyline points="2 10 12 3 22 10"/></svg></span>
                 <span class="txt" id="modalAmenities">—</span>
@@ -197,7 +197,7 @@
             </div>
 
             <!-- Projected value highlight (investment) -->
-            <div class="mt-projected" id="modalProjected" data-buyer-view="investment" style="display:none;">
+            <div class="mt-projected mt-investment-only" id="modalProjected" style="display:none;">
               <div class="mt-projected-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
               </div>
@@ -213,16 +213,16 @@
             </div>
 
             <!-- Investment commentary -->
-            <div class="mt-compare" id="modalCompare" data-buyer-view="investment" style="display:none;">
+            <div class="mt-compare mt-investment-only" id="modalCompare" style="display:none;">
               <span class="bullet"></span>
               <span id="modalCompareText">—</span>
             </div>
 
             <!-- For-investment longform description -->
-            <p class="mt-section-text" id="modalInvestmentText" data-buyer-view="investment" style="display:none;"></p>
+            <p class="mt-section-text mt-investment-only" id="modalInvestmentText" style="display:none;"></p>
 
             <!-- For-living longform description -->
-            <p class="mt-section-text" id="modalLivingText" data-buyer-view="living" style="display:none;"></p>
+            <p class="mt-section-text mt-living-only" id="modalLivingText" style="display:none;"></p>
 
             <div class="mt-divider"></div>
 
@@ -281,7 +281,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               DISCLAIMER
             </button>
-            <button type="button" class="mt-tab">
+            <button type="button" class="mt-tab" onclick="sharePropertyPdf()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               SHARE
             </button>
@@ -695,12 +695,12 @@
 
         <!-- RIGHT: Saved counter + Avatar + Hamburger -->
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
-          <button type="button" aria-label="Saved units" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
+          <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
-            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;" data-saved-count>Guardados (3)</span>
-          </button>
+            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;" data-saved-count>Guardados ({{ count($wishlistIds ?? []) }})</span>
+          </a>
 
           <span aria-hidden="true" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
 
@@ -812,14 +812,16 @@
                 </div>
               </a>
 
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                  </svg>
+              <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" style="text-decoration:none;display:block;width:100%">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
-              </div>
+              </a>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
                 <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
@@ -1228,15 +1230,21 @@
                   <span></span>
                 @endif
 
-                <button type="button" class="fg-add-to-list" aria-label="Add to list" title="Shortlisted by {{ $unit->shortlisted_count ?? 0 }} other">
+                @php $isFav = in_array($unit->id, $wishlistIds ?? []); @endphp
+                <button type="button"
+                        class="fg-add-to-list {{ $isFav ? 'is-fav' : '' }}"
+                        aria-label="Add to list"
+                        aria-pressed="{{ $isFav ? 'true' : 'false' }}"
+                        data-wishlist-toggle data-unit-id="{{ $unit->id }}"
+                        title="Shortlisted by {{ $unit->shortlisted_count ?? 0 }} other">
                   <span class="heart">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ $isFav ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                   </span>
                   <span class="text">
-                    <span class="label">Add to list</span>
-                    <span class="meta">Shortlisted by {{ $unit->shortlisted_count ?? 0 }} other</span>
+                    <span class="label">{{ $isFav ? 'Saved' : 'Add to list' }}</span>
+                    <span class="meta">Shortlisted by <span data-unit-count="{{ $unit->id }}">{{ $unit->shortlisted_count ?? 0 }}</span> other</span>
                   </span>
                 </button>
               </div>
@@ -1805,7 +1813,53 @@
                   row.style.display = '';
               } else { row.style.display = 'none'; }
           };
-          setTextRow('modalRowAmen',   'modalAmenities', unit.amenities_text);
+          // Amenities with icons
+          const amenRow = document.getElementById('modalRowAmen');
+          const amenVal = document.getElementById('modalAmenities');
+          if (amenRow && amenVal) {
+              const amenities = unit.amenities || [];
+              if (Array.isArray(amenities) && amenities.length > 0) {
+                  const amenityIcons = {
+                      'pool': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>',
+                      'gym': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6 20v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/></svg>',
+                      'beach_club': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M12 2v20"/><path d="M4 12c0-4 3-7 8-7s8 3 8 7"/></svg>',
+                      'restaurant': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+                      'spa': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>',
+                      'tennis': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2v20"/><path d="M4.93 4.93l14.14 14.14"/><path d="M19.07 4.93L4.93 19.07"/></svg>',
+                      'golf': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 13v8"/><path d="M9 6l3-4 3 4"/></svg>',
+                      'security': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+                      'parking': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15V9"/><path d="M17 15V9"/></svg>',
+                      'concierge': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+                      'playground': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+                      'bbq': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M6 12v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/><path d="M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>',
+                  };
+                  const amenityLabels = {
+                      'pool': 'Pool',
+                      'gym': 'Gym',
+                      'beach_club': 'Beach Club',
+                      'restaurant': 'Restaurant',
+                      'spa': 'Spa',
+                      'tennis': 'Tennis Court',
+                      'golf': 'Golf Course',
+                      'security': '24/7 Security',
+                      'parking': 'Parking',
+                      'concierge': 'Concierge',
+                      'playground': 'Playground',
+                      'bbq': 'BBQ Area',
+                  };
+                  let html = '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+                  amenities.forEach(key => {
+                      if (amenityIcons[key]) {
+                          html += '<div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink-700);">' + amenityIcons[key] + '<span>' + amenityLabels[key] + '</span></div>';
+                      }
+                  });
+                  html += '</div>';
+                  amenVal.innerHTML = html;
+                  amenRow.style.display = '';
+              } else {
+                  amenRow.style.display = 'none';
+              }
+          }
           setTextRow('modalRowWalk',   'modalWalkScore', unit.walk_score);
           setTextRow('modalRowSchool', 'modalSchool',    unit.school_proximity);
 
@@ -2010,29 +2064,13 @@
           this.classList.add('active');
         });
       });
-      // Buyer toggle — swap visibility of buyer-specific blocks
+      // Buyer toggle — toggles a `living-mode` class on .mt-shell; CSS does the rest
       function applyBuyerMode(mode) {
-        document.querySelectorAll('[data-buyer-view]').forEach(el => {
-          const match = el.getAttribute('data-buyer-view') === mode;
-          // Respect inline displays that mark a section as hidden (no data) — only toggle
-          // when an item is meant to be visible. Use a private flag to remember it.
-          if (match) {
-            // Restore previous display only if it was hidden because of mode mismatch
-            if (el.dataset.hiddenByMode === '1') {
-              el.style.display = el.dataset.prevDisplay || '';
-              el.dataset.hiddenByMode = '0';
-            }
-          } else {
-            if (el.style.display !== 'none' || el.dataset.hiddenByMode === '1') {
-              el.dataset.prevDisplay = el.style.display;
-              el.dataset.hiddenByMode = '1';
-              el.style.display = 'none';
-            }
-          }
-        });
+        const shell = document.querySelector('#moreInfoModal .mt-shell');
+        if (!shell) return;
+        shell.classList.toggle('living-mode', mode === 'living');
       }
       window.applyBuyerMode = applyBuyerMode;
-      // Initialize from the active button
       const activeBuyerBtn = document.querySelector('.mt-buyer-toggle button.active');
       if (activeBuyerBtn) applyBuyerMode(activeBuyerBtn.dataset.buyer || 'investment');
 
@@ -2808,6 +2846,21 @@
       window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
     }
 
+    // Opens the property PDF in a new tab; that page auto-triggers the browser
+    // print dialog so the user can "Save as PDF" / download.
+    function sharePropertyPdf() {
+      if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
+        alert('Primero abrí los detalles de una unidad.');
+        return;
+      }
+      const recipient = prompt('¿Para quién es esta ficha? (opcional)', '');
+      const params = new URLSearchParams();
+      if (recipient && recipient.trim()) params.set('to', recipient.trim());
+      const qs = params.toString();
+      const url = '/property-pdf/' + encodeURIComponent(currentOpenUnit) + (qs ? '?' + qs : '');
+      window.open(url, '_blank', 'noopener');
+    }
+
     function toggleAlerts() {
       alert('Alertas activadas. Te avisamos si baja de precio o quedan menos de 3 unidades.');
     }
@@ -3204,6 +3257,55 @@
         document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
       }
     });
+
+    // ============================
+    // WISHLIST TOGGLE — hearts on cards persist to the DB for logged-in users
+    // ============================
+    (function initWishlist(){
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('[data-wishlist-toggle]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const unitId = btn.dataset.unitId;
+        if (!unitId) return;
+
+        // Optimistic UI flip
+        const wasFav = btn.classList.contains('is-fav');
+        btn.classList.toggle('is-fav', !wasFav);
+        const svg = btn.querySelector('svg');
+        if (svg) svg.setAttribute('fill', !wasFav ? 'currentColor' : 'none');
+        const label = btn.querySelector('.label');
+        if (label) label.textContent = !wasFav ? 'Saved' : 'Add to list';
+
+        fetch(`/api/wishlist/toggle/${unitId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+          credentials: 'same-origin',
+        }).then(r => r.ok ? r.json() : Promise.reject(r))
+          .then(data => {
+            if (data && data.success) {
+              // Sync to authoritative state in case of race
+              btn.classList.toggle('is-fav', !!data.wishlisted);
+              if (svg) svg.setAttribute('fill', data.wishlisted ? 'currentColor' : 'none');
+              if (label) label.textContent = data.wishlisted ? 'Saved' : 'Add to list';
+              const cnt = document.querySelector(`[data-unit-count="${unitId}"]`);
+              if (cnt && typeof data.unit_count !== 'undefined') cnt.textContent = data.unit_count;
+              const headerCnt = document.querySelector('[data-saved-count]');
+              if (headerCnt && typeof data.total !== 'undefined') headerCnt.textContent = `Guardados (${data.total})`;
+            }
+          }).catch(err => {
+            // Revert optimistic UI
+            btn.classList.toggle('is-fav', wasFav);
+            if (svg) svg.setAttribute('fill', wasFav ? 'currentColor' : 'none');
+            if (label) label.textContent = wasFav ? 'Saved' : 'Add to list';
+            if (err && err.status === 401) {
+              window.location.href = '/login';
+            }
+          });
+      });
+    })();
 
     // ============================
     // RESERVED CARD COUNTDOWN (HH:MM:SS)

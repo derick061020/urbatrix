@@ -95,6 +95,7 @@ class Unit extends Model
         'projected_value_year',
         'roi_percent',
         'comparison_text',
+        'amenities',
         'amenities_text',
         'walk_score',
         'school_proximity',
@@ -183,6 +184,7 @@ class Unit extends Model
         'set_discount_globally' => 'boolean',
         'hide_original_price' => 'boolean',
         'show_price_alternative' => 'boolean',
+        'amenities' => 'array',
     ];
 
     public function deals()

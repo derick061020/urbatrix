@@ -178,38 +178,50 @@
         </div>
 
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
-            <div class="cli-nav-section">Gestión</div>
+            @php
+                $uid = auth()->id();
+                $pendingDocs = \App\Models\Document::whereHas('reservation', fn($q) => $q->where('user_id', $uid))->whereIn('status', ['pending','generated'])->count();
+                $pendingAgreements = \App\Models\Document::whereHas('reservation', fn($q) => $q->where('user_id', $uid))
+                    ->whereIn('document_type', ['payment_plan','purchase_promise','contract','budget'])
+                    ->whereIn('status', ['pending','generated','awaiting_signature','in_review'])->count();
+                $pendingPays = \App\Models\Payment::whereHas('reservation', fn($q) => $q->where('user_id', $uid))->where('status', 'pending')->count();
+                $savedCount = \App\Models\Wishlist::where('user_id', $uid)->count();
+                $unreadMsgs = \App\Models\Message::whereHas('reservation', fn($q) => $q->where('user_id', $uid))
+                    ->where('sender_role', 'admin')->whereNull('read_at')->count();
+            @endphp
 
             <a href="{{ route('dashboard') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'mi-propiedad' ? 'active' : '' }}">
                 <i class="pi pi-home"></i> Mi propiedad
             </a>
+
+            <div class="cli-nav-section">Mi cuenta</div>
             <a href="{{ route('dashboard.documents') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'documents' ? 'active' : '' }}">
-                <i class="pi pi-file"></i> Mis documentos
-                @php $pendingDocs = \App\Models\Document::whereHas('reservation', fn($q) => $q->where('user_id', auth()->id()))->whereIn('status', ['pending','generated'])->count(); @endphp
+                <i class="pi pi-folder-open"></i> Mis documentos
                 @if($pendingDocs > 0)<span class="badge-count">{{ $pendingDocs }}</span>@endif
+            </a>
+            <a href="{{ route('dashboard.acuerdos') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'acuerdos' ? 'active' : '' }}">
+                <i class="pi pi-check-square"></i> Acuerdos
+                @if($pendingAgreements > 0)<span class="badge-count">{{ $pendingAgreements }}</span>@endif
             </a>
             <a href="{{ route('dashboard.payments') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'payments' ? 'active' : '' }}">
                 <i class="pi pi-credit-card"></i> Plan de pagos
-                @php $pendingPays = \App\Models\Payment::whereHas('reservation', fn($q) => $q->where('user_id', auth()->id()))->where('status', 'pending')->count(); @endphp
                 @if($pendingPays > 0)<span class="badge-count">{{ $pendingPays }}</span>@endif
+            </a>
+            <a href="{{ route('dashboard.guardados') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'guardados' ? 'active' : '' }}">
+                <i class="pi pi-heart"></i> Guardados
+                @if($savedCount > 0)<span class="badge-count" style="background:#5c7c68">{{ $savedCount }}</span>@endif
+            </a>
+
+            <div class="cli-nav-section">Comunicación</div>
+            <a href="{{ route('dashboard.messages') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'messages' ? 'active' : '' }}">
+                <i class="pi pi-comments"></i> Mensajes
+                @if($unreadMsgs > 0)<span class="badge-count">{{ $unreadMsgs }}</span>@endif
             </a>
             <a href="{{ route('dashboard.progress') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'progress' ? 'active' : '' }}">
                 <i class="pi pi-chart-line"></i> Avance de Obra
             </a>
-            <a href="{{ route('dashboard.messages') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'messages' ? 'active' : '' }}">
-                <i class="pi pi-comments"></i> Mensajes
-                @php
-                    $unreadMsgs = \App\Models\Message::whereHas('reservation', fn($q) => $q->where('user_id', Auth::id()))
-                        ->where('sender_role', 'admin')
-                        ->whereNull('read_at')
-                        ->count();
-                @endphp
-                @if($unreadMsgs > 0)<span class="badge-count">{{ $unreadMsgs }}</span>@endif
-            </a>
-
-            <div class="cli-nav-section">Cuenta</div>
-            <a href="{{ route('dashboard.profile.edit') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'profile' ? 'active' : '' }}">
-                <i class="pi pi-user-edit"></i> Mi perfil
+            <a href="{{ route('dashboard.calendario') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'calendario' ? 'active' : '' }}">
+                <i class="pi pi-calendar"></i> Calendario
             </a>
         </nav>
 

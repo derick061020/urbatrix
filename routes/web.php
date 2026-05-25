@@ -85,6 +85,15 @@ Route::middleware(['auth'])->group(function () {
     // Profile (client)
     Route::get('/dashboard/profile',  [DashboardController::class, 'editProfile'])->name('dashboard.profile.edit');
     Route::post('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('dashboard.profile.update');
+
+    // Guardados / wishlist
+    Route::get('/dashboard/guardados', [DashboardController::class, 'guardados'])->name('dashboard.guardados');
+
+    // Acuerdos (documentos firmables)
+    Route::get('/dashboard/acuerdos',  [DashboardController::class, 'acuerdos'])->name('dashboard.acuerdos');
+
+    // Calendario
+    Route::get('/dashboard/calendario', [DashboardController::class, 'calendario'])->name('dashboard.calendario');
 });
 
 // Active users routes
@@ -95,6 +104,8 @@ Route::post('/api/update-last-seen', [ActiveUserController::class, 'updateLastSe
 Route::get('/api/units/{unitId}', [HomeController::class, 'getUnitDetails']);
 Route::post('/api/units/{unitId}/view', [HomeController::class, 'recordView']);
 Route::post('/api/units/filter', [HomeController::class, 'filterUnits']);
+Route::post('/api/wishlist/toggle/{unitId}', [HomeController::class, 'toggleWishlist'])->middleware('auth')->name('wishlist.toggle');
+Route::get('/property-pdf/{unitId}', [HomeController::class, 'propertyPdf'])->name('property.pdf');
 
 // Admin routes
 Route::prefix('admin')->middleware(['admin'])->group(function () {
