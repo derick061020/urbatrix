@@ -208,30 +208,33 @@
 </div>
 
 @push('scripts')
+@php
+$__acuerdosData = $pending->merge($completed)->map(function($d) use ($typeMeta, $advisorName, $reservation) {
+    [$typeLabel] = $typeMeta[$d->document_type] ?? ['Documento'];
+    $observations = data_get($d->metadata, 'observations', []);
+    return [
+        'id'        => $d->id,
+        'title'     => $d->title ?? $typeLabel,
+        'type'      => $d->document_type,
+        'type_label'=> strtoupper($typeLabel),
+        'file_url'  => $d->file_path ? asset('storage/'.$d->file_path) : null,
+        'status'    => $d->status,
+        'created'   => $d->created_at?->locale('es')->isoFormat('D MMM YYYY · h:mm A'),
+        'advisor'   => $advisorName,
+        'advisor_msg' => data_get($d->metadata, 'advisor_message', 'Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.'),
+        'observations' => $observations,
+        'sign_url'  => route('documents.sign', $d->id),
+        'reject_url'=> $d->document_type === 'budget' && $reservation
+                        ? route('dashboard.budget.observation', $reservation->id)
+                        : route('dashboard.contract.observation', $d->id),
+        'download'  => route('documents.download', $d->id),
+        'can_sign'  => in_array($d->status, ['pending','generated','awaiting_signature','in_review']),
+    ];
+})->values();
+@endphp
 <script>
 // Documents data passed from server
-window.__acuerdos = @json($pending->merge($completed)->map(function($d) use ($typeMeta, $advisorName) {
-        [$typeLabel] = $typeMeta[$d->document_type] ?? ['Documento'];
-        $observations = data_get($d->metadata, 'observations', []);
-        return [
-            'id'        => $d->id,
-            'title'     => $d->title ?? $typeLabel,
-            'type'      => $d->document_type,
-            'type_label'=> strtoupper($typeLabel),
-            'file_url'  => $d->file_path ? asset('storage/'.$d->file_path) : null,
-            'status'    => $d->status,
-            'created'   => $d->created_at?->locale('es')->isoFormat('D MMM YYYY · h:mm A'),
-            'advisor'   => $advisorName,
-            'advisor_msg' => data_get($d->metadata, 'advisor_message', 'Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.'),
-            'observations' => $observations,
-            'sign_url'  => route('documents.sign', $d->id),
-            'reject_url'=> $d->document_type === 'budget' && $reservation
-                            ? route('dashboard.budget.observation', $reservation->id)
-                            : route('dashboard.contract.observation', $d->id),
-            'download'  => route('documents.download', $d->id),
-            'can_sign'  => in_array($d->status, ['pending','generated','awaiting_signature','in_review']),
-        ];
-    })->values());
+window.__acuerdos = @json($__acuerdosData);
 
 function openAcuerdoModal(id) {
     const doc = (window.__acuerdos || []).find(x => String(x.id) === String(id));
@@ -299,13 +302,13 @@ function closeAcuerdoModal() {
     document.body.style.overflow = '';
 }
 
-function csrf() { return document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'; }
+function getCsrfToken() { return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'; }
 
 function submitSignAcuerdo(doc) {
     if (!confirm('Confirmás que querés firmar "' + doc.title + '"? Esta acción queda registrada.')) return;
     fetch(doc.sign_url, {
         method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrf(), 'Accept': 'application/json' },
+        headers: { 'X-CSRF-TOKEN': getCsrfToken(), 'Accept': 'application/json' },
         credentials: 'same-origin',
     }).then(r => r.json()).then(d => {
         if (d.success !== false) window.location.reload();
@@ -318,7 +321,7 @@ function submitRejectAcuerdo(doc) {
     if (!obs || obs.trim() === '') return;
     const fd = new FormData();
     fd.append('observation', obs);
-    fd.append('_token', csrf());
+    fd.append('_token', getCsrfToken());
     fetch(doc.reject_url, {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
