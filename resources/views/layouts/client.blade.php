@@ -266,9 +266,9 @@
                 <i class="pi pi-bell"></i>
                 <span class="dot-indicator"></span>
             </button>
-            <a href="{{ route('dashboard.profile.edit') }}" class="topbar-icon-btn shrink-0" title="Editar perfil">
+            <button type="button" class="topbar-icon-btn shrink-0" title="Configuración" onclick="openSettingsModal()">
                 <i class="pi pi-cog"></i>
-            </a>
+            </button>
         </header>
 
         <main class="flex-1 overflow-auto bg-white">
@@ -276,6 +276,20 @@
         </main>
     </div>
 </div>
+
+@include('admin.crm._partials.settings-modal', [
+    'stProfileRoute' => 'dashboard.profile.update',
+    'stLogoutRoute'  => 'logout',
+])
+
+@if (session('settings_success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        if (typeof openSettingsModal === 'function') openSettingsModal();
+    });
+</script>
+@endif
+
 @stack('scripts')
 </body>
 </html>

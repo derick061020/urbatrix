@@ -193,7 +193,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
                         <label class="field-label">Agregar titular secundario <span class="field-required">*</span></label>
-                        <select class="auth-input auth-select"><option value="no">No</option><option value="si">Sí</option></select>
+                        <select id="addCoBuyer" class="auth-input auth-select" onchange="toggleCoBuyersPanel(this.value)">
+                            <option value="no">No</option>
+                            <option value="si">Sí</option>
+                        </select>
                     </div>
                     <div>
                         <label class="field-label">Nombre <span class="field-required">*</span></label>
@@ -342,6 +345,85 @@
                         <input type="text" class="auth-input">
                     </div>
                 </div>
+
+                {{-- ============ TITULARES SECUNDARIOS ============ --}}
+                <div id="coBuyersPanel" class="mt-7" style="display:none;">
+                    <div class="h-px bg-ink-200/70 mb-5"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500">Titulares adicionales</div>
+                            <p class="text-[12px] text-ink-500 mt-1">Agregá los datos de cada copropietario. Todos serán incluidos en los contratos.</p>
+                        </div>
+                        <button type="button" id="addCoBuyerBtn" onclick="addCoBuyerRow()" class="auth-btn auth-btn-ghost text-[12px] py-2 px-3">
+                            <i class="pi pi-plus text-[11px]"></i> Agregar otro
+                        </button>
+                    </div>
+                    <div id="coBuyersList" class="space-y-4"></div>
+                </div>
+
+                <template id="coBuyerTpl">
+                    <div class="co-buyer-row rounded-2xl border border-ink-200 bg-ink-50/40 p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-[13px] font-bold text-ink-900">Titular <span data-co-index>#2</span></div>
+                            <button type="button" onclick="removeCoBuyerRow(this)" class="text-err text-[11px] font-semibold inline-flex items-center gap-1 hover:underline" title="Quitar">
+                                <i class="pi pi-trash text-[11px]"></i> Quitar
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="field-label">Nombre <span class="field-required">*</span></label>
+                                <input type="text" data-co-field="first_name" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">Apellido <span class="field-required">*</span></label>
+                                <input type="text" data-co-field="last_name" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">E-mail <span class="field-required">*</span></label>
+                                <input type="email" data-co-field="email" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">Teléfono <span class="field-required">*</span></label>
+                                <input type="tel" data-co-field="phone" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">Tipo de documento <span class="field-required">*</span></label>
+                                <select data-co-field="id_type" class="auth-input auth-select">
+                                    <option value="">Seleccionar…</option>
+                                    <option>Cédula</option><option>Pasaporte</option><option>Otro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label">Número de documento <span class="field-required">*</span></label>
+                                <input type="text" data-co-field="document_number" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">Fecha de nacimiento <span class="field-required">*</span></label>
+                                <input type="date" data-co-field="birth_date" class="auth-input">
+                            </div>
+                            <div>
+                                <label class="field-label">Nacionalidad <span class="field-required">*</span></label>
+                                <input type="text" data-co-field="nationality" class="auth-input">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="field-label">Relación con el titular principal <span class="field-required">*</span></label>
+                                <select data-co-field="relationship" class="auth-input auth-select">
+                                    <option value="">Seleccionar…</option>
+                                    <option>Cónyuge</option>
+                                    <option>Hijo/a</option>
+                                    <option>Padre / Madre</option>
+                                    <option>Hermano/a</option>
+                                    <option>Socio comercial</option>
+                                    <option>Otro</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="field-label">Porcentaje de copropiedad (%)</label>
+                                <input type="number" min="1" max="99" step="1" data-co-field="ownership_pct" class="auth-input" placeholder="Ej. 50">
+                            </div>
+                        </div>
+                    </div>
+                </template>
 
                 <div class="mt-8">
                     <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
@@ -618,6 +700,58 @@
         ageInput.value = age >= 0 ? age : '';
     };
 
+    /* ---------- Co-buyers (titulares secundarios) ---------- */
+    window.toggleCoBuyersPanel = (val) => {
+        const panel = document.getElementById('coBuyersPanel');
+        const list  = document.getElementById('coBuyersList');
+        if (val === 'si') {
+            panel.style.display = 'block';
+            if (list.children.length === 0) addCoBuyerRow();
+        } else {
+            panel.style.display = 'none';
+            list.innerHTML = '';
+        }
+    };
+    window.addCoBuyerRow = () => {
+        const tpl = document.getElementById('coBuyerTpl');
+        const list = document.getElementById('coBuyersList');
+        const clone = tpl.content.firstElementChild.cloneNode(true);
+        const idxEl = clone.querySelector('[data-co-index]');
+        if (idxEl) idxEl.textContent = '#' + (list.children.length + 2);
+        list.appendChild(clone);
+        // Limit to 5 co-buyers
+        if (list.children.length >= 5) {
+            document.getElementById('addCoBuyerBtn').setAttribute('disabled', 'true');
+            document.getElementById('addCoBuyerBtn').style.opacity = '.5';
+        }
+    };
+    window.removeCoBuyerRow = (btn) => {
+        const row = btn.closest('.co-buyer-row');
+        const list = document.getElementById('coBuyersList');
+        row.remove();
+        // Re-number
+        Array.from(list.querySelectorAll('[data-co-index]')).forEach((el, i) => el.textContent = '#' + (i + 2));
+        document.getElementById('addCoBuyerBtn').removeAttribute('disabled');
+        document.getElementById('addCoBuyerBtn').style.opacity = '';
+        if (list.children.length === 0) {
+            document.getElementById('addCoBuyer').value = 'no';
+            document.getElementById('coBuyersPanel').style.display = 'none';
+        }
+    };
+    window.collectCoBuyers = () => {
+        const rows = document.querySelectorAll('#coBuyersList .co-buyer-row');
+        const out = [];
+        rows.forEach(row => {
+            const obj = {};
+            row.querySelectorAll('[data-co-field]').forEach(el => {
+                obj[el.dataset.coField] = (el.value || '').trim();
+            });
+            // Only push if at least name+doc filled
+            if (obj.first_name && obj.document_number) out.push(obj);
+        });
+        return out;
+    };
+
     /* ---------- Spouse fields toggle ---------- */
     window.toggleSpouseFields = () => {
         const m = document.getElementById('maritalStatus').value;
@@ -685,6 +819,10 @@
 
         // Inputs with data-name attribute (semantic field names)
         document.querySelectorAll('[data-name]').forEach(el => fd.append(el.dataset.name, el.value));
+
+        // Titulares secundarios (co-buyers)
+        const coBuyers = (typeof collectCoBuyers === 'function') ? collectCoBuyers() : [];
+        fd.append('co_buyers', JSON.stringify(coBuyers));
 
         // Custom payment percentages
         if (paymentMethod === 'PERSONALIZADO') {

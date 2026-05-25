@@ -70,7 +70,14 @@
                 </thead>
                 <tbody>
                     @forelse($documents as $d)
-                        @php $st = $statusLabel[$d->status] ?? ['Pendiente','warn']; @endphp
+                        @php
+                            $st = $statusLabel[$d->status] ?? ['Pendiente','warn'];
+                            $previewPayload = [
+                                'url' => route('documents.preview', $d->id),
+                                'title' => $d->title ?: 'Documento',
+                                'filename' => $d->filename ?: basename((string) $d->file_path),
+                            ];
+                        @endphp
                         <tr>
                             <td><input type="checkbox" class="w-4 h-4 accent-brand"></td>
                             <td>
@@ -99,6 +106,7 @@
                                     </form>
                                 @endif
                                 @if($d->file_path)
+                                    <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-[12px] text-brand font-semibold hover:underline mr-2"><i class="pi pi-eye text-[10px]"></i> Ver</button>
                                     <a href="{{ route('documents.download', $d->id) }}" class="text-[12px] text-brand font-semibold hover:underline mr-2">Descargar</a>
                                 @endif
                                 <a href="{{ route('admin.crm.expediente.detalle', $d->reservation_id ?? 0) }}?tab=documentos" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
@@ -119,4 +127,5 @@
 
 @include('admin.crm._partials.modal_subir_documento')
 @include('admin.crm._partials.modal_exportar', ['name' => 'Documentos', 'id' => 'modal-exportar-documentos'])
+@include('admin.crm._partials.document_preview_modal')
 @endsection

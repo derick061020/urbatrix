@@ -156,43 +156,11 @@
               </div>
             </div>
 
-            <!-- Financial table (For Living) — costs only, no rental income -->
-            <div class="mt-fin-table mt-living-only" id="mtFinTableLiving">
-              <div class="row">
-                <div class="cell" id="modalRowLeviesL" style="display:none;">
-                  <span class="k">HOA Levies</span>
-                  <span class="v"><b id="modalLeviesL">—</b><i>/mo</i></span>
-                </div>
-                <div class="cell" id="modalRowRatesL" style="display:none;">
-                  <span class="k">Rates</span>
-                  <span class="v"><b id="modalRatesL">—</b><i>/mo</i></span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="cell" id="modalRowFeesL" style="display:none;">
-                  <span class="k">Monthly Fees</span>
-                  <span class="v"><b id="modalFeesL">—</b><i>/mo</i></span>
-                </div>
-                <div class="cell" id="modalRowTotalCost" style="display:none;">
-                  <span class="k">Total Monthly Cost</span>
-                  <span class="v"><b id="modalTotalCost">—</b><i>/mo</i></span>
-                </div>
-              </div>
-            </div>
-
-            <!-- For-living extras: amenities + walk score + school -->
+            <!-- Amenities — For Living -->
+            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;">Amenities &amp; Lifestyle</p>
             <div class="mt-living-extras mt-living-only">
               <div class="mt-living-row" id="modalRowAmen" style="display:none;">
-                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-7 9 7"/><path d="M5 10V21h14V10"/><polyline points="2 10 12 3 22 10"/></svg></span>
                 <span class="txt" id="modalAmenities">—</span>
-              </div>
-              <div class="mt-living-row" id="modalRowWalk" style="display:none;">
-                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M11 8l-4 6 4 3 0 5"/><path d="M14 13l3-1"/></svg></span>
-                <span class="txt"><b id="modalWalkScore">—</b><span class="muted"> walkability score</span></span>
-              </div>
-              <div class="mt-living-row" id="modalRowSchool" style="display:none;">
-                <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5L2 10l10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
-                <span class="txt" id="modalSchool">—</span>
               </div>
             </div>
 
@@ -222,7 +190,7 @@
             <p class="mt-section-text mt-investment-only" id="modalInvestmentText" style="display:none;"></p>
 
             <!-- For-living longform description -->
-            <p class="mt-section-text mt-living-only" id="modalLivingText" style="display:none;"></p>
+            <p class="mt-section-text mt-living-note mt-living-only" id="modalLivingText" style="display:none;"></p>
 
             <div class="mt-divider"></div>
 
@@ -261,7 +229,7 @@
           <!-- Sticky bottom -->
           <div class="mt-cta-row">
             <button id="modalReserveBtn" type="button" class="mt-btn-secondary" onclick="openReservePage(currentOpenUnit)">Reserve Online</button>
-            <button type="button" class="mt-btn-primary" onclick="openVideoCall()">
+            <button type="button" class="mt-btn-primary" onclick="openAdvisorVideoCall(currentOpenUnit)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
               Book Video Call
             </button>
@@ -329,24 +297,213 @@
   </div><!-- /#moreInfoModal -->
 
 
-  <!-- ADVISOR VIDEO CALL MODAL -->
-  <div id="advisorModal" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1200;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);padding:1rem;">
-    <div style="background:white;border-radius:1rem;max-width:380px;width:100%;padding:1.5rem;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
-      <button onclick="closeAdvisorVideoCall()" style="position:absolute;top:0.5rem;right:0.5rem;background:transparent;border:none;font-size:1.5rem;color:rgb(98,84,65);cursor:pointer;line-height:1;">×</button>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">
-        <span class="advisor-dot" style="width:8px;height:8px;border-radius:50%;background:rgb(34,197,94);display:inline-block;"></span>
-        <span style="font-size:0.7rem;color:rgb(34,150,80);font-weight:600;">Asesor disponible · Próxima ventana en 2 h</span>
+  <!-- ADVISOR VIDEO CALL MODAL — Figma 812:50211 (modal-agendar-videollamada) -->
+  <style>
+    .vc-overlay {
+        position:fixed; inset:0; z-index:1200;
+        background:rgba(15,17,24,.55);
+        display:none; align-items:center; justify-content:center;
+        padding:1rem;
+        animation: vcFadeIn .18s ease-out;
+    }
+    .vc-overlay.open { display:flex; }
+    @keyframes vcFadeIn { from { opacity:0 } to { opacity:1 } }
+
+    .vc-modal {
+        width:100%; max-width:500px;
+        background:#fff; border-radius:18px;
+        box-shadow:0 30px 80px -20px rgba(10,13,20,.35);
+        animation: vcSlide .22s cubic-bezier(.4,0,.2,1);
+        overflow:hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    @keyframes vcSlide { from { transform: translateY(12px) scale(.98); opacity:0 } to { transform:none; opacity:1 } }
+
+    .vc-header {
+        display:flex; align-items:flex-start; gap:12px;
+        padding:18px 20px 16px;
+        border-bottom:1px solid #eaecf0;
+    }
+    .vc-header-icon {
+        width:40px; height:40px; border-radius:999px;
+        background:#f4f5f7; color:#525866;
+        display:inline-flex; align-items:center; justify-content:center;
+        flex-shrink:0;
+    }
+    .vc-header-icon svg { width:20px; height:20px; }
+    .vc-header-text { flex:1; min-width:0; }
+    .vc-header-title {
+        font-family:'Inter Tight', Inter, sans-serif;
+        font-size:16px; font-weight:700; color:#171717; line-height:1.25;
+    }
+    .vc-header-sub {
+        font-size:12px; color:#717784; margin-top:2px;
+    }
+    .vc-close {
+        width:32px; height:32px; border-radius:8px;
+        background:transparent; border:none; cursor:pointer;
+        color:#717784; display:inline-flex; align-items:center; justify-content:center;
+        font-size:18px; flex-shrink:0;
+    }
+    .vc-close:hover { background:#f5f7fa; color:#222530; }
+
+    .vc-body { padding:18px 20px 4px; }
+    .vc-field { margin-bottom:18px; }
+    .vc-field-label {
+        display:block;
+        font-size:13px; font-weight:600; color:#222530;
+        margin-bottom:6px;
+    }
+    .vc-field-label .opt { color:#99a0ae; font-weight:500; }
+
+    .vc-select, .vc-input, .vc-textarea {
+        width:100%; box-sizing:border-box;
+        background:#fafbfc; border:1px solid #eaecf0;
+        border-radius:10px; padding:10px 12px;
+        font-size:13px; color:#222530; outline:none;
+        transition: border-color .15s, box-shadow .15s, background .15s;
+        font-family:inherit;
+    }
+    .vc-input:focus, .vc-select:focus, .vc-textarea:focus {
+        border-color:#5c7c68; background:#fff;
+        box-shadow:0 0 0 3px rgba(92,124,104,.18);
+    }
+    .vc-select { appearance:none; padding-right:36px;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23717784' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+        background-repeat:no-repeat; background-position: right 12px center;
+    }
+    .vc-input-icon {
+        position:relative;
+    }
+    .vc-input-icon .pi {
+        position:absolute; left:12px; top:50%; transform:translateY(-50%);
+        color:#717784; font-size:14px; pointer-events:none;
+    }
+    .vc-input-icon input { padding-left:36px; }
+
+    .vc-textarea { min-height:90px; resize:vertical; }
+    .vc-textarea-wrap { position:relative; }
+    .vc-textarea-count {
+        position:absolute; right:12px; bottom:8px;
+        font-size:11px; color:#a3a3a3;
+        pointer-events:none;
+    }
+
+    .vc-slots {
+        display:grid; grid-template-columns: repeat(3, minmax(0,1fr));
+        gap:8px;
+    }
+    .vc-slot {
+        padding:10px 8px; border-radius:10px;
+        background:#fafbfc; border:1px solid #eaecf0;
+        font-size:13px; font-weight:600; color:#525866;
+        text-align:center; cursor:pointer;
+        transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+    }
+    .vc-slot:hover { background:#fff; border-color:#cacfd8; color:#222530; }
+    .vc-slot.active {
+        background:#5c7c68; border-color:#5c7c68; color:#fff;
+        box-shadow:0 4px 12px -4px rgba(92,124,104,.45);
+    }
+
+    .vc-footer {
+        display:flex; align-items:center; justify-content:space-between; gap:10px;
+        padding:14px 20px 18px;
+        border-top:1px solid #eaecf0;
+    }
+    .vc-btn {
+        display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        padding:11px 22px; border-radius:10px;
+        font-size:13px; font-weight:600; cursor:pointer;
+        transition: background .15s, border-color .15s;
+        border:1px solid transparent; flex:1;
+    }
+    .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
+    .vc-btn-ghost:hover { background:#f5f7fa; }
+    .vc-btn-primary { background:#5c7c68; color:#fff; border-color:#5c7c68; }
+    .vc-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+
+    .vc-alert {
+        margin: 0 20px 12px;
+        padding:9px 12px; border-radius:9px;
+        font-size:12px; font-weight:500;
+        display:flex; align-items:center; gap:8px;
+    }
+    .vc-alert-err { background:#ffebec; color:#e93544; border:1px solid rgba(251,55,72,.25); }
+    .vc-alert-ok  { background:#e3f7ec; color:#1daf61; border:1px solid rgba(31,193,107,.25); }
+  </style>
+
+  <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="Agendar Videollamada" onclick="if(event.target===this) closeAdvisorVideoCall()">
+    <div class="vc-modal">
+      <div class="vc-header">
+        <div class="vc-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+        </div>
+        <div class="vc-header-text">
+          <div class="vc-header-title">Agendar Videollamada</div>
+          <div class="vc-header-sub" id="advisorModalSub">Con tu asesor de Makai Residences</div>
+        </div>
+        <button type="button" class="vc-close" onclick="closeAdvisorVideoCall()" aria-label="Cerrar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
-      <h3 style="margin:0 0 0.25rem 0;font-size:1.1rem;font-weight:700;color:rgb(98,84,65);">Agendar Videollamada</h3>
-      <p style="margin:0 0 1rem 0;font-size:0.75rem;color:rgb(98,84,65);opacity:0.75;">Te contactamos para confirmar el horario.</p>
-      <form onsubmit="return submitAdvisorVideoCall(event)">
+
+      <div id="advisorAlert" class="vc-alert" style="display:none;"></div>
+
+      <form id="advisorForm" class="vc-body" onsubmit="return submitAdvisorVideoCall(event)">
         <input type="hidden" name="unit_id" id="advisorModalUnitId" value="">
-        <input type="text" name="name" placeholder="Nombre completo" required style="width:100%;padding:0.55rem 0.75rem;border:1px solid rgb(218,211,200);border-radius:0.5rem;margin-bottom:0.5rem;font-size:0.85rem;color:rgb(37,32,24);outline:none;">
-        <input type="email" name="email" placeholder="Email" required style="width:100%;padding:0.55rem 0.75rem;border:1px solid rgb(218,211,200);border-radius:0.5rem;margin-bottom:0.5rem;font-size:0.85rem;color:rgb(37,32,24);outline:none;">
-        <input type="tel" name="phone" placeholder="Teléfono (con prefijo)" required style="width:100%;padding:0.55rem 0.75rem;border:1px solid rgb(218,211,200);border-radius:0.5rem;margin-bottom:0.5rem;font-size:0.85rem;color:rgb(37,32,24);outline:none;">
-        <input type="text" name="preferred_time" placeholder="Horario preferido (ej. mañana 10:00 GMT-5)" required style="width:100%;padding:0.55rem 0.75rem;border:1px solid rgb(218,211,200);border-radius:0.5rem;margin-bottom:0.75rem;font-size:0.85rem;color:rgb(37,32,24);outline:none;">
-        <button type="submit" style="width:100%;height:2.5rem;border-radius:0.5rem;background:rgb(102,123,106);color:white;border:none;font-size:0.8rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;">CONFIRMAR SOLICITUD</button>
+        <input type="hidden" name="preferred_time" id="advisorPreferredTime" value="">
+
+        <div class="vc-field">
+          <label class="vc-field-label" for="advisorUnitSelect">Propiedad de interés</label>
+          <select id="advisorUnitSelect" name="unit_label" class="vc-select" required>
+            <option value="" disabled selected>Selecciona una unidad</option>
+            @foreach($units as $unitOpt)
+              @php
+                $optId    = $unitOpt->custom_id ?? $unitOpt->id;
+                $optPrice = number_format((float)($unitOpt->price ?? 0), 0);
+              @endphp
+              <option value="{{ $optId }}" data-price="{{ $optPrice }}">Unit {{ $optId }} · ${{ $optPrice }} USD</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="vc-field">
+          <label class="vc-field-label" for="advisorDate">Fecha preferida</label>
+          <div class="vc-input-icon">
+            <i class="pi pi-calendar"></i>
+            <input type="date" id="advisorDate" name="preferred_date" class="vc-input" required>
+          </div>
+        </div>
+
+        <div class="vc-field">
+          <label class="vc-field-label">Horario disponible</label>
+          <div class="vc-slots" role="radiogroup" aria-label="Horario disponible">
+            @foreach(['9:00 AM','10:00 AM','11:00 AM','2:00 PM','3:00 PM','4:00 PM'] as $slot)
+              <button type="button" class="vc-slot" role="radio" aria-checked="false" onclick="selectAdvisorSlot(this)">{{ $slot }}</button>
+            @endforeach
+          </div>
+        </div>
+
+        <div class="vc-field">
+          <label class="vc-field-label" for="advisorNote">Nota para el asesor <span class="opt">(Opcional)</span></label>
+          <div class="vc-textarea-wrap">
+            <textarea id="advisorNote" name="note" class="vc-textarea" maxlength="200" placeholder="Referencia bancaria, número de comprobante" oninput="updateAdvisorNoteCount(this)"></textarea>
+            <span class="vc-textarea-count" id="advisorNoteCount">0/200</span>
+          </div>
+        </div>
       </form>
+
+      <div class="vc-footer">
+        <button type="button" class="vc-btn vc-btn-ghost" onclick="closeAdvisorVideoCall()">Cancelar</button>
+        <button type="submit" form="advisorForm" class="vc-btn vc-btn-primary">Confirmar solicitud</button>
+      </div>
     </div>
   </div>
 
@@ -1265,8 +1422,8 @@
               <div class="fg-card-head">
                 <div class="fg-card-title-row">
                   <span class="name">{{ $unitId }}</span>
-                  @if(!empty($unit->roi))
-                    <span class="roi">{{ $unit->roi }}% ROI</span>
+                  @if(!empty($unit->roi_percent) && (float) $unit->roi_percent > 0)
+                    <span class="roi">{{ rtrim(rtrim(number_format((float) $unit->roi_percent, 1, '.', ''), '0'), '.') }}% ROI</span>
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
@@ -1344,7 +1501,7 @@
                 @else
                   <div class="fg-card-buttons">
                     <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">More Info</button>
-                    <button class="fg-btn-cta" onclick="openReservePage('{{ $unitId }}')">
+                    <button class="fg-btn-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
@@ -1491,8 +1648,8 @@
                   @endif
                 </td>
                 <td>
-                  @if(!empty($unit->roi))
-                    <span class="roi">{{ $unit->roi }}%</span>
+                  @if(!empty($unit->roi_percent) && (float) $unit->roi_percent > 0)
+                    <span class="roi">{{ rtrim(rtrim(number_format((float) $unit->roi_percent, 1, '.', ''), '0'), '.') }}%</span>
                   @else
                     <span class="roi" style="color:#a3a3a3;">—</span>
                   @endif
@@ -1510,7 +1667,7 @@
                     @elseif($statusCls === 'reserved')
                       <button class="fg-list-cta" type="button" disabled style="opacity:.5;cursor:not-allowed;">Reserved</button>
                     @else
-                      <button class="fg-list-cta" type="button" onclick="openReservePage('{{ $unitId }}')">Book Video Call</button>
+                      <button class="fg-list-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">Book Video Call</button>
                     @endif
                   </div>
                 </td>
@@ -1796,13 +1953,6 @@
           toggleRow('modalRowFees',   'modalFees',  feesSum);
           toggleRow('modalRowRates',  'modalRates', unit.rates);
 
-          // Living view (no rental, plus total monthly cost)
-          toggleRow('modalRowLeviesL', 'modalLeviesL', unit.levies);
-          toggleRow('modalRowFeesL',   'modalFeesL',   feesSum);
-          toggleRow('modalRowRatesL',  'modalRatesL',  unit.rates);
-          const totalCost = Number(unit.levies || 0) + Number(unit.rates || 0) + Number(feesSum || 0);
-          toggleRow('modalRowTotalCost', 'modalTotalCost', totalCost);
-
           // Living extras
           const setTextRow = (rowId, valId, value) => {
               const row = document.getElementById(rowId);
@@ -1847,21 +1997,31 @@
                       'playground': 'Playground',
                       'bbq': 'BBQ Area',
                   };
-                  let html = '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+                  let html = '<div class="mt-amenities-grid">';
+                  let renderedAmenities = 0;
                   amenities.forEach(key => {
-                      if (amenityIcons[key]) {
-                          html += '<div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink-700);">' + amenityIcons[key] + '<span>' + amenityLabels[key] + '</span></div>';
-                      }
+                      const label = amenityLabels[key] || String(key).replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+                      const icon = amenityIcons[key] || '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+                      html += '<div class="mt-amenity-pill"><span class="mt-amenity-ico">' + icon + '</span><span>' + label + '</span></div>';
+                      renderedAmenities++;
                   });
                   html += '</div>';
-                  amenVal.innerHTML = html;
-                  amenRow.style.display = '';
+                  if (renderedAmenities > 0) {
+                      amenVal.innerHTML = html;
+                      amenRow.style.display = '';
+                  } else {
+                      amenRow.style.display = 'none';
+                  }
               } else {
                   amenRow.style.display = 'none';
               }
           }
-          setTextRow('modalRowWalk',   'modalWalkScore', unit.walk_score);
-          setTextRow('modalRowSchool', 'modalSchool',    unit.school_proximity);
+          // Show "Amenities & Lifestyle" label only when amenities exist
+          const lifestyleLabel = document.getElementById('modalLifestyleLabel');
+          if (lifestyleLabel) {
+              const anyVisible = document.getElementById('modalRowAmen')?.style.display !== 'none';
+              lifestyleLabel.style.display = anyVisible ? '' : 'none';
+          }
 
           // Investment longform + Living longform
           const showText = (id, text) => {
@@ -2803,29 +2963,87 @@
     }
 
     function openAdvisorVideoCall(unitId) {
+      const modal = document.getElementById('advisorModal');
       document.getElementById('advisorModalUnitId').value = unitId || '';
-      document.getElementById('advisorModal').style.display = 'flex';
+
+      // Pre-seleccionar la unidad en el dropdown si vino unitId
+      const sel = document.getElementById('advisorUnitSelect');
+      if (sel && unitId) {
+        const opt = Array.from(sel.options).find(o => o.value === String(unitId));
+        if (opt) sel.value = opt.value;
+      }
+
+      // Fecha default: mañana
+      const dateInput = document.getElementById('advisorDate');
+      if (dateInput && !dateInput.value) {
+        const t = new Date(); t.setDate(t.getDate() + 1);
+        dateInput.min = new Date().toISOString().slice(0, 10);
+        dateInput.value = t.toISOString().slice(0, 10);
+      }
+
+      // Reset slots y note
+      document.querySelectorAll('#advisorModal .vc-slot').forEach(s => {
+        s.classList.remove('active');
+        s.setAttribute('aria-checked', 'false');
+      });
+      document.getElementById('advisorPreferredTime').value = '';
+      const note = document.getElementById('advisorNote');
+      if (note) { note.value = ''; document.getElementById('advisorNoteCount').textContent = '0/200'; }
+      hideAdvisorAlert();
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
     function closeAdvisorVideoCall() {
-      document.getElementById('advisorModal').style.display = 'none';
+      document.getElementById('advisorModal').classList.remove('open');
+      document.body.style.overflow = '';
     }
+    function selectAdvisorSlot(btn) {
+      document.querySelectorAll('#advisorModal .vc-slot').forEach(s => {
+        s.classList.remove('active');
+        s.setAttribute('aria-checked', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-checked', 'true');
+      document.getElementById('advisorPreferredTime').value = btn.textContent.trim();
+    }
+    function updateAdvisorNoteCount(el) {
+      document.getElementById('advisorNoteCount').textContent = (el.value.length || 0) + '/200';
+    }
+    function showAdvisorAlert(msg, type) {
+      const el = document.getElementById('advisorAlert');
+      el.className = 'vc-alert ' + (type === 'err' ? 'vc-alert-err' : 'vc-alert-ok');
+      el.innerHTML = (type === 'err' ? '<i class="pi pi-exclamation-circle"></i> ' : '<i class="pi pi-check-circle"></i> ') + msg;
+      el.style.display = 'flex';
+    }
+    function hideAdvisorAlert(){ document.getElementById('advisorAlert').style.display = 'none'; }
+
+    // ESC cierra modal
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && document.getElementById('advisorModal')?.classList.contains('open')) {
+        closeAdvisorVideoCall();
+      }
+    });
+
     function submitAdvisorVideoCall(e) {
       e.preventDefault();
-      const form = e.target;
-      const data = {
-        unit_id: form.unit_id.value,
-        name: form.name.value,
-        email: form.email.value,
-        phone: form.phone.value,
-        preferred_time: form.preferred_time.value,
-      };
+      const unitLabel = document.getElementById('advisorUnitSelect').value;
+      const date      = document.getElementById('advisorDate').value;
+      const time      = document.getElementById('advisorPreferredTime').value;
+      const note      = document.getElementById('advisorNote').value;
+      const unitId    = document.getElementById('advisorModalUnitId').value || unitLabel;
+
+      if (!unitLabel) { showAdvisorAlert('Seleccioná una propiedad de interés.', 'err'); return false; }
+      if (!date)      { showAdvisorAlert('Indicá una fecha preferida.', 'err'); return false; }
+      if (!time)      { showAdvisorAlert('Elegí un horario disponible.', 'err'); return false; }
+
       const subject = encodeURIComponent('Solicitud de videollamada - Makai Residences');
       const body = encodeURIComponent(
-        'Nombre: ' + data.name + '\n' +
-        'Email: ' + data.email + '\n' +
-        'Teléfono: ' + data.phone + '\n' +
-        'Horario preferido: ' + data.preferred_time + '\n' +
-        'Unidad de interés: ' + (data.unit_id || 'No especificada')
+        'Unidad de interés: ' + unitLabel + '\n' +
+        'Fecha preferida: ' + date + '\n' +
+        'Horario: ' + time + '\n' +
+        (note ? ('Nota: ' + note + '\n') : '') +
+        'ID unidad: ' + (unitId || 'No especificada')
       );
       window.location.href = 'mailto:support+makai_residences@launchbase.co.za?subject=' + subject + '&body=' + body;
       closeAdvisorVideoCall();
@@ -3278,6 +3496,13 @@
         if (svg) svg.setAttribute('fill', !wasFav ? 'currentColor' : 'none');
         const label = btn.querySelector('.label');
         if (label) label.textContent = !wasFav ? 'Saved' : 'Add to list';
+        // Re-trigger heart pop animation on every toggle
+        const heartSpan = btn.querySelector('.heart');
+        if (heartSpan) {
+          heartSpan.style.animation = 'none';
+          void heartSpan.offsetHeight;
+          heartSpan.style.animation = '';
+        }
 
         fetch(`/api/wishlist/toggle/${unitId}`, {
           method: 'POST',
@@ -3290,6 +3515,12 @@
               btn.classList.toggle('is-fav', !!data.wishlisted);
               if (svg) svg.setAttribute('fill', data.wishlisted ? 'currentColor' : 'none');
               if (label) label.textContent = data.wishlisted ? 'Saved' : 'Add to list';
+              const heartSpan = btn.querySelector('.heart');
+              if (heartSpan) {
+                heartSpan.style.animation = 'none';
+                void heartSpan.offsetHeight;
+                heartSpan.style.animation = '';
+              }
               const cnt = document.querySelector(`[data-unit-count="${unitId}"]`);
               if (cnt && typeof data.unit_count !== 'undefined') cnt.textContent = data.unit_count;
               const headerCnt = document.querySelector('[data-saved-count]');
@@ -3300,6 +3531,12 @@
             btn.classList.toggle('is-fav', wasFav);
             if (svg) svg.setAttribute('fill', wasFav ? 'currentColor' : 'none');
             if (label) label.textContent = wasFav ? 'Saved' : 'Add to list';
+            const heartSpan = btn.querySelector('.heart');
+            if (heartSpan) {
+              heartSpan.style.animation = 'none';
+              void heartSpan.offsetHeight;
+              heartSpan.style.animation = '';
+            }
             if (err && err.status === 401) {
               window.location.href = '/login';
             }

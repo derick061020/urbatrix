@@ -9,6 +9,11 @@
             ? asset($kycDoc->file_path)
             : \Storage::disk('public')->url($kycDoc->file_path))
         : null;
+    $kycPreviewPayload = $kycDoc?->file_path ? [
+        'url' => route('documents.preview', $kycDoc->id),
+        'title' => 'Documento de identidad',
+        'filename' => $kycDoc->filename ?: basename((string) $kycDoc->file_path),
+    ] : null;
 
     $row = function ($label, $value) {
         $val = trim((string) ($value ?? ''));
@@ -46,6 +51,9 @@
             $row('País',            $meta['country']         ?? $reservation->country ?? null),
         ],
     ];
+
+    $coBuyers = $meta['co_buyers'] ?? $reservation->co_buyers ?? [];
+    if (!is_array($coBuyers)) $coBuyers = [];
 @endphp
 <dialog id="{{ $id }}" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <div class="w-[720px] max-w-[95vw] bg-white rounded-2xl overflow-hidden">
@@ -68,7 +76,7 @@
                 <div class="flex items-center gap-3 p-3 rounded-lg bg-ink-50 border border-ink-100">
                     <i class="pi pi-paperclip text-ink-500"></i>
                     <div class="flex-1 text-[12px] text-ink-700 truncate">Documento de identidad adjunto</div>
-                    <a href="{{ $kycDocUrl }}" target="_blank" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-external-link text-[10px]"></i> Abrir archivo</a>
+                    <button type="button" onclick="openDocumentPreview(@js($kycPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> Ver archivo</button>
                 </div>
             @else
                 <div class="text-[12px] text-ink-500">Sin archivo adjunto.</div>
@@ -87,6 +95,46 @@
                     </div>
                 </div>
             @endforeach
+
+            @if(count($coBuyers) > 0)
+                <div>
+                    <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-400 mb-2 flex items-center gap-2">
+                        Titulares adicionales
+                        <span class="px-2 py-0.5 rounded-full bg-info-soft text-info text-[10px] font-bold">{{ count($coBuyers) }}</span>
+                    </div>
+                    <div class="space-y-3">
+                        @foreach($coBuyers as $i => $cb)
+                            @php
+                                $cbName = trim(($cb['first_name'] ?? '').' '.($cb['last_name'] ?? '')) ?: 'Titular #'.($i+2);
+                            @endphp
+                            <div class="rounded-xl border border-ink-100 p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-[13px] font-bold text-ink-900">#{{ $i + 2 }} · {{ $cbName }}</div>
+                                    @if(!empty($cb['relationship']))
+                                        <span class="px-2 py-0.5 rounded-full bg-ink-100 text-ink-600 text-[10px] font-semibold uppercase tracking-wide">{{ $cb['relationship'] }}</span>
+                                    @endif
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach([
+                                        ['Documento', ($cb['id_type'] ?? '').' '.($cb['document_number'] ?? '')],
+                                        ['E-mail', $cb['email'] ?? null],
+                                        ['Teléfono', $cb['phone'] ?? null],
+                                        ['Nacimiento', $cb['birth_date'] ?? null],
+                                        ['Nacionalidad', $cb['nationality'] ?? null],
+                                        ['% Copropiedad', isset($cb['ownership_pct']) ? $cb['ownership_pct'].'%' : null],
+                                    ] as [$lbl, $val])
+                                        @php $val = trim((string)$val); @endphp
+                                        <div class="border border-ink-100 rounded-lg px-3 py-2 bg-ink-50/40">
+                                            <div class="text-[10px] uppercase text-ink-400 font-semibold tracking-wide">{{ $lbl }}</div>
+                                            <div class="text-[12px] text-ink-900 mt-0.5 break-words">{{ $val === '' ? '—' : $val }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">

@@ -7,8 +7,11 @@ use App\Models\Reservation;
 use App\Services\DocumentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
+use Symfony\Component\Process\Process;
 
 class DocumentController extends Controller
 {
@@ -17,11 +20,39 @@ class DocumentController extends Controller
      */
     public function download(Document $document)
     {
-        // Check if user has access to this document
+        $document = $this->prepareDocumentForAccess($document);
+        $absolute = $this->resolveAbsolutePath($document->file_path);
+        if (! $absolute) {
+            abort(404, 'Documento no encontrado');
+        }
+
+        return Response::download($absolute, $document->filename ?: basename($absolute));
+    }
+
+    /**
+     * Preview a document inline.
+     */
+    public function preview(Document $document)
+    {
+        $document = $this->prepareDocumentForAccess($document);
+        $absolute = $this->resolveAbsolutePath($document->file_path);
+        if (! $absolute) {
+            abort(404, 'Documento no encontrado');
+        }
+        $previewPath = $this->preparePreviewFile($absolute);
+
+        $previewFilename = pathinfo($document->filename ?: basename($previewPath), PATHINFO_FILENAME)
+            .'.'.pathinfo($previewPath, PATHINFO_EXTENSION);
+
+        return Response::file($previewPath, [
+            'Content-Disposition' => 'inline; filename="'.str_replace('"', '', $previewFilename).'"',
+        ]);
+    }
+
+    private function prepareDocumentForAccess(Document $document): Document
+    {
         $this->authorizeAccess($document);
 
-        // Block clients from downloading the payment plan PDF until they accept the budget.
-        // Admins can always download to review.
         if ($document->document_type === 'payment_plan' && Auth::user()?->role !== 'admin') {
             $reservation = $document->reservation;
             $accepted = $reservation && ($reservation->budget_status === 'approved'
@@ -31,84 +62,187 @@ class DocumentController extends Controller
             }
         }
 
-        // Resolve the absolute path. The file can live in:
-        //   - storage/app/public/...   (Storage disk "public")  → e.g. onboarding/{user}/id_front.jpg
-        //   - public/documents/...     (legacy upload path)     → e.g. documents/id_RES-XYZ_123.jpg
-        //   - public/...               (other absolute paths under web root)
-        $resolveAbsolutePath = function (?string $rel): ?string {
-            if (! $rel || $rel === 'pending') return null;
-            $candidates = [
-                storage_path('app/public/' . ltrim($rel, '/')),
-                public_path(ltrim($rel, '/')),
-            ];
-            foreach ($candidates as $c) {
-                if (is_file($c)) return $c;
-            }
-            return null;
-        };
-
-        // For auto-generated docs (payment_plan / purchase_promise / contract), always
-        // regenerate from the current reservation data so the file reflects the latest plan.
-        // We skip regeneration once a doc is signed — the signed copy is the authoritative file.
         $regenerableTypes = ['payment_plan', 'purchase_promise', 'contract'];
-        if (in_array($document->document_type, $regenerableTypes) && ! $document->isSigned() && ! $document->isApproved()) {
-            $reservation = $document->reservation;
-            if ($reservation) {
-                // Template paths used by AdminController. The fallback DocumentBuilder is
-                // ONLY used when the user's .docx template is missing — we never overwrite
-                // a template-based file with a programmatic one (keeps the user's branding).
-                $templates = [
-                    'payment_plan'     => storage_path('app/templates/plan_de_pagos.docx'),
-                    'purchase_promise' => [
-                        storage_path('app/templates/promesa_compraventa.docx'),
-                        storage_path('app/templates/promesa_compravente.docx'),
-                    ],
-                    'contract'         => storage_path('app/templates/contract_template.docx'),
-                ];
-                $templateExists = (function () use ($templates, $document) {
-                    $paths = (array) ($templates[$document->document_type] ?? []);
-                    foreach ($paths as $p) if (is_file($p)) return true;
-                    return false;
-                })();
+        if (! in_array($document->document_type, $regenerableTypes) || $document->isSigned() || $document->isApproved()) {
+            return $document;
+        }
 
-                // 1st attempt: template-based generation (preserves the user's design)
-                try {
-                    $adminController = new \App\Http\Controllers\AdminController();
-                    if ($document->document_type === 'payment_plan') {
-                        $adminController->generatePaymentPlan($reservation);
-                    } elseif ($document->document_type === 'purchase_promise') {
-                        $adminController->generatePurchasePromise($reservation);
-                    } elseif ($document->document_type === 'contract') {
-                        $adminController->generateContract($reservation);
-                    }
-                    $document->refresh();
-                } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::warning('Template-based generation failed: '.$e->getMessage());
-                }
+        $reservation = $document->reservation;
+        if (! $reservation) {
+            return $document;
+        }
 
-                // Fallback: ONLY when the template is missing AND no file was produced.
-                // We never overwrite a template-based file — that would lose the user's design.
-                if (! $templateExists && ! $resolveAbsolutePath($document->file_path)) {
-                    try {
-                        if ($document->document_type === 'payment_plan') {
-                            \App\Services\DocumentBuilder::buildPaymentPlan($reservation);
-                        } elseif ($document->document_type === 'purchase_promise') {
-                            \App\Services\DocumentBuilder::buildPurchasePromise($reservation);
-                        }
-                        $document->refresh();
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::error('Fallback DocumentBuilder failed: '.$e->getMessage());
-                    }
+        $templates = [
+            'payment_plan'     => storage_path('app/templates/plan_de_pagos.docx'),
+            'purchase_promise' => [
+                storage_path('app/templates/promesa_compraventa.docx'),
+                storage_path('app/templates/promesa_compravente.docx'),
+            ],
+            'contract'         => storage_path('app/templates/contract_template.docx'),
+        ];
+        $templateExists = (function () use ($templates, $document) {
+            $paths = (array) ($templates[$document->document_type] ?? []);
+            foreach ($paths as $path) {
+                if (is_file($path)) return true;
+            }
+            return false;
+        })();
+
+        try {
+            $adminController = new \App\Http\Controllers\AdminController();
+            if ($document->document_type === 'payment_plan') {
+                $adminController->generatePaymentPlan($reservation);
+            } elseif ($document->document_type === 'purchase_promise') {
+                $adminController->generatePurchasePromise($reservation);
+            } elseif ($document->document_type === 'contract') {
+                $adminController->generateContract($reservation);
+            }
+            $document->refresh();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Template-based generation failed: '.$e->getMessage());
+        }
+
+        if (! $templateExists && ! $this->resolveAbsolutePath($document->file_path)) {
+            try {
+                if ($document->document_type === 'payment_plan') {
+                    \App\Services\DocumentBuilder::buildPaymentPlan($reservation);
+                } elseif ($document->document_type === 'purchase_promise') {
+                    \App\Services\DocumentBuilder::buildPurchasePromise($reservation);
                 }
+                $document->refresh();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Fallback DocumentBuilder failed: '.$e->getMessage());
             }
         }
 
-        $absolute = $resolveAbsolutePath($document->file_path);
-        if (! $absolute) {
-            abort(404, 'Documento no encontrado');
+        return $document;
+    }
+
+    private function resolveAbsolutePath(?string $relativePath): ?string
+    {
+        if (! $relativePath || $relativePath === 'pending') {
+            return null;
         }
 
-        return Response::download($absolute, $document->filename ?: basename($absolute));
+        $candidates = [
+            storage_path('app/public/' . ltrim($relativePath, '/')),
+            public_path(ltrim($relativePath, '/')),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function preparePreviewFile(string $absolutePath): string
+    {
+        $extension = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+        if (! in_array($extension, ['doc', 'docx'])) {
+            return $absolutePath;
+        }
+
+        $previewDir = storage_path('app/document_previews');
+        $profileDir = storage_path('app/libreoffice_profile');
+        if (! is_dir($previewDir)) {
+            mkdir($previewDir, 0755, true);
+        }
+        if (! is_dir($profileDir)) {
+            mkdir($profileDir, 0755, true);
+        }
+
+        $previewPath = $previewDir.'/'.md5($absolutePath.'|'.filemtime($absolutePath)).'.pdf';
+        if (is_file($previewPath)) {
+            return $previewPath;
+        }
+
+        $convertedPath = $this->convertWordWithLibreOffice($absolutePath, $previewDir, $profileDir)
+            ?: $this->convertWordWithPhpWord($absolutePath, $previewPath);
+
+        if (! $convertedPath || ! is_file($convertedPath)) {
+            abort(500, 'No se pudo convertir el documento Word a PDF para previsualizarlo.');
+        }
+
+        if ($convertedPath !== $previewPath) {
+            rename($convertedPath, $previewPath);
+        }
+
+        return $previewPath;
+    }
+
+    private function convertWordWithLibreOffice(string $absolutePath, string $previewDir, string $profileDir): ?string
+    {
+        $binary = $this->findLibreOfficeBinary();
+        if ($binary === '') {
+            return null;
+        }
+
+        $process = new Process([
+            $binary,
+            '--headless',
+            '--nologo',
+            '--nofirststartwizard',
+            '-env:UserInstallation=file://'.$profileDir,
+            '--convert-to',
+            'pdf',
+            '--outdir',
+            $previewDir,
+            $absolutePath,
+        ], null, [
+            'DISPLAY' => false,
+        ]);
+        $process->setTimeout(60);
+        $process->run();
+
+        $convertedPath = $previewDir.'/'.pathinfo($absolutePath, PATHINFO_FILENAME).'.pdf';
+        if (! $process->isSuccessful() || ! is_file($convertedPath)) {
+            return null;
+        }
+
+        return $convertedPath;
+    }
+
+    private function convertWordWithPhpWord(string $absolutePath, string $previewPath): ?string
+    {
+        try {
+            Settings::setPdfRendererName(Settings::PDF_RENDERER_DOMPDF);
+            Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
+
+            $phpWord = IOFactory::load($absolutePath);
+            IOFactory::createWriter($phpWord, 'PDF')->save($previewPath);
+
+            return is_file($previewPath) ? $previewPath : null;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('PHPWord PDF preview conversion failed: '.$e->getMessage());
+            return null;
+        }
+    }
+
+    private function findLibreOfficeBinary(): string
+    {
+        $paths = array_filter(explode(PATH_SEPARATOR, getenv('PATH') ?: ''));
+        $candidates = [
+            '/usr/bin/soffice',
+            '/usr/local/bin/soffice',
+            '/usr/bin/libreoffice',
+            '/usr/local/bin/libreoffice',
+        ];
+
+        foreach ($paths as $path) {
+            $candidates[] = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'soffice';
+            $candidates[] = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'libreoffice';
+        }
+
+        foreach (array_unique($candidates) as $candidate) {
+            if (is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
     }
     
     /**

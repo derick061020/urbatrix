@@ -1827,6 +1827,7 @@ class AdminController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Perfil actualizado correctamente.');
+        $flash = $request->boolean('redirect_settings') ? 'settings_success' : 'success';
+        return back()->with($flash, 'Perfil actualizado correctamente.');
     }
 }

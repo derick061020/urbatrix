@@ -489,6 +489,7 @@
     .fg-hero {
       position: relative;
       width: 100%;
+      max-height : 84%;
       aspect-ratio: 1366 / 620;
       overflow: hidden;
       background: #cfe7f5; /* fallback sky tone in case image not yet loaded */
@@ -597,8 +598,12 @@
       z-index: 5;
     }
     .fg-hero-spacer {
-      height: 80px;
+      height: 4%;
+      margin-top:-10px;
       background: linear-gradient(180deg, #ffffff 0%, #f2f5f8 100%);
+    }
+    #main-unit-reserve-list{
+      margin-top: -10px;
     }
 
     @keyframes hero-text-enter {
@@ -836,6 +841,7 @@
       display: flex;
       justify-content: center;
       padding: 28px 24px 16px;
+      padding-top: 0px;
       background: #f2f5f8;
     }
     
@@ -1096,6 +1102,51 @@
       font-size: 10px;
       line-height: 1;
       color: #a3a3a3;
+    }
+
+    /* When favorited: hide text, show only heart icon with animation */
+    .fg-add-to-list.is-fav .text {
+      display: none;
+    }
+    .fg-add-to-list.is-fav {
+      padding: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+      background: #e74c3c;
+      border-color: #e74c3c;
+    }
+    .fg-add-to-list.is-fav .heart {
+      width: 14px;
+      height: 14px;
+    }
+    .fg-add-to-list.is-fav .heart svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Heart pop animation when toggled */
+    @keyframes heart-pop {
+      0%   { transform: scale(1); }
+      25%  { transform: scale(1.35); }
+      50%  { transform: scale(0.9); }
+      75%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .fg-add-to-list.is-fav .heart svg {
+      animation: heart-pop 0.4s ease;
+    }
+    .fg-add-to-list .heart svg {
+      transition: color 0.2s ease;
+    }
+    .fg-add-to-list.is-fav .heart svg {
+      color: #fff;
+    }
+    .fg-add-to-list.is-fav {
+      background: #e74c3c;
+      border-color: #e74c3c;
     }
     /* Status badge (HIGH DEMAND / PENDING / 2ND CHANCE) — top-left of image */
     .fg-status-badge {
@@ -2575,36 +2626,59 @@
     .mt-shell:not(.living-mode) .mt-living-only { display: none; }
     .mt-shell.living-mode .mt-investment-only { display: none; }
 
-    /* Living extras (amenities, walk score, school) */
+    /* Living extras (amenities) */
     .mt-living-extras {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: block;
       margin-top: 8px;
     }
     .mt-living-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      background: #f2f5f8;
-      border: 1px solid #eaecf0;
-      border-radius: 10px;
       font-size: 12px;
       color: #2b303b;
     }
-    .mt-living-row .ico {
+    .mt-amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 10px;
+    }
+    .mt-amenity-pill {
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      gap: 10px;
+      padding: 9px 12px;
+      background: #f2f5f8;
+      border: 1px solid #d9dde5;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #525866;
+      line-height: 1.25;
+    }
+    .mt-amenity-ico {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 22px; height: 22px;
-      border-radius: 6px;
-      background: #5c7c68;
-      color: #ffffff;
+      width: 20px;
+      height: 20px;
+      color: #5c7c68;
       flex-shrink: 0;
     }
-    .mt-living-row .txt b { font-weight: 700; }
-    .mt-living-row .txt .muted { color: #717784; font-weight: 500; }
+    .mt-amenity-ico svg {
+      width: 16px;
+      height: 16px;
+    }
+    @media (max-width: 520px) {
+      .mt-amenities-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Total Monthly Cost — Living-mode highlight (mirrors Net Return on Investment side) */
+    .mt-fin-table .cell.cell-total {
+      background: #fff8ec;
+      border-color: #f6dca5;
+    }
+    .mt-fin-table .cell.cell-total .k { color: #b67a06; font-weight: 600; }
+    .mt-fin-table .cell.cell-total .v.warning { color: #e16614; }
+    .mt-fin-table .cell.cell-total .v.warning b { font-weight: 800; }
 
     /* Longform description (used both for investment and living modes) */
     .mt-section-text {
@@ -2617,6 +2691,25 @@
       line-height: 1.55;
       color: #2b303b;
       white-space: pre-line;
+    }
+    .mt-living-note {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 18px;
+      background: #fff8ec;
+      border-color: #f6dca5;
+      color: #e16614;
+      font-weight: 600;
+    }
+    .mt-living-note::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
     }
     .mt-section-label {
       margin: 0 0 8px 0;

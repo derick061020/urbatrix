@@ -19,6 +19,11 @@
     elseif ($awaitingClient){ $stateLabel = ['Esperando respuesta del cliente', 'info']; }
     elseif (! empty($obs))  { $stateLabel = ['Cliente envió observación', 'warn']; }
     else                    { $stateLabel = ['En revisión por el cliente', 'info']; }
+    $previewPayload = [
+        'url' => route('documents.preview', $d->id),
+        'title' => $title,
+        'filename' => $d->filename ?: basename((string) $d->file_path),
+    ];
 @endphp
 
 <div class="crm-card overflow-hidden">
@@ -27,7 +32,8 @@
         <div class="text-[13px] font-bold text-ink-700">{{ $title }}</div>
         <span class="crm-pill bg-{{ $stateLabel[1] }}-soft text-{{ $stateLabel[1] }} ml-2">{{ $stateLabel[0] }}</span>
         @if($d->file_path)
-            <a href="{{ route('documents.download', $d->id) }}" class="ml-auto crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> Descargar</a>
+            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="ml-auto crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> Ver</button>
+            <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> Descargar</a>
         @endif
     </div>
 

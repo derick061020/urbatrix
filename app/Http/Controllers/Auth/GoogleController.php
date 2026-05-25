@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
@@ -26,7 +27,10 @@ class GoogleController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            
+
+            // Download and store avatar locally
+            $avatarPath = $this->downloadAvatar($googleUser->getAvatar(), $googleUser->getId());
+
             // Find or create user
             $user = User::where('google_id', $googleUser->getId())
                 ->orWhere('email', $googleUser->getEmail())
@@ -36,7 +40,7 @@ class GoogleController extends Controller
                 // If user exists but doesn't have google_id, update it
                 if (!$user->google_id) {
                     $user->google_id = $googleUser->getId();
-                    $user->avatar = $googleUser->getAvatar();
+                    $user->avatar = $avatarPath;
                     $user->save();
                 }
             } else {
@@ -45,7 +49,7 @@ class GoogleController extends Controller
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
-                    'avatar' => $googleUser->getAvatar(),
+                    'avatar' => $avatarPath,
                     'password' => bcrypt(Str::random(32)), // Random password
                     'email_verified_at' => now(),
                     'role' => 'user',
@@ -65,6 +69,23 @@ class GoogleController extends Controller
             // Log the error for debugging
             Log::error('Google OAuth Error: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Error al autenticar con Google. Por favor intenta nuevamente.');
+        }
+    }
+
+    /**
+     * Download avatar from Google and store locally
+     */
+    private function downloadAvatar($avatarUrl, $googleId)
+    {
+        try {
+            $contents = file_get_contents($avatarUrl);
+            $fileName = 'avatar_' . $googleId . '_' . time() . '.jpg';
+            $path = 'avatars/' . $fileName;
+            Storage::disk('public')->put($path, $contents);
+            return $path;
+        } catch (\Exception $e) {
+            Log::error('Failed to download avatar: ' . $e->getMessage());
+            return null;
         }
     }
 }

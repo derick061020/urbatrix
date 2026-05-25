@@ -49,6 +49,7 @@ class Reservation extends Model
         'spouse_name',
         'spouse_nationality',
         'spouse_document',
+        'co_buyers',
         'id_type',
         'document_number',
         'unit_id',
@@ -70,6 +71,7 @@ class Reservation extends Model
         'expedition_date' => 'date',
         'birth_date' => 'date',
         'age' => 'integer',
+        'co_buyers' => 'array',
     ];
 
     public function isBudgetSent(): bool

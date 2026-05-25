@@ -34,7 +34,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+            $user = Auth::user();
+            $redirectPath = $user->role === 'admin' ? '/admin/crm/dashboard' : '/dashboard';
+            return redirect()->intended($redirectPath);
         }
 
         return back()->withErrors([

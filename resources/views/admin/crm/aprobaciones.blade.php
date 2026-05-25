@@ -130,7 +130,14 @@
                     <span class="text-[10px] text-ink-400 w-20 text-right">{{ $p->created_at?->diffForHumans() }}</span>
                     <div class="flex items-center gap-1">
                         @if($p->receipt_path)
-                            <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Ver comprobante"><i class="pi pi-eye text-[10px]"></i> Ver</a>
+                            @php
+                                $receiptPreviewPayload = [
+                                    'url' => asset('storage/'.$p->receipt_path),
+                                    'title' => 'Comprobante de pago',
+                                    'filename' => basename((string) $p->receipt_path),
+                                ];
+                            @endphp
+                            <button type="button" onclick="openDocumentPreview(@js($receiptPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Ver comprobante"><i class="pi pi-eye text-[10px]"></i> Ver</button>
                         @endif
                         @if($r)
                             <a href="{{ route('admin.crm.pagos', $r->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Ver expediente"><i class="pi pi-folder text-[10px]"></i> Expediente</a>
@@ -235,4 +242,5 @@
         ])
     @endif
 @endforeach
+@include('admin.crm._partials.document_preview_modal')
 @endsection

@@ -157,6 +157,33 @@ class ReservationController extends Controller
     }
 
     /**
+     * Parse JSON co_buyers payload into a sanitized array of buyer rows.
+     */
+    private function parseCoBuyers($raw)
+    {
+        if (empty($raw)) return null;
+        $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+        if (!is_array($decoded) || empty($decoded)) return null;
+
+        $allowed = ['first_name','last_name','email','phone','id_type','document_number','birth_date','nationality','relationship','ownership_pct'];
+        $clean = [];
+        foreach ($decoded as $row) {
+            if (!is_array($row)) continue;
+            $r = [];
+            foreach ($allowed as $k) {
+                $v = $row[$k] ?? null;
+                if (is_string($v)) $v = trim($v);
+                if ($v !== '' && $v !== null) $r[$k] = $v;
+            }
+            // Require at least name + document
+            if (!empty($r['first_name']) && !empty($r['document_number'])) {
+                $clean[] = $r;
+            }
+        }
+        return empty($clean) ? null : $clean;
+    }
+
+    /**
      * Update reservation with additional form data
      */
     public function update(Request $request)
@@ -182,6 +209,7 @@ class ReservationController extends Controller
             'spouse_name' => 'nullable|string|max:255',
             'spouse_nationality' => 'nullable|string|max:255',
             'spouse_document' => 'nullable|string|max:255',
+            'co_buyers' => 'nullable|string',
             'id_type' => 'nullable|string|max:255',
             'document_number' => 'nullable|string|max:255',
             // Address fields
@@ -252,6 +280,7 @@ class ReservationController extends Controller
                 'spouse_name' => $validated['spouse_name'] ?? null,
                 'spouse_nationality' => $validated['spouse_nationality'] ?? null,
                 'spouse_document' => $validated['spouse_document'] ?? null,
+                'co_buyers' => $this->parseCoBuyers($validated['co_buyers'] ?? null),
                 'id_type' => $validated['id_type'] ?? null,
                 'document_number' => $validated['document_number'] ?? null,
                 // Address fields
@@ -309,6 +338,7 @@ class ReservationController extends Controller
                         'apartment_number'  => $reservation->apartment_number,
                         'postal_code'       => $reservation->postal_code,
                         'country'           => $reservation->country,
+                        'co_buyers'         => $reservation->co_buyers ?? [],
                     ];
                     \App\Models\Document::updateOrCreate(
                         ['reservation_id' => $reservation->id, 'document_type' => 'kyc'],

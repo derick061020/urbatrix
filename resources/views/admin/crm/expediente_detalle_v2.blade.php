@@ -173,7 +173,14 @@
                                 $allDocs = $reservation->documents->merge($kycDocs)->unique('id')->sortByDesc('created_at');
                             @endphp
                             @forelse($allDocs as $d)
-                                @php $st = $statusLabel[$d->status] ?? ['—','ink-500']; @endphp
+                                @php
+                                    $st = $statusLabel[$d->status] ?? ['—','ink-500'];
+                                    $previewPayload = [
+                                        'url' => route('documents.preview', $d->id),
+                                        'title' => $d->title ?: 'Documento',
+                                        'filename' => $d->filename ?: basename((string) $d->file_path),
+                                    ];
+                                @endphp
                                 <tr>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-3">
@@ -189,7 +196,7 @@
                                     <td class="text-[12px] text-ink-700">{{ optional($d->updated_at)->format('Y-m-d') }}</td>
                                     <td class="text-[12px] text-ink-500">
                                         @if($d->file_path)
-                                            <a href="{{ \Storage::disk('public')->url($d->file_path) }}" target="_blank" class="text-brand hover:underline">{{ $d->filename }}</a>
+                                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-brand hover:underline text-left">{{ $d->filename }}</button>
                                         @else
                                             {{ $d->filename }}
                                         @endif
@@ -210,6 +217,9 @@
                                             <form method="POST" action="{{ route('documents.reject', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Rechazar</button></form>
                                         @endif
                                         @if($d->document_type !== 'kyc')
+                                            @if($d->file_path)
+                                                <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> Ver</button>
+                                            @endif
                                             <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> Descargar</a>
                                         @endif
                                     </td>
@@ -392,6 +402,7 @@
 
 @include('admin.crm._partials.modal_subir_documento', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
+@include('admin.crm._partials.document_preview_modal')
 
 {{-- KYC view modal(s) — one per kyc Document in the expediente --}}
 @foreach($reservation->documents->where('document_type', 'kyc') as $kycDoc)

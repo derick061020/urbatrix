@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/contract/{document}/accept', [DashboardController::class, 'acceptContract'])->name('dashboard.contract.accept');
     
     // Document management routes
+    Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->name('documents.preview');
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/sign', [DocumentController::class, 'sign'])->name('documents.sign');
     Route::post('/documents/{document}/signnow/sync', [DocumentController::class, 'signnowSync'])->name('documents.signnow.sync');
@@ -221,6 +222,5 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Payment approval routes
     Route::post('/payments/{payment}/approve', [AdminController::class, 'approvePayment'])->name('admin.payments.approve');
 });
-
 
 
