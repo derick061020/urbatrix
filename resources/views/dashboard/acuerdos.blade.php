@@ -43,7 +43,12 @@
     }
 
     foreach ($contractDocs as $d) {
-        if (in_array($d->status, ['signed','approved','completed'])) {
+        // Skip signed documents - they should not appear in acuerdos
+        if ($d->status === 'signed') {
+            continue;
+        }
+        
+        if (in_array($d->status, ['approved','completed'])) {
             $completed->push($d);
         } elseif (in_array($d->status, ['pending','generated','awaiting_signature','in_review'])) {
             $pending->push($d);

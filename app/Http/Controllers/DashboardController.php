@@ -457,8 +457,10 @@ class DashboardController extends Controller
         }
 
         $docs = $reservation->documents()->orderByDesc('created_at')->get();
+        // Exclude signed documents from both pending and completed - they should not appear in acuerdos
+        $docs = $docs->filter(fn($d) => $d->status !== 'signed');
         $pending   = $docs->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']));
-        $completed = $docs->filter(fn($d) => in_array($d->status, ['signed', 'approved', 'completed']));
+        $completed = $docs->filter(fn($d) => in_array($d->status, ['approved', 'completed']));
 
         return view('dashboard.acuerdos', [
             'reservation' => $reservation,
