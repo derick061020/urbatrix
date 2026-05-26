@@ -317,9 +317,11 @@
 
         {{-- Header --}}
         <header class="relative z-10 flex items-center justify-between px-7 py-6 lg:px-11">
-            @include('auth._logo')
+            <div class="relative">
+                @include('auth._logo')
+            </div>
 
-            <div id="step-indicator" class="hidden lg:flex items-center gap-5">
+            <div id="step-indicator" class="hidden lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:flex items-center gap-5">
                 @php
                     $steps = [
                         ['Confirmación', 1],
@@ -352,8 +354,8 @@
         {{-- "Volver" button (only steps 1-5) --}}
         <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> Volver</button>
 
-        <main class="flex-1 flex items-start justify-center px-5 pt-7 pb-10 relative z-10">
-            <div class="w-full max-w-[452px]">
+        <main class="flex-1 pt-7 pb-10 relative z-10">
+            <div class="w-full max-w-[452px] mx-auto px-5">
 
                 {{-- ========= STEP 0 — Crea tu cuenta ========= --}}
                 <div class="reg-step active" data-step="0">
@@ -367,6 +369,27 @@
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
                     <div id="step0-error" class="hidden mb-4 px-3 py-2 rounded-lg bg-err-soft border border-err/30 text-[12px] text-err"></div>
+
+                    {{-- Social buttons — icon only --}}
+                    <div class="flex gap-3 mb-5">
+                        <a href="#" class="auth-btn-social" title="Registrarse con Apple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                        </a>
+                        <a href="{{ route('auth.google') }}" class="auth-btn-social" title="Registrarse con Google">
+                            <svg width="20" height="20" viewBox="0 0 24 24">
+                                <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 16.42 6.5l3.27-3.27A11.97 11.97 0 0 0 1.31 7.41z"/>
+                                <path fill="#34A853" d="M16.04 18.01A7.36 7.36 0 0 1 12 19.1a7.08 7.08 0 0 1-6.72-4.82L1.29 17.41A12 12 0 0 0 12 24c2.93 0 5.73-1.04 7.83-3z"/>
+                                <path fill="#4A90E2" d="M19.83 21c2.2-2.05 3.62-5.1 3.62-9 0-.72-.11-1.49-.27-2.18H12v4.43h6.43c-.32 1.6-1.2 2.83-2.39 3.64z"/>
+                                <path fill="#FBBC05" d="M5.28 14.27a7.12 7.12 0 0 1 0-4.51L1.31 6.59a12.01 12.01 0 0 0 0 10.82z"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="h-px flex-1 bg-ink-200"></span>
+                        <span class="text-[11px] uppercase tracking-[0.16em] text-ink-400 font-medium">O</span>
+                        <span class="h-px flex-1 bg-ink-200"></span>
+                    </div>
 
                     <form id="form-step0" class="space-y-4" onsubmit="return submitStep0(event)">
                         <div>
