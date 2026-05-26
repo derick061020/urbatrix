@@ -980,6 +980,11 @@
                 </div>
               </a>
 
+              <!-- Divider -->
+              <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
+                <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
+              </div>
+
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
                 <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
