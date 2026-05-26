@@ -42,31 +42,41 @@
 
     {{-- Toolbar --}}
     <div class="flex items-center gap-3 flex-wrap">
-        <button class="cli-btn cli-btn-ghost text-[12px]">Hoy</button>
+        <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-today">Hoy</button>
         <div class="relative">
-            <select class="cli-input pl-3 pr-9 text-[12px] !h-9 w-auto">
-                <option>Últimos 7 días</option>
-                <option>Próximos 7 días</option>
-                <option>Este mes</option>
+            <select class="cli-input pl-3 pr-9 text-[12px] !h-9 w-auto" id="select-range">
+                <option value="week">Vista semanal</option>
+                <option value="last7">Últimos 7 días</option>
+                <option value="next7">Próximos 7 días</option>
+                <option value="month">Este mes</option>
             </select>
         </div>
         <div class="cli-btn cli-btn-ghost text-[12px] inline-flex items-center gap-2">
             <i class="pi pi-calendar text-[11px]"></i>
-            {{ $start->locale('es')->isoFormat('D MMM') }} - {{ $end->locale('es')->isoFormat('D MMM YYYY') }}
+            <span id="date-range-label">{{ $start->locale('es')->isoFormat('D MMM') }} - {{ $end->locale('es')->isoFormat('D MMM YYYY') }}</span>
         </div>
 
         <div class="ml-auto flex items-center gap-3">
             <div class="relative w-64">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400 text-[12px]"></i>
-                <input class="cli-input pr-3" placeholder="Buscar…">
+                <input class="cli-input pr-3" id="search-events" placeholder="Buscar eventos…">
             </div>
-            <button class="cli-btn cli-btn-ghost text-[12px]"><i class="pi pi-sliders-h text-[11px]"></i> Filtrar</button>
+            <div class="relative">
+                <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-filter"><i class="pi pi-sliders-h text-[11px]"></i> Filtrar</button>
+                <div id="filter-dropdown" class="absolute right-0 top-full mt-1 z-20 hidden" style="min-width:200px;">
+                    <div class="cli-card p-3 space-y-2">
+                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-1">Tipo de evento</div>
+                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="task" checked> <span>Tareas</span></label>
+                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="payment" checked> <span>Pagos</span></label>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Top cards (upcoming) --}}
     @if($topCards->count())
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="top-cards-grid">
             @foreach($topCards as $e)
                 @php
                     [$bg, $fg] = $typeColors[$e->type] ?? ['#f2f5f8', '#525866'];
@@ -77,7 +87,7 @@
                         default                 => '#fa7319',
                     };
                 @endphp
-                <div class="cli-card overflow-hidden">
+                <div class="cli-card overflow-hidden top-card" data-type="{{ $e->type }}">
                     <div class="px-4 pt-3 pb-2 flex items-start gap-2">
                         <div class="flex-1 min-w-0">
                             <div class="text-[13px] font-bold text-ink-950 truncate">{{ $e->title }}</div>
@@ -146,9 +156,10 @@
                             $heightRem = max(2.5, ($hEnd - $hStart) * 6);
                             [$bg, $fg] = $typeColors[$e->type] ?? ['#f2f5f8', '#525866'];
                         @endphp
-                        <div class="absolute left-1 right-1 rounded-lg px-2 py-1.5 text-[11px] overflow-hidden shadow-xs cursor-pointer hover:shadow-card transition-shadow"
+                        <div class="absolute left-1 right-1 rounded-lg px-2 py-1.5 text-[11px] overflow-hidden shadow-xs cursor-pointer hover:shadow-card transition-shadow cal-event"
                              style="top:{{ $topRem }}rem; height:{{ $heightRem }}rem; background:{{ $bg }}; color:{{ $fg }};"
-                             title="{{ $e->title }}">
+                             title="{{ $e->title }}"
+                             data-type="{{ $e->type }}">
                             <div class="font-semibold truncate">{{ $e->title }}</div>
                             <div class="text-[10px] opacity-80">{{ $e->start->format('H:i') }} - {{ $e->end->format('H:i') }}</div>
                         </div>
@@ -159,7 +170,7 @@
     </div>
 
     @if($events->isEmpty())
-        <div class="cli-card p-10 text-center">
+        <div class="cli-card p-10 text-center" id="empty-state">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-calendar text-[22px]"></i></div>
             <div class="mt-3 text-[15px] font-bold text-ink-950">Tu calendario está vacío</div>
             <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">Cuando tu asesor agende una videollamada o cuando se cargue una nueva cuota, vas a verla acá.</p>
@@ -172,6 +183,119 @@
 .bg-stripes {
     background-image: repeating-linear-gradient(45deg, rgba(202,207,216,.15) 0 8px, transparent 8px 16px);
 }
+#filter-dropdown {
+    box-shadow: 0 4px 16px -4px rgba(10,13,20,.12), 0 1px 3px rgba(10,13,20,.06);
+}
+.cal-event.hidden,
+.top-card.hidden {
+    display: none !important;
+}
 </style>
+@endpush
+
+@push('scripts')
+<script>
+(function() {
+    var filterDropdown = document.getElementById('filter-dropdown');
+    var btnFilter = document.getElementById('btn-filter');
+    var filterInputs = document.querySelectorAll('.filter-type');
+    var searchInput = document.getElementById('search-events');
+    var btnToday = document.getElementById('btn-today');
+    var selectRange = document.getElementById('select-range');
+
+    // ── Filter dropdown toggle ──
+    if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', function(e) {
+            e.stopPropagation();
+            filterDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function() {
+            filterDropdown.classList.add('hidden');
+        });
+        filterDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    // ── Apply all filters (type + search) ──
+    function applyFilters() {
+        var checked = Array.from(filterInputs).filter(function(cb) { return cb.checked; }).map(function(cb) { return cb.value; });
+        var q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+        // Filter grid events (.cal-event)
+        document.querySelectorAll('.cal-event').forEach(function(el) {
+            var type = el.getAttribute('data-type') || '';
+            var title = (el.querySelector('.font-semibold')?.textContent || '').toLowerCase();
+            var typeMatch = checked.includes(type);
+            var searchMatch = !q || title.includes(q);
+            el.classList.toggle('hidden', !(typeMatch && searchMatch));
+        });
+
+        // Filter top cards (.top-card)
+        document.querySelectorAll('.top-card').forEach(function(el) {
+            var type = el.getAttribute('data-type') || '';
+            var title = (el.querySelector('.font-bold')?.textContent || '').toLowerCase();
+            var typeMatch = checked.includes(type);
+            var searchMatch = !q || title.includes(q);
+            el.classList.toggle('hidden', !(typeMatch && searchMatch));
+        });
+
+        // Toggle empty state
+        var visibleEvents = document.querySelectorAll('.cal-event:not(.hidden)').length;
+        var visibleCards = document.querySelectorAll('.top-card:not(.hidden)').length;
+        var emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.style.display = (visibleEvents === 0 && visibleCards === 0) ? '' : 'none';
+        }
+    }
+
+    // ── Type checkboxes ──
+    filterInputs.forEach(function(cb) {
+        cb.addEventListener('change', applyFilters);
+    });
+
+    // ── Search input ──
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+
+    // ── "Hoy" button ──
+    if (btnToday) {
+        btnToday.addEventListener('click', function() {
+            var params = new URLSearchParams(window.location.search);
+            params.delete('start');
+            window.location.search = params.toString();
+        });
+    }
+
+    // ── Range selector ──
+    if (selectRange) {
+        selectRange.addEventListener('change', function() {
+            var val = this.value;
+            var params = new URLSearchParams(window.location.search);
+            var today = new Date();
+            var start = null;
+            if (val === 'last7') {
+                start = new Date(today);
+                start.setDate(today.getDate() - 7);
+                start = start.toISOString().split('T')[0];
+            } else if (val === 'next7') {
+                start = today.toISOString().split('T')[0];
+            } else if (val === 'month') {
+                start = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-01';
+            } else {
+                // 'week' — current week (Monday)
+                var day = today.getDay();
+                var diff = day === 0 ? 6 : day - 1;
+                var monday = new Date(today);
+                monday.setDate(today.getDate() - diff);
+                start = monday.toISOString().split('T')[0];
+            }
+            params.set('start', start);
+            window.location.search = params.toString();
+        });
+    }
+})();
+</script>
 @endpush
 @endsection
