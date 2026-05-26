@@ -164,7 +164,7 @@
     {{-- ============= SIDEBAR (transparent) ============= --}}
     <aside id="cli-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         {{-- Logo card --}}
-        <div class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer">
+        <a href="{{ url('/') }}" class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer no-underline">
             <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#5c7c68">
                 <span class="block w-6 h-6">
                     <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full">
@@ -175,10 +175,6 @@
                 <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Duna Development</div>
             </div>
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
-        </div>
-
-        <a href="{{ url('/') }}" class="cli-btn cli-btn-primary w-full mt-3">
-            <i class="pi pi-building"></i> Ver listado de unidades
         </a>
 
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">

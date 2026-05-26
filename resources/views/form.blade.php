@@ -663,11 +663,13 @@
 
     const markInvalid = (el) => {
         el.classList.add('is-invalid');
+        el.setAttribute('aria-invalid', 'true');
         return el;
     };
 
     const clearInvalid = (el) => {
         el.classList.remove('is-invalid');
+        el.removeAttribute('aria-invalid');
     };
 
     const clearStepInvalid = (stepEl) => {
