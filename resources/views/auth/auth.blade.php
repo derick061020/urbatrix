@@ -42,15 +42,12 @@
         width: 100%; height: 100%;
         object-fit: cover; object-position: center;
       }
-      /* Decorative concentric circles in the hero top-right area */
+      /* Decorative isotipo in the hero top-right area */
       .auth-bg::after {
-        content:""; position:absolute; top:-180px; right:-180px;
-        width: 640px; height: 640px;
-        background:
-          radial-gradient(circle at center, transparent 47%, rgba(255,255,255,.16) 47.5%, rgba(255,255,255,.16) 49%, transparent 49.5%),
-          radial-gradient(circle at center, transparent 36%, rgba(255,255,255,.14) 36.5%, rgba(255,255,255,.14) 38%, transparent 38.5%),
-          radial-gradient(circle at center, transparent 25%, rgba(255,255,255,.12) 25.5%, rgba(255,255,255,.12) 27%, transparent 27.5%),
-          radial-gradient(circle at center, transparent 14%, rgba(255,255,255,.10) 14.5%, rgba(255,255,255,.10) 16%, transparent 16.5%);
+        content:""; position:absolute; top:-10px; right:-10px;
+        width: 450px; height: 450px;
+        background: url('/images/isotipo-makai.png') no-repeat center/contain;
+        opacity: 1;
         pointer-events:none;
       }
 
