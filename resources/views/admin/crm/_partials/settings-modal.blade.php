@@ -458,7 +458,7 @@
                             <div class="st-row-desc">Última actividad: {{ now()->isoFormat('D MMMM YYYY · HH:mm') }}</div>
                         </div>
                         <div class="st-row-right">
-                            <form method="POST" action="{{ route($stLogoutRoute) }}" class="m-0">@csrf
+                            <form method="POST" action="{{ route($stLogoutRoute) }}" class="m-0" data-logout-confirm>@csrf
                                 <button type="submit" class="st-btn st-btn-ghost" style="color:#e93544;">Cerrar sesión</button>
                             </form>
                         </div>

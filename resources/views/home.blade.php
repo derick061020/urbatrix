@@ -1103,7 +1103,7 @@
               </div>
 
               <!-- Sign Out -->
-              <form method="POST" action="/logout" style="margin:0;width:100%;flex-shrink:0;">
+              <form method="POST" action="/logout" style="margin:0;width:100%;flex-shrink:0;" data-logout-confirm>
                 @csrf
                 <button type="submit" class="logout-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;border:none;cursor:pointer;">
                   <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
@@ -3617,7 +3617,7 @@
     }
   </script>
 
-
+@include('partials.logout-modal')
 </body>
 
 </html>

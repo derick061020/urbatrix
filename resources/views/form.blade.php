@@ -41,6 +41,7 @@
       .auth-input:focus { outline:none; border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .auth-input[readonly] { background:#f8f8f8; color:#5c5c5c; }
+      .auth-input.is-invalid { border-color:#fb3748 !important; box-shadow:0 0 0 3px rgba(251,55,72,.14) !important; }
       .auth-select { appearance:none; padding-right:36px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position: right 12px center; }
 
       .auth-btn {
@@ -93,6 +94,7 @@
       }
       .pay-card:hover { background:#f8f8f8; }
       .pay-card.selected { border-color:#5c7c68; background:#fff; box-shadow:0 0 0 1px #5c7c68; }
+      .pay-card.is-invalid { border-color:#fb3748; background:#fff7f7; box-shadow:0 0 0 1px #fb3748; }
 
       /* Drop zone */
       .file-drop {
@@ -101,6 +103,7 @@
           cursor:pointer; transition: border-color .15s, background-color .15s;
       }
       .file-drop:hover { border-color:#5c7c68; background:#fafafa; }
+      .file-drop.is-invalid { border-color:#fb3748; background:#fff7f7; box-shadow:0 0 0 3px rgba(251,55,72,.10); }
 
       /* Spinner used by success modal */
       .check-circle {
@@ -228,7 +231,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Foto ID <span class="field-required">*</span></label>
+                        <label class="field-label">Foto del documento de identidad<span class="field-required">*</span></label>
 
                         @if(! empty($existingKycDoc))
                             @php $status = $existingKycDoc['status'] ?? 'pending'; @endphp
@@ -650,8 +653,66 @@
     const CSRF = document.querySelector('meta[name=csrf-token]').content;
     let currentStep = 1;
 
+    const isVisible = (el) => !!(el && el.getClientRects().length);
+    const getStep = (step) => document.querySelector(`.reg-step[data-step="${step}"]`);
+
+    const fieldIsRequired = (el) => {
+        const holder = el.closest('div');
+        return !!holder?.querySelector('.field-required');
+    };
+
+    const markInvalid = (el) => {
+        el.classList.add('is-invalid');
+        return el;
+    };
+
+    const clearInvalid = (el) => {
+        el.classList.remove('is-invalid');
+    };
+
+    const clearStepInvalid = (stepEl) => {
+        stepEl?.querySelectorAll('.is-invalid').forEach(clearInvalid);
+    };
+
+    const scrollToFirstInvalid = (stepEl) => {
+        const firstInvalid = stepEl?.querySelector('.is-invalid');
+        if (!firstInvalid) return;
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof firstInvalid.focus === 'function' && !firstInvalid.classList.contains('file-drop')) {
+            firstInvalid.focus({ preventScroll: true });
+        }
+    };
+
+    const validateStep = (stepNumber) => {
+        const stepEl = getStep(stepNumber);
+        if (!stepEl) return true;
+
+        clearStepInvalid(stepEl);
+        const invalidFields = [];
+
+        stepEl.querySelectorAll('.auth-input').forEach((el) => {
+            if (!isVisible(el) || el.disabled || el.readOnly || !fieldIsRequired(el)) return;
+            if (!String(el.value || '').trim()) invalidFields.push(markInvalid(el));
+        });
+
+        stepEl.querySelectorAll('input[type="file"][required]').forEach((el) => {
+            const drop = el.closest('.file-drop');
+            if (!drop || !isVisible(drop)) return;
+            if (!el.files || !el.files.length) invalidFields.push(markInvalid(drop));
+        });
+
+        if (invalidFields.length) {
+            scrollToFirstInvalid(stepEl);
+            return false;
+        }
+
+        return true;
+    };
+
     /* ---------- Step navigation ---------- */
     window.goToStep = (n) => {
+        if (n > currentStep && !validateStep(currentStep)) return;
+
         currentStep = n;
         document.querySelectorAll('.reg-step').forEach(el => el.classList.toggle('active', +el.dataset.step === n));
         document.querySelectorAll('#step-indicator .step-pill').forEach(p => {
@@ -666,6 +727,17 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.prevStep = () => { if (currentStep > 1) goToStep(currentStep - 1); };
+
+    document.addEventListener('input', (event) => {
+        if (event.target.matches('.auth-input')) clearInvalid(event.target);
+    });
+    document.addEventListener('change', (event) => {
+        if (event.target.matches('.auth-input')) clearInvalid(event.target);
+        if (event.target.matches('input[type="file"]')) {
+            const drop = event.target.closest('.file-drop');
+            if (drop) clearInvalid(drop);
+        }
+    });
 
     /* ---------- File upload feedback ---------- */
     window.updateFileSize = (input) => {
@@ -775,6 +847,7 @@
         }
         document.querySelectorAll('.pay-card').forEach(card => {
             const i = card.querySelector('input[type=checkbox]');
+            card.classList.remove('is-invalid');
             card.classList.toggle('selected', i.checked);
         });
     };
@@ -788,6 +861,7 @@
     window.submitForm = async () => {
         const submitBtn = document.getElementById('submit-btn');
         const errBox = document.getElementById('step4-error');
+        if (!validateStep(currentStep)) return;
 
         // Get selected payment method
         let paymentMethod = '';
@@ -799,7 +873,24 @@
         if (!paymentMethod) {
             errBox.textContent = 'Selecciona un plan de pago para continuar.';
             errBox.classList.remove('hidden');
+            document.querySelectorAll('.pay-card').forEach(card => card.classList.add('is-invalid'));
             return;
+        }
+
+        if (paymentMethod === 'PERSONALIZADO') {
+            const customFields = [
+                document.querySelector('input[name=custom_payment_1]'),
+                document.querySelector('input[name=custom_payment_2]'),
+                document.querySelector('input[name=custom_payment_3]'),
+            ];
+            const missingCustomFields = customFields.filter(field => field && !String(field.value || '').trim());
+            if (missingCustomFields.length) {
+                missingCustomFields.forEach(markInvalid);
+                errBox.textContent = 'Completa los porcentajes del plan personalizado para continuar.';
+                errBox.classList.remove('hidden');
+                scrollToFirstInvalid(getStep(4));
+                return;
+            }
         }
         errBox.classList.add('hidden');
 

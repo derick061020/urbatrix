@@ -264,7 +264,7 @@
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Cliente' }}</div>
                     <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Cliente' }}</div>
                 </button>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                <form method="POST" action="{{ route('logout') }}" class="m-0" data-logout-confirm>
                     @csrf
                     <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión"><i class="pi pi-arrow-up-right text-xs"></i></button>
                 </form>
@@ -311,6 +311,7 @@
     'stProfileRoute' => 'dashboard.profile.update',
     'stLogoutRoute'  => 'logout',
 ])
+@include('partials.logout-modal')
 
 @if (session('settings_success'))
 <script>

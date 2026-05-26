@@ -317,7 +317,7 @@
                                 </li>
 
                                 <li class="pt-4 mt-4 border-t border-gray-700">
-                                    <form method="POST" action="/logout" class="block">
+                                    <form method="POST" action="/logout" class="block" data-logout-confirm>
                                         @csrf
                                         <button type="submit" class="lb-admin-main-nav-link w-full text-left flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
                                             <svg class="material-design-icon__svg text-text-primary-inverse" width="20" height="20" viewBox="0 0 24 24">
@@ -488,5 +488,6 @@
                 <!--- fin contenido de las vistas ---->
             </main>
         </div>
+        @include('partials.logout-modal')
     </body>
 </html>

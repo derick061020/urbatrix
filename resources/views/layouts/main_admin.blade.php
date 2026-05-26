@@ -962,6 +962,7 @@
             </main>
         </div>
         
+        @include('partials.logout-modal')
         @yield('scripts')
     </body>
 </html>
