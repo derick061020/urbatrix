@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@29.0.1/dist/css/intlTelInput.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -191,12 +192,25 @@
       }
       .role-card.selected .radio-dot { border-color:#5c7c68; }
       .role-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#5c7c68; }
+      @keyframes verif-pop {
+        0%   { transform: scale(1); }
+        50%  { transform: scale(1.15); }
+        100% { transform: scale(1); }
+      }
       .verif-tag {
         position:absolute; right:14px; top:-9px;
         background:#fff; border:1px solid #ebebeb;
         padding: 3px 8px; border-radius: 999px;
         font-size: 9px; font-weight:600; letter-spacing:.1em;
         color:#a3a3a3;
+        transition: background-color .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease;
+      }
+      .role-card.selected .verif-tag {
+        background: #5c7c68;
+        border-color: #5c7c68;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(92,124,104,.25);
+        animation: verif-pop .45s cubic-bezier(.34,1.56,.64,1) both;
       }
 
       /* ---- Document row ---- */
@@ -214,6 +228,159 @@
       .panel-scroll { overflow-y: auto; overflow-x: hidden; }
       .panel-scroll::-webkit-scrollbar { width: 6px; }
       .panel-scroll::-webkit-scrollbar-thumb { background:#cacfd8; border-radius:6px; }
+    </style>
+
+    {{-- Override intl-tel-input styles to match the original prefix selector --}}
+    <style>
+        .auth-phone-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .auth-phone-wrapper .iti {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            --iti-border-color: #ebebeb;
+            --iti-hover-color: #f8f8f8;
+            --iti-spacer-horizontal: 12px;
+        }
+        .auth-phone-wrapper .iti__country-container {
+            position: static;
+            flex: 0 0 120px;
+            min-width: 0;
+            padding: 0;
+        }
+        .auth-phone-wrapper .iti__selected-country {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 10px;
+            padding: 0 10px 0 12px;
+            color: #171717;
+            font-size: 14px;
+            line-height: 1;
+            transition: border-color .15s, box-shadow .15s;
+            z-index: 2;
+        }
+        .auth-phone-wrapper .iti__selected-country-primary {
+            display: contents;
+        }
+        .auth-phone-wrapper .iti__selected-country .iti__flag {
+            order: 1;
+            flex-shrink: 0;
+        }
+        .auth-phone-wrapper .iti__selected-country,
+        .auth-phone-wrapper .iti__selected-country:focus {
+            background: #fff;
+        }
+        .auth-phone-wrapper .iti__selected-country:hover {
+            background: #f8f8f8;
+        }
+        .auth-phone-wrapper .iti__selected-country:active {
+            transform: translateY(1px);
+        }
+        .auth-phone-wrapper .iti__selected-dial-code {
+            order: 2;
+            margin-left: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .auth-phone-wrapper .iti .iti__tel-input {
+            flex: 1 1 0;
+            min-width: 0 !important;
+            width: 0 !important;
+            height: 40px;
+            padding: 0 14px !important;
+            border: 1px solid #ebebeb;
+            border-radius: 10px;
+            background: #fff;
+            color: #171717;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color .15s, box-shadow .15s;
+            outline: none;
+            margin: 0;
+        }
+        .auth-phone-wrapper .iti .iti__tel-input:focus {
+            border-color: #5c7c68;
+            box-shadow: 0 0 0 3px rgba(92,124,104,.15);
+        }
+        .auth-phone-wrapper .iti .iti__tel-input::placeholder {
+            color: #a3a3a3;
+        }
+        .auth-phone-wrapper .iti .iti__arrow {
+            order: 3;
+            margin-left: auto;
+            border-color: #a3a3a3;
+        }
+        .auth-phone-wrapper .iti__selected-country:focus-visible {
+            outline: none;
+            border-color: #5c7c68;
+            box-shadow: 0 0 0 3px rgba(92,124,104,.15);
+        }
+        .auth-phone-wrapper .iti__country-selector {
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px -6px rgba(0,0,0,.12);
+            margin-top: 6px;
+            overflow: hidden;
+            min-width: 280px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .auth-phone-wrapper .iti__search-input {
+            height: 40px;
+            border: 0;
+            padding: 10px 38px;
+            font-size: 14px;
+            color: #171717;
+            font-family: inherit;
+            outline: none;
+        }
+        .auth-phone-wrapper .iti__search-input::placeholder {
+            color: #a3a3a3;
+        }
+        .auth-phone-wrapper .iti__search-input-wrapper {
+            border-bottom: 1px solid #ebebeb;
+        }
+        .auth-phone-wrapper .iti__search-icon {
+            left: 14px;
+        }
+        .auth-phone-wrapper .iti__search-clear {
+            right: 8px;
+        }
+        .auth-phone-wrapper .iti__country-list {
+            max-height: 280px;
+        }
+        .auth-phone-wrapper .iti__country {
+            padding: 8px 14px;
+            font-size: 14px;
+            color: #171717;
+        }
+        .auth-phone-wrapper .iti__country.iti__highlight {
+            background: #f2f5f8;
+        }
+        .auth-phone-wrapper .iti__country-name {
+            color: #171717;
+        }
+        .auth-phone-wrapper .iti__dial-code {
+            color: #717784;
+        }
+        @media (max-width: 420px) {
+            .auth-phone-wrapper .iti {
+                gap: 6px;
+            }
+            .auth-phone-wrapper .iti__country-container {
+                flex-basis: 106px;
+            }
+        }
     </style>
 </head>
 <body data-mode="{{ ($mode ?? 'login') === 'register' ? 'register' : 'login' }}" class="bg-white">
@@ -405,19 +572,9 @@
                         </div>
                         <div>
                             <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Número de teléfono <span class="text-err">*</span></label>
-                            <div class="flex gap-2">
-                                <div class="relative">
-                                    <select name="country" class="auth-input pr-7 w-[120px] appearance-none">
-                                        <option value="DO+1">🇩🇴 +1</option>
-                                        <option value="US+1">🇺🇸 +1</option>
-                                        <option value="ES+34">🇪🇸 +34</option>
-                                        <option value="MX+52">🇲🇽 +52</option>
-                                        <option value="FR+33">🇫🇷 +33</option>
-                                        <option value="BR+55">🇧🇷 +55</option>
-                                    </select>
-                                    <i class="pi pi-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-[10px] pointer-events-none"></i>
-                                </div>
-                                <input type="tel" name="phone" required placeholder="(612) 000-0000" class="auth-input flex-1" autocomplete="tel">
+                            <div class="auth-phone-wrapper">
+                                <input type="hidden" name="country" id="country-input" value="DO+1">
+                                <input type="tel" name="phone" id="phone-input" required autocomplete="tel" class="auth-input">
                             </div>
                         </div>
                         <label class="flex items-start gap-2 cursor-pointer pt-1">
@@ -673,7 +830,52 @@
     </div>
 </section>
 
+{{-- Load intl-tel-input JS from CDN, then initialize --}}
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@29.0.1/dist/js/intlTelInputWithUtils.min.js"></script>
 <script>
+/* Initialize intl-tel-input */
+document.addEventListener('DOMContentLoaded', function () {
+    const phoneInput = document.getElementById('phone-input');
+    const countryHidden = document.getElementById('country-input');
+    if (!phoneInput || !countryHidden) return;
+
+    const iti = window.intlTelInput(phoneInput, {
+        initialCountry: 'do',
+        countryNameLocale: 'es',
+        countrySearch: true,
+        placeholderNumberPolicy: 'AGGRESSIVE',
+        placeholderNumberType: 'FIXED_LINE',
+        formatAsYouType: true,
+        separateDialCode: true,
+        matchDropdownWidth: false,
+        uiTranslations: {
+            selectedCountryAriaLabel: 'Cambiar país para el número, seleccionado ${countryName} (${dialCode})',
+            noCountrySelected: 'Selecciona un país',
+            countryListAriaLabel: 'Lista de países',
+            searchPlaceholder: 'Buscar país...',
+            clearSearchAriaLabel: 'Limpiar búsqueda',
+            searchEmptyState: 'Sin resultados',
+            searchSummaryAria(count) {
+                if (count === 0) return 'Sin resultados';
+                if (count === 1) return '1 resultado';
+                return `${count} resultados`;
+            },
+        },
+    });
+
+    if (!countryHidden.value) {
+        const c = iti.getSelectedCountryData();
+        countryHidden.value = c.iso2.toUpperCase() + '+' + c.dialCode;
+    }
+
+    phoneInput.addEventListener('countrychange', function () {
+        const c = iti.getSelectedCountryData();
+        countryHidden.value = c.iso2.toUpperCase() + '+' + c.dialCode;
+    });
+
+    window.__phoneIti = iti;
+});
+
 (function () {
     const CSRF = document.querySelector('meta[name=csrf-token]').content;
     const body = document.body;
@@ -768,6 +970,14 @@
     /* ------------ Step 0 — basics + send code ------------- */
     window.submitStep0 = async (e) => {
         e.preventDefault();
+        // Ensure phone input has the full international number from intl-tel-input
+        const iti = window.__phoneIti;
+        if (iti) {
+            const fullNumber = iti.getNumber();
+            if (fullNumber) {
+                document.getElementById('phone-input').value = fullNumber;
+            }
+        }
         const fd = new FormData(e.target);
         const data = Object.fromEntries(fd.entries());
         if (!data.full_name || !data.email || !data.phone) return false;
