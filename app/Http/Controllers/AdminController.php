@@ -292,63 +292,100 @@ class AdminController extends Controller
 
     public function agents()
     {
-        $agents = Agent::orderBy('created_at', 'desc')->get();
-        return view('admin.agents', compact('agents'));
+        $brokers = User::where('role', 'broker')
+            ->with('assignedUnits:id,custom_id,name,price,status')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $units = Unit::orderBy('custom_id')->get(['id', 'custom_id', 'name', 'status']);
+        return view('admin.agents', compact('brokers', 'units'));
     }
 
     public function storeAgent(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:agents,email',
-            'phone' => 'nullable|string|max:20',
-            'license' => 'nullable|string|max:50',
-            'commission_rate' => 'required|numeric|min:0|max:100',
-            'bio' => 'nullable|string',
-            'active' => 'boolean'
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'phone'    => 'nullable|string|max:30',
+            'password' => 'nullable|string|min:8',
+            'active'   => 'nullable|boolean',
+            'unit_ids' => 'nullable|array',
+            'unit_ids.*' => 'integer|exists:units,id',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $parts = preg_split('/\s+/', trim($data['name']), 2);
+        $tempPassword = $data['password'] ?? \Illuminate\Support\Str::random(10);
 
-        Agent::create($request->all());
-
-        return redirect()->route('admin.agents')
-            ->with('success', 'Agent created successfully!');
-    }
-
-    public function updateAgent(Request $request, Agent $agent)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:agents,email,' . $agent->id,
-            'phone' => 'nullable|string|max:20',
-            'license' => 'nullable|string|max:50',
-            'commission_rate' => 'required|numeric|min:0|max:100',
-            'bio' => 'nullable|string',
-            'active' => 'boolean'
+        $user = User::create([
+            'name'       => $data['name'],
+            'first_name' => $parts[0] ?? '',
+            'last_name'  => $parts[1] ?? '',
+            'email'      => $data['email'],
+            'phone'      => $data['phone'] ?? null,
+            'password'   => Hash::make($tempPassword),
+            'role'       => 'broker',
+            'verification_status' => ($data['active'] ?? true) ? 'approved' : 'pending',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+        if (! empty($data['unit_ids'])) {
+            $user->assignedUnits()->sync($data['unit_ids']);
         }
 
-        $agent->update($request->all());
-
         return redirect()->route('admin.agents')
-            ->with('success', 'Agent updated successfully!');
+            ->with('success', "Broker creado. Contraseña temporal: {$tempPassword}");
     }
 
-    public function deleteAgent(Agent $agent)
+    public function updateAgent(Request $request, $agent)
     {
-        $agent->delete();
+        $broker = User::where('role', 'broker')->findOrFail($agent);
+
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($broker->id)],
+            'phone'    => 'nullable|string|max:30',
+            'active'   => 'nullable|boolean',
+            'unit_ids' => 'nullable|array',
+            'unit_ids.*' => 'integer|exists:units,id',
+        ]);
+
+        $parts = preg_split('/\s+/', trim($data['name']), 2);
+
+        $broker->update([
+            'name'       => $data['name'],
+            'first_name' => $parts[0] ?? '',
+            'last_name'  => $parts[1] ?? '',
+            'email'      => $data['email'],
+            'phone'      => $data['phone'] ?? null,
+            'verification_status' => ($data['active'] ?? true) ? 'approved' : 'pending',
+        ]);
+
+        if ($request->has('unit_ids')) {
+            $broker->assignedUnits()->sync($data['unit_ids'] ?? []);
+        }
+
         return redirect()->route('admin.agents')
-            ->with('success', 'Agent deleted successfully!');
+            ->with('success', 'Broker actualizado.');
+    }
+
+    public function deleteAgent($agent)
+    {
+        $broker = User::where('role', 'broker')->findOrFail($agent);
+        $broker->delete();
+        return redirect()->route('admin.agents')
+            ->with('success', 'Broker eliminado.');
+    }
+
+    public function assignBrokerUnits(Request $request, $agent)
+    {
+        $broker = User::where('role', 'broker')->findOrFail($agent);
+        $data = $request->validate([
+            'unit_ids' => 'nullable|array',
+            'unit_ids.*' => 'integer|exists:units,id',
+        ]);
+
+        $broker->assignedUnits()->sync($data['unit_ids'] ?? []);
+
+        return redirect()->route('admin.agents')
+            ->with('success', "Unidades asignadas a {$broker->name}.");
     }
 
     public function deals()
@@ -428,12 +465,20 @@ class AdminController extends Controller
 
     public function transactionsReport()
     {
-        $deals = Deal::with(['unit', 'agent'])
-            ->orderBy('deal_date', 'desc')
-            ->get();
+        $dealsQuery = Deal::with(['unit', 'agent']);
+        $totalQuery = Deal::where('status', 'COMPLETED');
+        $pendingQuery = Deal::where('status', 'PENDING');
 
-        $totalRevenue = Deal::where('status', 'COMPLETED')->sum('deal_price');
-        $pendingRevenue = Deal::where('status', 'PENDING')->sum('deal_price');
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->all();
+            $dealsQuery->whereIn('unit_id', $unitIds);
+            $totalQuery->whereIn('unit_id', $unitIds);
+            $pendingQuery->whereIn('unit_id', $unitIds);
+        }
+
+        $deals = $dealsQuery->orderBy('deal_date', 'desc')->get();
+        $totalRevenue = $totalQuery->sum('deal_price');
+        $pendingRevenue = $pendingQuery->sum('deal_price');
 
         return view('admin.transactions-report', compact('deals', 'totalRevenue', 'pendingRevenue'));
     }
@@ -508,31 +553,46 @@ class AdminController extends Controller
             ->whereDate('due_date', '<', now())
             ->update(['status' => 'vencida']);
 
+        $isBroker = Auth::user()->role === 'broker';
+        $brokerUnitIds = $isBroker
+            ? Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all()
+            : [];
+
+        $reservationsBase = Reservation::query();
+        if ($isBroker) $reservationsBase->whereIn('unit_id', $brokerUnitIds);
+
+        $docsBase = Document::query();
+        if ($isBroker) {
+            $docsBase->whereHas('reservation', fn($q) => $q->whereIn('unit_id', $brokerUnitIds));
+        }
+
         $stats = [
-            'expedientes_activos'     => Reservation::count(),
-            'expedientes_incompletos' => Reservation::whereDoesntHave('documents', fn($q) => $q->where('status', 'approved'))->count(),
-            'docs_pendientes'         => Document::whereIn('status', ['pending', 'generated'])->count(),
-            'docs_rechazados'         => Document::where('status', 'rejected')->count(),
-            'aprobaciones_cola'       => Approval::where('status', 'pendiente')->count(),
-            'aprobaciones_alta'       => Approval::where('status', 'pendiente')->where('priority', 'alta')->count(),
-            'tareas_vencidas'         => Task::where('status', 'vencida')->count(),
-            'tareas_hoy'              => Task::whereDate('due_date', today())->where('status', '!=', 'completada')->count(),
+            'expedientes_activos'     => (clone $reservationsBase)->count(),
+            'expedientes_incompletos' => (clone $reservationsBase)
+                ->whereDoesntHave('documents', fn($q) => $q->where('status', 'approved'))->count(),
+            'docs_pendientes'         => (clone $docsBase)->whereIn('status', ['pending', 'generated'])->count(),
+            'docs_rechazados'         => (clone $docsBase)->where('status', 'rejected')->count(),
+            'aprobaciones_cola'       => $isBroker ? 0 : Approval::where('status', 'pendiente')->count(),
+            'aprobaciones_alta'       => $isBroker ? 0 : Approval::where('status', 'pendiente')->where('priority', 'alta')->count(),
+            'tareas_vencidas'         => $isBroker ? 0 : Task::where('status', 'vencida')->count(),
+            'tareas_hoy'              => $isBroker ? 0 : Task::whereDate('due_date', today())->where('status', '!=', 'completada')->count(),
         ];
 
         $proyectos = Project::all();
 
-        $expedientesRecientes = Reservation::with(['unit', 'documents'])
+        $expedientesRecientes = (clone $reservationsBase)
+            ->with(['unit', 'documents'])
             ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
 
-        $aprobacionesUrgentes = Approval::where('status', 'pendiente')
+        $aprobacionesUrgentes = $isBroker ? collect() : Approval::where('status', 'pendiente')
             ->where('priority', 'alta')
             ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
 
-        $tareasHoy = Task::with('reservation')
+        $tareasHoy = $isBroker ? collect() : Task::with('reservation')
             ->where('status', '!=', 'completada')
             ->whereNotNull('due_date')
             ->whereBetween('due_date', [today()->subDay(), today()->addDay()])
@@ -545,7 +605,14 @@ class AdminController extends Controller
     public function crmExpedientes(Request $request)
     {
         $search = $request->get('search');
-        $reservations = Reservation::with(['unit', 'documents', 'payments'])
+        $query = Reservation::with(['unit', 'documents', 'payments']);
+
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($id) => (string) $id)->all();
+            $query->whereIn('unit_id', $unitIds);
+        }
+
+        $reservations = $query
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($w) use ($search) {
                     $w->where('first_name', 'like', "%$search%")
@@ -567,6 +634,12 @@ class AdminController extends Controller
         if ($tab !== 'todos') {
             $query->where('status', $tab);
         }
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($id) => (string) $id)->all();
+            $query->whereHas('reservation', function ($q) use ($unitIds) {
+                $q->whereIn('unit_id', $unitIds);
+            });
+        }
         $documents = $query->orderBy('updated_at', 'desc')->paginate(30);
 
         $tabs = ['todos', 'pending', 'generated', 'signed', 'approved', 'rejected'];
@@ -576,10 +649,12 @@ class AdminController extends Controller
 
     public function crmContratos()
     {
-        $reservations = Reservation::with(['unit', 'documents'])
-            ->orderBy('created_at', 'desc')
-            ->take(50)
-            ->get();
+        $query = Reservation::with(['unit', 'documents']);
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($id) => (string) $id)->all();
+            $query->whereIn('unit_id', $unitIds);
+        }
+        $reservations = $query->orderBy('created_at', 'desc')->take(50)->get();
 
         return view('admin.crm.contratos', compact('reservations'));
     }
@@ -836,8 +911,16 @@ class AdminController extends Controller
     public function crmPagos($id)
     {
         $reservation = Reservation::with(['unit', 'payments'])->findOrFail($id);
+
+        if (Auth::user()->role === 'broker') {
+            $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
+            if (! in_array((string) $reservation->unit_id, $allowed, true)) {
+                abort(403, 'No tienes acceso a este expediente.');
+            }
+        }
+
         $payments = $reservation->payments()->orderBy('created_at', 'desc')->get();
-        
+
         // Calculate statistics
         $paidCount = $payments->where('status', 'paid')->count();
         $pendingCount = $payments->where('status', 'pending')->count();
@@ -869,6 +952,14 @@ class AdminController extends Controller
     public function crmExpedienteDetalle($id)
     {
         $reservation = Reservation::with(['unit', 'documents', 'payments'])->findOrFail($id);
+
+        if (Auth::user()->role === 'broker') {
+            $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
+            if (! in_array((string) $reservation->unit_id, $allowed, true)) {
+                abort(403, 'No tienes acceso a este expediente.');
+            }
+        }
+
         $tab = request('tab', 'resumen');
         return view('admin.crm.expediente_detalle_v2', compact('reservation', 'tab'));
     }
@@ -1486,25 +1577,11 @@ class AdminController extends Controller
             // Create TemplateProcessor
             $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
 
-            // Prepare replacements
-            $replacements = [
-                '${cliente_nombre}' => $reservation->first_name . ' ' . $reservation->last_name,
-                '${cliente_dni}' => $reservation->document_number ?? 'N/A',
-                '${cliente_email}' => $reservation->email,
-                '${cliente_telefono}' => $reservation->phone,
-                '${cliente_direccion}' => $this->formatAddress($reservation),
-                '${codigo_reserva}' => $reservation->reservation_code,
-                '${nombre_unidad}' => $reservation->unit_name ?? $reservation->unit->name ?? 'Unit ' . $reservation->unit_id,
-                '${precio_total}' => number_format($reservation->unit_price, 2, '.', ','),
-                '${precio_literal_es}' => $this->convertNumberToWords($reservation->unit_price, 'es'),
-                '${precio_literal_en}' => $this->convertNumberToWords($reservation->unit_price, 'en'),
-                '${fecha_actual}' => date('d/m/Y'),
-                '${fecha_actual_en}' => date('m/d/Y'),
-                '${plan_de_pagos_es}' => $this->getPaymentPlanDescription($reservation, 'es'),
-                '${plan_de_pagos_en}' => $this->getPaymentPlanDescription($reservation, 'en'),
-            ];
+            // Use the same replacement set as the contract — the promise template shares
+            // the buyer/unit placeholders (${nombre_del_comprador}, ${tipo_de comprador_es},
+            // ${identificacion_de comprador}, etc., some of which contain a literal space).
+            $replacements = $this->getContractReplacements($reservation);
 
-            // Replace all variables
             foreach ($replacements as $search => $replace) {
                 $templateProcessor->setValue($search, $replace);
             }

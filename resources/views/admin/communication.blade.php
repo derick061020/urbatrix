@@ -6,11 +6,25 @@
 
 @section('content')
 @php
-    $conversations = \App\Models\Reservation::with('unit')->orderBy('updated_at', 'desc')->get();
+    $conversations = \App\Models\Reservation::with(['unit', 'latestMessage'])
+        ->withCount(['messages as unread_count' => function ($q) {
+            $q->where('sender_role', 'client')->whereNull('read_at');
+        }])
+        ->orderBy('updated_at', 'desc')->get();
     $active = request('r')
         ? $conversations->firstWhere('id', (int) request('r'))
         : $conversations->first();
-    $notes = $active && $active->admin_notes ? explode("\n", trim($active->admin_notes)) : [];
+
+    $threadMessages = collect();
+    if ($active) {
+        $threadMessages = $active->messages()->with('sender')->get();
+        // Mark client-sent messages as read when admin opens this conversation
+        $active->messages()
+            ->where('sender_role', 'client')
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+    }
+
     $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3'];
 @endphp
 <div class="p-6">
@@ -35,7 +49,9 @@
                     @php
                         $init = strtoupper(substr($c->first_name ?? 'C',0,1).substr($c->last_name ?? 'M',0,1));
                         $bg = $avBg[$c->id % count($avBg)];
-                        $lastNote = $c->admin_notes ? array_reverse(explode("\n", trim($c->admin_notes)))[0] : 'Sin mensajes aún';
+                        $lastMsg = $c->latestMessage;
+                        $lastNote = $lastMsg?->body ?? 'Sin mensajes aún';
+                        $lastWhen = $lastMsg?->created_at ?? $c->updated_at;
                         $isActive = $active && $c->id === $active->id;
                     @endphp
                     <a href="?r={{ $c->id }}" class="px-4 py-3 flex items-start gap-3 cursor-pointer border-b border-ink-100 {{ $isActive ? 'bg-brand-tint/40' : '' }} hover:bg-ink-50">
@@ -43,9 +59,14 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between">
                                 <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $c->first_name }} {{ $c->last_name }}</div>
-                                <div class="text-[10px] text-ink-400">{{ $c->updated_at?->diffForHumans() }}</div>
+                                <div class="text-[10px] text-ink-400">{{ optional($lastWhen)->diffForHumans() }}</div>
                             </div>
-                            <div class="text-[11px] text-ink-500 truncate">{{ \Illuminate\Support\Str::limit($lastNote, 50) }}</div>
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="text-[11px] text-ink-500 truncate flex-1">{{ \Illuminate\Support\Str::limit($lastNote, 50) }}</div>
+                                @if($c->unread_count > 0)
+                                    <span class="crm-pill bg-err text-white text-[10px]">{{ $c->unread_count }}</span>
+                                @endif
+                            </div>
                         </div>
                     </a>
                 @empty
@@ -70,13 +91,27 @@
                     <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Ver expediente</a>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-5 space-y-3">
-                    @forelse($notes as $line)
-                        <div class="flex justify-end">
-                            <div class="max-w-[60%] bg-brand text-white rounded-2xl px-4 py-2.5">
-                                <div class="text-[12px]">{{ $line }}</div>
+                <div class="flex-1 overflow-y-auto p-5 space-y-3" id="admin-comm-scroll">
+                    @forelse($threadMessages as $msg)
+                        @php
+                            $isAdmin = $msg->sender_role === 'admin';
+                            $senderName = $msg->sender?->name ?? ($isAdmin ? 'Asesor' : trim(($active->first_name ?? '').' '.($active->last_name ?? '')));
+                        @endphp
+                        @if($isAdmin)
+                            <div class="flex justify-end">
+                                <div class="max-w-[60%]">
+                                    <div class="bg-brand text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
+                                    <div class="text-[10px] text-ink-400 mt-1 text-right">{{ $senderName }} · {{ $msg->created_at->format('Y-m-d H:i') }}</div>
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="flex justify-start">
+                                <div class="max-w-[60%]">
+                                    <div class="bg-ink-100 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2.5 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
+                                    <div class="text-[10px] text-ink-400 mt-1">{{ $senderName }} · {{ $msg->created_at->format('Y-m-d H:i') }}</div>
+                                </div>
+                            </div>
+                        @endif
                     @empty
                         <div class="text-center text-[12px] text-ink-500 mt-12">Sin mensajes aún. Envía el primero abajo.</div>
                     @endforelse
@@ -84,8 +119,8 @@
 
                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="p-3 border-t border-ink-100 bg-white flex items-center gap-2 m-0">@csrf
                     <input type="hidden" name="reservation_id" value="{{ $active->id }}">
-                    <input type="hidden" name="channel" value="email">
-                    <input type="text" name="message" required placeholder="Escribe un mensaje…" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
+                    <input type="hidden" name="channel" value="chat">
+                    <input type="text" name="message" required maxlength="5000" autocomplete="off" placeholder="Escribe un mensaje…" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
                     <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-send text-[11px]"></i> Enviar</button>
                 </form>
             @else
@@ -133,4 +168,11 @@
         </aside>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const adminCommScroll = document.getElementById('admin-comm-scroll');
+    if (adminCommScroll) adminCommScroll.scrollTop = adminCommScroll.scrollHeight;
+</script>
+@endpush
 @endsection

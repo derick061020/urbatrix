@@ -197,6 +197,11 @@ class Unit extends Model
         return $this->belongsTo(Agent::class);
     }
 
+    public function brokers()
+    {
+        return $this->belongsToMany(User::class, 'broker_unit')->withTimestamps();
+    }
+
     public function images()
     {
         return $this->hasMany(UnitImage::class)->orderBy('sort_order');

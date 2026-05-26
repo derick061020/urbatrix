@@ -180,10 +180,35 @@
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
             @php
                 $uid = auth()->id();
-                $pendingDocs = \App\Models\Document::whereHas('reservation', fn($q) => $q->where('user_id', $uid))->whereIn('status', ['pending','generated'])->count();
-                $pendingAgreements = \App\Models\Document::whereHas('reservation', fn($q) => $q->where('user_id', $uid))
-                    ->whereIn('document_type', ['payment_plan','purchase_promise','contract','budget'])
-                    ->whereIn('status', ['pending','generated','awaiting_signature','in_review'])->count();
+                $reservation = \App\Models\Reservation::where('user_id', $uid)->latest()->first();
+                
+                // Mis documentos: total de documentos que se muestran en la vista (contratos firmados + KYC)
+                $reservationDocs = $reservation ? $reservation->documents : collect();
+                $userDocs = \App\Models\Document::whereNull('reservation_id')
+                    ->where(function($q) use ($uid) {
+                        $q->where('metadata->user_id', $uid)
+                          ->orWhere('metadata->source', 'register');
+                    })
+                    ->get();
+                $allDocs = $reservationDocs->merge($userDocs)->unique('id');
+                
+                $signedDocs = $allDocs->filter(function($d) {
+                    return in_array($d->status, ['signed', 'approved', 'completed'])
+                        && in_array($d->document_type, ['payment_plan', 'purchase_promise', 'contract']);
+                })->count();
+                
+                $kycDocs = $allDocs->whereIn('document_type', ['id_front', 'id_back', 'kyc'])->count();
+                
+                $totalDocs = $signedDocs + $kycDocs;
+                
+                // Acuerdos: cuenta documentos pendientes del controlador (igual que el controlador)
+                $pendingAgreements = 0;
+                if ($reservation) {
+                    $docs = $reservation->documents;
+                    $docs = $docs->filter(fn($d) => $d->status !== 'signed');
+                    $pendingAgreements = $docs->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']))->count();
+                }
+                
                 $pendingPays = \App\Models\Payment::whereHas('reservation', fn($q) => $q->where('user_id', $uid))->where('status', 'pending')->count();
                 $savedCount = \App\Models\Wishlist::where('user_id', $uid)->count();
                 $unreadMsgs = \App\Models\Message::whereHas('reservation', fn($q) => $q->where('user_id', $uid))
@@ -197,7 +222,7 @@
             <div class="cli-nav-section">Mi cuenta</div>
             <a href="{{ route('dashboard.documents') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'documents' ? 'active' : '' }}">
                 <i class="pi pi-folder-open"></i> Mis documentos
-                @if($pendingDocs > 0)<span class="badge-count">{{ $pendingDocs }}</span>@endif
+                @if($totalDocs > 0)<span class="badge-count">{{ $totalDocs }}</span>@endif
             </a>
             <a href="{{ route('dashboard.acuerdos') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'acuerdos' ? 'active' : '' }}">
                 <i class="pi pi-check-square"></i> Acuerdos

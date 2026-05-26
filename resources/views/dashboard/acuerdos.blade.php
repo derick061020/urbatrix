@@ -8,21 +8,16 @@
 @php
     $reservation = $reservation ?? null;
 
-    /* ---- Synthetic "budget" doc so the client can review the payment plan from acuerdos ---- */
+    /* ---- Only show the payment plan agreement once the operator has sent the proposal ---- */
     $budgetSent = $reservation && ($reservation->isBudgetSent() || $reservation->budget_status === 'approved' || !empty($reservation->budget_observations));
     $budgetAccepted = $reservation && ($reservation->budget_status === 'approved' || in_array($reservation->status, ['contract_signed','signed']));
 
-    $allDocs = $reservation
-        ? $reservation->documents()->orderByDesc('created_at')->get()
-        : collect();
+    // Usar los documentos del controlador
+    $pending   = $pending ?? collect();
+    $completed = $completed ?? collect();
 
-    /* Hide budget-style entries — we use the synthetic budget item below instead. */
-    $contractDocs = $allDocs->whereNotIn('document_type', ['kyc']);
-
-    $pending   = collect();
-    $completed = collect();
-
-    /* Budget pseudo-doc (sourced from reservation, not Document) */
+    /* Budget pseudo-doc (sourced from reservation, not Document) — agregar como colección separada */
+    $budgetCollection = collect();
     if ($budgetSent) {
         $pseudoBudget = (object) [
             'pseudo' => true,
@@ -38,26 +33,33 @@
                 'advisor_message' => $reservation->budget_notes,
             ],
         ];
-        if ($budgetAccepted) $completed->push($pseudoBudget);
-        else $pending->push($pseudoBudget);
+        $budgetCollection->push($pseudoBudget);
     }
 
-    foreach ($contractDocs as $d) {
-        // Skip signed documents - they should not appear in acuerdos
-        if ($d->status === 'signed') {
-            continue;
-        }
-        
-        if (in_array($d->status, ['approved','completed'])) {
-            $completed->push($d);
-        } elseif (in_array($d->status, ['pending','generated','awaiting_signature','in_review'])) {
-            $pending->push($d);
-        } else {
-            $completed->push($d);
-        }
-    }
+    // Usar los documentos del controlador directamente
+    $allPending = $pending ?? collect();
+    $allCompleted = $completed ?? collect();
 
-    $total = $pending->count() + $completed->count();
+    // Filtrar promesa de compraventa: solo mostrar si el plan de pagos está firmado
+    $paymentPlanSigned = $reservation ? $reservation->documents->firstWhere('document_type', 'payment_plan')?->status === 'signed' : false;
+    
+    $allPending = $allPending->filter(function($d) use ($paymentPlanSigned) {
+        $type = is_object($d) ? ($d->document_type ?? '') : ($d['document_type'] ?? '');
+        if ($type === 'purchase_promise' && !$paymentPlanSigned) {
+            return false;
+        }
+        return true;
+    });
+    
+    $allCompleted = $allCompleted->filter(function($d) use ($paymentPlanSigned) {
+        $type = is_object($d) ? ($d->document_type ?? '') : ($d['document_type'] ?? '');
+        if ($type === 'purchase_promise' && !$paymentPlanSigned) {
+            return false;
+        }
+        return true;
+    });
+
+    $total = $allPending->count() + $allCompleted->count();
 
     $typeMeta = [
         'budget'           => ['Presupuesto y plan de pagos', 'warn', 'pi-calculator'],
@@ -66,8 +68,12 @@
         'contract'         => ['Contrato', 'info', 'pi-file'],
     ];
 
-    $advisor = \App\Models\Agent::where('active', true)->orderBy('id')->first();
-    $advisorName = $advisor->name ?? 'Alejandro Morales';
+    // Obtener el nombre del admin/agente que configuró el presupuesto
+    $advisorName = null;
+    if ($reservation && $reservation->budget_configured_by) {
+        $configuredBy = \App\Models\User::find($reservation->budget_configured_by);
+        $advisorName = $configuredBy ? $configuredBy->name : null;
+    }
 
     $breakdown = $reservation ? \App\Helpers\PaymentPlanHelper::calculatePaymentBreakdown($reservation) : null;
 @endphp
@@ -149,38 +155,41 @@
     {{-- Header summary --}}
     <div class="px-5 py-4 rounded-2xl bg-ink-100/70 border border-ink-200 flex items-center justify-between flex-wrap gap-2">
         <div>
-            <div class="text-[15px] font-bold text-ink-950">{{ $total }} documento{{ $total === 1 ? '' : 's' }} · {{ $pending->count() }} pendiente{{ $pending->count() === 1 ? '' : 's' }} de tu acción</div>
+            <div class="text-[15px] font-bold text-ink-950">{{ $total }} documento{{ $total === 1 ? '' : 's' }} · {{ $allPending->count() }} pendiente{{ $allPending->count() === 1 ? '' : 's' }} de tu acción</div>
             <div class="text-[12px] text-ink-500 mt-0.5">Revisá lo que envió tu asesor, pedí cambios o firmá. Todo queda registrado.</div>
         </div>
     </div>
 
     {{-- ============ PENDIENTES ============ --}}
-    @if($pending->isNotEmpty())
+    @if($allPending->isNotEmpty())
         <div class="cli-card overflow-hidden">
             <div class="px-5 py-3 bg-warn-soft/60 border-b border-warn/15 flex items-center gap-2">
                 <i class="pi pi-clock text-warn-dark"></i>
                 <div class="text-[14px] font-bold text-warn-dark">Requiere tu atención</div>
             </div>
             <div class="divide-y divide-ink-100">
-                @foreach($pending as $doc)
+                @foreach($allPending as $doc)
                     @php
-                        [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$doc->document_type] ?? ['Documento', 'ink-500', 'pi-file'];
-                        $createdAt = $doc->created_at ? \Carbon\Carbon::parse($doc->created_at)->locale('es')->isoFormat('D MMM YYYY') : '';
+                        $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
+                        [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
+                        $createdAt = (is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale('es')->isoFormat('D MMM YYYY') : '';
+                        $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
+                        $docId = is_object($doc) ? $doc->id : $doc['id'];
                     @endphp
                     <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 transition-colors">
                         <span class="w-1 h-12 rounded-full bg-warn shrink-0"></span>
                         <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600 shrink-0"><i class="pi {{ $typeIcon }}"></i></div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[14px] font-bold text-ink-950 truncate">{{ $doc->title ?? $typeLabel }}</div>
+                            <div class="text-[14px] font-bold text-ink-950 truncate">{{ $docTitle }}</div>
                             <div class="text-[12px] text-ink-500 mt-0.5 flex items-center gap-2 flex-wrap">
                                 <span class="inline-flex items-center gap-1"><span class="dot bg-{{ $typeColor }}"></span> {{ $typeLabel }}</span>
-                                <span>{{ $advisorName }}</span>
-                                <span>·</span>
+                                @if($advisorName)<span>{{ $advisorName }}</span>@endif
+                                @if($advisorName && $createdAt)<span>·</span>@endif
                                 <span>{{ $createdAt }}</span>
                             </div>
                         </div>
                         <button type="button" class="cli-btn bg-warn text-white border-warn hover:bg-warn-dark px-3 py-2 text-[12px] font-semibold rounded-lg inline-flex items-center gap-2 shrink-0"
-                                data-open-acuerdo="{{ $doc->id }}">
+                                data-open-acuerdo="{{ $docId }}">
                             <i class="pi pi-eye text-[11px]"></i> Revisar
                         </button>
                     </div>
@@ -190,31 +199,34 @@
     @endif
 
     {{-- ============ COMPLETADOS ============ --}}
-    @if($completed->isNotEmpty())
+    @if($allCompleted->isNotEmpty())
         <div class="cli-card overflow-hidden">
             <div class="px-5 py-3 bg-ok-soft/60 border-b border-ok/20 flex items-center gap-2">
                 <i class="pi pi-check-circle text-ok-dark"></i>
                 <div class="text-[14px] font-bold text-ok-dark">Completados</div>
             </div>
             <div class="divide-y divide-ink-100">
-                @foreach($completed as $doc)
+                @foreach($allCompleted as $doc)
                     @php
-                        [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$doc->document_type] ?? ['Documento', 'ink-500', 'pi-file'];
-                        $signedAt = $doc->signed_at ? \Carbon\Carbon::parse($doc->signed_at)->locale('es')->isoFormat('D MMM YYYY') : ($doc->created_at ? \Carbon\Carbon::parse($doc->created_at)->locale('es')->isoFormat('D MMM YYYY') : '');
+                        $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
+                        [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
+                        $signedAt = (is_object($doc) ? ($doc->signed_at ?? '') : ($doc['signed_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->signed_at : $doc['signed_at'])->locale('es')->isoFormat('D MMM YYYY') : ((is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale('es')->isoFormat('D MMM YYYY') : '');
+                        $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
+                        $docId = is_object($doc) ? $doc->id : $doc['id'];
                     @endphp
                     <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 transition-colors">
                         <span class="w-1 h-12 rounded-full bg-ok shrink-0"></span>
                         <div class="w-10 h-10 rounded-lg bg-ok-soft flex items-center justify-center text-ok-dark shrink-0"><i class="pi {{ $typeIcon }}"></i></div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[14px] font-bold text-ink-950 truncate">{{ $doc->title ?? $typeLabel }}</div>
+                            <div class="text-[14px] font-bold text-ink-950 truncate">{{ $docTitle }}</div>
                             <div class="text-[12px] text-ink-500 mt-0.5 flex items-center gap-2 flex-wrap">
                                 <span class="inline-flex items-center gap-1"><span class="dot bg-ok"></span> {{ $typeLabel }}</span>
-                                <span>{{ $advisorName }}</span>
-                                <span>·</span>
+                                @if($advisorName)<span>{{ $advisorName }}</span>@endif
+                                @if($advisorName && $signedAt)<span>·</span>@endif
                                 <span>{{ $signedAt }}</span>
                             </div>
                         </div>
-                        <button type="button" class="cli-btn cli-btn-ghost text-[12px] py-2 px-3" data-open-acuerdo="{{ $doc->id }}">
+                        <button type="button" class="cli-btn cli-btn-ghost text-[12px] py-2 px-3" data-open-acuerdo="{{ $docId }}">
                             <i class="pi pi-eye text-[11px]"></i> Ver
                         </button>
                     </div>
@@ -223,11 +235,10 @@
         </div>
     @endif
 
-    @if($pending->isEmpty() && $completed->isEmpty())
+    @if($allPending->isEmpty() && $allCompleted->isEmpty())
         <div class="cli-card p-10 text-center">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-folder-open text-[22px]"></i></div>
-            <div class="mt-3 text-[15px] font-bold text-ink-950">Aún no tenés acuerdos disponibles</div>
-            <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">Cuando tu asesor envíe un presupuesto o contrato, lo verás acá para revisarlo y firmarlo.</p>
+            <div class="mt-3 text-[15px] font-bold text-ink-950">No tenés acuerdos por revisar</div>
         </div>
     @endif
 </div>
@@ -290,7 +301,7 @@
                             <span id="acm-status-pill" class="acm-status-pill bg-warn-soft text-warn-dark">Pendiente</span>
                         </div>
                         <div class="font-display text-[18px] font-semibold text-ink-950 mt-1" id="acm-fullTitle">Documento</div>
-                        <div class="text-[11px] text-ink-500 mt-1" id="acm-meta">{{ $advisorName }}</div>
+                        @if($advisorName)<div class="text-[11px] text-ink-500 mt-1" id="acm-meta">{{ $advisorName }}</div>@endif
 
                         <div class="mt-4 flex items-center gap-1">
                             <span class="acm-step-pill is-active" data-step="1"><span class="num">1</span> Revisar</span>
@@ -313,7 +324,8 @@
                     <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 
                         {{-- ============ REVIEW PANEL ============ --}}
-                        <div class="acm-panel active" data-acm-panel="review">
+                        <div class="acm-panel active overflow-y-auto max-h-full" data-acm-panel="review">
+                            @if($advisorName)
                             <div id="acm-advisor-block">
                                 <div class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mb-2">Mensaje de tu asesor</div>
                                 <div class="rounded-xl border border-ink-200 bg-ink-50 p-3">
@@ -321,6 +333,7 @@
                                     <div class="text-[12px] text-ink-700 mt-2 leading-relaxed whitespace-pre-line" id="acm-advisor-msg">—</div>
                                 </div>
                             </div>
+                            @endif
 
                             <div class="mt-4">
                                 <div class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mb-2 flex items-center justify-between">
@@ -397,12 +410,12 @@
 $acceptBudgetUrl = $reservation ? route('dashboard.budget.accept', $reservation->id) : null;
 $obsBudgetUrl    = $reservation ? route('dashboard.budget.observation', $reservation->id) : null;
 
-$__acuerdosData = $pending->merge($completed)->map(function($d) use ($typeMeta, $advisorName, $reservation, $breakdown, $acceptBudgetUrl, $obsBudgetUrl) {
-    [$typeLabel] = $typeMeta[$d->document_type] ?? ['Documento'];
+$__acuerdosData = $allPending->merge($allCompleted)->map(function($d) use ($typeMeta, $advisorName, $reservation, $breakdown, $acceptBudgetUrl, $obsBudgetUrl) {
+    [$typeLabel] = $typeMeta[$d['document_type'] ?? ''] ?? ['Documento'];
 
-    $isBudget   = $d->document_type === 'budget';
-    $isPayment  = $d->document_type === 'payment_plan';
-    $isContract = in_array($d->document_type, ['purchase_promise','contract']);
+    $isBudget   = ($d['document_type'] ?? '') === 'budget';
+    $isPayment  = ($d['document_type'] ?? '') === 'payment_plan';
+    $isContract = in_array($d['document_type'] ?? '', ['purchase_promise','contract']);
 
     /* Observations source */
     if ($isBudget) {
@@ -412,23 +425,41 @@ $__acuerdosData = $pending->merge($completed)->map(function($d) use ($typeMeta, 
         $signed = $accepted;   // budget is "accepted", not signed — but in lifecycle terms, this is the final state for it
         $previewUrl = null;
         $downloadUrl = null;
+    } elseif ($isPayment) {
+        // payment_plan shares the conversation log with the budget — both admin CRM and the
+        // simple client partial read/write from reservation.budget_observations
+        $observations = $reservation?->budget_observations ?? [];
+        $advisorMsg = $reservation?->budget_notes;
+        $accepted = !empty(data_get($d['metadata'] ?? [], 'accepted_at'));
+        $signed = in_array($d['status'] ?? '', ['signed','approved']);
+        $docId = $d['id'] ?? '';
+        $previewUrl = ($d['file_path'] ?? '') ? route('documents.preview', $docId) : null;
+        $downloadUrl = ($d['file_path'] ?? '') ? route('documents.download', $docId) : null;
     } else {
-        $observations = data_get($d->metadata, 'observations', []);
-        $advisorMsg = data_get($d->metadata, 'advisor_message');
-        $accepted = !empty(data_get($d->metadata, 'accepted_at'));
-        $signed = method_exists($d, 'isSigned') ? $d->isSigned() : false;
-        $previewUrl = $d->file_path ? route('documents.preview', $d->id) : null;
-        $downloadUrl = $d->file_path ? route('documents.download', $d->id) : null;
+        $observations = data_get($d['metadata'] ?? [], 'observations', []);
+        $advisorMsg = data_get($d['metadata'] ?? [], 'advisor_message');
+        $accepted = !empty(data_get($d['metadata'] ?? [], 'accepted_at'));
+        $signed = false; // Arrays don't have methods, use status instead
+        $docId = $d['id'] ?? '';
+        $previewUrl = ($d['file_path'] ?? '') ? route('documents.preview', $docId) : null;
+        $downloadUrl = ($d['file_path'] ?? '') ? route('documents.download', $docId) : null;
     }
 
     /* Endpoints */
-    $obsUrl    = $isBudget ? $obsBudgetUrl : route('dashboard.contract.observation', $d->id);
-    $acceptUrl = $isBudget ? $acceptBudgetUrl : ($isContract ? route('dashboard.contract.accept', $d->id) : null);
-    $signUrl   = (!$isBudget && method_exists($d, 'isSigned')) ? route('documents.sign', $d->id) : null;
+    $docId = $d['id'] ?? '';
+    $obsUrl    = ($isBudget || $isPayment) ? $obsBudgetUrl : route('dashboard.contract.observation', $docId);
+    $acceptUrl = $isBudget ? $acceptBudgetUrl : ($isContract ? route('dashboard.contract.accept', $docId) : null);
+    $signUrl   = (!$isBudget) ? route('documents.sign', $docId) : null;
 
     /* Status label */
+    $lastObs = ! empty($observations) ? end($observations) : null;
+    $awaitingAdmin = $lastObs
+        && (($lastObs['from'] ?? '') === 'client')
+        && (($lastObs['kind'] ?? null) !== 'accept');
+
     if ($signed) $statusLabel = ($isBudget ? 'Aceptado' : 'Firmado');
     elseif ($accepted) $statusLabel = 'Aceptado · pendiente firma';
+    elseif ($awaitingAdmin) $statusLabel = 'Pendiente de respuesta del asesor';
     else $statusLabel = 'Pendiente de tu respuesta';
 
     /* Can-accept / can-sign / can-observe */
@@ -466,16 +497,17 @@ $__acuerdosData = $pending->merge($completed)->map(function($d) use ($typeMeta, 
     }
 
     return [
-        'id'           => (string) $d->id,
-        'doc_type'     => $d->document_type,
-        'title'        => $d->title ?? $typeLabel,
+        'id'           => (string) ($d['id'] ?? ''),
+        'doc_type'     => $d['document_type'] ?? '',
+        'title'        => $d['title'] ?? $typeLabel,
         'type_label'   => strtoupper($typeLabel),
         'preview_url'  => $previewUrl,
         'download_url' => $downloadUrl,
         'status_label' => $statusLabel,
         'signed'       => $signed,
         'accepted'     => $accepted,
-        'created'      => $d->created_at ? \Carbon\Carbon::parse($d->created_at)->locale('es')->isoFormat('D MMM YYYY · h:mm A') : '',
+        'awaiting_admin' => $awaitingAdmin,
+        'created'      => ($d['created_at'] ?? '') ? \Carbon\Carbon::parse($d['created_at'])->locale('es')->isoFormat('D MMM YYYY · h:mm A') : '',
         'advisor'      => $advisorName,
         'advisor_msg'  => $advisorMsg ?: 'Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.',
         'observations' => collect($observations)->map(function($o) {
@@ -561,6 +593,7 @@ function openAcuerdoModal(id) {
     pill.className = 'acm-status-pill ' + (
         doc.signed ? 'bg-ok-soft text-ok-dark' :
         doc.accepted ? 'bg-info-soft text-info' :
+        doc.awaiting_admin ? 'bg-info-soft text-info' :
         'bg-warn-soft text-warn-dark'
     );
 

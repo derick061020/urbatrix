@@ -104,6 +104,11 @@ class Reservation extends Model
         return $this->hasMany(Message::class)->orderBy('created_at');
     }
 
+    public function latestMessage()
+    {
+        return $this->hasOne(Message::class)->latestOfMany();
+    }
+
     public function getReservationStatusAttribute()
     {
         return $this->status;

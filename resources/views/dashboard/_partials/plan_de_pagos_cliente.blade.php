@@ -35,12 +35,12 @@
                 @endif
             </div>
         </div>
-        @if($isSent && ! $accepted)
-            <span class="cli-pill bg-info-soft text-info">Pendiente de tu respuesta</span>
-        @elseif($needsAdminAction)
-            <span class="cli-pill bg-warn-soft text-warn">Revisión por asesor</span>
-        @elseif($accepted)
+        @if($accepted)
             <span class="cli-pill bg-ok-soft text-ok">Aceptado</span>
+        @elseif($needsAdminAction)
+            <span class="cli-pill bg-info-soft text-info">Pendiente de respuesta del asesor</span>
+        @elseif($isSent)
+            <span class="cli-pill bg-warn-soft text-warn-dark">Pendiente de tu respuesta</span>
         @endif
     </div>
 

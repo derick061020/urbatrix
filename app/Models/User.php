@@ -37,6 +37,16 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isBroker(): bool
+    {
+        return $this->role === 'broker';
+    }
+
+    public function assignedUnits()
+    {
+        return $this->belongsToMany(Unit::class, 'broker_unit')->withTimestamps();
+    }
+
     public function hasKycDocument(): bool
     {
         if (! $this->kyc_id_document) return false;

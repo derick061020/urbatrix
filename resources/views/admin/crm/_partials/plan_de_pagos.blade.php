@@ -13,9 +13,13 @@
     $installments = $r->payment_installments            ?? $config['payment_installments'];
     $legal        = $r->legal_costs                     ?? $config['legal_costs'];
     $isSent       = $r->isBudgetSent();
-    // "Aceptado" covers both states: client clicked Conforme (budget_status='approved')
-    // OR the contract is fully signed (status='contract_signed'/'signed').
-    $isAccepted   = $r->budget_status === 'approved' || in_array($r->status, ['contract_signed', 'signed']);
+    $planDocSigned = (bool) $r->documents->first(fn ($d) => $d->document_type === 'payment_plan' && in_array($d->status, ['signed', 'approved']));
+    // "Aceptado" covers: client clicked Conforme (budget_status='approved'),
+    // the contract is fully signed (status='contract_signed'/'signed'),
+    // or the payment plan document itself was already signed by the client.
+    $isAccepted   = $r->budget_status === 'approved'
+        || in_array($r->status, ['contract_signed', 'signed'])
+        || $planDocSigned;
     // The form is locked once the client accepted — admin can no longer edit.
     $isLocked     = $isAccepted;
     // Distinguish a real pending observation from a stale acceptance entry.
@@ -69,6 +73,17 @@
         </div>
     @endif
 
+    @if($isLocked)
+        <div class="p-5">
+            <div class="rounded-lg border border-ok/30 bg-ok-soft/40 px-4 py-3 flex items-center gap-3">
+                <i class="pi pi-check-circle text-ok"></i>
+                <div class="text-[12px] text-ok-dark">
+                    <div class="font-semibold">Plan de pagos firmado por el cliente</div>
+                    <div class="opacity-80">El presupuesto quedó cerrado. La pestaña "Plan de Pagos" ya está habilitada.</div>
+                </div>
+            </div>
+        </div>
+    @else
     <form method="POST" action="{{ route('admin.crm.budget.save', $r->id) }}" class="p-5 space-y-4 m-0">
         @csrf
 
@@ -127,22 +142,16 @@
             </div>
         @endif
 
-        @if(! $isLocked)
-            <div class="flex flex-wrap items-center gap-2 justify-end pt-2 border-t border-ink-100">
-                <button type="submit" name="action" value="save" class="crm-btn crm-btn-ghost"><i class="pi pi-save"></i> Guardar borrador</button>
-                <button type="submit" name="action" value="send" class="crm-btn crm-btn-primary"><i class="pi pi-send"></i> {{ $isSent ? 'Reenviar al cliente' : 'Enviar al cliente' }}</button>
-                @if($isSent)
-                    <form method="POST" action="{{ route('admin.crm.budget.revert', $r->id) }}" class="m-0" onclick="event.stopPropagation();">
-                        @csrf
-                        <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm('¿Revertir a borrador? El cliente dejará de verlo.');"><i class="pi pi-undo"></i> Revertir</button>
-                    </form>
-                @endif
-            </div>
-        @else
-            <div class="text-[12px] text-ok-dark flex items-center gap-2 pt-2 border-t border-ink-100">
-                <i class="pi pi-check-circle"></i>
-                <span>Plan aceptado por el cliente. La pestaña "Plan de Pagos" ya está habilitada.</span>
-            </div>
-        @endif
+        <div class="flex flex-wrap items-center gap-2 justify-end pt-2 border-t border-ink-100">
+            <button type="submit" name="action" value="save" class="crm-btn crm-btn-ghost"><i class="pi pi-save"></i> Guardar borrador</button>
+            <button type="submit" name="action" value="send" class="crm-btn crm-btn-primary"><i class="pi pi-send"></i> {{ $isSent ? 'Reenviar al cliente' : 'Enviar al cliente' }}</button>
+            @if($isSent)
+                <form method="POST" action="{{ route('admin.crm.budget.revert', $r->id) }}" class="m-0" onclick="event.stopPropagation();">
+                    @csrf
+                    <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm('¿Revertir a borrador? El cliente dejará de verlo.');"><i class="pi pi-undo"></i> Revertir</button>
+                </form>
+            @endif
+        </div>
     </form>
+    @endif
 </div>

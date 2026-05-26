@@ -20,7 +20,7 @@ class DocumentController extends Controller
      */
     public function download(Document $document)
     {
-        $document = $this->prepareDocumentForAccess($document);
+        $document = $this->prepareDocumentForAccess($document, true);
         $absolute = $this->resolveAbsolutePath($document->file_path);
         if (! $absolute) {
             abort(404, 'Documento no encontrado');
@@ -34,7 +34,7 @@ class DocumentController extends Controller
      */
     public function preview(Document $document)
     {
-        $document = $this->prepareDocumentForAccess($document);
+        $document = $this->prepareDocumentForAccess($document, false);
         $absolute = $this->resolveAbsolutePath($document->file_path);
         if (! $absolute) {
             abort(404, 'Documento no encontrado');
@@ -49,11 +49,12 @@ class DocumentController extends Controller
         ]);
     }
 
-    private function prepareDocumentForAccess(Document $document): Document
+    private function prepareDocumentForAccess(Document $document, bool $isDownload = false): Document
     {
         $this->authorizeAccess($document);
 
-        if ($document->document_type === 'payment_plan' && Auth::user()?->role !== 'admin') {
+        // Solo aplicar restricción del plan de pagos para download, no para preview
+        if ($isDownload && $document->document_type === 'payment_plan' && Auth::user()?->role !== 'admin') {
             $reservation = $document->reservation;
             $accepted = $reservation && ($reservation->budget_status === 'approved'
                 || in_array($reservation->status, ['contract_signed', 'signed']));
@@ -302,34 +303,18 @@ class DocumentController extends Controller
             ], 400);
         }
 
-        // If SignNow is configured, send the email invite and tell the client to check inbox.
-        // We do NOT mark the doc as signed locally — that happens via the SignNow webhook
-        // (or the admin's "Sincronizar firma" button) once the recipient actually signs.
-        if (\App\Services\SignNowService::isConfigured()) {
-            try {
-                $signerEmail = $document->reservation?->email ?? Auth::user()?->email;
-                $signerName  = trim(($document->reservation?->first_name ?? '').' '.($document->reservation?->last_name ?? ''))
-                    ?: (Auth::user()?->name ?? 'Cliente');
-
-                $result = \App\Services\SignNowService::sendForSignature($document, $signerEmail, $signerName);
-
-                return response()->json([
-                    'success'      => true,
-                    'email_sent'   => true,
-                    'signer_email' => $result['signer_email'] ?? $signerEmail,
-                    'message'      => 'Te enviamos un correo a '.$signerEmail.' con el link para firmar. Revisalo en tu bandeja de entrada (también en spam).',
-                    'provider'     => 'signnow',
-                    'status'       => $document->fresh()->status,
-                ]);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('SignNow signing failed, falling back to local sign: '.$e->getMessage());
-                // fall through to local signing
-            }
-        }
-
-        // Local fallback: mark the doc as signed server-side
+        // Always sign locally — mark the doc as signed server-side immediately.
+        // (SignNow integration intentionally bypassed: clients sign in-app via the
+        // canvas/typed signature in the Acuerdos modal, no external email round-trip.)
         try {
-            DocumentService::signDocument($document, Auth::id(), $request->input('notes'));
+            $notes = $request->input('notes');
+
+            // Embed the signature image into the actual file (append a signature page
+            // to the docx). If this fails we still mark the doc as signed — the JSON
+            // payload with the signature stays in `notes` as legal evidence.
+            $this->embedSignatureInDocument($document, $notes);
+
+            DocumentService::signDocument($document, Auth::id(), $notes);
             $document->refresh();
 
             return response()->json([
@@ -344,6 +329,103 @@ class DocumentController extends Controller
                 'success' => false,
                 'message' => 'Error al firmar el documento: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Append a signature section (image + signer name + date) to the document's
+     * generated docx file and update the document's file_path to point to the
+     * new signed version. Best-effort — failures are logged, not thrown.
+     */
+    private function embedSignatureInDocument(Document $document, ?string $notesJson): void
+    {
+        if (! $notesJson) return;
+
+        $data = json_decode($notesJson, true);
+        if (! is_array($data) || empty($data['signature_image'])) return;
+
+        if (! preg_match('#^data:image/(png|jpe?g);base64,(.+)$#', $data['signature_image'], $m)) {
+            return;
+        }
+        $imageBinary = base64_decode($m[2], true);
+        if ($imageBinary === false || $imageBinary === '') return;
+
+        $absolute = $this->resolveAbsolutePath($document->file_path);
+        if (! $absolute || ! is_file($absolute)) return;
+
+        $ext = strtolower(pathinfo($absolute, PATHINFO_EXTENSION));
+        if (! in_array($ext, ['doc', 'docx'])) return;
+
+        $tmpDir = storage_path('app/tmp_signatures');
+        if (! is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0755, true);
+        }
+        $sigExt = $m[1] === 'jpeg' ? 'jpg' : $m[1];
+        $sigPath = $tmpDir . '/sig_' . $document->id . '_' . time() . '.' . $sigExt;
+        if (file_put_contents($sigPath, $imageBinary) === false) return;
+
+        try {
+            $phpWord = \PhpOffice\PhpWord\IOFactory::load($absolute);
+
+            $section = $phpWord->addSection();
+            $section->addTextBreak(1);
+            $section->addText('FIRMA DEL CLIENTE', [
+                'bold' => true,
+                'size' => 13,
+                'color' => '171717',
+            ], [
+                'spaceBefore' => 200,
+                'spaceAfter'  => 120,
+            ]);
+
+            $section->addImage($sigPath, [
+                'width'  => 220,
+                'height' => 90,
+                'wrappingStyle' => 'inline',
+            ]);
+
+            $signerName = trim((string)($data['signer_name'] ?? ''));
+            $ts = $data['timestamp'] ?? now()->toIso8601String();
+            try {
+                $when = \Carbon\Carbon::parse($ts)->format('d/m/Y H:i');
+            } catch (\Throwable $e) {
+                $when = now()->format('d/m/Y H:i');
+            }
+
+            $section->addTextBreak(1);
+            if ($signerName !== '') {
+                $section->addText('Nombre: ' . $signerName, ['size' => 11]);
+            }
+            $section->addText('Fecha: ' . $when, ['size' => 11]);
+            $section->addText(
+                'Documento firmado electrónicamente desde el portal del cliente.',
+                ['italic' => true, 'size' => 9, 'color' => '717784']
+            );
+
+            $dir = dirname($absolute);
+            $base = pathinfo($absolute, PATHINFO_FILENAME);
+            $signedAbsolute = $dir . DIRECTORY_SEPARATOR . $base . '_signed.docx';
+
+            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($signedAbsolute);
+
+            if (is_file($signedAbsolute)) {
+                $publicRoot = storage_path('app/public') . DIRECTORY_SEPARATOR;
+                $signedRelative = str_starts_with($signedAbsolute, $publicRoot)
+                    ? str_replace(DIRECTORY_SEPARATOR, '/', substr($signedAbsolute, strlen($publicRoot)))
+                    : 'documents/' . basename($signedAbsolute);
+
+                $document->update([
+                    'file_path' => $signedRelative,
+                    'filename'  => basename($signedAbsolute),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning(
+                'Could not embed signature into document ' . $document->id . ': ' . $e->getMessage()
+            );
+        } finally {
+            if (is_file($sigPath)) @unlink($sigPath);
         }
     }
 

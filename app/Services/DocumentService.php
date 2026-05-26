@@ -84,23 +84,26 @@ class DocumentService
     {
         $document->markAsSigned($userId, $notes);
 
-        // Update reservation status if both documents are signed
         $reservation = $document->reservation;
         $paymentPlan = $reservation->documents()->ofType('payment_plan')->first();
         $purchasePromise = $reservation->documents()->ofType('purchase_promise')->first();
 
-        if ($paymentPlan && $purchasePromise &&
-            $paymentPlan->isSigned() && $purchasePromise->isSigned()) {
-            // Update reservation status to contract_signed
-            $reservation->update(['status' => 'contract_signed']);
-
-            // Generate payments after both documents are signed
+        // As soon as the payment plan is signed, materialize the installment
+        // calendar so the client sees the cuotas in "Plan de Pagos". The
+        // purchase_promise signing comes later and shouldn't be a blocker.
+        if ($paymentPlan && $paymentPlan->isSigned() && $reservation->payments()->count() === 0) {
             try {
                 $paymentsCount = \App\Services\PaymentService::generatePayments($reservation);
-                \Illuminate\Support\Facades\Log::info('Payments generated from document signing: ' . $paymentsCount);
+                \Illuminate\Support\Facades\Log::info('Payments generated after payment_plan signed: ' . $paymentsCount);
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('Could not generate payments: ' . $e->getMessage());
             }
+        }
+
+        // Once both documents are signed, promote the reservation status.
+        if ($paymentPlan && $purchasePromise &&
+            $paymentPlan->isSigned() && $purchasePromise->isSigned()) {
+            $reservation->update(['status' => 'contract_signed']);
         }
 
         return $document;

@@ -225,6 +225,7 @@
         </div>
 
         {{-- Nav --}}
+        @php $isBroker = Auth::user()->role === 'broker'; @endphp
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
             <a href="{{ route('admin.crm.dashboard') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.dashboard' ? 'active' : '' }}">
                 <i class="pi pi-th-large"></i> Dashboard
@@ -232,15 +233,35 @@
 
             <div class="crm-nav-section">Gestión</div>
             @php
-                $expedientesCount = \App\Models\Reservation::count();
-                $docsPendientesCount = \App\Models\Document::whereIn('status', ['pending', 'generated'])->count();
-                $contratosPendientesCount = \App\Models\Reservation::where('budget_status', 'draft')->orWhereNull('budget_status')->count();
-                $pendingUsersCount = \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')
+                $brokerUnitIds = $isBroker
+                    ? Auth::user()->assignedUnits()->pluck('units.id')->all()
+                    : [];
+                $brokerUnitIdStrings = array_map('strval', $brokerUnitIds);
+
+                $expedientesQuery = \App\Models\Reservation::query();
+                if ($isBroker) $expedientesQuery->whereIn('unit_id', $brokerUnitIdStrings);
+                $expedientesCount = $expedientesQuery->count();
+
+                $docsQuery = \App\Models\Document::whereIn('status', ['pending', 'generated']);
+                if ($isBroker) {
+                    $docsQuery->whereHas('reservation', function($q) use ($brokerUnitIdStrings) {
+                        $q->whereIn('unit_id', $brokerUnitIdStrings);
+                    });
+                }
+                $docsPendientesCount = $docsQuery->count();
+
+                $contratosQuery = \App\Models\Reservation::where(function($q){
+                    $q->where('budget_status', 'draft')->orWhereNull('budget_status');
+                });
+                if ($isBroker) $contratosQuery->whereIn('unit_id', $brokerUnitIdStrings);
+                $contratosPendientesCount = $contratosQuery->count();
+
+                $pendingUsersCount = (!$isBroker && \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status'))
                     ? \App\Models\User::where('verification_status', 'pending')->count()
                     : 0;
-                $pendingKycDocsCount = \App\Models\Document::where('document_type', 'kyc')->where('status', 'pending')->whereNotNull('reservation_id')->count();
-                $aprobacionesCount = \App\Models\Approval::where('status', 'pendiente')->count() + $pendingUsersCount + $pendingKycDocsCount;
-                $tareasCount = \App\Models\Task::whereIn('status', ['pendiente', 'en_proceso', 'vencida'])->count();
+                $pendingKycDocsCount = $isBroker ? 0 : \App\Models\Document::where('document_type', 'kyc')->where('status', 'pending')->whereNotNull('reservation_id')->count();
+                $aprobacionesCount = $isBroker ? 0 : (\App\Models\Approval::where('status', 'pendiente')->count() + $pendingUsersCount + $pendingKycDocsCount);
+                $tareasCount = $isBroker ? 0 : \App\Models\Task::whereIn('status', ['pendiente', 'en_proceso', 'vencida'])->count();
             @endphp
             <a href="{{ route('admin.crm.expedientes') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.expedientes' ? 'active' : '' }}">
                 <i class="pi pi-folder"></i> Expedientes @if($expedientesCount > 0)<span class="badge-count">{{ $expedientesCount }}</span>@endif
@@ -255,45 +276,46 @@
                 <i class="pi pi-credit-card"></i> Transacciones
             </a>
 
-            <div class="crm-nav-section">Proyectos</div>
-            <a href="{{ route('admin.crm.proyectos') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.proyectos' ? 'active' : '' }}">
-                <i class="pi pi-building"></i> Proyectos
-            </a>
-            <a href="{{ route('admin.units') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'units' ? 'active' : '' }}">
-                <i class="pi pi-home"></i> Unidades
-            </a>
-            <a href="{{ route('admin.crm.avance-obra') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.avance-obra' ? 'active' : '' }}">
-                <i class="pi pi-chart-line"></i> Avance de Obra
-            </a>
+            @unless($isBroker)
+                <div class="crm-nav-section">Proyectos</div>
+                <a href="{{ route('admin.crm.proyectos') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.proyectos' ? 'active' : '' }}">
+                    <i class="pi pi-building"></i> Proyectos
+                </a>
+                <a href="{{ route('admin.units') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'units' ? 'active' : '' }}">
+                    <i class="pi pi-home"></i> Unidades
+                </a>
+                <a href="{{ route('admin.crm.avance-obra') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.avance-obra' ? 'active' : '' }}">
+                    <i class="pi pi-chart-line"></i> Avance de Obra
+                </a>
 
-            <div class="crm-nav-section">Comunicación</div>
-            @php
-                // Count unread messages sent BY clients across all reservations (what the admin needs to read)
-                $mensajesCount = \App\Models\Message::where('sender_role', 'client')->whereNull('read_at')->count();
-            @endphp
-            <a href="{{ route('admin.communication') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'communication' ? 'active' : '' }}">
-                <i class="pi pi-comments"></i> Mensajes @if($mensajesCount > 0)<span class="badge-count">{{ $mensajesCount }}</span>@endif
-            </a>
-            <a href="{{ route('admin.crm.plantillas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.plantillas' ? 'active' : '' }}">
-                <i class="pi pi-envelope"></i> Plantilla y Automatiz…
-            </a>
-            <a href="{{ route('admin.crm.anuncios') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.anuncios' ? 'active' : '' }}">
-                <i class="pi pi-megaphone"></i> Anuncios
-            </a>
+                <div class="crm-nav-section">Comunicación</div>
+                @php
+                    $mensajesCount = \App\Models\Message::where('sender_role', 'client')->whereNull('read_at')->count();
+                @endphp
+                <a href="{{ route('admin.communication') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'communication' ? 'active' : '' }}">
+                    <i class="pi pi-comments"></i> Mensajes @if($mensajesCount > 0)<span class="badge-count">{{ $mensajesCount }}</span>@endif
+                </a>
+                <a href="{{ route('admin.crm.plantillas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.plantillas' ? 'active' : '' }}">
+                    <i class="pi pi-envelope"></i> Plantilla y Automatiz…
+                </a>
+                <a href="{{ route('admin.crm.anuncios') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.anuncios' ? 'active' : '' }}">
+                    <i class="pi pi-megaphone"></i> Anuncios
+                </a>
 
-            <div class="crm-nav-section">Equipo</div>
-            <a href="{{ route('admin.profiles') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'profiles' ? 'active' : '' }}">
-                <i class="pi pi-user"></i> Usuarios
-            </a>
-            <a href="{{ route('admin.agents') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'agents' ? 'active' : '' }}">
-                <i class="pi pi-briefcase"></i> Brokers y Externos
-            </a>
-            <a href="{{ route('admin.crm.aprobaciones') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.aprobaciones' ? 'active' : '' }}">
-                <i class="pi pi-check-square"></i> Aprobaciones @if($aprobacionesCount > 0)<span class="badge-count">{{ $aprobacionesCount }}</span>@endif
-            </a>
-            <a href="{{ route('admin.crm.tareas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.tareas' ? 'active' : '' }}">
-                <i class="pi pi-check"></i> Tareas @if($tareasCount > 0)<span class="badge-count">{{ $tareasCount }}</span>@endif
-            </a>
+                <div class="crm-nav-section">Equipo</div>
+                <a href="{{ route('admin.profiles') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'profiles' ? 'active' : '' }}">
+                    <i class="pi pi-user"></i> Usuarios
+                </a>
+                <a href="{{ route('admin.agents') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'agents' ? 'active' : '' }}">
+                    <i class="pi pi-briefcase"></i> Brokers
+                </a>
+                <a href="{{ route('admin.crm.aprobaciones') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.aprobaciones' ? 'active' : '' }}">
+                    <i class="pi pi-check-square"></i> Aprobaciones @if($aprobacionesCount > 0)<span class="badge-count">{{ $aprobacionesCount }}</span>@endif
+                </a>
+                <a href="{{ route('admin.crm.tareas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.tareas' ? 'active' : '' }}">
+                    <i class="pi pi-check"></i> Tareas @if($tareasCount > 0)<span class="badge-count">{{ $tareasCount }}</span>@endif
+                </a>
+            @endunless
         </nav>
 
         {{-- User --}}
@@ -304,7 +326,7 @@
                 </a>
                 <a href="{{ route('admin.profile.edit') }}" class="flex-1 min-w-0 leading-tight no-underline text-ink-950" title="Editar perfil">
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Samuel Urbina' }}</div>
-                    <div class="text-[11px] text-ink-500">Administrador</div>
+                    <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'broker' ? 'Broker' : 'Administrador' }}</div>
                 </a>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf

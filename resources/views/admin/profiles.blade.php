@@ -6,7 +6,8 @@
 
 @section('content')
 @php
-    $users = \App\Models\User::orderBy('created_at', 'desc')->paginate(50);
+    $clientsQuery = \App\Models\User::where('role', 'user');
+    $users = (clone $clientsQuery)->orderBy('created_at', 'desc')->paginate(50);
     $userIds = $users->getCollection()->pluck('id');
     $reservationsByUser = \App\Models\Reservation::with(['unit','documents'])
         ->whereIn('user_id', $userIds)
@@ -14,15 +15,18 @@
         ->get()
         ->groupBy('user_id');
 
-    $totalUsers = \App\Models\User::count();
-    $conUnidad  = \App\Models\Reservation::whereNotNull('user_id')->distinct('user_id')->count('user_id');
+    $totalUsers = (clone $clientsQuery)->count();
+    $conUnidad  = \App\Models\Reservation::whereNotNull('user_id')
+        ->whereIn('user_id', (clone $clientsQuery)->pluck('id'))
+        ->distinct('user_id')->count('user_id');
     $sinUnidad  = $totalUsers - $conUnidad;
     $admins     = \App\Models\User::where('role', 'admin')->count();
 
-    // Users with pending KYC verification (uploaded docs during register)
+    // Client users with pending KYC verification (uploaded docs during register)
     $pendingKyc = collect();
     if (\Schema::hasColumn('users', 'verification_status')) {
-        $pendingKyc = \App\Models\User::where('verification_status', 'pending')
+        $pendingKyc = \App\Models\User::where('role', 'user')
+            ->where('verification_status', 'pending')
             ->whereNotNull('kyc_id_document')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -158,7 +162,6 @@
                             $bg = $avBg[$u->id % count($avBg)];
                             $rolePill = match($u->role) {
                                 'admin'   => ['Admin', 'err'],
-                                'broker'  => ['Broker', 'info'],
                                 default   => ['Usuario', 'ok'],
                             };
                         @endphp

@@ -134,6 +134,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/agents', [AdminController::class, 'storeAgent'])->name('admin.agents.store');
     Route::put('/agents/{agent}', [AdminController::class, 'updateAgent'])->name('admin.agents.update');
     Route::delete('/agents/{agent}', [AdminController::class, 'deleteAgent'])->name('admin.agents.delete');
+    Route::post('/agents/{agent}/units', [AdminController::class, 'assignBrokerUnits'])->name('admin.agents.units');
 
     Route::get('/communication', [AdminController::class, 'communication'])->name('admin.communication');
     Route::get('/extras', [AdminController::class, 'extras'])->name('admin.extras');

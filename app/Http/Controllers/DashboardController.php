@@ -43,6 +43,11 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
+        // If the user is a broker, redirect to CRM
+        if (Auth::user()?->role === 'broker') {
+            return redirect()->route('admin.crm.dashboard');
+        }
+
         $reservation = $this->resolveReservation($request);
         if (! $reservation) return view('dashboard.empty');
 
@@ -73,6 +78,7 @@ class DashboardController extends Controller
     public function payments(Request $request)
     {
         $reservation = $this->resolveReservation($request);
+        if (! $reservation) return view('dashboard.empty');
         return view('dashboard.pagos', [
             'activeRoute' => 'payments',
             'reservation' => $reservation,
@@ -456,9 +462,24 @@ class DashboardController extends Controller
             ]);
         }
 
-        $docs = $reservation->documents()->orderByDesc('created_at')->get();
+        $acuerdoTypes = ['budget', 'payment_plan', 'purchase_promise', 'contract'];
+        $docs = $reservation->documents()
+            ->whereIn('document_type', $acuerdoTypes)
+            ->orderByDesc('created_at')
+            ->get();
         // Exclude signed documents from both pending and completed - they should not appear in acuerdos
         $docs = $docs->filter(fn($d) => $d->status !== 'signed');
+
+        // El payment_plan solo se muestra al cliente cuando el admin ya envió el plan.
+        // Generar el .docx en el admin crea el Document con status='generated', pero eso
+        // no implica que el cliente deba verlo todavía.
+        $budgetSent = $reservation->isBudgetSent()
+            || $reservation->budget_status === 'approved'
+            || ! empty($reservation->budget_observations);
+        if (! $budgetSent) {
+            $docs = $docs->reject(fn($d) => $d->document_type === 'payment_plan');
+        }
+
         $pending   = $docs->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']));
         $completed = $docs->filter(fn($d) => in_array($d->status, ['approved', 'completed']));
 

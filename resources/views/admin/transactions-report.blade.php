@@ -6,13 +6,25 @@
 
 @section('content')
 @php
-    $payments = \App\Models\Payment::with('reservation.unit')->orderBy('paid_at', 'desc')->orderBy('created_at', 'desc')->paginate(40);
-    $totalCobrado    = \App\Models\Payment::where('status', 'paid')->sum('amount');
-    $pendienteCobro  = \App\Models\Payment::where('status', 'pending')->sum('amount');
-    $pagosVencidos   = \App\Models\Payment::where('status', 'overdue')->sum('amount');
-    $countPaid       = \App\Models\Payment::where('status', 'paid')->count();
-    $countPending    = \App\Models\Payment::where('status', 'pending')->count();
-    $countOverdue    = \App\Models\Payment::where('status', 'overdue')->count();
+    $brokerUnitIds = auth()->user()->role === 'broker'
+        ? auth()->user()->assignedUnits()->pluck('units.id')->all()
+        : null;
+
+    $scopeBroker = function ($query) use ($brokerUnitIds) {
+        if ($brokerUnitIds !== null) {
+            $query->whereHas('reservation', fn ($q) => $q->whereIn('unit_id', $brokerUnitIds));
+        }
+        return $query;
+    };
+
+    $payments = $scopeBroker(\App\Models\Payment::with('reservation.unit'))
+        ->orderBy('paid_at', 'desc')->orderBy('created_at', 'desc')->paginate(40);
+    $totalCobrado    = $scopeBroker(\App\Models\Payment::where('status', 'paid'))->sum('amount');
+    $pendienteCobro  = $scopeBroker(\App\Models\Payment::where('status', 'pending'))->sum('amount');
+    $pagosVencidos   = $scopeBroker(\App\Models\Payment::where('status', 'overdue'))->sum('amount');
+    $countPaid       = $scopeBroker(\App\Models\Payment::where('status', 'paid'))->count();
+    $countPending    = $scopeBroker(\App\Models\Payment::where('status', 'pending'))->count();
+    $countOverdue    = $scopeBroker(\App\Models\Payment::where('status', 'overdue'))->count();
 @endphp
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
