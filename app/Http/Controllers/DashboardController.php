@@ -40,7 +40,7 @@ class DashboardController extends Controller
     {
         // If the user is an admin, redirect to admin dashboard
         if (Auth::user()?->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.crm.dashboard');
         }
 
         // If the user is a broker, redirect to CRM
