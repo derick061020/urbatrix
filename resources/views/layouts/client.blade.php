@@ -177,6 +177,10 @@
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
         </div>
 
+        <a href="{{ url('/') }}" class="cli-btn cli-btn-primary w-full mt-3">
+            <i class="pi pi-building"></i> Ver listado de unidades
+        </a>
+
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
             @php
                 $uid = auth()->id();
@@ -253,13 +257,13 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <a href="{{ route('dashboard.profile.edit') }}" class="cli-avatar shrink-0" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil">
+                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
-                </a>
-                <a href="{{ route('dashboard.profile.edit') }}" class="flex-1 min-w-0 leading-tight no-underline text-ink-950" title="Editar perfil">
+                </button>
+                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="Editar perfil" onclick="openSettingsModal()">
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Cliente' }}</div>
                     <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Cliente' }}</div>
-                </a>
+                </button>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión"><i class="pi pi-arrow-up-right text-xs"></i></button>
@@ -287,6 +291,7 @@
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
                 <input type="text" placeholder="Buscar…" class="topbar-search pr-3" />
             </div>
+
             <button type="button" class="topbar-icon-btn shrink-0" title="Notificaciones">
                 <i class="pi pi-bell"></i>
                 <span class="dot-indicator"></span>

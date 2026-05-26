@@ -47,6 +47,26 @@ class User extends Authenticatable
         return $this->belongsToMany(Unit::class, 'broker_unit')->withTimestamps();
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function hasActiveReservation(): bool
+    {
+        return $this->reservations()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhereRaw('LOWER(status) <> ?', ['cancelled']);
+            })
+            ->exists();
+    }
+
+    public function postAuthRedirectPath(): string
+    {
+        return $this->hasActiveReservation() ? '/dashboard' : '/';
+    }
+
     public function hasKycDocument(): bool
     {
         if (! $this->kyc_id_document) return false;

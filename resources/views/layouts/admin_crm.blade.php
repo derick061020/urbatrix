@@ -321,13 +321,13 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <a href="{{ route('admin.profile.edit') }}" class="crm-avatar shrink-0" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil">
+                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
-                </a>
-                <a href="{{ route('admin.profile.edit') }}" class="flex-1 min-w-0 leading-tight no-underline text-ink-950" title="Editar perfil">
+                </button>
+                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="Editar perfil" onclick="openSettingsModal()">
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Samuel Urbina' }}</div>
                     <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'broker' ? 'Broker' : 'Administrador' }}</div>
-                </a>
+                </button>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión">

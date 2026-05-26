@@ -35,8 +35,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
-            $redirectPath = $user->role === 'admin' ? '/admin/crm/dashboard' : '/dashboard';
-            return redirect()->intended($redirectPath);
+            return redirect($user->postAuthRedirectPath());
         }
 
         return back()->withErrors([
@@ -199,7 +198,7 @@ class AuthController extends Controller
         return response()->json([
             'ok'       => true,
             'pending'  => $user->isPendingVerification(),
-            'redirect' => $user->role === 'admin' ? '/admin/crm/dashboard' : '/dashboard',
+            'redirect' => $user->postAuthRedirectPath(),
         ]);
     }
 
