@@ -1818,8 +1818,10 @@ class AdminController extends Controller
             'name'        => 'required|string|max:255',
             'type'        => 'required|string|max:60',
             'stage'       => 'required|string|max:60',
+            'location'    => 'nullable|string|max:160',
             'progress'    => 'required|integer|min:0|max:100',
             'color'       => 'nullable|string|max:9',
+            'icon_path'   => 'nullable|string|max:255',
             'description' => 'nullable|string|max:2000',
         ]);
         Project::create($validated);
@@ -1832,8 +1834,10 @@ class AdminController extends Controller
             'name'        => 'required|string|max:255',
             'type'        => 'required|string|max:60',
             'stage'       => 'required|string|max:60',
+            'location'    => 'nullable|string|max:160',
             'progress'    => 'required|integer|min:0|max:100',
             'color'       => 'nullable|string|max:9',
+            'icon_path'   => 'nullable|string|max:255',
             'description' => 'nullable|string|max:2000',
         ]);
         $project->update($validated);

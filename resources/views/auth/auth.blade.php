@@ -268,7 +268,7 @@
 
                 <div class="flex items-center gap-3 my-6">
                     <span class="h-px flex-1 bg-ink-200"></span>
-                    <span class="text-[11px] uppercase tracking-[0.16em] text-ink-400 font-medium">OR</span>
+                    <span class="text-[11px] uppercase tracking-[0.16em] text-ink-400 font-medium">O</span>
                     <span class="h-px flex-1 bg-ink-200"></span>
                 </div>
 

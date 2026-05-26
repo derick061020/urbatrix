@@ -80,18 +80,25 @@
 @php
     $activos = $proyectos->filter(fn($p) => ($p->sold_count + $p->reserved_count) > 0 || ($p->progress ?? 0) > 0)->count();
 
-    $iconMap = [
-        'makai'  => ['bg' => '#5c7c68', 'img' => '/images/projects/makai.png'],
-        'naviva' => ['bg' => '#c89f2d', 'img' => '/images/projects/naviva.png'],
-        'liv'    => ['bg' => '#2f7c83', 'img' => '/images/projects/liv.png'],
+    // Fallback assets when no icon_path is stored in DB (matched by slug prefix)
+    $iconFallback = [
+        'makai'  => '/images/projects/makai.png',
+        'naviva' => '/images/projects/naviva.png',
+        'liv'    => '/images/projects/liv.png',
     ];
 
-    $resolveIcon = function($name) use ($iconMap) {
-        $key = strtolower(\Illuminate\Support\Str::slug($name));
-        foreach ($iconMap as $k => $v) {
-            if (str_starts_with($key, $k)) return $v;
+    $resolveIcon = function($p) use ($iconFallback) {
+        $img = $p->icon_path ?: null;
+        if (!$img) {
+            $key = strtolower(\Illuminate\Support\Str::slug($p->name));
+            foreach ($iconFallback as $k => $v) {
+                if (str_starts_with($key, $k)) { $img = $v; break; }
+            }
         }
-        return ['bg' => '#5c7c68', 'img' => null];
+        return [
+            'bg'  => $p->color ?: '#5c7c68',
+            'img' => $img,
+        ];
     };
 @endphp
 
@@ -128,7 +135,8 @@
             $isActive   = ($sold + $reserved) > 0 || ($p->progress ?? 0) > 0;
             $pctVentas  = $total > 0 ? round((($sold + $reserved) / $total) * 100) : 0;
             $pctObra    = (int) ($p->progress ?? 0);
-            $icon       = $resolveIcon($p->name);
+            $icon       = $resolveIcon($p);
+            $locationTxt = $p->location ?: 'Sin ubicación';
         @endphp
 
         @if(!$isActive)
@@ -144,7 +152,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="font-display text-[16px] font-bold text-ink-950 truncate">{{ $p->name }}</div>
                     <div class="text-[11px] font-semibold text-err uppercase tracking-wide flex items-center gap-1 mt-0.5">
-                        <i class="pi pi-map-marker text-[10px]"></i> CAP CANA · PUNTA CANA
+                        <i class="pi pi-map-marker text-[10px]"></i> {{ $locationTxt }}
                     </div>
                 </div>
                 <span class="pr-pill pr-pill-prep">En preparación</span>
@@ -165,7 +173,7 @@
                         <div class="min-w-0">
                             <div class="font-display text-[16px] font-bold text-ink-950 uppercase tracking-wide truncate">{{ $p->name }}</div>
                             <div class="text-[11px] font-semibold text-err uppercase tracking-wide flex items-center gap-1 mt-0.5">
-                                <i class="pi pi-map-marker text-[10px]"></i> CAP CANA · PUNTA CANA
+                                <i class="pi pi-map-marker text-[10px]"></i> {{ $locationTxt }}
                             </div>
                         </div>
                     </div>
@@ -304,10 +312,12 @@
                 <div><label class="text-[12px] font-semibold text-ink-700">Tipo</label><input type="text" name="type" placeholder="Residencial" class="crm-input pl-3 mt-1"></div>
                 <div><label class="text-[12px] font-semibold text-ink-700">Etapa</label><input type="text" name="stage" placeholder="En desarrollo" class="crm-input pl-3 mt-1"></div>
             </div>
+            <div><label class="text-[12px] font-semibold text-ink-700">Ubicación</label><input type="text" name="location" placeholder="Cap Cana · Punta Cana" class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="text-[12px] font-semibold text-ink-700">Avance %</label><input type="number" name="progress" value="0" min="0" max="100" class="crm-input pl-3 mt-1"></div>
                 <div><label class="text-[12px] font-semibold text-ink-700">Color</label><input type="color" name="color" value="#5c7c68" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>
             </div>
+            <div><label class="text-[12px] font-semibold text-ink-700">Ícono (URL o ruta)</label><input type="text" name="icon_path" placeholder="/images/projects/proyecto.png" class="crm-input pl-3 mt-1"></div>
             <div><label class="text-[12px] font-semibold text-ink-700">Descripción</label><textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
