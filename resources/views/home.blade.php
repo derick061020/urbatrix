@@ -827,7 +827,7 @@
         </div>
 
         <!-- CENTER: Units sold + online users -->
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 1 auto;min-width:0;">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0;">
           <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ $soldCount ?? 0 }} OF {{ $totalUnits ?? 0 }} UNITS SOLD</span>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
@@ -881,7 +881,7 @@
             <div class="menu-dropdown-container" id="profileDropdown">
               
               <!-- User Info Section -->
-              <div style="display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;background:white;border-radius:10px;width:100%;flex-shrink:0;">
+              <div style="display:flex;gap:8px;align-items:center;padding:8px;background:white;border-radius:10px;width:100%;flex-shrink:0;">
                 <div style="position:relative;border-radius:999px;width:40px;height:40px;flex-shrink:0;overflow:hidden;">
                   @if(auth()->check() && auth()->user()->avatar)
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
@@ -891,18 +891,22 @@
                     </span>
                   @endif
                 </div>
-                <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
+                <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
                   <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;white-space:nowrap;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
                   <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;min-width:max-content;">{{ auth()->check() ? auth()->user()->email : 'samuelurbi@gmail.com' }}</div>
                 </div>
-                <div style="background:white;border:1px solid #ebebeb;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;flex-shrink:0;box-shadow:0px 1px 2px 0px rgba(10,13,20,0.03);">
-                  <div style="display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0;">
-                    <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;white-space:nowrap;">USD</div>
-                  </div>
-                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                <div style="position:relative;">
+                  <button type="button" class="fg-filter-btn" onclick="toggleCurrencyDropdown()" id="currencyBtn">
+                    <span id="currencyLabel">USD</span>
+                    <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div id="currencyDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:100px;padding:8px;">
+                    <div style="font-family:'Poppins',sans-serif;">
+                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('USD')">USD</label>
+                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('EUR')">EUR</label>
+                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('CAD')">CAD</label>
+                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('MXN')">MXN</label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1438,9 +1442,9 @@
                 </div>
                 <div class="fg-card-divider"></div>
                 <div class="fg-card-price">
-                  <span class="price">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
+                  <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="sqft">${{ number_format($unit->price / $unit->internal_area, 0) }}/sqft</span>
+                    <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/sqft</span>
                   @endif
                 </div>
                 @if($hasDiscount)
@@ -1494,9 +1498,9 @@
                 @elseif($isReserved)
                   <div class="fg-card-buttons">
                     <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">More Info</button>
-                    <button class="fg-btn-cta" type="button" disabled style="cursor:not-allowed;opacity:.5;">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V5a3 3 0 1 1 6 0v3"/></svg>
-                      Reserved
+                    <button class="fg-btn-cta" type="button" onclick="notifyWhenAvailable('{{ $unitId }}')">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                      Notificar si se libera
                     </button>
                   </div>
                   <div class="fg-card-availability">
@@ -1595,7 +1599,7 @@
             <button type="button" class="fg-list-tab" data-tab="second" onclick="setListTab(this)">2nd Chance <span class="badge">{{ $units->filter(fn($u)=>!empty($u->is_second_chance))->count() }}</span></button>
             <button type="button" class="fg-list-tab" data-tab="sold" onclick="setListTab(this)">Sold <span class="badge">{{ $units->where('status', 'SOLD')->count() }}</span></button>
           </div>
-          <button class="fg-pill-matches" type="button" style="margin-left:auto;">
+          <button class="fg-pill-matches" type="button" style="margin-left:auto;" onclick="shareMatches()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
@@ -1647,9 +1651,9 @@
                 <td>{{ number_format($unit->internal_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
                 <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
                 <td>
-                  <span class="price">${{ number_format($unit->price, 0, ',', ',') }}</span>
+                  <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="price-meta">${{ number_format($unit->price / $unit->internal_area, 0) }}/SQFT</span>
+                    <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/SQFT</span>
                   @endif
                 </td>
                 <td>
@@ -2079,6 +2083,10 @@
           }
           if (badgeEl) {
               // override pill colors when not available
+              badgeEl.className = isReserved ? 'mt-badge-reserved'
+                               : isSold ? 'mt-badge-reserved'
+                               : isPending ? 'mt-badge-available'
+                               : 'mt-badge-available';
               badgeEl.style.background = isSold || isReserved ? '#fde2e1'
                                        : isPending ? '#fef3c7'
                                        : '';
@@ -2222,11 +2230,13 @@
           }
         });
       }
-      // Currency toggle
+      // Currency toggle (modal only)
       document.querySelectorAll('.mt-currency-toggle button').forEach(function (b) {
         b.addEventListener('click', function () {
           this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
           this.classList.add('active');
+          const cur = this.dataset.cur || 'USD';
+          updateModalCurrencyDisplay(cur);
         });
       });
       // Buyer toggle — toggles a `living-mode` class on .mt-shell; CSS does the rest
@@ -2857,6 +2867,12 @@
         activeBtn.style.borderColor = '#111827';
       }
       
+      // Update the select dropdown value
+      const currencySelect = document.getElementById('currencySelect');
+      if (currencySelect) {
+        currencySelect.value = currency;
+      }
+      
       // Store currency preference
       localStorage.setItem('selectedCurrency', currency);
       
@@ -2915,11 +2931,81 @@
       updateLanguageDisplay(lang);
     }
 
-    // Update currency display
+    // Exchange rates (relative to 1 USD)
+    const EXCHANGE_RATES = {
+      USD: 1,
+      EUR: 0.92,
+      CAD: 1.36,
+      MXN: 17.45,
+      DOP: 58.5,
+    };
+
+    const CURRENCY_SYMBOLS = {
+      USD: '$',
+      EUR: '€',
+      CAD: 'C$',
+      MXN: 'MX$',
+      DOP: 'RD$',
+    };
+
+    // Update currency display — converts all prices marked with data-usd
     function updateCurrencyDisplay(currency) {
-      // This function can be expanded to update all price displays
-      console.log('Currency changed to:', currency);
-      // You can add logic here to update prices throughout the page
+      const rate = EXCHANGE_RATES[currency] || 1;
+      const symbol = CURRENCY_SYMBOLS[currency] || '$';
+
+      // Convert all .price elements with data-usd (cards + list)
+      document.querySelectorAll('.price[data-usd]').forEach(el => {
+        const usd = parseFloat(el.dataset.usd);
+        if (!isNaN(usd)) {
+          const converted = Math.round(usd * rate);
+          el.textContent = symbol + number_format(converted, 0, ' ', ' ');
+        }
+      });
+
+      // Convert all .sqft and .price-meta with data-usd-sqft
+      document.querySelectorAll('[data-usd-sqft]').forEach(el => {
+        const usd = parseFloat(el.dataset.usdSqft || el.dataset.usd_sqft);
+        if (!isNaN(usd)) {
+          const converted = Math.round(usd * rate);
+          el.textContent = symbol + number_format(converted, 0) + '/sqft';
+        }
+      });
+
+      // Convert modal price
+      const modalPrice = document.getElementById('modalPrice');
+      if (modalPrice && modalPrice.dataset.usd) {
+        const usd = parseFloat(modalPrice.dataset.usd);
+        if (!isNaN(usd)) {
+          const converted = Math.round(usd * rate);
+          modalPrice.textContent = symbol + number_format(converted, 0, ' ', ' ');
+        }
+      }
+    }
+
+    // Update modal currency display only — converts only modal prices
+    function updateModalCurrencyDisplay(currency) {
+      const rate = EXCHANGE_RATES[currency] || 1;
+      const symbol = CURRENCY_SYMBOLS[currency] || '$';
+
+      // Convert modal price only
+      const modalPrice = document.getElementById('modalPrice');
+      if (modalPrice && modalPrice.dataset.usd) {
+        const usd = parseFloat(modalPrice.dataset.usd);
+        if (!isNaN(usd)) {
+          const converted = Math.round(usd * rate);
+          modalPrice.textContent = symbol + number_format(converted, 0, ' ', ' ');
+        }
+      }
+
+      // Convert modal sqft price if exists
+      const modalSqft = document.getElementById('modalSqft');
+      if (modalSqft && modalSqft.dataset.usdSqft) {
+        const usd = parseFloat(modalSqft.dataset.usdSqft);
+        if (!isNaN(usd)) {
+          const converted = Math.round(usd * rate);
+          modalSqft.textContent = symbol + number_format(converted, 0) + '/sqft';
+        }
+      }
     }
 
     // Update language display
@@ -2959,6 +3045,80 @@
         if (financial) financial.style.display = 'flex';
         if (lifestyle) lifestyle.style.display = 'none';
       }
+    }
+
+    // Share matches function - copies current filter link to clipboard
+    function shareMatches() {
+      const activeTab = document.querySelector('.fg-list-tab.active');
+      const tabValue = activeTab ? activeTab.dataset.tab : 'all';
+      const searchInput = document.querySelector('#fgListSearch input');
+      const searchValue = searchInput ? searchInput.value : '';
+      
+      // Build shareable URL with current filters
+      const url = new URL(window.location.href);
+      if (tabValue !== 'all') {
+        url.searchParams.set('tab', tabValue);
+      }
+      if (searchValue) {
+        url.searchParams.set('search', searchValue);
+      }
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        showToast('Link copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy link');
+      });
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      // Remove existing toast if any
+      const existingToast = document.querySelector('.fg-toast');
+      if (existingToast) existingToast.remove();
+      
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = 'fg-toast';
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--brand, #5c7c68);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        animation: slideUp 0.3s ease;
+      `;
+      
+      // Add animation keyframes if not exists
+      if (!document.querySelector('#toast-animation')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animation';
+        style.textContent = `
+          @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      document.body.appendChild(toast);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
     }
 
     function openVideoCall() {
@@ -3126,6 +3286,39 @@
           });
         }, 10);
       }
+    }
+
+    // Toggle currency dropdown
+    function toggleCurrencyDropdown() {
+      const dropdown = document.getElementById('currencyDropdown');
+      if (!dropdown) return;
+      
+      // Close all other dropdowns first
+      document.querySelectorAll('.filter-dropdown').forEach(d => {
+        if (d !== dropdown) d.style.display = 'none';
+      });
+      
+      // Toggle current dropdown
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      
+      // Close on outside click
+      if (dropdown.style.display === 'block') {
+        setTimeout(() => {
+          document.addEventListener('click', function closeDropdown(e) {
+            if (!dropdown.contains(e.target) && !e.target.closest('#currencyBtn')) {
+              dropdown.style.display = 'none';
+              document.removeEventListener('click', closeDropdown);
+            }
+          });
+        }, 10);
+      }
+    }
+
+    // Select currency
+    function selectCurrency(currency) {
+      document.getElementById('currencyLabel').textContent = currency;
+      document.getElementById('currencyDropdown').style.display = 'none';
+      setCurrency(currency);
     }
 
     // Apply price filter

@@ -26,6 +26,7 @@
     $aprobAlta              = $stats['aprobaciones_alta']       ?? 0;
     $tareasVencidas         = $stats['tareas_vencidas']         ?? 0;
     $tareasHoyCount         = $stats['tareas_hoy']              ?? 0;
+    $perfilesPendientes     = $stats['perfiles_pendientes']     ?? 0;
 @endphp
 
 <div class="p-4 sm:p-6 lg:p-8 space-y-5">
@@ -40,6 +41,19 @@
         <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-err font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">Ver todas <i class="pi pi-arrow-right text-[10px]"></i></a>
         <button type="button" class="text-ink-400 hover:text-ink-700 shrink-0" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[11px]"></i></button>
     </div>
+
+    @if($perfilesPendientes > 0)
+    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-warn-soft border border-warn/20 text-[13px] text-ink-700">
+        <i class="pi pi-user-check text-warn text-[16px]"></i>
+        <span class="leading-tight">
+            <span class="font-bold text-ink-950">{{ $perfilesPendientes }} {{ $perfilesPendientes === 1 ? 'perfil pendiente' : 'perfiles pendientes' }} de verificación</span> &mdash;
+            Hay {{ $perfilesPendientes }} {{ $perfilesPendientes === 1 ? 'usuario que aún no ha completado' : 'usuarios que aún no han completado' }} su proceso de verificación de identidad (KYC).
+            Revisa los documentos y aprueba o rechaza sus perfiles para que puedan continuar.
+        </span>
+        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-warn font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">Ir a verificaciones <i class="pi pi-arrow-right text-[10px]"></i></a>
+        <button type="button" class="text-ink-400 hover:text-ink-700 shrink-0" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[11px]"></i></button>
+    </div>
+    @endif
 
     {{-- KPI cards con punto en esquina superior derecha --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

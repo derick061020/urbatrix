@@ -141,10 +141,12 @@
         <div id="step-indicator" class="hidden lg:flex items-center gap-5">
             @php
                 $steps = [
-                    ['Datos personales', 1],
-                    ['Dirección',        2],
-                    ['Profesión',        3],
-                    ['Forma de pago',    4],
+                    ['Datos básicos',   1],
+                    ['Documento',       2],
+                    ['Información',     3],
+                    ['Dirección',       4],
+                    ['Profesión',       5],
+                    ['Forma de pago',   6],
                 ];
             @endphp
             @foreach($steps as $s)
@@ -180,27 +182,18 @@
 
         <div class="w-full max-w-[640px] relative">
 
-            {{-- ====== STEP 1 — Datos personales (KYC) ====== --}}
+            {{-- ====== STEP 1 — Datos básicos ====== }}
             <div class="reg-step active" data-step="1">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
-                        <i class="pi pi-id-card text-ink-600 text-[26px]"></i>
+                        <i class="pi pi-user text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Datos personales</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Completa los datos del adquiriente principal</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Datos básicos</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">Información de contacto del adquiriente</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
-                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Datos generales del adquiriente</div>
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="sm:col-span-2">
-                        <label class="field-label">Agregar titular secundario <span class="field-required">*</span></label>
-                        <select id="addCoBuyer" class="auth-input auth-select" onchange="toggleCoBuyersPanel(this.value)">
-                            <option value="no">No</option>
-                            <option value="si">Sí</option>
-                        </select>
-                    </div>
                     <div>
                         <label class="field-label">Nombre <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" value="{{ $reservation->first_name ?? '' }}" readonly>
@@ -217,7 +210,25 @@
                         <label class="field-label">Teléfono <span class="field-required">*</span></label>
                         <input type="tel" class="auth-input" value="{{ $reservation->phone ?? '' }}" readonly>
                     </div>
+                </div>
 
+                <div class="mt-8">
+                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                </div>
+            </div>
+
+            {{-- ====== STEP 2 — Documento ====== }}
+            <div class="reg-step" data-step="2">
+                <div class="text-center mb-7">
+                    <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
+                        <i class="pi pi-id-card text-ink-600 text-[26px]"></i>
+                    </div>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Documento de identidad</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">Información de tu documento oficial</p>
+                </div>
+                <div class="h-px bg-ink-200/70 mb-6"></div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="field-label">Tipo de identificación <span class="field-required">*</span></label>
                         <select id="idType" class="auth-input auth-select">
@@ -293,6 +304,25 @@
                         <label class="field-label">Lugar de expedición <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="expedition_place">
                     </div>
+                </div>
+
+                <div class="mt-8">
+                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                </div>
+            </div>
+
+            {{-- ====== STEP 3 — Información personal ====== }}
+            <div class="reg-step" data-step="3">
+                <div class="text-center mb-7">
+                    <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
+                        <i class="pi pi-info-circle text-ink-600 text-[26px]"></i>
+                    </div>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Información personal</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">Datos adicionales del adquiriente</p>
+                </div>
+                <div class="h-px bg-ink-200/70 mb-6"></div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="field-label">Fecha de nacimiento <span class="field-required">*</span></label>
                         <input type="date" class="auth-input" data-name="birth_date" id="birth_date" onchange="calculateAge()">
@@ -347,9 +377,17 @@
                         <label class="field-label">País de residencia <span class="field-required">*</span></label>
                         <input type="text" class="auth-input">
                     </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="field-label">Agregar titular secundario <span class="field-required">*</span></label>
+                        <select id="addCoBuyer" class="auth-input auth-select" onchange="toggleCoBuyersPanel(this.value)">
+                            <option value="no">No</option>
+                            <option value="si">Sí</option>
+                        </select>
+                    </div>
                 </div>
 
-                {{-- ============ TITULARES SECUNDARIOS ============ --}}
+                {{-- ============ TITULARES SECUNDARIOS ============ }}
                 <div id="coBuyersPanel" class="mt-7" style="display:none;">
                     <div class="h-px bg-ink-200/70 mb-5"></div>
                     <div class="flex items-center justify-between mb-4">
@@ -429,12 +467,12 @@
                 </template>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 2 — Dirección ====== --}}
-            <div class="reg-step" data-step="2">
+            {{-- ====== STEP 4 — Dirección ====== --}}
+            <div class="reg-step" data-step="4">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-map-marker text-ink-600 text-[26px]"></i>
@@ -480,12 +518,12 @@
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(5)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 3 — Profesión & Unidad ====== --}}
-            <div class="reg-step" data-step="3">
+            {{-- ====== STEP 5 — Profesión & Unidad ====== --}}
+            <div class="reg-step" data-step="5">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-briefcase text-ink-600 text-[26px]"></i>
@@ -516,22 +554,45 @@
 
                 <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mt-7 mb-4">Unidad reservada</div>
 
-                <div class="rounded-2xl border border-ink-200 p-5 bg-ink-50/40 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="field-label">Unidad</label>
-                        <input type="text" class="auth-input" value="{{ $reservation->unit_name ?? '' }}" readonly>
+                <div class="rounded-2xl border border-ink-200 overflow-hidden bg-white shadow-sm">
+                    {{-- Property Image --}}
+                    <div class="relative h-48 sm:h-56 bg-gradient-to-br from-brand-soft to-ink-50 overflow-hidden">
+                        @if($unit && $unit->images && $unit->images->count() > 0)
+                            <img src="{{ $unit->images->first()->image_path ?? asset('images/hero/hero.png') }}"
+                                 alt="Unidad {{ $reservation->unit_name ?? '' }}"
+                                 class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-soft to-ink-50">
+                                <div class="text-center">
+                                    <i class="pi pi-home text-brand text-[48px] mb-3"></i>
+                                    <div class="text-ink-600 font-semibold text-[14px]">{{ $reservation->unit_name ?? 'Unidad' }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <div class="text-white font-display text-[18px] font-bold">{{ $reservation->unit_name ?? 'Unidad' }}</div>
+                            <div class="text-white/80 text-[12px]">Nivel {{ $unit->floor ?? 'N/A' }}</div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="field-label">Nivel</label>
-                        <input type="text" class="auth-input" value="{{ $unit->floor ?? 'N/A' }}" readonly>
-                    </div>
-                    <div>
-                        <label class="field-label">Precio de lista</label>
-                        <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
-                    </div>
-                    <div>
-                        <label class="field-label">Precio final</label>
-                        <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
+
+                    {{-- Unit Details --}}
+                    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="field-label">Unidad</label>
+                            <input type="text" class="auth-input" value="{{ $reservation->unit_name ?? '' }}" readonly>
+                        </div>
+                        <div>
+                            <label class="field-label">Nivel</label>
+                            <input type="text" class="auth-input" value="{{ $unit->floor ?? 'N/A' }}" readonly>
+                        </div>
+                        <div>
+                            <label class="field-label">Precio de lista</label>
+                            <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
+                        </div>
+                        <div>
+                            <label class="field-label">Precio final</label>
+                            <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
+                        </div>
                     </div>
                 </div>
 
@@ -544,12 +605,12 @@
                 </label>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(6)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 4 — Forma de pago ====== --}}
-            <div class="reg-step" data-step="4">
+            {{-- ====== STEP 6 — Forma de pago ====== --}}
+            <div class="reg-step" data-step="6">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-credit-card text-ink-600 text-[26px]"></i>
@@ -559,7 +620,7 @@
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
-                <div id="step4-error" class="hidden mb-4 px-3 py-2 rounded-lg bg-err-soft border border-err/30 text-[12px] text-err"></div>
+                <div id="step6-error" class="hidden mb-4 px-3 py-2 rounded-lg bg-err-soft border border-err/30 text-[12px] text-err"></div>
 
                 <div class="space-y-3">
                     {{-- Option A --}}
@@ -862,7 +923,7 @@
     /* ---------- Submit ---------- */
     window.submitForm = async () => {
         const submitBtn = document.getElementById('submit-btn');
-        const errBox = document.getElementById('step4-error');
+        const errBox = document.getElementById('step6-error');
         if (!validateStep(currentStep)) return;
 
         // Get selected payment method
@@ -890,7 +951,7 @@
                 missingCustomFields.forEach(markInvalid);
                 errBox.textContent = 'Completa los porcentajes del plan personalizado para continuar.';
                 errBox.classList.remove('hidden');
-                scrollToFirstInvalid(getStep(4));
+                scrollToFirstInvalid(getStep(6));
                 return;
             }
         }

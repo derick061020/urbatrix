@@ -566,6 +566,10 @@ class AdminController extends Controller
             $docsBase->whereHas('reservation', fn($q) => $q->whereIn('unit_id', $brokerUnitIds));
         }
 
+        $pendingProfilesCount = (!$isBroker && \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status'))
+            ? User::where('verification_status', 'pending')->count()
+            : 0;
+
         $stats = [
             'expedientes_activos'     => (clone $reservationsBase)->count(),
             'expedientes_incompletos' => (clone $reservationsBase)
@@ -576,6 +580,7 @@ class AdminController extends Controller
             'aprobaciones_alta'       => $isBroker ? 0 : Approval::where('status', 'pendiente')->where('priority', 'alta')->count(),
             'tareas_vencidas'         => $isBroker ? 0 : Task::where('status', 'vencida')->count(),
             'tareas_hoy'              => $isBroker ? 0 : Task::whereDate('due_date', today())->where('status', '!=', 'completada')->count(),
+            'perfiles_pendientes'     => $pendingProfilesCount,
         ];
 
         $proyectos = Project::all();
