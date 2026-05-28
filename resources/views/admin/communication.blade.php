@@ -89,6 +89,9 @@
                         <div class="text-[11px] text-ink-500">{{ $active->unit->name ?? '—' }} · {{ $active->email }}</div>
                     </div>
                     <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Ver expediente</a>
+                    <button type="button" onclick="toggleRightRail()" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Expandir menú">
+                        <i class="pi pi-ellipsis-v"></i>
+                    </button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-5 space-y-3" id="admin-comm-scroll">
@@ -129,7 +132,7 @@
         </section>
 
         {{-- Right rail --}}
-        <aside class="col-span-3 border-l border-ink-100 flex flex-col overflow-y-auto">
+        <aside id="right-rail" class="col-span-3 border-l border-ink-100 flex flex-col overflow-y-auto hidden">
             <div class="p-4 border-b border-ink-100">
                 <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">Enviar por canal</div>
                 @if($active)
@@ -173,6 +176,13 @@
 <script>
     const adminCommScroll = document.getElementById('admin-comm-scroll');
     if (adminCommScroll) adminCommScroll.scrollTop = adminCommScroll.scrollHeight;
+
+    function toggleRightRail() {
+        const rightRail = document.getElementById('right-rail');
+        if (rightRail) {
+            rightRail.classList.toggle('hidden');
+        }
+    }
 </script>
 @endpush
 @endsection
