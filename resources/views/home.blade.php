@@ -485,18 +485,35 @@
   </div>
 
   <script>
-    // Returns the canonical shareable URL for the currently opened unit.
+    // Returns the canonical shareable URL.
+    //   • If a unit modal is open → link to that unit, but ALSO keep the current
+    //     filter/view query string so the recipient lands on the same grid state.
+    //   • Otherwise → link to the current filtered grid/list view.
     function buildShareUrl() {
-      const unitId = (typeof currentOpenUnit !== 'undefined' && currentOpenUnit) ? currentOpenUnit : '';
-      const base = window.location.origin + '/';
-      return unitId ? base + '?unit=' + encodeURIComponent(unitId) : base;
+      const params = new URLSearchParams(window.location.search);
+      const unitId = (typeof currentOpenUnit !== 'undefined' && currentOpenUnit) ? String(currentOpenUnit) : '';
+      if (unitId) {
+        params.set('unit', unitId);
+      } else {
+        params.delete('unit');
+      }
+      const qs = params.toString();
+      return window.location.origin + window.location.pathname + (qs ? '?' + qs : '');
     }
 
+    // Triggered by the green "N Matches" pill — copies the filtered URL.
+    window.shareMatches = function () {
+      const url = buildShareUrl();
+      const input = document.getElementById('shareUrlInput');
+      if (input) input.value = url;
+      document.getElementById('shareModal').classList.add('open');
+      const lbl = document.getElementById('shareCopyLabel');
+      if (lbl) lbl.textContent = 'Copiar';
+      document.getElementById('shareCopyBtn').classList.remove('copied');
+    };
+
     window.openShareModal = function () {
-      if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
-        alert('Primero abrí los detalles de una unidad.');
-        return;
-      }
+      // Allow sharing even with no unit open — falls back to the filtered URL.
       const url = buildShareUrl();
       document.getElementById('shareUrlInput').value = url;
       document.getElementById('shareModal').classList.add('open');
@@ -1683,12 +1700,12 @@
           </button>
         </div>
 
-        <button class="fg-pill-matches" type="button">
+        <button class="fg-pill-matches" type="button" onclick="shareMatches()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          102 Matches
+          {{ $units->count() }} Matches
         </button>
       </div>
       <!-- Cards Grid -->
@@ -1711,8 +1728,35 @@
           $unitId = $unit->custom_id ?? $unit->id;
           $shortlistedCount = (int) ($unit->shortlisted_count ?? 0);
         @endphp
+        @php
+          $beds = (int) ($unit->bedrooms ?? 0);
+          if (!empty($unit->type) && strcasecmp($unit->type, 'Penthouse') === 0) {
+              $unitTypeLbl = 'Penthouse';
+          } elseif ($beds === 0) {
+              $unitTypeLbl = 'Studio';
+          } else {
+              $unitTypeLbl = $beds . ' Bed';
+          }
+          $floorRaw = trim((string) ($unit->floor ?? ''));
+          $floorNorm = ($floorRaw === '' || strcasecmp($floorRaw, 'ground') === 0) ? 'Ground' : $floorRaw;
+          $searchBlob = strtolower(implode(' ', array_filter([
+              $unitId, $unit->name, $unit->floor, $unit->direction,
+              $unit->outlook, $unit->type, $beds.' bed',
+          ])));
+        @endphp
         <!--- unit - start  ---->
-        <div class="{{ $cardCls }}">
+        <div class="{{ $cardCls }}"
+             data-filter-unit="{{ $unitId }}"
+             data-filter-search="{{ $searchBlob }}"
+             data-filter-floor="{{ $floorNorm }}"
+             data-filter-type="{{ $unitTypeLbl }}"
+             data-filter-bedrooms="{{ $beds }}"
+             data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
+             data-filter-outlook="{{ $unit->outlook ?? '' }}"
+             data-filter-price="{{ (float) $unit->price }}"
+             data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
+             data-filter-status="{{ $st }}"
+             data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
           <div class="fg-card-inner">
 
             <!-- Image area -->
@@ -1837,7 +1881,7 @@
               <div class="fg-card-actions">
                 @if($isSold)
                   <div class="fg-card-buttons">
-                    <button class="fg-btn-info-similar" type="button" onclick="if(typeof openMoreInfo==='function'){openMoreInfo('{{ $unitId }}')}">View Similar Units</button>
+                    <button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">View Similar Units</button>
                   </div>
                   <div class="fg-card-availability">
                     <span class="dot"></span>
@@ -1911,23 +1955,6 @@
         </div>
         <!---- unit - end   ---->
 
-        <!-- Insert CTA card after 2 complete rows (6 units) -->
-        @if($loop->iteration === 6)
-        <div style="grid-column:1/-1;justify-self:center;width:100%;">
-          <div style="position:relative;border-radius:28px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(10,13,20,0.05);">
-            <button style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;color:#5c5c5c;">×</button>
-            <div style="order:2;background:var(--brand);display:flex;flex-direction:column;justify-content:center;padding:32px 40px;font-family:'Inter',sans-serif;">
-              <h4 style="margin:0 0 12px 0;font-weight:700;font-size:20px;color:white;line-height:28px;">Own Fully Furnished. Earn Effortlessly.</h4>
-              <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:white;opacity:0.95;">Step into effortless ownership with a fully furnished unit—on us. Enjoy a free USD $30,000 furniture pack on launch and explore how Dolce Hotels &amp; Resorts by Wyndham professionally manages your investment for optimal returns.</p>
-              <button style="background:#b4874a;color:white;border:none;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;width:fit-content;font-family:'Inter',sans-serif;">Download ROI's</button>
-            </div>
-            <div style="order:1;overflow:hidden;min-height:280px;">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FxAm2it27WacYwCuJuage%2FFurniture%2F1773908563262%2Ffull.webp" alt="Own Fully Furnished. Earn Effortlessly." style="width:100%;height:100%;object-fit:cover;display:block;">
-            </div>
-          </div>
-        </div>
-        @endif
-
         @endforeach
       </div>
 
@@ -1984,7 +2011,31 @@
                 $unitId = $unit->custom_id ?? $unit->id;
                 $tabKey = $statusCls === 'hot' || $statusCls === 'available' || $statusCls === 'reserved' ? 'available' : $statusCls;
               @endphp
-              <tr class="{{ $rowCls }}" data-tab="{{ $tabKey }}" data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}">
+              @php
+                $rowBeds = (int) ($unit->bedrooms ?? 0);
+                if (!empty($unit->type) && strcasecmp($unit->type, 'Penthouse') === 0) {
+                    $rowTypeLbl = 'Penthouse';
+                } elseif ($rowBeds === 0) {
+                    $rowTypeLbl = 'Studio';
+                } else {
+                    $rowTypeLbl = $rowBeds . ' Bed';
+                }
+                $rowFloorRaw  = trim((string) ($unit->floor ?? ''));
+                $rowFloorNorm = ($rowFloorRaw === '' || strcasecmp($rowFloorRaw, 'ground') === 0) ? 'Ground' : $rowFloorRaw;
+              @endphp
+              <tr class="{{ $rowCls }}"
+                  data-tab="{{ $tabKey }}"
+                  data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}"
+                  data-filter-unit="{{ $unitId }}"
+                  data-filter-floor="{{ $rowFloorNorm }}"
+                  data-filter-type="{{ $rowTypeLbl }}"
+                  data-filter-bedrooms="{{ $rowBeds }}"
+                  data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
+                  data-filter-outlook="{{ $unit->outlook ?? '' }}"
+                  data-filter-price="{{ (float) $unit->price }}"
+                  data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
+                  data-filter-status="{{ $st }}"
+                  data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
                 <td><b>{{ $unitId }}</b></td>
                 <td>
                     <span class="fg-list-status {{ $statusCls }}">{{ strtoupper($statusLabel) }}</span>
@@ -2046,40 +2097,101 @@
       <div class="fg-plan-wrap" id="fgPlanWrap">
         <div class="fg-plan-board">
 
+          @php
+            // Group all public units by floor (DB-driven). Units without a floor
+            // value are bucketed under "Ground". Floors are sorted naturally so
+            // "Ground" comes first, then 1, 2, 3, …
+            $floorBuckets = collect($units ?? [])->groupBy(function($u) {
+                $f = trim((string) ($u->floor ?? ''));
+                if ($f === '' || strcasecmp($f, 'ground') === 0 || strcasecmp($f, 'pb') === 0) {
+                    return 'Ground';
+                }
+                return $f;
+            });
+
+            $floorOrder = $floorBuckets->keys()->sort(function($a, $b) {
+                if ($a === 'Ground') return -1;
+                if ($b === 'Ground') return 1;
+                $na = (int) preg_replace('/\D+/', '', $a);
+                $nb = (int) preg_replace('/\D+/', '', $b);
+                if ($na === $nb) return strcmp($a, $b);
+                return $na <=> $nb;
+            })->values();
+
+            // Active floor = first bucket with any AVAILABLE unit, else first
+            $activeFloor = $floorOrder->first(function($f) use ($floorBuckets) {
+                return $floorBuckets[$f]->contains(fn($u) =>
+                    !in_array(strtolower((string)$u->status), ['sold','reserved','pending'])
+                );
+            }) ?? ($floorOrder->first() ?? 'Ground');
+
+            // Available count per floor (excludes sold/reserved/pending)
+            $availableByFloor = $floorOrder->mapWithKeys(function($f) use ($floorBuckets) {
+                $n = $floorBuckets[$f]->filter(fn($u) =>
+                    !in_array(strtolower((string)$u->status), ['sold','reserved','pending'])
+                )->count();
+                return [$f => $n];
+            });
+
+            // Distinct, well-spread anchor coords across the 1366×769 planview.
+            // Markers cycle through this list per floor; "side" flips to keep the
+            // tail pointing into the canvas. Add more entries if a floor has more.
+            $anchorPoints = [
+                ['x'=>1184,   'y'=>295,   'side'=>'left'],
+                ['x'=>289,    'y'=>349,   'side'=>'right'],
+                ['x'=>1129,   'y'=>394,   'side'=>'left'],
+                ['x'=>375,    'y'=>412,   'side'=>'right'],
+                ['x'=>1082.5, 'y'=>474.5, 'side'=>'left'],
+                ['x'=>460,    'y'=>500,   'side'=>'right'],
+                ['x'=>980,    'y'=>540,   'side'=>'left'],
+                ['x'=>560,    'y'=>360,   'side'=>'right'],
+                ['x'=>880,    'y'=>320,   'side'=>'left'],
+                ['x'=>650,    'y'=>440,   'side'=>'right'],
+                ['x'=>790,    'y'=>250,   'side'=>'left'],
+                ['x'=>320,    'y'=>260,   'side'=>'right'],
+            ];
+
+            $markerStateFor = function($u) {
+                $s = strtolower((string) $u->status);
+                if (in_array($s, ['sold'])) return 'sold';
+                if (in_array($s, ['reserved','pending'])) return 'reserved';
+                if (!empty($u->is_second_chance)) return '2nd';
+                if (!empty($u->is_high_demand)) return 'hot';
+                return 'default';
+            };
+          @endphp
+
           <!-- chips-filters bar (Figma 193:6017) -->
           <div class="fg-plan-topbar">
             <div class="fg-plan-chips" role="tablist" aria-label="Floor filter">
-              @php
-                $floorChips = [
-                  ['label' => 'Ground', 'count' => 12, 'active' => false],
-                  ['label' => 'P1',     'count' => 10, 'active' => true],
-                  ['label' => 'P2',     'count' => 8,  'active' => false],
-                  ['label' => 'P3',     'count' => 7,  'active' => false],
-                  ['label' => 'P4',     'count' => 5,  'active' => false],
-                  ['label' => 'P5',     'count' => 3,  'active' => false],
-                  ['label' => 'P6',     'count' => 9,  'active' => false],
-                  ['label' => 'P7',     'count' => 13, 'active' => false],
-                ];
-              @endphp
-              @foreach($floorChips as $c)
+              @forelse($floorOrder as $floorLabel)
+                @php $isActive = ($floorLabel === $activeFloor); @endphp
                 <button type="button"
-                        class="fg-chip-floor{{ $c['active'] ? ' is-active' : '' }}"
+                        class="fg-chip-floor{{ $isActive ? ' is-active' : '' }}"
                         role="tab"
-                        aria-selected="{{ $c['active'] ? 'true' : 'false' }}"
-                        data-floor="{{ strtolower($c['label']) }}">
+                        aria-selected="{{ $isActive ? 'true' : 'false' }}"
+                        data-floor="{{ $floorLabel }}">
                   <span class="fg-chip-left">
                     <span class="fg-chip-dot"></span>
-                    <span class="fg-chip-text">{{ $c['label'] }}</span>
+                    <span class="fg-chip-text">{{ $floorLabel }}</span>
                   </span>
-                  <span class="fg-chip-count">{{ $c['count'] }}</span>
+                  <span class="fg-chip-count">{{ $floorBuckets[$floorLabel]->count() }}</span>
                 </button>
-              @endforeach
+              @empty
+                <div class="fg-plan-empty-chips" style="color:#9aa3a0;font-size:13px;padding:8px 12px;">
+                  Sin unidades publicadas.
+                </div>
+              @endforelse
             </div>
 
-            <!-- PISO 1 · 6 UNIDADES DISPONIBLES (Figma 193:6028) -->
+            <!-- Active floor label · N UNIDADES DISPONIBLES -->
             <div class="fg-plan-piso">
-              <div class="fg-plan-piso-left">PISO 1</div>
-              <div class="fg-plan-piso-right">6 UNIDADES DISPONIBLES</div>
+              <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
+                {{ strtoupper($activeFloor === 'Ground' ? 'PLANTA BAJA' : 'PISO '.$activeFloor) }}
+              </div>
+              <div class="fg-plan-piso-right" id="fgPlanPisoCount">
+                {{ $availableByFloor[$activeFloor] ?? 0 }} UNIDADES DISPONIBLES
+              </div>
             </div>
           </div>
 
@@ -2087,62 +2199,54 @@
           <div class="fg-plan-canvas" style="background-color: white!important;" id="fgPlanCanvas">
             <!-- Planview image — labels, compass, and PHASE 1 are baked in -->
             <img src="/images/plan-view/makai-planview.png"
-                 alt="Plan view — Ground Floor"
+                 alt="Plan view"
                  class="fg-plan-img"
                  draggable="false">
 
-            <!-- Hotspot markers positioned in coords from Figma frame (1366×769) -->
-            @php
-              // Exact coordinates from Figma. Each marker is 72×72px.
-              // Side = which corner the tail points to (Figma's `left` / `right` props).
-              $planMarkers = [
-                ['x'=>1184,  'y'=>295,  'state'=>'default',  'side'=>'left',  'unit'=>'A-101'],
-                ['x'=>289,   'y'=>349,  'state'=>'default',  'side'=>'right', 'unit'=>'A-104'],
-                ['x'=>1129,  'y'=>394,  'state'=>'hot',      'side'=>'left',  'unit'=>'C-103'],
-                ['x'=>375,   'y'=>412,  'state'=>'sold',     'side'=>'right', 'unit'=>'B-110'],
-                ['x'=>1082.5,'y'=>474.5,'state'=>'default',  'side'=>'left',  'unit'=>'C-108'],
-              ];
-              $markerFill = [
-                'default'  => ['#5c7c68', '#455d4d'],
-                'hot'      => ['#f06a23', '#c84e16'],
-                'reserved' => ['#cd9600', '#a07700'],
-                'sold'     => ['#9aa3a0', '#7e8784'],
-                '2nd'      => ['#3b82f6', '#1d4ed8'],
-              ];
-            @endphp
-
-            @foreach($planMarkers as $i => $m)
-              @php
-                // Position as % of 1366×769 canvas
-                $leftPct = ($m['x'] / 1366) * 100;
-                $topPct  = ($m['y'] / 769) * 100;
-                // Resolve display data per marker — fall back to unit lookup if available
-                $unitObj = isset($units) ? $units->first(fn($u) => ($u->custom_id ?? $u->id) == $m['unit']) : null;
-                $markerPrice = $unitObj?->price ? '$'.number_format($unitObj->price/1000, 0).'k' : '$473k';
-                $markerArea  = $unitObj?->internal_area ?? 120;
-              @endphp
-              <button type="button"
-                      class="fg-plan-marker is-{{ $m['state'] }} side-{{ $m['side'] }}"
-                      style="left:{{ number_format($leftPct, 4, '.', '') }}%;top:{{ number_format($topPct, 4, '.', '') }}%;"
-                      onclick="openMoreInfo('{{ $m['unit'] }}')"
-                      aria-label="Unit {{ $m['unit'] }}">
-                <span class="fg-plan-marker-bubble">
-                  @include('partials._plan_marker_svg', [
-                      'state' => $m['state'],
-                      'side'  => $m['side'],
-                      'uid'   => $i.'_'.$m['state'],
-                  ])
-                  <span class="fg-plan-marker-text">
-                    <span class="fg-plan-marker-price">{{ $markerPrice }}</span>
-                    <span class="fg-plan-marker-sqft">{{ $markerArea }}</span>
-                  </span>
-                  @if($m['state'] === 'hot')
-                    <span class="fg-plan-marker-fire" aria-hidden="true">
-                      <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
+            {{-- Render one marker per real unit, grouped by floor. JS toggles
+                 visibility based on the active floor chip. --}}
+            @foreach($floorOrder as $floorLabel)
+              @foreach($floorBuckets[$floorLabel]->values() as $idx => $unit)
+                @php
+                  $anchor   = $anchorPoints[$idx % count($anchorPoints)];
+                  $leftPct  = ($anchor['x'] / 1366) * 100;
+                  $topPct   = ($anchor['y'] / 769) * 100;
+                  $state    = $markerStateFor($unit);
+                  $side     = $anchor['side'];
+                  $unitId   = $unit->id;
+                  $unitLbl  = $unit->custom_id ?? ('U-'.$unit->id);
+                  $price    = (float) ($unit->price ?? 0);
+                  $priceTxt = $price > 0 ? '$'.number_format($price/1000, 0).'k' : '—';
+                  $area     = $unit->internal_area ?? 0;
+                  $areaTxt  = $area > 0 ? rtrim(rtrim(number_format($area, 0), '0'), '.') : '—';
+                  $hidden   = ($floorLabel !== $activeFloor);
+                  $uid      = $floorLabel.'_'.$idx.'_'.$state;
+                @endphp
+                <button type="button"
+                        class="fg-plan-marker is-{{ $state }} side-{{ $side }}{{ $hidden ? ' is-hidden' : '' }}"
+                        style="left:{{ number_format($leftPct, 4, '.', '') }}%;top:{{ number_format($topPct, 4, '.', '') }}%;{{ $hidden ? 'display:none;' : '' }}"
+                        data-floor="{{ $floorLabel }}"
+                        data-unit-id="{{ $unitId }}"
+                        onclick="openMoreInfo('{{ $unitId }}')"
+                        aria-label="Unit {{ $unitLbl }}">
+                  <span class="fg-plan-marker-bubble">
+                    @include('partials._plan_marker_svg', [
+                        'state' => $state,
+                        'side'  => $side,
+                        'uid'   => $uid,
+                    ])
+                    <span class="fg-plan-marker-text">
+                      <span class="fg-plan-marker-price">{{ $priceTxt }}</span>
+                      <span class="fg-plan-marker-sqft">{{ $areaTxt }}</span>
                     </span>
-                  @endif
-                </span>
-              </button>
+                    @if($state === 'hot')
+                      <span class="fg-plan-marker-fire" aria-hidden="true">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
+                      </span>
+                    @endif
+                  </span>
+                </button>
+              @endforeach
             @endforeach
           </div>
 
@@ -2266,7 +2370,16 @@
           const unitDesc = document.getElementById('modalDesc');
           
           if (unitNum) unitNum.textContent = unit.custom_id || unit.name || 'Unit ' + unit.id;
-          if (unitPrice) unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
+          if (unitPrice) {
+            unitPrice.dataset.usd = unit.price || 0;
+            unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
+            const modalToggle = document.querySelector('#moreInfoModal .mt-currency-toggle');
+            if (modalToggle) {
+              modalToggle.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+              const usdBtn = modalToggle.querySelector('button[data-cur="USD"]');
+              if (usdBtn) usdBtn.classList.add('active');
+            }
+          }
 
           // Stat boxes — populate from DB; show — when missing
           const setStat = (id, value, suffix='') => {
@@ -2611,17 +2724,47 @@
           this.classList.add('active');
         });
       });
-      // Plan floor chips
-      document.querySelectorAll('.fg-chip-floor').forEach(function (b) {
-        b.addEventListener('click', function () {
-          this.parentElement.querySelectorAll('.fg-chip-floor').forEach(x => {
-            x.classList.remove('is-active');
-            x.setAttribute('aria-selected', 'false');
+      // Plan floor chips → filter markers + update floor label
+      (function () {
+        const chips     = document.querySelectorAll('.fg-chip-floor');
+        const canvas    = document.getElementById('fgPlanCanvas');
+        const labelEl   = document.getElementById('fgPlanPisoLabel');
+        const countEl   = document.getElementById('fgPlanPisoCount');
+        if (!chips.length || !canvas) return;
+
+        function activate(floor) {
+          chips.forEach(x => {
+            const on = x.dataset.floor === floor;
+            x.classList.toggle('is-active', on);
+            x.setAttribute('aria-selected', on ? 'true' : 'false');
           });
-          this.classList.add('is-active');
-          this.setAttribute('aria-selected', 'true');
+
+          let available = 0;
+          canvas.querySelectorAll('.fg-plan-marker').forEach(m => {
+            const match = m.dataset.floor === floor;
+            m.classList.toggle('is-hidden', !match);
+            m.style.display = match ? '' : 'none';
+            if (match && !m.classList.contains('is-sold') && !m.classList.contains('is-reserved')) {
+              available++;
+            }
+          });
+
+          if (labelEl) {
+            labelEl.textContent = (floor === 'Ground')
+              ? 'PLANTA BAJA'
+              : 'PISO ' + floor.toUpperCase();
+          }
+          if (countEl) {
+            countEl.textContent = available + ' UNIDADES DISPONIBLES';
+          }
+        }
+
+        chips.forEach(b => {
+          b.addEventListener('click', function () {
+            activate(this.dataset.floor);
+          });
         });
-      });
+      })();
     });
 
     // ============================
@@ -3406,29 +3549,8 @@
       }
     }
 
-    // Share matches function - copies current filter link to clipboard
-    function shareMatches() {
-      const activeTab = document.querySelector('.fg-list-tab.active');
-      const tabValue = activeTab ? activeTab.dataset.tab : 'all';
-      const searchInput = document.querySelector('#fgListSearch input');
-      const searchValue = searchInput ? searchInput.value : '';
-      
-      // Build shareable URL with current filters
-      const url = new URL(window.location.href);
-      if (tabValue !== 'all') {
-        url.searchParams.set('tab', tabValue);
-      }
-      if (searchValue) {
-        url.searchParams.set('search', searchValue);
-      }
-      
-      // Copy to clipboard
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        showToast('Link copied to clipboard!');
-      }).catch(() => {
-        showToast('Failed to copy link');
-      });
-    }
+    // (shareMatches is defined earlier near the share modal — opens the share
+    // dialog with the current filtered/grid URL pre-filled.)
 
     // Show toast notification
     function showToast(message) {
@@ -3900,51 +4022,165 @@
       label.textContent = sortOptions[currentFilters.sort] || 'Sort';
     }
 
-    // Apply all filters via AJAX
-    function applyFilters() {
+    // Apply all filters — pure client-side. Toggles visibility on the
+    // already-rendered grid cards (.fg-card) and list rows (tr[data-filter-unit]),
+    // sorts the grid in place, and updates the match counters + URL params.
+    function applyFilters(options) {
+      options = options || {};
       const unitNumberInput = document.querySelector('input[placeholder="Unit No."]');
       if (unitNumberInput) {
-        currentFilters.unitNumber = unitNumberInput.value;
+        currentFilters.unitNumber = (unitNumberInput.value || '').trim();
       }
 
-      // Show loading state
-      showFilterLoading();
+      const f = currentFilters;
+      const q = f.unitNumber ? f.unitNumber.toLowerCase() : '';
 
-      // Send AJAX request
-      fetch('/api/units/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        body: JSON.stringify(currentFilters)
-      })
-      .then(response => response.json())
-      .then(data => {
-        updateUnitsGrid(data.units);
-        updateMatchCount(data.total);
-        hideFilterLoading();
-      })
-      .catch(error => {
-        console.error('Error applying filters:', error);
-        hideFilterLoading();
+      function matches(el) {
+        const status   = (el.dataset.filterStatus   || '').toLowerCase();
+        const floor    = (el.dataset.filterFloor    || '');
+        const type     = (el.dataset.filterType     || '');
+        const beds     = parseInt(el.dataset.filterBedrooms || '0', 10);
+        const dir      = (el.dataset.filterDirection|| '').toUpperCase();
+        const outlook  = (el.dataset.filterOutlook  || '');
+        const price    = parseFloat(el.dataset.filterPrice  || '0');
+        const area     = parseFloat(el.dataset.filterArea   || '0');
+        const search   = (el.dataset.filterSearch   || '');
+        const unitLbl  = (el.dataset.filterUnit     || '').toLowerCase();
+
+        if (q && !search.includes(q) && !unitLbl.includes(q)) return false;
+        if (f.minPrice != null && price < f.minPrice) return false;
+        if (f.maxPrice != null && price > f.maxPrice) return false;
+
+        if (f.types && f.types.length) {
+          const ok = f.types.some(t => {
+            if (t === 'Studio')    return beds === 0;
+            if (t === '1 Bed')     return beds === 1;
+            if (t === '2 Bed')     return beds === 2;
+            if (t === '3 Bed')     return beds === 3;
+            if (t === 'Penthouse') return type === 'Penthouse';
+            return false;
+          });
+          if (!ok) return false;
+        }
+        if (f.directions && f.directions.length && !f.directions.includes(dir)) return false;
+        if (f.outlooks   && f.outlooks.length   && !f.outlooks.includes(outlook)) return false;
+        if (f.floors     && f.floors.length     && !f.floors.includes(floor))    return false;
+        return true;
+      }
+
+      const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
+      let visibleGrid = 0;
+      cards.forEach(c => {
+        const ok = matches(c);
+        c.style.display = ok ? '' : 'none';
+        if (ok) visibleGrid++;
       });
+
+      const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
+      let visibleList = 0;
+      rows.forEach(r => {
+        const ok = matches(r);
+        // Also respect the list status tab (data-list-tab on table)
+        const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
+        const tabOk = (activeTab === 'all') || (r.dataset.tab === activeTab);
+        const show = ok && tabOk;
+        r.style.display = show ? '' : 'none';
+        if (show) visibleList++;
+      });
+
+      // Sort cards in place when a sort is selected
+      const grid = document.querySelector('.fg-units-grid');
+      if (grid && f.sort) {
+        const sortFns = {
+          'price-asc':     (a,b) => parseFloat(a.dataset.filterPrice||0) - parseFloat(b.dataset.filterPrice||0),
+          'price-desc':    (a,b) => parseFloat(b.dataset.filterPrice||0) - parseFloat(a.dataset.filterPrice||0),
+          'size-asc':      (a,b) => parseFloat(a.dataset.filterArea||0)  - parseFloat(b.dataset.filterArea||0),
+          'size-desc':     (a,b) => parseFloat(b.dataset.filterArea||0)  - parseFloat(a.dataset.filterArea||0),
+          'bedrooms-asc':  (a,b) => parseInt(a.dataset.filterBedrooms||0)- parseInt(b.dataset.filterBedrooms||0),
+          'bedrooms-desc': (a,b) => parseInt(b.dataset.filterBedrooms||0)- parseInt(a.dataset.filterBedrooms||0),
+          'custom_id':     (a,b) => (a.dataset.filterUnit||'').localeCompare(b.dataset.filterUnit||'')
+        };
+        const fn = sortFns[f.sort];
+        if (fn) {
+          // Sort all cards (visible + hidden). Skip the inline CTA card which
+          // has no dataset.filterUnit and lives mid-grid — keep its DOM order.
+          const sortable = cards.slice().sort(fn);
+          sortable.forEach(c => grid.appendChild(c));
+        }
+      }
+
+      updateMatchCount(visibleGrid);
+      updateListMatchCount(visibleList);
+      if (!options.skipUrl) syncFiltersToUrl();
     }
 
-    // Update units grid
-    function updateUnitsGrid(units) {
-      const gridContainer = document.querySelector('.grid-template-columns');
-      if (!gridContainer) return;
-
-      gridContainer.innerHTML = '';
-      
-      units.forEach(unit => {
-        const unitCard = createUnitCard(unit);
-        gridContainer.appendChild(unitCard);
-      });
+    // Sync current filter state to URL query string (no reload).
+    function syncFiltersToUrl() {
+      const params = new URLSearchParams();
+      const f = currentFilters;
+      if (f.unitNumber)             params.set('q', f.unitNumber);
+      if (f.minPrice != null)       params.set('min', f.minPrice);
+      if (f.maxPrice != null)       params.set('max', f.maxPrice);
+      if (f.types?.length)          params.set('type', f.types.join(','));
+      if (f.directions?.length)     params.set('dir',  f.directions.join(','));
+      if (f.outlooks?.length)       params.set('out',  f.outlooks.join(','));
+      if (f.floors?.length)         params.set('floor', f.floors.join(','));
+      if (f.sort && f.sort !== 'custom_id') params.set('sort', f.sort);
+      // Preserve `unit` and `view` if already in URL
+      const existing = new URLSearchParams(window.location.search);
+      if (existing.get('unit')) params.set('unit', existing.get('unit'));
+      if (existing.get('view')) params.set('view', existing.get('view'));
+      const qs = params.toString();
+      const url = window.location.pathname + (qs ? '?' + qs : '');
+      window.history.replaceState({}, '', url);
     }
 
-    // Create unit card HTML
+    // Restore filter state from URL on first load.
+    function applyFiltersFromUrl() {
+      const p = new URLSearchParams(window.location.search);
+      if (!p.toString()) {
+        // No URL params — still compute the initial match counts from the
+        // server-rendered DOM so the pill doesn't show a stale placeholder.
+        applyFilters({ skipUrl: true });
+        return;
+      }
+      currentFilters.unitNumber = p.get('q') || '';
+      currentFilters.minPrice   = p.get('min') ? parseFloat(p.get('min')) : null;
+      currentFilters.maxPrice   = p.get('max') ? parseFloat(p.get('max')) : null;
+      currentFilters.types      = p.get('type')  ? p.get('type').split(',').filter(Boolean)  : [];
+      currentFilters.directions = p.get('dir')   ? p.get('dir').split(',').filter(Boolean)   : [];
+      currentFilters.outlooks   = p.get('out')   ? p.get('out').split(',').filter(Boolean)   : [];
+      currentFilters.floors     = p.get('floor') ? p.get('floor').split(',').filter(Boolean) : [];
+      currentFilters.sort       = p.get('sort')  || 'custom_id';
+
+      // Reflect into the UI controls
+      const setCheckGroup = (selector, values) => {
+        document.querySelectorAll(selector).forEach(cb => {
+          cb.checked = values.includes(cb.value);
+        });
+      };
+      const minEl = document.getElementById('minPrice'); if (minEl) minEl.value = currentFilters.minPrice ?? '';
+      const maxEl = document.getElementById('maxPrice'); if (maxEl) maxEl.value = currentFilters.maxPrice ?? '';
+      setCheckGroup('#typeDropdown input[type="checkbox"]',      currentFilters.types);
+      setCheckGroup('#directionDropdown input[type="checkbox"]', currentFilters.directions);
+      setCheckGroup('#outlookDropdown input[type="checkbox"]',   currentFilters.outlooks);
+      setCheckGroup('#floorDropdown input[type="checkbox"]',     currentFilters.floors);
+      const sortRadio = document.querySelector('#sortDropdown input[value="'+currentFilters.sort+'"]');
+      if (sortRadio) sortRadio.checked = true;
+      const unitInput = document.querySelector('input[placeholder="Unit No."]');
+      if (unitInput) unitInput.value = currentFilters.unitNumber;
+
+      updatePriceLabel();
+      updateTypeLabel();
+      updateDirectionLabel();
+      updateOutlookLabel();
+      updateFloorLabel();
+      updateSortLabel();
+      applyFilters({ skipUrl: true });
+    }
+
+    // Legacy stubs kept for any external callers — no-ops now (client-side filter).
+    function updateUnitsGrid() {}
     function createUnitCard(unit) {
       const div = document.createElement('div');
       div.style.cssText = 'position:relative;width:100%;max-width:24rem;overflow:hidden;background:rgb(249,248,246);border-radius:1rem;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1);';
@@ -4045,17 +4281,28 @@
       return div;
     }
 
-    // Update match count
+    // Update match count — the green "N Matches" pill in the grid filter bar.
     function updateMatchCount(count) {
-      const matchButton = document.querySelector('button[style*="rgb(34,197,94)"]');
-      if (matchButton) {
-        matchButton.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21,9L17,5V8H10V10H17V13M7,11L3,15L7,19V16H14V14H7V11Z"></path>
-          </svg>
-          ${count} Matches
-        `;
-      }
+      const pill = document.querySelector('.fg-filter-bar .fg-pill-matches');
+      if (!pill) return;
+      // Replace just the trailing text so the SVG stays intact.
+      pill.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        ${count} Matches`;
+    }
+    // The list view also has its own "N Matches" pill in the toolbar.
+    function updateListMatchCount(count) {
+      const pill = document.querySelector('#fgListWrap .fg-pill-matches');
+      if (!pill) return;
+      pill.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        ${count} Matches`;
     }
 
     // Loading states
@@ -4122,20 +4369,38 @@
       return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // Add event listener for reset button
+    // Add event listener for reset button + restore filters from URL
     document.addEventListener('DOMContentLoaded', function() {
       const resetButton = document.querySelector('button[style*="rgb(239,68,68)"]');
       if (resetButton) {
         resetButton.addEventListener('click', resetFilters);
       }
 
-      // Add event listener for unit number search
+      // Unit-number search (grid) — typing filters in real time
       const unitNumberInput = document.querySelector('input[placeholder="Unit No."]');
       if (unitNumberInput) {
         unitNumberInput.addEventListener('input', function() {
           currentFilters.unitNumber = this.value;
           applyFilters();
         });
+      }
+
+      // Restore filter state from URL (?q=&min=&max=&type=&dir=&out=&floor=&sort=)
+      applyFiltersFromUrl();
+
+      // If URL has ?unit=X, open that unit's modal once everything is wired.
+      const urlUnit = new URLSearchParams(window.location.search).get('unit');
+      if (urlUnit && typeof openMoreInfo === 'function') {
+        setTimeout(() => openMoreInfo(urlUnit), 250);
+      }
+      // If URL has ?view=list, switch to list view tab.
+      const urlView = new URLSearchParams(window.location.search).get('view');
+      if (urlView === 'list') {
+        const listBtn = document.querySelector('[data-view="list"]');
+        if (listBtn) listBtn.click();
+      } else if (urlView === 'plan') {
+        const planBtn = document.querySelector('[data-view="plan"]');
+        if (planBtn) planBtn.click();
       }
     });
 
@@ -4260,6 +4525,12 @@
       }
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
+      // Reflect view in URL so the share link preserves grid/list/plan choice.
+      const params = new URLSearchParams(window.location.search);
+      if (view === 'grid') params.delete('view');
+      else params.set('view', view);
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
     }
 
     document.querySelectorAll('.fg-toggle button[data-view], .fg-location-btn[data-view]').forEach(btn => {
@@ -4268,24 +4539,84 @@
       });
     });
 
-    // List view tabs
+    // List view tabs — delegate to the unified filter so status tab + filters compose.
     function setListTab(btn) {
-      const tab = btn.dataset.tab;
       document.querySelectorAll('.fg-list-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      const rows = document.querySelectorAll('#fgListTable tbody tr');
-      rows.forEach(r => {
-        if (tab === 'all') { r.style.display = ''; return; }
-        r.style.display = (r.dataset.tab === tab) ? '' : 'none';
-      });
+      if (typeof applyFilters === 'function') applyFilters();
     }
     function filterListRows(q) {
-      const needle = (q || '').trim().toLowerCase();
-      document.querySelectorAll('#fgListTable tbody tr').forEach(r => {
-        const hay = (r.dataset.search || '');
-        r.style.display = !needle || hay.includes(needle) ? '' : 'none';
-      });
+      currentFilters.unitNumber = (q || '').trim();
+      // Also reflect into the grid search input so both stay in sync.
+      const gridInput = document.querySelector('input[placeholder="Unit No."]');
+      if (gridInput) gridInput.value = currentFilters.unitNumber;
+      if (typeof applyFilters === 'function') applyFilters();
     }
+
+    // "View Similar Units" — on a sold card, filter the grid to other available
+    // units that match the sold one's profile (same bedrooms; same floor or
+    // direction when present). Hides the sold/reserved/pending ones.
+    window.viewSimilarUnits = function (btn) {
+      const card = btn.closest('.fg-card');
+      if (!card) return;
+      const beds   = parseInt(card.dataset.filterBedrooms || '0', 10);
+      const dir    = (card.dataset.filterDirection || '').toUpperCase();
+      const floor  = (card.dataset.filterFloor || '');
+      const type   = (card.dataset.filterType || '');
+      const refUnit= (card.dataset.filterUnit || '');
+
+      // Reset to a clean state, then apply the similarity criteria.
+      resetFilters();
+      const typeLbl = (type === 'Studio' || type === 'Penthouse')
+        ? type
+        : (beds >= 1 && beds <= 3 ? beds + ' Bed' : null);
+      if (typeLbl) {
+        currentFilters.types = [typeLbl];
+        document.querySelectorAll('#typeDropdown input[type="checkbox"]').forEach(cb => {
+          cb.checked = (cb.value === typeLbl);
+        });
+        updateTypeLabel();
+      }
+
+      // Custom matcher: bedrooms must match; exclude sold/reserved/pending and
+      // exclude the reference unit itself.
+      const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
+      let visible = 0;
+      cards.forEach(c => {
+        const cBeds   = parseInt(c.dataset.filterBedrooms || '0', 10);
+        const cStatus = (c.dataset.filterStatus || '').toLowerCase();
+        const cUnit   = (c.dataset.filterUnit || '');
+        const sameBeds = cBeds === beds;
+        const isAvail  = !['sold','reserved','pending'].includes(cStatus);
+        const notSelf  = cUnit !== refUnit;
+        const show = sameBeds && isAvail && notSelf;
+        c.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      updateMatchCount(visible);
+      // Also apply on the list view in case the user toggles.
+      const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
+      let listVisible = 0;
+      rows.forEach(r => {
+        const rBeds   = parseInt(r.dataset.filterBedrooms || '0', 10);
+        const rStatus = (r.dataset.filterStatus || '').toLowerCase();
+        const rUnit   = (r.dataset.filterUnit || '');
+        const show = (rBeds === beds) && !['sold','reserved','pending'].includes(rStatus) && rUnit !== refUnit;
+        r.style.display = show ? '' : 'none';
+        if (show) listVisible++;
+      });
+      updateListMatchCount(listVisible);
+
+      // Smooth scroll to the grid so the user sees the result.
+      const grid = document.querySelector('.fg-units-grid');
+      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      if (visible === 0) {
+        // No matches → fall back to opening the original unit modal so the user
+        // can still see why it was sold.
+        if (typeof openMoreInfo === 'function') openMoreInfo(refUnit);
+      }
+    };
   </script>
 
 @include('partials.logout-modal')
