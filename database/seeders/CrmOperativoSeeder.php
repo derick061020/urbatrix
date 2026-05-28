@@ -14,11 +14,28 @@ class CrmOperativoSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure additional projects exist
+        // Ensure additional projects exist. Only Makai is "active" in the UI —
+        // Naviva and LIV are kept as upcoming (En preparación) to match Figma
+        // (Figma 644:40555). Colors + icons are sampled from the Figma render.
         $projects = [
-            ['name' => 'Naviva Residences', 'type' => 'Horizontal', 'stage' => 'Construcción', 'progress' => 61, 'color' => '#2EBFA0'],
-            ['name' => 'LIV at Cap Cana',   'type' => 'Vertical',   'stage' => 'Preventa',     'progress' => 12, 'color' => '#4A8FD4'],
-            ['name' => 'Altum Corporate',   'type' => 'Mixto',      'stage' => 'Entrega',      'progress' => 94, 'color' => '#8B68D4'],
+            [
+                'name'      => 'Naviva Residences',
+                'type'      => 'Horizontal',
+                'stage'     => 'En preparación',
+                'progress'  => 0,
+                'color'     => '#b2a908',
+                'location'  => 'Cap Cana · Punta Cana',
+                'icon_path' => '/images/projects/naviva-icon.png',
+            ],
+            [
+                'name'      => 'LIV at Cap Cana',
+                'type'      => 'Vertical',
+                'stage'     => 'En preparación',
+                'progress'  => 0,
+                'color'     => '#077f82',
+                'location'  => 'Cap Cana · Punta Cana',
+                'icon_path' => '/images/projects/liv-icon.png',
+            ],
         ];
         foreach ($projects as $p) {
             Project::firstOrCreate(['name' => $p['name']], $p);

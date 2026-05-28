@@ -18,16 +18,29 @@
         background:#ffffff;
         border:1px solid #eaecf0;
         border-radius:14px;
-        padding:14px 18px;
+        padding:16px 20px;
         display:flex; align-items:center; gap:14px;
+        transition: border-color .15s, box-shadow .15s, transform .15s;
     }
+    .pr-card-row:hover {
+        border-color:#d0d5dd;
+        box-shadow:0 2px 6px rgba(10,13,20,.04);
+    }
+    /* Project icon — backgrounds come from the Figma asset itself, so when an
+       <img> is present it covers the whole 44×44 square. The wrapper's
+       background-color is the fallback when no icon is set. */
     .pr-icon {
-        width:42px; height:42px; border-radius:10px;
+        width:44px; height:44px; border-radius:12px;
         display:inline-flex; align-items:center; justify-content:center;
         color:#fff; flex-shrink:0;
-        background-size:cover; background-position:center;
+        overflow:hidden;
     }
-    .pr-icon img { width:28px; height:28px; object-fit:contain; display:block; }
+    .pr-icon img {
+        width:100%; height:100%;
+        object-fit:cover;
+        display:block;
+        image-rendering: -webkit-optimize-contrast;
+    }
     .pr-stat-label {
         font-size:10px; font-weight:700; letter-spacing:.06em;
         color:#99a0ae; text-transform:uppercase;
@@ -78,7 +91,10 @@
 
 @section('content')
 @php
-    $activos = $proyectos->filter(fn($p) => ($p->sold_count + $p->reserved_count) > 0 || ($p->progress ?? 0) > 0)->count();
+    // A project is "active" when it has real units in the system. Projects
+    // seeded without units (Naviva, LIV) stay collapsed as "En preparación"
+    // — matches Figma 644:40555.
+    $activos = $proyectos->filter(fn($p) => ($p->units_count ?? 0) > 0)->count();
 
     // Fallback assets when no icon_path is stored in DB (matched by slug prefix)
     $iconFallback = [
@@ -132,7 +148,7 @@
             $valorTotal = $p->units()->sum('price');
             $valorM     = $valorTotal >= 1_000_000 ? '$'.number_format($valorTotal / 1_000_000, 2).'M'
                           : '$'.number_format($valorTotal, 0);
-            $isActive   = ($sold + $reserved) > 0 || ($p->progress ?? 0) > 0;
+            $isActive   = ($total ?? 0) > 0;
             $pctVentas  = $total > 0 ? round((($sold + $reserved) / $total) * 100) : 0;
             $pctObra    = (int) ($p->progress ?? 0);
             $icon       = $resolveIcon($p);

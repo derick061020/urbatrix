@@ -698,7 +698,11 @@ class AdminController extends Controller
             'units as sold_count'      => fn($q) => $q->where('status', 'SOLD'),
             'units as reserved_count'  => fn($q) => $q->where('status', 'RESERVED'),
             'units as available_count' => fn($q) => $q->where('status', 'AVAILABLE'),
-        ])->orderBy('name')->get();
+        ])
+            // Active projects (have units) first, then alphabetical.
+            ->orderByRaw('CASE WHEN (SELECT COUNT(*) FROM units WHERE units.project_id = projects.id) > 0 THEN 0 ELSE 1 END')
+            ->orderBy('name')
+            ->get();
 
         $selected = Project::withCount([
             'units',

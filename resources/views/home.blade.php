@@ -766,6 +766,122 @@
     }
     .vc-alert-err { background:#ffebec; color:#e93544; border:1px solid rgba(251,55,72,.25); }
     .vc-alert-ok  { background:#e3f7ec; color:#1daf61; border:1px solid rgba(31,193,107,.25); }
+
+    /* ===========================================================
+       Filter + view transitions
+       =========================================================== */
+    @keyframes fgCardIn {
+      0%   { opacity: 0; transform: translateY(10px) scale(.96); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes fgCardOut {
+      0%   { opacity: 1; transform: none; }
+      100% { opacity: 0; transform: translateY(-6px) scale(.97); }
+    }
+    .fg-units-grid > .fg-card {
+      animation: fgCardIn .32s cubic-bezier(.16,1,.3,1) both;
+      will-change: opacity, transform;
+    }
+    .fg-units-grid > .fg-card.is-fading-out {
+      animation: fgCardOut .22s ease forwards;
+      pointer-events: none;
+    }
+
+    #fgListTable tbody tr[data-filter-unit] {
+      transition: opacity .25s ease;
+    }
+    #fgListTable tbody tr[data-filter-unit].is-fading-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes fgRowIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #fgListTable tbody tr[data-filter-unit].is-fading-in {
+      animation: fgRowIn .28s ease both;
+    }
+
+    /* Plan view — markers pop in/out + canvas crossfades on floor change. */
+    @keyframes fgMarkerPop {
+      0%   { opacity: 0; transform: scale(.4) translateY(6px); }
+      60%  { opacity: 1; transform: scale(1.06); }
+      100% { opacity: 1; transform: none; }
+    }
+    .fg-plan-marker {
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .fg-plan-marker.is-hidden {
+      opacity: 0 !important;
+      transform: scale(.3);
+      pointer-events: none;
+    }
+    .fg-plan-marker.is-popping {
+      animation: fgMarkerPop .42s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes fgPlanFade {
+      from { opacity: .35; }
+      to   { opacity: 1;   }
+    }
+    .fg-plan-canvas.is-switching {
+      animation: fgPlanFade .35s ease both;
+    }
+
+    /* "PISO X · N UNIDADES" — soft slide when label/count updates. */
+    @keyframes fgPlanLabelIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .fg-plan-piso.is-changing .fg-plan-piso-left,
+    .fg-plan-piso.is-changing .fg-plan-piso-right {
+      animation: fgPlanLabelIn .28s ease both;
+    }
+
+    /* Unit info modal — open animation. */
+    @keyframes mtBackdropIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes mtPanelIn {
+      from { opacity: 0; transform: translateY(24px) scale(.96); }
+      to   { opacity: 1; transform: none; }
+    }
+    #moreInfoModal.is-opening .mt-backdrop {
+      animation: mtBackdropIn .25s ease both;
+    }
+    #moreInfoModal.is-opening .mt-shell {
+      animation: mtPanelIn .42s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    /* Share modal — same pattern (lighter). */
+    @keyframes shFadeIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+    #shareModal.open .sh-modal {
+      animation: shFadeIn .3s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    /* "N Matches" pill — pulse when the count changes. */
+    @keyframes fgPillPulse {
+      0%, 100% { transform: none; }
+      50%      { transform: scale(1.08); }
+    }
+    .fg-pill-matches.is-pulsing {
+      animation: fgPillPulse .35s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fg-units-grid > .fg-card,
+      .fg-plan-marker.is-popping,
+      .fg-plan-canvas.is-switching,
+      #moreInfoModal.is-opening .mt-backdrop,
+      #moreInfoModal.is-opening .mt-shell,
+      #shareModal.open .sh-modal,
+      .fg-pill-matches.is-pulsing,
+      .fg-plan-piso.is-changing .fg-plan-piso-left,
+      .fg-plan-piso.is-changing .fg-plan-piso-right {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
   </style>
 
   <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="Agendar Videollamada" onclick="if(event.target===this) closeAdvisorVideoCall()">
@@ -2604,6 +2720,10 @@
           const modal = document.getElementById('moreInfoModal');
           if (modal) {
             modal.style.display = 'flex';
+            // Replay open animation
+            modal.classList.remove('is-opening');
+            void modal.offsetWidth;
+            modal.classList.add('is-opening');
             document.body.style.overflow = 'hidden';
             console.log('Modal should be visible now');
           } else {
@@ -2637,6 +2757,10 @@
           const modal = document.getElementById('moreInfoModal');
           if (modal) {
             modal.style.display = 'flex';
+            // Replay open animation
+            modal.classList.remove('is-opening');
+            void modal.offsetWidth;
+            modal.classList.add('is-opening');
             document.body.style.overflow = 'hidden';
           }
         });
@@ -2739,16 +2863,47 @@
             x.setAttribute('aria-selected', on ? 'true' : 'false');
           });
 
+          // Cross-fade the whole canvas while markers swap.
+          canvas.classList.remove('is-switching');
+          void canvas.offsetWidth;
+          canvas.classList.add('is-switching');
+          setTimeout(() => canvas.classList.remove('is-switching'), 380);
+
           let available = 0;
+          let i = 0;
           canvas.querySelectorAll('.fg-plan-marker').forEach(m => {
             const match = m.dataset.floor === floor;
-            m.classList.toggle('is-hidden', !match);
-            m.style.display = match ? '' : 'none';
-            if (match && !m.classList.contains('is-sold') && !m.classList.contains('is-reserved')) {
-              available++;
+            if (match) {
+              m.style.display = '';
+              m.classList.remove('is-hidden');
+              // Stagger the pop-in slightly per marker.
+              m.classList.remove('is-popping');
+              const idx = i++;
+              setTimeout(() => {
+                void m.offsetWidth;
+                m.classList.add('is-popping');
+                setTimeout(() => m.classList.remove('is-popping'), 460);
+              }, idx * 45);
+              if (!m.classList.contains('is-sold') && !m.classList.contains('is-reserved')) {
+                available++;
+              }
+            } else {
+              m.classList.add('is-hidden');
+              // Keep in DOM (no display:none) so the next show animates clean.
+              setTimeout(() => {
+                if (m.classList.contains('is-hidden')) m.style.display = 'none';
+              }, 220);
             }
           });
 
+          // Animate the PISO label/count change.
+          const piso = labelEl ? labelEl.closest('.fg-plan-piso') : null;
+          if (piso) {
+            piso.classList.remove('is-changing');
+            void piso.offsetWidth;
+            piso.classList.add('is-changing');
+            setTimeout(() => piso.classList.remove('is-changing'), 320);
+          }
           if (labelEl) {
             labelEl.textContent = (floor === 'Ground')
               ? 'PLANTA BAJA'
@@ -4022,6 +4177,38 @@
       label.textContent = sortOptions[currentFilters.sort] || 'Sort';
     }
 
+    // Animate a card/row in or out. Uses CSS keyframes (.is-fading-in /
+    // .is-fading-out) and only flips display:none after the exit anim completes
+    // so the element actually leaves the grid flow.
+    function animateToggle(el, visible, opts) {
+      opts = opts || {};
+      const isHidden = el.style.display === 'none';
+      if (visible) {
+        if (isHidden || el.classList.contains('is-fading-out')) {
+          el.style.display = '';
+          el.classList.remove('is-fading-out');
+          // Re-trigger entry animation
+          el.classList.remove('is-fading-in');
+          // Force reflow so the keyframe replays
+          void el.offsetWidth;
+          el.classList.add('is-fading-in');
+          setTimeout(() => el.classList.remove('is-fading-in'), 400);
+        }
+      } else if (!isHidden) {
+        if (opts.kind === 'row') {
+          el.classList.add('is-fading-out');
+          setTimeout(() => {
+            if (el.classList.contains('is-fading-out')) el.style.display = 'none';
+          }, 240);
+        } else {
+          el.classList.add('is-fading-out');
+          setTimeout(() => {
+            if (el.classList.contains('is-fading-out')) el.style.display = 'none';
+          }, 220);
+        }
+      }
+    }
+
     // Apply all filters — pure client-side. Toggles visibility on the
     // already-rendered grid cards (.fg-card) and list rows (tr[data-filter-unit]),
     // sorts the grid in place, and updates the match counters + URL params.
@@ -4072,19 +4259,18 @@
       let visibleGrid = 0;
       cards.forEach(c => {
         const ok = matches(c);
-        c.style.display = ok ? '' : 'none';
+        animateToggle(c, ok);
         if (ok) visibleGrid++;
       });
 
       const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
       let visibleList = 0;
+      const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
       rows.forEach(r => {
         const ok = matches(r);
-        // Also respect the list status tab (data-list-tab on table)
-        const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
         const tabOk = (activeTab === 'all') || (r.dataset.tab === activeTab);
         const show = ok && tabOk;
-        r.style.display = show ? '' : 'none';
+        animateToggle(r, show, { kind: 'row' });
         if (show) visibleList++;
       });
 
@@ -4281,17 +4467,30 @@
       return div;
     }
 
+    // Pulse the pill briefly whenever its number changes — small visual cue
+    // that the filter just updated.
+    function pulseMatchPill(pill, newCount) {
+      if (!pill) return;
+      const prev = pill.dataset.lastCount;
+      if (prev !== String(newCount)) {
+        pill.classList.remove('is-pulsing');
+        void pill.offsetWidth; // restart anim
+        pill.classList.add('is-pulsing');
+        setTimeout(() => pill.classList.remove('is-pulsing'), 380);
+        pill.dataset.lastCount = String(newCount);
+      }
+    }
     // Update match count — the green "N Matches" pill in the grid filter bar.
     function updateMatchCount(count) {
       const pill = document.querySelector('.fg-filter-bar .fg-pill-matches');
       if (!pill) return;
-      // Replace just the trailing text so the SVG stays intact.
       pill.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
         </svg>
         ${count} Matches`;
+      pulseMatchPill(pill, count);
     }
     // The list view also has its own "N Matches" pill in the toolbar.
     function updateListMatchCount(count) {
@@ -4303,6 +4502,7 @@
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
         ${count} Matches`;
+      pulseMatchPill(pill, count);
     }
 
     // Loading states
