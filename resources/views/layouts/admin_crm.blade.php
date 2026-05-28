@@ -377,10 +377,6 @@
                     </button>
                 </form>
             </div>
-            <div class="px-3 pb-3 pt-1 flex items-center justify-between gap-2">
-                <span class="text-[11px] text-ink-500">{{ __('Idioma') }}</span>
-                @include('partials.language-toggle', ['variant' => 'compact'])
-            </div>
         </div>
     </aside>
 

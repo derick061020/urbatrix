@@ -176,31 +176,31 @@
     <div class="cli-card overflow-hidden">
         <div class="px-5 py-3 flex items-center gap-3 bg-warn-soft/40 border-b border-ink-100">
             <div class="w-8 h-8 rounded-full bg-warn-soft flex items-center justify-center text-warn-dark"><i class="pi pi-clock"></i></div>
-            <div class="text-[14px] font-bold text-ink-950">Pagos en revisión</div>
-            <span class="ml-auto text-[11px] text-warn-dark">{{ $enRevision->count() }} en revisión</span>
+            <div class="text-[14px] font-bold text-ink-950">{{ __('Pagos en revisión') }}</div>
+            <span class="ml-auto text-[11px] text-warn-dark">{{ $enRevision->count() }} {{ __('en revisión') }}</span>
         </div>
         <table class="w-full">
             <thead class="bg-white">
                 <tr>
-                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Concepto</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Monto</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Fecha</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Estado</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Comprobante</th>
+                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Concepto') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Monto') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Fecha') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Comprobante') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink-100">
                 @foreach($enRevision as $p)
                     <tr>
-                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? 'Cuota' }}</td>
+                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Cuota') }}</td>
                         <td class="px-3 py-3.5 text-[13px] font-bold text-warn-dark">${{ number_format($p->amount, 0) }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5">
-                            <span class="cli-pill bg-warn-soft text-warn-dark">EN REVISIÓN</span>
+                            <span class="cli-pill bg-warn-soft text-warn-dark">{{ __('EN REVISIÓN') }}</span>
                         </td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
                             @if($p->receipt_path)
-                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">Ver</a>
+                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Ver') }}</a>
                             @else — @endif
                         </td>
                     </tr>
@@ -214,34 +214,34 @@
     <div class="cli-card overflow-hidden">
         <div class="px-5 py-3 flex items-center gap-3 bg-ink-50/60 border-b border-ink-100">
             <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-receipt"></i></div>
-            <div class="text-[14px] font-bold text-ink-950">Pagos confirmados</div>
-            <span class="ml-auto text-[11px] text-ink-500">{{ $pagados->count() }} transacciones</span>
+            <div class="text-[14px] font-bold text-ink-950">{{ __('Pagos confirmados') }}</div>
+            <span class="ml-auto text-[11px] text-ink-500">{{ $pagados->count() }} {{ __('transacciones') }}</span>
         </div>
         <table class="w-full">
             <thead class="bg-white">
                 <tr>
-                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Concepto</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Pagado</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Fecha</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Método</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Comprobante</th>
+                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Concepto') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Pagado') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Fecha') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Método') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Comprobante') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink-100">
                 @forelse($pagados as $p)
                     <tr>
-                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? 'Cuota inicial — Reserva' }}</td>
+                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Cuota inicial — Reserva') }}</td>
                         <td class="px-3 py-3.5 text-[13px] font-bold text-ok-dark">${{ number_format($p->amount, 0) }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
                             @if($p->receipt_path)
-                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">Descargar</a>
+                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Descargar') }}</a>
                             @else — @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-5 py-8 text-center text-[12px] text-ink-500">Sin pagos confirmados todavía.</td></tr>
+                    <tr><td colspan="5" class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('Sin pagos confirmados todavía.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -255,54 +255,54 @@
         <input type="hidden" name="payment_id" value="{{ $nextPay->id ?? '' }}">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-credit-card"></i></div>
-            <div class="text-[15px] font-bold text-ink-900 flex-1">Subir comprobante de pago</div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Subir comprobante de pago') }}</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="p-6 space-y-4">
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Concepto</label>
-                <input type="text" name="label" required value="{{ $nextPay->label ?? 'Cuota' }}" class="cli-input pl-3 mt-1" readonly>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Concepto') }}</label>
+                <input type="text" name="label" required value="{{ $nextPay->label ?? __('Cuota') }}" class="cli-input pl-3 mt-1" readonly>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Monto</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Monto') }}</label>
                 <div class="relative mt-1">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-ink-500">$</span>
                     <input type="number" step="0.01" name="amount" required value="{{ $nextPay->amount ?? 0 }}" class="cli-input pl-7" readonly>
                 </div>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Método de pago</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Método de pago') }}</label>
                 <select name="payment_method" required class="cli-input pl-3 mt-1">
-                    <option value="">Seleccionar...</option>
-                    <option value="wire">Wire Transfer</option>
+                    <option value="">{{ __('Seleccionar...') }}</option>
+                    <option value="wire">{{ __('Transferencia bancaria') }}</option>
                     <option value="ach">ACH</option>
-                    <option value="card">Tarjeta</option>
-                    <option value="cash">Efectivo</option>
-                    <option value="check">Cheque</option>
+                    <option value="card">{{ __('Tarjeta') }}</option>
+                    <option value="cash">{{ __('Efectivo') }}</option>
+                    <option value="check">{{ __('Cheque') }}</option>
                 </select>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Fecha de pago</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha de pago') }}</label>
                 <input type="date" name="paid_at" required value="{{ now()->toDateString() }}" class="cli-input pl-3 mt-1">
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Comprobante de pago *</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Comprobante de pago') }} *</label>
                 <div id="receiptDropzone" class="border-2 border-dashed border-ink-200 rounded-xl py-6 px-4 text-center cursor-pointer hover:border-brand transition-colors" onclick="this.querySelector('input').click()">
                     <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
-                    <div id="receiptPlaceholder" class="text-[13px] font-semibold text-ink-700 mt-2">Sube tu comprobante</div>
+                    <div id="receiptPlaceholder" class="text-[13px] font-semibold text-ink-700 mt-2">{{ __('Sube tu comprobante') }}</div>
                     <div id="receiptFileName" class="text-[13px] font-semibold text-brand mt-2 hidden"></div>
-                    <div class="text-[11px] text-ink-500 mt-1">PDF, JPG o PNG · máx. 4 MB</div>
+                    <div class="text-[11px] text-ink-500 mt-1">{{ __('PDF, JPG o PNG · máx. 4 MB') }}</div>
                     <input type="file" name="receipt" id="receiptInput" accept=".pdf,.jpg,.jpeg,.png" class="hidden" required>
                 </div>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Notas (opcional)</label>
-                <textarea name="notes" rows="2" class="cli-input pl-3 pt-2 mt-1 h-auto resize-none" placeholder="Referencia, descripción, etc."></textarea>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Notas (opcional)') }}</label>
+                <textarea name="notes" rows="2" class="cli-input pl-3 pt-2 mt-1 h-auto resize-none" placeholder="{{ __('Referencia, descripción, etc.') }}"></textarea>
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="cli-btn cli-btn-ghost">Cancelar</button>
-            <button type="submit" id="submitPaymentBtn" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> Enviar para aprobación</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="cli-btn cli-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" id="submitPaymentBtn" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> {{ __('Enviar para aprobación') }}</button>
         </div>
     </form>
 </dialog>
