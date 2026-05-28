@@ -10,6 +10,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\LocaleController;
 
 // Auth routes
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -21,9 +24,18 @@ Route::post('/register/verify',   [AuthController::class, 'registerVerify'])->na
 Route::post('/register/complete', [AuthController::class, 'registerComplete'])->name('register.complete');
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
+// Forgot / reset password
+Route::get('/forgot-password',          [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password/send',    [AuthController::class, 'forgotPasswordSend'])->name('password.send');
+Route::post('/forgot-password/verify',  [AuthController::class, 'forgotPasswordVerify'])->name('password.verify');
+Route::post('/forgot-password/reset',   [AuthController::class, 'forgotPasswordReset'])->name('password.update');
+
 // Google OAuth routes
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
+
+// Cambio de idioma — disponible sin autenticación
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::get('/', [HomeController::class, 'index'])->middleware('auth');
 
@@ -90,6 +102,13 @@ Route::middleware(['auth'])->group(function () {
     // Guardados / wishlist
     Route::get('/dashboard/guardados', [DashboardController::class, 'guardados'])->name('dashboard.guardados');
 
+    // Global search (client topbar)
+    Route::get('/dashboard/search', [SearchController::class, 'client'])->name('dashboard.search');
+
+    // Notifications (client topbar)
+    Route::get('/dashboard/notifications',       [NotificationController::class, 'client'])->name('dashboard.notifications');
+    Route::post('/dashboard/notifications/read', [NotificationController::class, 'read'])->name('dashboard.notifications.read');
+
     // Acuerdos (documentos firmables)
     Route::get('/dashboard/acuerdos',  [DashboardController::class, 'acuerdos'])->name('dashboard.acuerdos');
 
@@ -110,7 +129,14 @@ Route::get('/property-pdf/{unitId}', [HomeController::class, 'propertyPdf'])->na
 
 // Admin routes
 Route::prefix('admin')->middleware(['admin'])->group(function () {
-    
+
+    // Global search (admin topbar)
+    Route::get('/search', [SearchController::class, 'admin'])->name('admin.search');
+
+    // Notifications (admin topbar)
+    Route::get('/notifications',       [NotificationController::class, 'admin'])->name('admin.notifications');
+    Route::post('/notifications/read', [NotificationController::class, 'read'])->name('admin.notifications.read');
+
     Route::get('/units', [AdminController::class, 'units'])->name('admin.units');
     Route::get('/units/create', [AdminController::class, 'createUnit'])->name('admin.units.create');
     Route::post('/units', [AdminController::class, 'storeUnit'])->name('admin.units.store');
@@ -137,6 +163,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/agents/{agent}/units', [AdminController::class, 'assignBrokerUnits'])->name('admin.agents.units');
 
     Route::get('/communication', [AdminController::class, 'communication'])->name('admin.communication');
+    Route::get('/communication/conversation/{id}', [AdminController::class, 'communicationConversation'])->name('admin.communication.conversation');
     Route::get('/extras', [AdminController::class, 'extras'])->name('admin.extras');
     Route::get('/data-export', [AdminController::class, 'dataExport'])->name('admin.data-export');
     Route::get('/email-templates', [AdminController::class, 'emailTemplates'])->name('admin.email-templates');
@@ -184,6 +211,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/document/upload',    [AdminController::class, 'uploadDocumentQuick'])->name('admin.crm.document.upload');
     Route::post('/crm/payment/create',     [AdminController::class, 'createPaymentQuick'])->name('admin.crm.payment.create');
     Route::get('/crm/export',              [AdminController::class, 'exportResource'])->name('admin.crm.export');
+    Route::post('/crm/export/request-code', [AdminController::class, 'requestExportCode'])->name('admin.crm.export.request');
+    Route::post('/crm/export/resend-code',  [AdminController::class, 'resendExportCode'])->name('admin.crm.export.resend');
+    Route::post('/crm/export/verify',       [AdminController::class, 'verifyExportCode'])->name('admin.crm.export.verify');
     Route::post('/crm/message/send',       [AdminController::class, 'sendMessageQuick'])->name('admin.crm.message.send');
 
     // CRM Tareas CRUD
@@ -206,6 +236,25 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/proyectos',                  [AdminController::class, 'storeProject'])->name('admin.crm.proyectos.store');
     Route::put('/crm/proyectos/{project}',         [AdminController::class, 'updateProject'])->name('admin.crm.proyectos.update');
     Route::delete('/crm/proyectos/{project}',      [AdminController::class, 'deleteProject'])->name('admin.crm.proyectos.delete');
+
+    // CRM Plantillas CRUD
+    Route::post('/crm/plantillas',                          [AdminController::class, 'storeTemplate'])->name('admin.crm.plantillas.store');
+    Route::put('/crm/plantillas/{template}',                [AdminController::class, 'updateTemplate'])->name('admin.crm.plantillas.update');
+    Route::delete('/crm/plantillas/{template}',             [AdminController::class, 'deleteTemplate'])->name('admin.crm.plantillas.delete');
+    Route::post('/crm/plantillas/{template}/duplicate',     [AdminController::class, 'duplicateTemplate'])->name('admin.crm.plantillas.duplicate');
+    Route::get('/crm/plantillas/{template}/data',           [AdminController::class, 'getTemplate'])->name('admin.crm.plantillas.data');
+    Route::post('/crm/plantillas/{template}/test',          [AdminController::class, 'sendTestTemplate'])->name('admin.crm.plantillas.test');
+
+    // CRM Automatizaciones CRUD
+    Route::post('/crm/automatizaciones',                          [AdminController::class, 'storeAutomation'])->name('admin.crm.automatizaciones.store');
+    Route::put('/crm/automatizaciones/{automation}',              [AdminController::class, 'updateAutomation'])->name('admin.crm.automatizaciones.update');
+    Route::delete('/crm/automatizaciones/{automation}',           [AdminController::class, 'deleteAutomation'])->name('admin.crm.automatizaciones.delete');
+    Route::post('/crm/automatizaciones/{automation}/toggle',      [AdminController::class, 'toggleAutomation'])->name('admin.crm.automatizaciones.toggle');
+    Route::post('/crm/automatizaciones/{automation}/run',         [AdminController::class, 'runAutomation'])->name('admin.crm.automatizaciones.run');
+    Route::get('/crm/automatizaciones/{automation}/data',         [AdminController::class, 'getAutomation'])->name('admin.crm.automatizaciones.data');
+
+    // CRM Channel settings
+    Route::post('/crm/canales',                             [AdminController::class, 'updateChannels'])->name('admin.crm.canales.update');
     
     // Contract generation routes for admin
     Route::get('/crm/contract/{reservation}/generate', [AdminController::class, 'generateContract'])->name('admin.crm.contract.generate');

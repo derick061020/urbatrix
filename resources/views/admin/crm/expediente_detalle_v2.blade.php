@@ -61,24 +61,16 @@
     <div class="crm-card">
         <div class="px-6 border-b border-ink-200 flex items-center gap-8">
             @php
-                $isBudgetApproved = in_array($reservation->status, ['contract_signed', 'signed']) || $reservation->budget_status === 'approved';
                 $tabs = [
                     ['resumen','Resumen'],
                     ['documentos','Documentos'],
-                    ['pagos','Plan de Pagos', $isBudgetApproved],
+                    ['pagos','Plan de Pagos'],
                     ['historial','Historial'],
                     ['comunicaciones','Comunicaciones'],
                 ];
             @endphp
             @foreach($tabs as $tdata)
-                @php
-                    $enabled = $tdata[2] ?? true;
-                @endphp
-                @if($enabled)
-                    <a href="?tab={{ $tdata[0] }}" class="crm-tab-line {{ $tab === $tdata[0] ? 'active' : '' }}">{{ $tdata[1] }}</a>
-                @else
-                    <span class="crm-tab-line opacity-50 cursor-not-allowed" title="Disponible después de que el cliente apruebe el plan de pagos">{{ $tdata[1] }}</span>
-                @endif
+                <a href="?tab={{ $tdata[0] }}" class="crm-tab-line {{ $tab === $tdata[0] ? 'active' : '' }}">{{ $tdata[1] }}</a>
             @endforeach
         </div>
 
@@ -139,20 +131,18 @@
             {{-- ============ DOCUMENTOS ============ --}}
             @elseif($tab === 'documentos')
 
-                @include('admin.crm._partials.plan_de_pagos', ['reservation' => $reservation])
-
                 @php
                     $planDoc = $reservation->documents->firstWhere('document_type', 'payment_plan');
                     $planSignedAdmin = $planDoc && in_array($planDoc->status, ['signed', 'approved']);
                     $promesaDocAdmin = $reservation->documents->firstWhere('document_type', 'purchase_promise');
                 @endphp
                 @if($planSignedAdmin && $promesaDocAdmin)
-                    <div class="mt-4">
+                    <div class="mb-4">
                         @include('admin.crm._partials.contrato_admin', ['document' => $promesaDocAdmin, 'reservation' => $reservation])
                     </div>
                 @endif
 
-                <div class="crm-card overflow-hidden mt-4">
+                <div class="crm-card overflow-hidden">
                     <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
                         <div class="text-[13px] font-bold text-ink-700"><i class="pi pi-file"></i> Documentos del expediente</div>
                         <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Subir documento</button>
@@ -233,7 +223,18 @@
 
             {{-- ============ PAGOS ============ --}}
             @elseif($tab === 'pagos')
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-5">
+                @include('admin.crm._partials.plan_de_pagos', ['reservation' => $reservation])
+
+                @php
+                    $planDocPagos = $reservation->documents->firstWhere('document_type', 'payment_plan');
+                    $planSignedPagos = $planDocPagos && in_array($planDocPagos->status, ['signed', 'approved']);
+                    $showPaymentSchedule = $planSignedPagos
+                        || in_array($reservation->status, ['contract_signed', 'signed'])
+                        || $reservation->budget_status === 'approved';
+                @endphp
+
+                @if($showPaymentSchedule)
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-5 mt-5">
                     <div class="crm-card p-4">
                         <div class="text-[10px] uppercase font-semibold text-ink-400">Total contrato</div>
                         <div class="text-[22px] font-bold text-ink-900 mt-1">${{ number_format($precio) }}</div>
@@ -287,6 +288,7 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
 
             {{-- ============ HISTORIAL ============ --}}
             @elseif($tab === 'historial')
@@ -351,7 +353,7 @@
                                 @else
                                     <div class="flex justify-start">
                                         <div class="max-w-[70%]">
-                                            <div class="bg-ink-100 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
+                                            <div class="bg-ink-200 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
                                             <div class="text-[10px] text-ink-400 mt-1">{{ $senderName }} · {{ $msg->created_at->format('Y-m-d H:i') }}</div>
                                         </div>
                                     </div>

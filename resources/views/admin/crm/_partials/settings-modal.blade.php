@@ -34,7 +34,7 @@
 
     .st-shell {
         width: 100%; max-width: 1040px;
-        max-height: calc(100vh - 48px);
+        height: 640px; max-height: calc(100vh - 48px);
         background: #fff; border-radius: 18px; overflow: hidden;
         box-shadow: 0 30px 80px -20px rgba(10,13,20,.35);
         display: grid; grid-template-columns: 260px 1fr;
@@ -73,7 +73,7 @@
     }
     .st-nav-item.active .chev { opacity: 1; }
 
-    .st-main { display: flex; flex-direction: column; min-width: 0; max-height: calc(100vh - 48px); }
+    .st-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; height: 100%; max-height: calc(100vh - 48px); }
     .st-head {
         padding: 22px 28px 0;
         display: flex; align-items: flex-start; justify-content: space-between;
@@ -204,7 +204,7 @@
     .st-collapse.open { display: block; }
 
     @media (max-width: 860px) {
-        .st-shell { grid-template-columns: 1fr; max-height: calc(100vh - 24px); }
+        .st-shell { grid-template-columns: 1fr; height: calc(100vh - 24px); max-height: calc(100vh - 24px); }
         .st-sidebar { display: flex; flex-direction: row; gap: 4px; overflow-x: auto; padding: 12px; }
         .st-sidebar .st-section-label { display: none; }
         .st-nav-item .chev { display: none; }

@@ -71,7 +71,7 @@
                     <div class="flex items-end gap-2.5 justify-start">
                         <div class="cli-avatar cli-avatar-sm" style="background:#7cb8e7">{{ $advInit }}</div>
                         <div>
-                            <div class="max-w-[520px] bg-ink-100 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2.5 text-[13px] whitespace-pre-line">{{ $m->body }}</div>
+                            <div class="max-w-[520px] bg-ink-200 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2.5 text-[13px] whitespace-pre-line">{{ $m->body }}</div>
                             <div class="text-[10px] text-ink-400 mt-1 pl-1">{{ $senderName }} · {{ $created->format('H:i') }}</div>
                         </div>
                     </div>

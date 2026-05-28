@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -115,6 +115,46 @@
       }
       .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
 
+      /* Search dropdown */
+      .search-dropdown {
+          position:absolute; top: calc(100% + 8px); left:0; right:0;
+          background:#fff; border:1px solid #ebebeb; border-radius:12px;
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,.15);
+          max-height: 420px; overflow-y:auto;
+          z-index: 60; display:none;
+      }
+      .search-dropdown.open { display:block; }
+      .search-dropdown__group + .search-dropdown__group { border-top:1px solid #f2f5f8; }
+      .search-dropdown__title {
+          padding: 10px 14px 4px; font-size:10px; font-weight:600;
+          text-transform:uppercase; letter-spacing:.08em; color:#a3a3a3;
+      }
+      .search-dropdown__item {
+          display:flex; align-items:center; gap:10px;
+          padding: 9px 14px; cursor:pointer; transition: background-color .12s;
+          text-decoration:none; color:#171717;
+      }
+      .search-dropdown__item:hover,
+      .search-dropdown__item.is-active { background:#f5f7f6; }
+      .search-dropdown__icon {
+          width:30px; height:30px; border-radius:8px; background:#f2f5f8;
+          display:flex; align-items:center; justify-content:center;
+          color:#5c5c5c; font-size:13px; flex-shrink:0;
+      }
+      .search-dropdown__label {
+          font-size:13px; font-weight:500; color:#171717; line-height:1.2;
+          white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .search-dropdown__sub {
+          font-size:11px; color:#717784; line-height:1.2; margin-top:2px;
+          white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .search-dropdown__empty,
+      .search-dropdown__spinner {
+          padding: 22px 14px; text-align:center; font-size:12px; color:#a3a3a3;
+      }
+      .search-dropdown mark { background:#fff5cf; color:#171717; padding:0 1px; border-radius:2px; }
+
       /* ============ RESPONSIVE ============ */
       #sidebar-backdrop { display:none; }
 
@@ -216,54 +256,58 @@
             @endphp
 
             <a href="{{ route('dashboard') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'mi-propiedad' ? 'active' : '' }}">
-                <i class="pi pi-home"></i> Mi propiedad
+                <i class="pi pi-home"></i> {{ __('Mi propiedad') }}
             </a>
 
-            <div class="cli-nav-section">Mi cuenta</div>
+            <div class="cli-nav-section">{{ __('Mi cuenta') }}</div>
             <a href="{{ route('dashboard.documents') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'documents' ? 'active' : '' }}">
-                <i class="pi pi-folder-open"></i> Mis documentos
+                <i class="pi pi-folder-open"></i> {{ __('Mis documentos') }}
                 @if($totalDocs > 0)<span class="badge-count">{{ $totalDocs }}</span>@endif
             </a>
             <a href="{{ route('dashboard.acuerdos') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'acuerdos' ? 'active' : '' }}">
-                <i class="pi pi-check-square"></i> Acuerdos
+                <i class="pi pi-check-square"></i> {{ __('Acuerdos') }}
                 @if($pendingAgreements > 0)<span class="badge-count">{{ $pendingAgreements }}</span>@endif
             </a>
             <a href="{{ route('dashboard.payments') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'payments' ? 'active' : '' }}">
-                <i class="pi pi-credit-card"></i> Plan de pagos
+                <i class="pi pi-credit-card"></i> {{ __('Plan de pagos') }}
                 @if($pendingPays > 0)<span class="badge-count">{{ $pendingPays }}</span>@endif
             </a>
             <a href="{{ route('dashboard.guardados') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'guardados' ? 'active' : '' }}">
-                <i class="pi pi-heart"></i> Guardados
+                <i class="pi pi-heart"></i> {{ __('Guardados') }}
                 @if($savedCount > 0)<span class="badge-count" style="background:#5c7c68">{{ $savedCount }}</span>@endif
             </a>
 
-            <div class="cli-nav-section">Comunicación</div>
+            <div class="cli-nav-section">{{ __('Comunicación') }}</div>
             <a href="{{ route('dashboard.messages') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'messages' ? 'active' : '' }}">
-                <i class="pi pi-comments"></i> Mensajes
+                <i class="pi pi-comments"></i> {{ __('Mensajes') }}
                 @if($unreadMsgs > 0)<span class="badge-count">{{ $unreadMsgs }}</span>@endif
             </a>
             <a href="{{ route('dashboard.progress') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'progress' ? 'active' : '' }}">
-                <i class="pi pi-chart-line"></i> Avance de Obra
+                <i class="pi pi-chart-line"></i> {{ __('Avance de obra') }}
             </a>
             <a href="{{ route('dashboard.calendario') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'calendario' ? 'active' : '' }}">
-                <i class="pi pi-calendar"></i> Calendario
+                <i class="pi pi-calendar"></i> {{ __('Calendario') }}
             </a>
         </nav>
 
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil" onclick="openSettingsModal()">
+                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
-                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="Editar perfil" onclick="openSettingsModal()">
-                    <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Cliente' }}</div>
-                    <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Cliente' }}</div>
+                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                    <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? __('Cliente') }}</div>
+                    <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'admin' ? __('Administrador') : __('Cliente') }}</div>
                 </button>
                 <form method="POST" action="{{ route('logout') }}" class="m-0" data-logout-confirm>
                     @csrf
-                    <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión"><i class="pi pi-arrow-up-right text-xs"></i></button>
+                    <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="{{ __('Cerrar sesión') }}"><i class="pi pi-arrow-up-right text-xs"></i></button>
                 </form>
+            </div>
+            <div class="px-3 pb-3 pt-1 flex items-center justify-between gap-2">
+                <span class="text-[11px] text-ink-500">{{ __('Idioma') }}</span>
+                @include('partials.language-toggle', ['variant' => 'compact'])
             </div>
         </div>
     </aside>
@@ -271,7 +315,7 @@
     {{-- ============= MAIN CARD ============= --}}
     <div class="flex-1 min-w-0 flex flex-col rounded-2xl bg-white shadow-panel border border-ink-200 overflow-hidden">
 
-        <header id="cli-topbar" class="h-[72px] bg-white border-b border-ink-100 flex items-center px-7 gap-5 shrink-0">
+        <header id="cli-topbar" class="h-[72px] bg-white border-b border-ink-100 flex items-center px-7 gap-3 shrink-0">
             <button id="mobile-toggle" type="button" class="topbar-icon-btn shrink-0"
                     onclick="document.getElementById('cli-sidebar').classList.toggle('open'); document.getElementById('sidebar-backdrop').classList.toggle('open');">
                 <i class="pi pi-bars"></i>
@@ -281,18 +325,16 @@
                 <p class="text-[11px] sm:text-[12px] text-ink-500 leading-tight mt-0.5 truncate">@yield('page_breadcrumb', 'Mi Propiedad')</p>
             </div>
             <div class="topbar-date hidden md:flex items-center text-[12px] text-ink-500 whitespace-nowrap">
-                {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                {{ \Carbon\Carbon::now()->locale(app()->getLocale())->isoFormat(app()->getLocale() === 'es' ? 'dddd, D [de] MMMM [de] YYYY' : 'dddd, MMMM D, YYYY') }}
             </div>
-            <div class="topbar-search-wrap relative w-64 hidden md:block">
+            <div class="topbar-search-wrap relative w-64 hidden md:block" data-search="client">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                <input type="text" placeholder="Buscar…" class="topbar-search pr-3" />
+                <input id="global-search-input" type="text" placeholder="{{ __('Buscar documentos, pagos, secciones…') }}" class="topbar-search pr-3" autocomplete="off" />
+                <div id="global-search-dropdown" class="search-dropdown" role="listbox"></div>
             </div>
 
-            <button type="button" class="topbar-icon-btn shrink-0" title="Notificaciones">
-                <i class="pi pi-bell"></i>
-                <span class="dot-indicator"></span>
-            </button>
-            <button type="button" class="topbar-icon-btn shrink-0" title="Configuración" onclick="openSettingsModal()">
+            @include('partials.notifications-dropdown', ['endpoint' => 'dashboard.notifications', 'readRoute' => 'dashboard.notifications.read'])
+            <button type="button" class="topbar-icon-btn shrink-0" title="{{ __('Configuración') }}" onclick="openSettingsModal()">
                 <i class="pi pi-cog"></i>
             </button>
         </header>
@@ -316,6 +358,8 @@
     });
 </script>
 @endif
+
+@include('partials.global-search', ['endpoint' => route('dashboard.search')])
 
 @stack('scripts')
 </body>

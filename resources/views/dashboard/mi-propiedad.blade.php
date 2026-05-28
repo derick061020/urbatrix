@@ -1,12 +1,12 @@
 @extends('layouts.client')
-@section('title', 'Mi Propiedad — MAKAI')
-@section('page_title', 'Mi Propiedad')
-@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? 'Tu unidad') . ' · Makai Residences')
+@section('title', __('Mi Propiedad').' — MAKAI')
+@section('page_title', __('Mi Propiedad'))
+@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Makai Residences')
 @php $activeRoute = 'mi-propiedad'; @endphp
 
 @section('content')
 @php
-    $unidad   = $reservation->unit->custom_id ?? $reservation->unit->name ?? 'Unidad';
+    $unidad   = $reservation->unit->custom_id ?? $reservation->unit->name ?? __('Unidad');
     $precio   = (float) ($reservation->unit->price ?? 0);
     $pagado   = (float) ($reservation->payments?->where('status', 'paid')->sum('amount') ?? 0);
     $pct      = $precio > 0 ? round(($pagado / $precio) * 100) : 0;
@@ -39,12 +39,12 @@
     if (in_array($reservation->status, ['contract_signed', 'signed'])) $stepCount = 6;
 
     $steps = [
-        ['Reserva',     'check-circle'],
-        ['KYC',         'id-card'],
-        ['Promesa',     'file-edit'],
-        ['Plan de Pago','calculator'],
-        ['Doc Pago',    'credit-card'],
-        ['Contrato',    'file'],
+        [__('Reserva'),      'check-circle'],
+        [__('KYC'),          'id-card'],
+        [__('Promesa'),      'file-edit'],
+        [__('Plan de pago'), 'calculator'],
+        [__('Doc. de pago'), 'credit-card'],
+        [__('Contrato'),     'file'],
     ];
 
     $nextPay  = $reservation->payments->where('status', 'pending')->sortBy('due_date')->first();
@@ -59,8 +59,8 @@
     @if($reservation->isBudgetSent() && !$contractSigned)
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-ok-soft border border-ok/30 text-[13px] text-ink-700">
             <i class="pi pi-file-text text-ok"></i>
-            <span><span class="font-bold text-ink-950">Presupuesto disponible</span> — Tu asesor ha enviado el presupuesto. Revísalo y acéptalo para continuar con tu compra.</span>
-            <a href="{{ route('dashboard.budget', $reservation) }}" class="ml-auto text-brand font-semibold hover:underline flex items-center gap-1">Ver presupuesto <i class="pi pi-arrow-right text-[10px]"></i></a>
+            <span><span class="font-bold text-ink-950">{{ __('Presupuesto disponible') }}</span> — {{ __('Tu asesor ha enviado el presupuesto. Revísalo y acéptalo para continuar con tu compra.') }}</span>
+            <a href="{{ route('dashboard.budget', $reservation) }}" class="ml-auto text-brand font-semibold hover:underline flex items-center gap-1">{{ __('Ver presupuesto') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
         </div>
     @endif
 
@@ -68,18 +68,18 @@
     @if(! $kycSubmitted)
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-err-soft border border-err/20 text-[13px] text-ink-700">
             <i class="pi pi-exclamation-circle text-err"></i>
-            <span><span class="font-bold text-ink-950">Acción requerida: KYC</span> — Necesitamos verificar tus documentos de identidad para continuar con tu expediente.</span>
-            <a href="{{ route('dashboard.documents') }}" class="ml-auto text-brand font-semibold hover:underline flex items-center gap-1">Ver documentos <i class="pi pi-arrow-right text-[10px]"></i></a>
+            <span><span class="font-bold text-ink-950">{{ __('Acción requerida: KYC') }}</span> — {{ __('Necesitamos verificar tus documentos de identidad para continuar con tu expediente.') }}</span>
+            <a href="{{ route('dashboard.documents') }}" class="ml-auto text-brand font-semibold hover:underline flex items-center gap-1">{{ __('Ver documentos') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
         </div>
     @elseif($kycSubmitted && ! $kycApproved && ! $kycRejected)
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-warn-soft border border-warn/30 text-[13px] text-ink-700">
             <i class="pi pi-clock text-warn"></i>
-            <span><span class="font-bold text-ink-950">KYC en revisión</span> — Tu documentación está siendo verificada por nuestro equipo. Te avisaremos cuando esté aprobada.</span>
+            <span><span class="font-bold text-ink-950">{{ __('KYC en revisión') }}</span> — {{ __('Tu documentación está siendo verificada por nuestro equipo. Te avisaremos cuando esté aprobada.') }}</span>
         </div>
     @elseif($kycRejected)
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-err-soft border border-err/20 text-[13px] text-ink-700">
             <i class="pi pi-exclamation-circle text-err"></i>
-            <span><span class="font-bold text-ink-950">KYC rechazado</span> — Tu documentación fue rechazada. Por favor contactá a tu asesor para más detalles.</span>
+            <span><span class="font-bold text-ink-950">{{ __('KYC rechazado') }}</span> — {{ __('Tu documentación fue rechazada. Por favor contacta a tu asesor para más detalles.') }}</span>
         </div>
     @endif
 
@@ -94,27 +94,27 @@
                 radial-gradient(circle at center, transparent 9%, rgba(255,255,255,.35) 9.5%, rgba(255,255,255,.35) 11%, transparent 11.5%);"></div>
 
             <div class="relative z-10">
-                <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">Tu propiedad</div>
+                <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
                 <div class="font-display text-[48px] font-medium leading-tight mt-1">{{ $unidad }}</div>
                 <div class="text-[13px] opacity-80 mt-1">Makai Residences · Cap Cana, Punta Cana</div>
 
                 {{-- Quick stats pills --}}
                 <div class="mt-6 inline-flex items-stretch rounded-2xl bg-white/10 backdrop-blur border border-white/15 overflow-hidden">
                     <div class="px-5 py-3 border-r border-white/15">
-                        <div class="text-[10px] uppercase tracking-wider opacity-70">Precio total</div>
+                        <div class="text-[10px] uppercase tracking-wider opacity-70">{{ __('Precio total') }}</div>
                         <div class="font-display text-[16px] font-semibold mt-1">${{ number_format($precio, 0) }} USD</div>
                     </div>
                     <div class="px-5 py-3 border-r border-white/15">
-                        <div class="text-[10px] uppercase tracking-wider opacity-70">Pagado</div>
+                        <div class="text-[10px] uppercase tracking-wider opacity-70">{{ __('Pagado') }}</div>
                         <div class="font-display text-[16px] font-semibold mt-1">${{ number_format($pagado, 0) }} USD</div>
                     </div>
                     <div class="px-5 py-3 border-r border-white/15">
-                        <div class="text-[10px] uppercase tracking-wider opacity-70">Avance compra</div>
+                        <div class="text-[10px] uppercase tracking-wider opacity-70">{{ __('Avance compra') }}</div>
                         <div class="font-display text-[16px] font-semibold mt-1">{{ $pct }}%</div>
                     </div>
                     <div class="px-5 py-3">
-                        <div class="text-[10px] uppercase tracking-wider opacity-70">Tipo</div>
-                        <div class="font-display text-[16px] font-semibold mt-1">{{ $tipoBeds }} Bed · {{ $tipoBath }} Ba</div>
+                        <div class="text-[10px] uppercase tracking-wider opacity-70">{{ __('Tipo') }}</div>
+                        <div class="font-display text-[16px] font-semibold mt-1">{{ $tipoBeds }} {{ __('Hab') }} · {{ $tipoBath }} {{ __('Bañ') }}</div>
                     </div>
                 </div>
             </div>
@@ -150,18 +150,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {{-- Detalles de tu unidad --}}
         <div class="cli-card overflow-hidden lg:col-span-2">
-            <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">Detalles de tu unidad</div>
+            <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ __('Detalles de tu unidad') }}</div>
             <div class="divide-y divide-ink-100">
                 @php
                     $details = [
-                        ['Unidad',    $unidad],
-                        ['Piso',      'Planta '.($reservation->unit->floor ?? '1')],
-                        ['Tipo',      ($reservation->unit->layout ?? '1 Bed + Family Room')],
-                        ['Interior',  ($reservation->unit->internal_area ?? '959').' sqft'],
-                        ['Terraza',   ($reservation->unit->expense_1 ?? '207').' sqft'],
-                        ['Vista',     ($reservation->unit->outlook ?? 'Lake Facing')],
-                        ['Proyecto',  'Makai Residences'],
-                        ['Ubicación', 'Cap Cana, Punta Cana · RD'],
+                        [__('Unidad'),    $unidad],
+                        [__('Piso'),      __('Planta').' '.($reservation->unit->floor ?? '1')],
+                        [__('Tipo'),      ($reservation->unit->layout ?? '1 Bed + Family Room')],
+                        [__('Interior'),  ($reservation->unit->internal_area ?? '959').' sqft'],
+                        [__('Terraza'),   ($reservation->unit->expense_1 ?? '207').' sqft'],
+                        [__('Vista'),     ($reservation->unit->outlook ?? 'Lake Facing')],
+                        [__('Proyecto'),  'Makai Residences'],
+                        [__('Ubicación'), 'Cap Cana, Punta Cana · RD'],
                     ];
                 @endphp
                 @foreach($details as $d)
@@ -178,30 +178,30 @@
             {{-- Mis documentos card --}}
             <a href="{{ route('dashboard.documents') }}" class="cli-card p-4 block hover:shadow-card transition-shadow relative">
                 @if(! $kycApproved)
-                    <span class="absolute top-3 right-4 cli-pill bg-err-soft text-err"><i class="pi pi-exclamation-circle text-[10px]"></i> Acción necesaria</span>
+                    <span class="absolute top-3 right-4 cli-pill bg-err-soft text-err"><i class="pi pi-exclamation-circle text-[10px]"></i> {{ __('Acción necesaria') }}</span>
                 @endif
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-file"></i></div>
                     <div class="flex-1">
-                        <div class="text-[14px] font-bold text-ink-950">Mis Documentos</div>
-                        <div class="text-[11px] text-ink-500">Sube y gestiona tus docs</div>
+                        <div class="text-[14px] font-bold text-ink-950">{{ __('Mis documentos') }}</div>
+                        <div class="text-[11px] text-ink-500">{{ __('Sube y gestiona tus docs') }}</div>
                     </div>
                 </div>
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400 mt-3 pt-3 border-t border-ink-100">{{ $kycApproved ? 'KYC completado' : 'Completa KYC' }}</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400 mt-3 pt-3 border-t border-ink-100">{{ $kycApproved ? __('KYC completado') : __('Completa KYC') }}</div>
             </a>
 
             {{-- Plan de pagos card --}}
             <a href="{{ route('dashboard.payments') }}" class="cli-card p-4 block hover:shadow-card transition-shadow">
-                <div class="text-right text-[10px] uppercase tracking-wider font-semibold text-ink-400">Próximo pago</div>
+                <div class="text-right text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Próximo pago') }}</div>
                 <div class="text-right font-display text-[22px] font-bold text-ink-950 mt-1">${{ number_format($nextPay->amount ?? 44650, 2) }}</div>
                 <div class="flex items-center gap-3 mt-3 pt-3 border-t border-ink-100">
                     <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-credit-card"></i></div>
                     <div class="flex-1">
-                        <div class="text-[14px] font-bold text-ink-950">Plan de Pagos</div>
-                        <div class="text-[11px] text-ink-500">Consulta tus cuotas</div>
+                        <div class="text-[14px] font-bold text-ink-950">{{ __('Plan de pagos') }}</div>
+                        <div class="text-[11px] text-ink-500">{{ __('Consulta tus cuotas') }}</div>
                     </div>
                 </div>
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-warn-dark mt-2">Vence {{ $nextPay && $nextPay->due_date ? $nextPay->due_date->locale('es')->isoFormat('D MMMM YYYY') : '31 Mayo 2026' }}</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-warn-dark mt-2">{{ __('Vence') }} {{ $nextPay && $nextPay->due_date ? $nextPay->due_date->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMMM YYYY' : 'MMMM D, YYYY') : '31 Mayo 2026' }}</div>
             </a>
 
             {{-- Asesor card --}}
@@ -210,12 +210,12 @@
                     <div class="cli-avatar" style="background:#5c7c68">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? 'Carlos Méndez' }}</div>
-                        <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> Disponible ahora</div>
+                        <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> {{ __('Disponible ahora') }}</div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-ink-100">
                     <a href="https://wa.me/{{ preg_replace('/\D/', '', $advisor->phone ?? '18095550101') }}" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-2"><i class="pi pi-whatsapp"></i> WhatsApp</a>
-                    <a href="{{ route('dashboard.messages') }}" class="cli-btn cli-btn-primary text-[12px] py-2"><i class="pi pi-comment text-[12px]"></i> Chat</a>
+                    <a href="{{ route('dashboard.messages') }}" class="cli-btn cli-btn-primary text-[12px] py-2"><i class="pi pi-comment text-[12px]"></i> {{ __('Chat') }}</a>
                 </div>
             </div>
         </div>

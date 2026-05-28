@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -199,6 +201,107 @@ class AuthController extends Controller
             'ok'       => true,
             'pending'  => $user->isPendingVerification(),
             'redirect' => $user->postAuthRedirectPath(),
+        ]);
+    }
+
+    /* =================================================================
+     * Forgot password — 3 steps: email → 6-digit code → new password
+     * ================================================================= */
+
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /** Step 1: receive email, generate a 6-digit code, store it (hashed). */
+    public function forgotPasswordSend(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        $user = User::where('email', $data['email'])->first();
+
+        // To avoid leaking which emails exist, always respond ok.
+        // In dev, we still return the code only when the user exists.
+        if (! $user) {
+            return response()->json(['ok' => true, 'code' => null]);
+        }
+
+        $code = (string) random_int(100000, 999999);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $data['email']],
+            ['token' => Hash::make($code), 'created_at' => now()]
+        );
+
+        $request->session()->put('password_reset', [
+            'email'    => $data['email'],
+            'verified' => false,
+        ]);
+
+        // TODO: send via Mail in production. For now we surface the code in dev.
+        return response()->json([
+            'ok'   => true,
+            'code' => app()->environment('production') ? null : $code,
+        ]);
+    }
+
+    /** Step 2: verify the 6-digit code. */
+    public function forgotPasswordVerify(Request $request)
+    {
+        $data = $request->validate(['code' => 'required|digits:6']);
+
+        $reset = $request->session()->get('password_reset');
+        if (! $reset || empty($reset['email'])) {
+            return response()->json(['message' => 'Sesión expirada'], 422);
+        }
+
+        $row = DB::table('password_reset_tokens')->where('email', $reset['email'])->first();
+        if (! $row) {
+            return response()->json(['message' => 'Código inválido o expirado'], 422);
+        }
+
+        // Expire codes after 60 minutes (matches config/auth.php passwords.expire).
+        if (now()->diffInMinutes($row->created_at) > 60) {
+            return response()->json(['message' => 'El código ha expirado'], 422);
+        }
+
+        if (! Hash::check($data['code'], $row->token)) {
+            return response()->json(['message' => 'Código incorrecto'], 422);
+        }
+
+        $reset['verified'] = true;
+        $request->session()->put('password_reset', $reset);
+
+        return response()->json(['ok' => true]);
+    }
+
+    /** Step 3: set new password. */
+    public function forgotPasswordReset(Request $request)
+    {
+        $reset = $request->session()->get('password_reset');
+        if (! $reset || empty($reset['verified'])) {
+            return response()->json(['message' => 'Verifica tu email antes de continuar'], 422);
+        }
+
+        $data = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $reset['email'])->first();
+        if (! $user) {
+            return response()->json(['message' => 'Usuario no encontrado'], 422);
+        }
+
+        $user->update(['password' => bcrypt($data['password'])]);
+
+        DB::table('password_reset_tokens')->where('email', $reset['email'])->delete();
+        $request->session()->forget('password_reset');
+
+        return response()->json([
+            'ok'       => true,
+            'redirect' => route('login'),
         ]);
     }
 

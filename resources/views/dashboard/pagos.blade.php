@@ -1,12 +1,12 @@
 @extends('layouts.client')
-@section('title', 'Plan de Pagos — MAKAI')
-@section('page_title', 'Plan de pagos')
-@section('page_breadcrumb', 'Mi Propiedad · Plan de Pagos')
+@section('title', __('Plan de pagos').' — MAKAI')
+@section('page_title', __('Plan de pagos'))
+@section('page_breadcrumb', __('Mi propiedad').' · '.__('Plan de pagos'))
 @php $activeRoute = 'payments'; @endphp
 
 @section('content')
 @php
-    $unidad  = $reservation->unit->custom_id ?? $reservation->unit->name ?? 'Unidad';
+    $unidad  = $reservation->unit->custom_id ?? $reservation->unit->name ?? __('Unidad');
     $precio  = (float) ($reservation->unit->price ?? 0);
     $pagado  = (float) ($reservation->payments?->where('status', 'paid')->sum('amount') ?? 0);
     $saldo   = max(0, $precio - $pagado);
@@ -36,10 +36,10 @@
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $kpis = [
-            ['Precio total',    '$'.number_format($precio, 0),   'text-ink-950'],
-            ['Total pagado',    '$'.number_format($pagado, 0),   'text-ink-950'],
-            ['Balance pendiente','$'.number_format($saldo, 0),    'text-ink-950'],
-            ['Próxima cuota',   '$'.number_format($nextPay->amount ?? 2694, 0),  'text-ok-dark'],
+            [__('Precio total'),     '$'.number_format($precio, 0),   'text-ink-950'],
+            [__('Total pagado'),     '$'.number_format($pagado, 0),   'text-ink-950'],
+            [__('Balance pendiente'),'$'.number_format($saldo, 0),    'text-ink-950'],
+            [__('Próxima cuota'),    '$'.number_format($nextPay->amount ?? 2694, 0),  'text-ok-dark'],
         ]; @endphp
         @foreach($kpis as $k)
             <div class="cli-card p-4">
@@ -52,13 +52,13 @@
     {{-- Progress --}}
     <div class="cli-card p-5">
         <div class="flex items-center justify-between text-[13px] mb-3">
-            <span class="font-semibold text-ink-950">Progreso del plan de pagos</span>
+            <span class="font-semibold text-ink-950">{{ __('Progreso del plan de pagos') }}</span>
             <span class="font-bold text-ok-dark text-[16px]">{{ $pct }}%</span>
         </div>
         <div class="relative h-2 rounded-full bg-ink-100 overflow-visible">
             <div class="absolute inset-y-0 left-0 rounded-full bg-ok transition-all" style="width:{{ $pct }}%"></div>
             {{-- Milestone markers --}}
-            @foreach([['0%', 0], ['5% Reserva', 5], ['20% Fin construcción', 20], ['100% Entrega', 100]] as [$label, $val])
+            @foreach([['0%', 0], ['5% '.__('Reserva'), 5], ['20% '.__('Fin construcción'), 20], ['100% '.__('Entrega'), 100]] as [$label, $val])
                 @php
                     $reached = $pct >= $val;
                     $clr = $reached ? '#1fc16b' : '#cacfd8';
@@ -69,7 +69,7 @@
             @endforeach
         </div>
         <div class="relative mt-3 text-[10px] uppercase tracking-wider font-semibold text-ink-400" style="height:14px;">
-            @foreach([['0%', 0, 'left-0'], ['5% Reserva', 5, ''], ['20% Fin construcción', 20, ''], ['100% Entrega', 100, 'right-0']] as $i => [$label, $val, $align])
+            @foreach([['0%', 0, 'left-0'], ['5% '.__('Reserva'), 5, ''], ['20% '.__('Fin construcción'), 20, ''], ['100% '.__('Entrega'), 100, 'right-0']] as $i => [$label, $val, $align])
                 @php
                     $reached = $pct >= $val;
                     $transform = $val === 0 ? '' : ($val === 100 ? 'transform:translateX(-100%);' : 'transform:translateX(-50%);');
@@ -84,25 +84,25 @@
     <div class="cli-card overflow-hidden">
         <div class="px-5 py-3 flex items-center gap-3 bg-ink-50/60 border-b border-ink-100">
             <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-calendar"></i></div>
-            <div class="text-[14px] font-bold text-ink-950">Calendario de pagos</div>
+            <div class="text-[14px] font-bold text-ink-950">{{ __('Calendario de pagos') }}</div>
             <div class="ml-auto flex items-center gap-4 text-[11px] text-ink-500">
-                <span class="flex items-center gap-1.5"><span class="dot bg-ok"></span> Pagado</span>
-                <span class="flex items-center gap-1.5"><span class="dot bg-warn"></span> Próximo</span>
-                <span class="flex items-center gap-1.5"><span class="dot bg-err"></span> Vencido</span>
+                <span class="flex items-center gap-1.5"><span class="dot bg-ok"></span> {{ __('Pagado') }}</span>
+                <span class="flex items-center gap-1.5"><span class="dot bg-warn"></span> {{ __('Próximo') }}</span>
+                <span class="flex items-center gap-1.5"><span class="dot bg-err"></span> {{ __('Vencido') }}</span>
                 @if($nextPay)
-                    <button onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn cli-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Registrar pago</button>
+                    <button onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn cli-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> {{ __('Registrar pago') }}</button>
                 @endif
             </div>
         </div>
         <table class="w-full">
             <thead class="bg-white">
                 <tr>
-                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Concepto</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Fecha</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Monto programado</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Pagado</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Saldo</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Estado</th>
+                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Concepto') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Fecha') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Monto programado') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Pagado') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Saldo') }}</th>
+                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
                     <th class="px-3 py-2.5"></th>
                 </tr>
             </thead>
@@ -124,13 +124,13 @@
                             <div class="flex items-center gap-3">
                                 <span class="dot {{ $bullet }} shrink-0"></span>
                                 <div>
-                                    <div class="text-[13px] font-semibold text-ink-950">{{ $p->label ?? 'Reserva (5%)' }}</div>
-                                    <div class="text-[11px] text-ink-500">Pago {{ $isPaid ? 'inicial de reserva' : 'inicial de reserva' }}</div>
+                                    <div class="text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Reserva (5%)') }}</div>
+                                    <div class="text-[11px] text-ink-500">{{ __('Pago inicial de reserva') }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-3 py-3.5 text-[12px] {{ $isOverdue || $isNext ? 'text-warn-dark font-semibold' : 'text-ink-700' }}">
-                            {{ optional($p->paid_at ?? $p->due_date)->locale('es')->isoFormat('D MMM YYYY') }}
+                            {{ optional($p->paid_at ?? $p->due_date)->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMM YYYY' : 'MMM D, YYYY') }}
                         </td>
                         <td class="px-3 py-3.5 text-[13px] font-semibold text-ink-950">${{ number_format($p->amount, 0) }}</td>
                         <td class="px-3 py-3.5 text-[13px] font-semibold {{ $isPaid ? 'text-ok-dark' : 'text-ink-400' }}">

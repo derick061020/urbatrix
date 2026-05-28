@@ -399,8 +399,8 @@
         <header class="flex items-center justify-between">
             @include('auth._logo')
             <div class="flex items-center gap-3">
-                <span class="hidden sm:inline text-[14px] text-ink-600">¿No tienes una cuenta?</span>
-                <button type="button" onclick="goToRegister()" class="auth-btn auth-btn-ghost">Regístrate</button>
+                <span class="hidden sm:inline text-[14px] text-ink-600">{{ __('¿No tienes una cuenta?') }}</span>
+                <button type="button" onclick="goToRegister()" class="auth-btn auth-btn-ghost">{{ __('Regístrate') }}</button>
             </div>
         </header>
 
@@ -411,8 +411,8 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 shadow-sm">
                         <i class="pi pi-user text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Inicia sesión en tu cuenta</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Introduce tus datos para iniciar sesión.</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Inicia sesión en tu cuenta') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Introduce tus datos para iniciar sesión.') }}</p>
                 </div>
 
                 {{-- Social buttons — icon only --}}
@@ -445,14 +445,14 @@
                 <form method="POST" action="/login" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Dirección de correo electrónico <span class="text-err">*</span></label>
+                        <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Dirección de correo electrónico') }} <span class="text-err">*</span></label>
                         <div class="relative">
                             <i class="pi pi-envelope absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                             <input type="email" name="email" value="{{ old('email') }}" required placeholder="samuel@gmail.com" class="auth-input has-icon" autocomplete="email">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Contraseña <span class="text-err">*</span></label>
+                        <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Contraseña') }} <span class="text-err">*</span></label>
                         <div class="relative">
                             <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                             <input id="login-pass" type="password" name="password" required placeholder="••••••••••••" class="auth-input has-icon has-trail" autocomplete="current-password">
@@ -462,11 +462,11 @@
                     <div class="flex items-center justify-between">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="remember" class="w-4 h-4 rounded accent-brand">
-                            <span class="text-[13px] text-ink-600">Mantenerme conectado</span>
+                            <span class="text-[13px] text-ink-600">{{ __('Mantenerme conectado') }}</span>
                         </label>
-                        <a href="#" class="auth-link text-[13px]">¿Olvidaste tu contraseña?</a>
+                        <a href="{{ route('password.request') }}" class="auth-link text-[13px]">{{ __('¿Olvidaste tu contraseña?') }}</a>
                     </div>
-                    <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Iniciar sesión</button>
+                    <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Iniciar sesión') }}</button>
                 </form>
             </div>
         </div>
@@ -491,11 +491,11 @@
             <div id="step-indicator" class="hidden lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:flex items-center gap-5">
                 @php
                     $steps = [
-                        ['Confirmación', 1],
-                        ['Perfil',       2],
-                        ['Documentación',3],
-                        ['Contraseña',   4],
-                        ['Resumen',      5],
+                        [__('Confirmación'), 1],
+                        [__('Perfil'),       2],
+                        [__('Documentación'),3],
+                        [__('Contraseña'),   4],
+                        [__('Resumen'),      5],
                     ];
                 @endphp
                 @foreach($steps as $idx => $s)
@@ -510,16 +510,16 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="hidden sm:inline text-[14px] text-ink-600 reg-initial-only">¿Necesitas ayuda?</span>
-                <a href="#" class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> Contáctanos</a>
-                <button type="button" onclick="goToLogin()" class="auth-btn auth-btn-ghost w-10 px-0" title="Volver al login">
+                <span class="hidden sm:inline text-[14px] text-ink-600 reg-initial-only">{{ __('¿Necesitas ayuda?') }}</span>
+                <a href="#" class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
+                <button type="button" onclick="goToLogin()" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Volver al login') }}">
                     <i class="pi pi-times text-[12px]"></i>
                 </button>
             </div>
         </header>
 
         {{-- "Volver" button (only steps 1-5) --}}
-        <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> Volver</button>
+        <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> {{ __('Volver') }}</button>
 
         <main class="flex-1 pt-7 pb-10 relative z-10">
             <div class="w-full max-w-[452px] mx-auto px-5">
@@ -530,8 +530,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-user-plus text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Crea tu cuenta</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Accede a Duna Sales Platform de forma gratuita</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Crea tu cuenta') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Accede a Duna Sales Platform de forma gratuita') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -560,18 +560,18 @@
 
                     <form id="form-step0" class="space-y-4" onsubmit="return submitStep0(event)">
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Nombre completo <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Nombre completo') }} <span class="text-err">*</span></label>
                             <input type="text" name="full_name" required placeholder="Samuel Urbina" class="auth-input" autocomplete="name">
                         </div>
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Dirección de correo electrónico <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Dirección de correo electrónico') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-envelope absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input type="email" name="email" required placeholder="samuel@gmail.com" class="auth-input has-icon" autocomplete="email">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Número de teléfono <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Número de teléfono') }} <span class="text-err">*</span></label>
                             <div class="auth-phone-wrapper">
                                 <input type="hidden" name="country" id="country-input" value="DO+1">
                                 <input type="tel" name="phone" id="phone-input" required autocomplete="tel" class="auth-input">
@@ -580,14 +580,16 @@
                         <label class="flex items-start gap-2 cursor-pointer pt-1">
                             <input type="checkbox" name="terms" value="1" required checked class="w-4 h-4 rounded accent-brand mt-0.5">
                             <span class="text-[13px] text-ink-600">
-                                Acepto los <a href="#" class="text-ink-950 hover:text-brand underline">Términos</a> y la
-                                <a href="#" class="text-ink-950 hover:text-brand underline">Política de Privacidad</a>.
+                                {!! __('Acepto los :terms y la :privacy.', [
+                                    'terms'   => '<a href="#" class="text-ink-950 hover:text-brand underline">'.__('Términos').'</a>',
+                                    'privacy' => '<a href="#" class="text-ink-950 hover:text-brand underline">'.__('Política de Privacidad').'</a>',
+                                ]) !!}
                             </span>
                         </label>
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Comenzar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Comenzar') }}</button>
                         <div class="text-center text-[13px] text-ink-600 mt-4">
-                            ¿Ya tienes una cuenta?
-                            <button type="button" onclick="goToLogin()" class="auth-link ml-1">Iniciar sesión</button>
+                            {{ __('¿Ya tienes una cuenta?') }}
+                            <button type="button" onclick="goToLogin()" class="auth-link ml-1">{{ __('Iniciar sesión') }}</button>
                         </div>
                     </form>
                 </div>
@@ -598,8 +600,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-envelope text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Verifica tu email</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Enviamos un código de 6 digitos a tu email.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Verifica tu email') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Enviamos un código de 6 dígitos a tu email.') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -618,12 +620,12 @@
                             <input class="code-input" data-pos="4" maxlength="1" inputmode="numeric" pattern="[0-9]*">
                             <input class="code-input" data-pos="5" maxlength="1" inputmode="numeric" pattern="[0-9]*">
                         </div>
-                        <button type="submit" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full">{{ __('Continuar') }}</button>
                         <div class="text-center mt-5 text-[13px] text-ink-500">
-                            ¿No recibiste el código?  Reenviar en <span class="resend-strong" id="resend-timer">58s</span>
+                            {{ __('¿No recibiste el código?') }}  {{ __('Reenviar en') }} <span class="resend-strong" id="resend-timer">58s</span>
                         </div>
                         <div class="text-center mt-3">
-                            <button type="button" onclick="resendCode()" id="resend-btn" disabled class="auth-link disabled:opacity-40 disabled:cursor-not-allowed">Volver a enviar el código</button>
+                            <button type="button" onclick="resendCode()" id="resend-btn" disabled class="auth-link disabled:opacity-40 disabled:cursor-not-allowed">{{ __('Volver a enviar el código') }}</button>
                         </div>
                     </form>
                 </div>
@@ -634,8 +636,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-id-card text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">¿Cómo utilizarás la plataforma?</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Selecciona el perfil que mejor te describa</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('¿Cómo utilizarás la plataforma?') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Selecciona el perfil que mejor te describa') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -643,33 +645,33 @@
                         <label class="role-card selected" data-role="buyer">
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-eye"></i></div>
                             <div class="flex-1">
-                                <div class="text-[14px] font-semibold text-ink-950">Soy comprador</div>
-                                <div class="text-[12px] text-ink-500">Estoy interesado en adquirir una propiedad</div>
+                                <div class="text-[14px] font-semibold text-ink-950">{{ __('Soy comprador') }}</div>
+                                <div class="text-[12px] text-ink-500">{{ __('Estoy interesado en adquirir una propiedad') }}</div>
                             </div>
                             <input type="radio" name="role" value="buyer" checked class="sr-only">
                             <span class="radio-dot"></span>
                         </label>
                         <label class="role-card" data-role="broker">
-                            <span class="verif-tag">VERIFICACIÓN REQUERIDA</span>
+                            <span class="verif-tag">{{ __('VERIFICACIÓN REQUERIDA') }}</span>
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-id-card"></i></div>
                             <div class="flex-1">
-                                <div class="text-[14px] font-semibold text-ink-950">Soy broker independiente</div>
-                                <div class="text-[12px] text-ink-500">Intermediario individual de propiedades</div>
+                                <div class="text-[14px] font-semibold text-ink-950">{{ __('Soy broker independiente') }}</div>
+                                <div class="text-[12px] text-ink-500">{{ __('Intermediario individual de propiedades') }}</div>
                             </div>
                             <input type="radio" name="role" value="broker" class="sr-only">
                             <span class="radio-dot"></span>
                         </label>
                         <label class="role-card" data-role="agency">
-                            <span class="verif-tag">VERIFICACIÓN REQUERIDA</span>
+                            <span class="verif-tag">{{ __('VERIFICACIÓN REQUERIDA') }}</span>
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-building"></i></div>
                             <div class="flex-1">
-                                <div class="text-[14px] font-semibold text-ink-950">Soy una agencia inmobiliaria</div>
-                                <div class="text-[12px] text-ink-500">Express o equipo de intermediación</div>
+                                <div class="text-[14px] font-semibold text-ink-950">{{ __('Soy una agencia inmobiliaria') }}</div>
+                                <div class="text-[12px] text-ink-500">{{ __('Express o equipo de intermediación') }}</div>
                             </div>
                             <input type="radio" name="role" value="agency" class="sr-only">
                             <span class="radio-dot"></span>
                         </label>
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-5">Continuar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-5">{{ __('Continuar') }}</button>
                     </form>
                 </div>
 
@@ -679,8 +681,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-id-card text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Documentación profesional</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Sube los documentos requeridos para activar tu cuenta</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Documentación profesional') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Sube los documentos requeridos para activar tu cuenta') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -688,9 +690,9 @@
                         @php
                             // Each row: [key, label, icon, optional, [roles allowed]]
                             $docs = [
-                                ['id_front', 'Cédula / Pasaporte (Frente)',  'id-card', false, ['broker', 'agency']],
-                                ['id_back',  'Cédula / Pasaporte (Reverso)', 'id-card', false, ['broker', 'agency']],
-                                ['rnc',      'RNC / Registro fiscal',        'file',    false, ['agency']],
+                                ['id_front', __('Cédula / Pasaporte (Frente)'),  'id-card', false, ['broker', 'agency']],
+                                ['id_back',  __('Cédula / Pasaporte (Reverso)'), 'id-card', false, ['broker', 'agency']],
+                                ['rnc',      __('RNC / Registro fiscal'),        'file',    false, ['agency']],
                             ];
                         @endphp
                         @foreach($docs as $d)
@@ -700,21 +702,21 @@
                                     <div class="text-[14px] text-ink-950 font-medium">
                                         {{ $d[1] }}
                                         @if(isset($d[3]) && $d[3])
-                                            <span class="text-[12px] text-ink-400 font-normal">(Opcional)</span>
+                                            <span class="text-[12px] text-ink-400 font-normal">({{ __('Opcional') }})</span>
                                         @endif
                                     </div>
                                     <div class="text-[11px] text-ink-500 doc-filename hidden mt-0.5"></div>
                                 </div>
                                 <input type="file" name="docs[{{ $d[0] }}]" accept=".pdf,.jpg,.jpeg,.png" class="hidden doc-input" onchange="onDocSelected(this)">
-                                <button type="button" class="auth-btn auth-btn-ghost text-[12px] py-1 px-3 doc-btn" onclick="this.previousElementSibling.click()">Subir</button>
+                                <button type="button" class="auth-btn auth-btn-ghost text-[12px] py-1 px-3 doc-btn" onclick="this.previousElementSibling.click()">{{ __('Subir') }}</button>
                             </div>
                         @endforeach
 
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-6">Continuar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-6">{{ __('Continuar') }}</button>
 
                         <div class="text-center text-[13px] text-ink-600 mt-4">
-                            ¿Quieres completar más tarde?
-                            <button type="button" onclick="skipDocs()" class="auth-link ml-1">Saltar este paso</button>
+                            {{ __('¿Quieres completar más tarde?') }}
+                            <button type="button" onclick="skipDocs()" class="auth-link ml-1">{{ __('Saltar este paso') }}</button>
                         </div>
                     </form>
                 </div>
@@ -725,8 +727,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-lock text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Configuración de contraseña</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Configura una contraseña segura para tu cuenta.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Configuración de contraseña') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Configura una contraseña segura para tu cuenta.') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -734,7 +736,7 @@
 
                     <form id="form-step4" class="space-y-4" onsubmit="return submitStep4(event)">
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Crear una contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Crear una contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="reg-pw1" type="password" name="password" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail" oninput="updatePwStrength()">
@@ -742,7 +744,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Confirmar contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Confirmar contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="reg-pw2" type="password" name="password_confirmation" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail">
@@ -756,15 +758,15 @@
                                 <div class="pw-bar" id="pw-bar-1"></div>
                                 <div class="pw-bar" id="pw-bar-2"></div>
                             </div>
-                            <div class="text-[12px] text-ink-500 mt-3 mb-1">Debe contener al menos:</div>
+                            <div class="text-[12px] text-ink-500 mt-3 mb-1">{{ __('Debe contener al menos:') }}</div>
                             <ul class="space-y-1 text-[12px]">
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 mayúscula</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 número</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> Al menos 8 caracteres</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 mayúscula') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 número') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 8 caracteres') }}</li>
                             </ul>
                         </div>
 
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Continuar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Continuar') }}</button>
                     </form>
                 </div>
 
@@ -774,8 +776,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-check text-ink-600 text-[22px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Resumen de incorporación</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Revisa y completa la configuración de tu cuenta.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Resumen de incorporación') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Revisa y completa la configuración de tu cuenta.') }}</p>
                     </div>
 
                     <div id="step5-error" class="hidden mb-4 px-3 py-2 rounded-lg bg-err-soft border border-err/30 text-[12px] text-err"></div>
@@ -784,7 +786,7 @@
                         <div class="px-4 py-3 flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-user"></i></div>
                             <div class="flex-1">
-                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Nombre completo</div>
+                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('Nombre completo') }}</div>
                                 <div class="text-[14px] font-semibold text-ink-950" id="sum-name">—</div>
                             </div>
                             <button type="button" class="text-ink-400 hover:text-ink-700 p-1" onclick="setStep(0)"><i class="pi pi-pencil text-[12px]"></i></button>
@@ -792,7 +794,7 @@
                         <div class="px-4 py-3 flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-envelope"></i></div>
                             <div class="flex-1">
-                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Correo electrónico</div>
+                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('Correo electrónico') }}</div>
                                 <div class="text-[14px] font-semibold text-ink-950" id="sum-email">—</div>
                             </div>
                             <button type="button" class="text-ink-400 hover:text-ink-700 p-1" onclick="setStep(0)"><i class="pi pi-pencil text-[12px]"></i></button>
@@ -800,7 +802,7 @@
                         <div class="px-4 py-3 flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-eye"></i></div>
                             <div class="flex-1">
-                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Rol</div>
+                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('Rol') }}</div>
                                 <div class="text-[14px] font-semibold text-ink-950" id="sum-role">—</div>
                             </div>
                             <button type="button" class="text-ink-400 hover:text-ink-700 p-1" onclick="setStep(2)"><i class="pi pi-pencil text-[12px]"></i></button>
@@ -808,13 +810,13 @@
                         <div id="sum-verif-row" class="px-4 py-3 flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-user-edit"></i></div>
                             <div class="flex-1">
-                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Verificación</div>
-                                <div class="text-[14px] font-semibold text-ink-950" id="sum-verif">Pendiente</div>
+                                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('Verificación') }}</div>
+                                <div class="text-[14px] font-semibold text-ink-950" id="sum-verif">{{ __('Pendiente') }}</div>
                             </div>
                             <button type="button" class="text-ink-400 hover:text-ink-700 p-1" onclick="setStep(3)"><i class="pi pi-pencil text-[12px]"></i></button>
                         </div>
                     </div>
-                    <button type="button" onclick="submitFinal()" class="auth-btn auth-btn-primary w-full mt-5">Completo</button>
+                    <button type="button" onclick="submitFinal()" class="auth-btn auth-btn-primary w-full mt-5">{{ __('Completo') }}</button>
                 </div>
 
             </div>

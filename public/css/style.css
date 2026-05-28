@@ -747,23 +747,27 @@
     }
     .fg-toggle-bg-active {
       position: absolute;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(90deg, rgb(92, 124, 104) 0%, rgb(92, 124, 104) 100%);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%),
+        var(--brand, rgb(92, 124, 104));
       height: 44px;
       left: 0;
       top: 0;
       width: 90px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow:
+      box-shadow: var(--brand-toggle-shadow,
         0 55px 16px 0 rgba(92,124,104,0.01),
         0 36px 14px 0 rgba(92,124,104,0.05),
         0 20px 12px 0 rgba(92,124,104,0.16),
         0 9px 9px  0 rgba(92,124,104,0.27),
-        0 2px 5px  0 rgba(92,124,104,0.31);
+        0 2px 5px  0 rgba(92,124,104,0.31));
       transition:
         left 0.32s cubic-bezier(0.22,1,0.36,1),
         opacity 0.22s ease,
-        transform 0.32s cubic-bezier(0.22,1,0.36,1);
+        transform 0.32s cubic-bezier(0.22,1,0.36,1),
+        background 0.6s ease,
+        box-shadow 0.6s ease;
       z-index: 1;
       pointer-events: none;
       opacity: 1;
@@ -804,9 +808,9 @@
     .fg-toggle:not(.plan-active) button.active svg { color: #ffffff; }
     .fg-toggle.plan-active button { color: #7b7b7b; }
     .fg-toggle.plan-active button svg { color: #7b7b7b; }
-    .fg-toggle button:not(.active):hover { color: #5c7c68; }
+    .fg-toggle button:not(.active):hover { color: var(--brand, #5c7c68); }
     .fg-toggle button:not(.active) svg { color: #7b7b7b; transition: color 0.22s ease; }
-    .fg-toggle button:not(.active):hover svg { color: #5c7c68; }
+    .fg-toggle button:not(.active):hover svg { color: var(--brand, #5c7c68); }
 
     /* Active background slides between Grid (default) and List */
     .fg-toggle button[data-view="list"].active ~ .fg-toggle-bg-active,
@@ -871,9 +875,9 @@
       border-radius: 100px;
       background: transparent;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.6s ease;
     }
-    .fg-location-btn:hover { background: rgba(92, 124, 104, 0.08); }
+    .fg-location-btn:hover { background: var(--brand-soft, rgba(92, 124, 104, 0.08)); }
     .fg-icon-location {
       display: inline-flex;
       align-items: center;
@@ -881,7 +885,7 @@
       width: 24px;
       height: 24px;
     }
-    .fg-icon-location svg { color: #5c7c68; }
+    .fg-icon-location svg { color: var(--brand, #5c7c68); transition: color 0.6s ease; }
     .fg-location-btn.active { background: var(--brand, #5c7c68); }
     .fg-location-btn.active .fg-icon-location svg { color: #ffffff; }
     
@@ -895,6 +899,84 @@
       height: 24px;
       overflow: hidden;
     }
+
+    /* Empty-state — projects without units (Naviva, Liv) */
+    .fg-project-empty { display: none; }
+    body[data-active-project="naviva"] .fg-project-empty,
+    body[data-active-project="liv"] .fg-project-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 24px;
+      min-height: 60vh;
+    }
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-toggle-bar,
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-filter-bar,
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-units-grid,
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-list-wrap,
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-plan-wrap,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-toggle-bar,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-filter-bar,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-units-grid,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-list-wrap,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-plan-wrap {
+      display: none !important;
+    }
+    .fg-project-empty-card {
+      max-width: 520px;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #ebebeb;
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(10,13,20,0.04);
+      font-family: 'Poppins', sans-serif;
+    }
+    .fg-project-empty-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand-soft, rgba(92,124,104,0.10));
+      color: var(--brand, #5c7c68);
+    }
+    .fg-project-empty-title {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: var(--brand, #5c7c68);
+    }
+    .fg-project-empty-text {
+      margin: 0 0 24px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #5c5c5c;
+    }
+    .fg-project-empty-text span[data-empty-project-name] {
+      font-weight: 600;
+      color: var(--brand, #5c7c68);
+    }
+    .fg-project-empty-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 22px;
+      background: var(--brand, #5c7c68);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.6s ease, transform 0.15s ease;
+    }
+    .fg-project-empty-cta:hover { transform: translateY(-1px); }
 
     /* FOOTER */
     .fg-footer {

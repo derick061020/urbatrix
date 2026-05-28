@@ -20,7 +20,7 @@
         <div class="text-[14px] font-semibold text-ink-700">{{ $reservations->total() }} clientes activos</div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-exportar-expedientes').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nueva reserva</button>
+            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nuevo Expediente</button>
         </div>
     </div>
 

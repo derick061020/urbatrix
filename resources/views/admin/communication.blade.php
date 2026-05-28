@@ -107,7 +107,7 @@
                         @else
                             <div class="flex justify-start">
                                 <div class="max-w-[60%]">
-                                    <div class="bg-ink-100 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2.5 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
+                                    <div class="bg-ink-200 text-ink-900 rounded-2xl rounded-bl-md px-4 py-2.5 text-[12px] whitespace-pre-line">{{ $msg->body }}</div>
                                     <div class="text-[10px] text-ink-400 mt-1">{{ $senderName }} · {{ $msg->created_at->format('Y-m-d H:i') }}</div>
                                 </div>
                             </div>

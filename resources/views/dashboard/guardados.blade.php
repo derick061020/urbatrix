@@ -595,17 +595,17 @@
                             @endif
 
                             <div class="fg-chip-row">
-                                @if($isHighDem)
-                                    <span class="fg-status-badge high-demand">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
-                                        HIGH DEMAND
-                                    </span>
-                                @elseif($isPending)
+                                @if($isPending)
                                     <span class="fg-status-badge pending">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                         PENDING
                                     </span>
-                                @elseif($isSecond)
+                                @elseif(!$isReserved && !$isSold && $isHighDem)
+                                    <span class="fg-status-badge high-demand">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
+                                        HIGH DEMAND
+                                    </span>
+                                @elseif(!$isReserved && !$isSold && $isSecond)
                                     <span class="fg-status-badge second">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                         2ND CHANCE

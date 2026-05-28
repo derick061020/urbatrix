@@ -18,7 +18,12 @@
       "Bash(magick admin-dashboard.png -crop 1200x150+0+95 +repage top-alert.png)",
       "Bash(magick admin-dashboard.png -crop 1200x180+0+135 +repage kpi-row.png)",
       "Bash(magick admin-dashboard.png -crop 850x500+0+285 +repage proy-card.png)",
-      "Bash(magick admin-dashboard.png -crop 380x500+850+285 +repage exp-card.png)"
+      "Bash(magick admin-dashboard.png -crop 380x500+850+285 +repage exp-card.png)",
+      "Bash(php -l /home/kira/Escritorio/projects/launchbase/launchbase/app/Http/Controllers/LocaleController.php)",
+      "Bash(php -l /home/kira/Escritorio/projects/launchbase/launchbase/app/Http/Middleware/SetLocale.php)",
+      "Bash(php -r \"json_decode\\(file_get_contents\\('/home/kira/Escritorio/projects/launchbase/launchbase/lang/es.json'\\), true\\); echo json_last_error_msg\\(\\).PHP_EOL;\")",
+      "Bash(php -r \"json_decode\\(file_get_contents\\('/home/kira/Escritorio/projects/launchbase/launchbase/lang/en.json'\\), true\\); echo json_last_error_msg\\(\\).PHP_EOL;\")",
+      "Bash(php -r ' *)"
     ]
   }
 }

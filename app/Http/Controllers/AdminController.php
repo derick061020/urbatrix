@@ -14,6 +14,10 @@ use App\Models\Approval;
 use App\Models\Aftersale;
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\CrmTemplate;
+use App\Models\CrmAutomation;
+use App\Models\CrmChannelSetting;
+use App\Models\ExportAuthorization;
 use App\Helpers\PaymentPlanHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -488,6 +492,25 @@ class AdminController extends Controller
         return view('admin.communication');
     }
 
+    public function communicationConversation($id)
+    {
+        $active = \App\Models\Reservation::with(['unit', 'documents', 'payments'])->findOrFail($id);
+        $threadMessages = $active->messages()->with('sender')->get();
+
+        $active->messages()
+            ->where('sender_role', 'client')
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3'];
+
+        return response()->json([
+            'id'     => $active->id,
+            'thread' => view('admin._partials.communication_thread', compact('active', 'threadMessages', 'avBg'))->render(),
+            'rail'   => view('admin._partials.communication_rail', compact('active'))->render(),
+        ]);
+    }
+
     public function extras()
     {
         return view('admin.extras');
@@ -648,6 +671,10 @@ class AdminController extends Controller
         $documents = $query->orderBy('updated_at', 'desc')->paginate(30);
 
         $tabs = ['todos', 'pending', 'generated', 'signed', 'approved', 'rejected'];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return view('admin.crm._partials.documentos_list', compact('documents', 'tab', 'tabs'));
+        }
 
         return view('admin.crm.documentos', compact('documents', 'tab', 'tabs'));
     }
@@ -941,7 +968,186 @@ class AdminController extends Controller
 
     /* ───── CRM nuevas vistas (sólo UI, sin backend) ───── */
     public function crmAvanceObra()      { return view('admin.crm.avance_obra'); }
-    public function crmPlantillas()      { return view('admin.crm.plantillas'); }
+    public function crmPlantillas(Request $request)
+    {
+        $tab = $request->get('tab', 'plantillas');
+        $filter = $request->get('cat', 'todas');
+
+        $templatesQuery = CrmTemplate::query()->orderBy('name');
+        if ($filter !== 'todas') {
+            $templatesQuery->where('category', $filter);
+        }
+        $templates = $templatesQuery->get();
+        $templatesAll = CrmTemplate::all();
+
+        $automations = CrmAutomation::with('template')->orderBy('name')->get();
+
+        $channels = CrmChannelSetting::all()->keyBy('channel');
+
+        $counts = [
+            'templates'   => CrmTemplate::count(),
+            'automations' => CrmAutomation::where('is_active', true)->count(),
+            'by_category' => CrmTemplate::selectRaw('category, COUNT(*) as c')->groupBy('category')->pluck('c', 'category')->all(),
+        ];
+
+        return view('admin.crm.plantillas', compact('templates', 'templatesAll', 'automations', 'channels', 'counts', 'tab', 'filter'));
+    }
+
+    /* ───── CRM: Templates CRUD ───── */
+    public function storeTemplate(Request $request)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:160',
+            'category'  => 'required|string|max:60',
+            'icon'      => 'nullable|string|max:40',
+            'channels'  => 'required|array|min:1',
+            'channels.*'=> 'in:email,whatsapp,sms,push',
+            'subject'   => 'nullable|string|max:255',
+            'body'      => 'required|string',
+            'variables' => 'nullable|array',
+        ]);
+        $validated['icon'] = $validated['icon'] ?: 'file';
+        $validated['is_active'] = true;
+        CrmTemplate::create($validated);
+        return back()->with('success', 'Plantilla creada.');
+    }
+
+    public function updateTemplate(Request $request, CrmTemplate $template)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:160',
+            'category'  => 'required|string|max:60',
+            'icon'      => 'nullable|string|max:40',
+            'channels'  => 'required|array|min:1',
+            'channels.*'=> 'in:email,whatsapp,sms,push',
+            'subject'   => 'nullable|string|max:255',
+            'body'      => 'required|string',
+            'variables' => 'nullable|array',
+            'is_active' => 'nullable|boolean',
+        ]);
+        $validated['icon'] = $validated['icon'] ?: 'file';
+        $template->update($validated);
+        return back()->with('success', 'Plantilla actualizada.');
+    }
+
+    public function deleteTemplate(CrmTemplate $template)
+    {
+        $template->delete();
+        return back()->with('success', 'Plantilla eliminada.');
+    }
+
+    public function duplicateTemplate(CrmTemplate $template)
+    {
+        $copy = $template->replicate();
+        $copy->name = $template->name . ' (copia)';
+        $copy->last_used_at = null;
+        $copy->usage_count = 0;
+        $copy->save();
+        return back()->with('success', 'Plantilla duplicada.');
+    }
+
+    public function getTemplate(CrmTemplate $template)
+    {
+        return response()->json($template);
+    }
+
+    public function sendTestTemplate(Request $request, CrmTemplate $template)
+    {
+        $request->validate([
+            'to' => 'required|string|max:160',
+        ]);
+        $template->last_used_at = now();
+        $template->usage_count = ($template->usage_count ?? 0) + 1;
+        $template->save();
+        return back()->with('success', 'Prueba enviada a ' . $request->input('to') . '.');
+    }
+
+    /* ───── CRM: Automations CRUD ───── */
+    public function storeAutomation(Request $request)
+    {
+        $validated = $request->validate([
+            'name'           => 'required|string|max:160',
+            'description'    => 'nullable|string|max:1000',
+            'trigger_event'  => 'required|string|max:80',
+            'template_id'    => 'nullable|exists:crm_templates,id',
+            'delay_minutes'  => 'required|integer|min:0|max:43200',
+            'channels'       => 'required|array|min:1',
+            'channels.*'     => 'in:email,whatsapp,sms,push',
+            'is_active'      => 'nullable|boolean',
+        ]);
+        $validated['is_active'] = (bool)($validated['is_active'] ?? true);
+        CrmAutomation::create($validated);
+        return back()->with('success', 'Automatización creada.');
+    }
+
+    public function updateAutomation(Request $request, CrmAutomation $automation)
+    {
+        $validated = $request->validate([
+            'name'           => 'required|string|max:160',
+            'description'    => 'nullable|string|max:1000',
+            'trigger_event'  => 'required|string|max:80',
+            'template_id'    => 'nullable|exists:crm_templates,id',
+            'delay_minutes'  => 'required|integer|min:0|max:43200',
+            'channels'       => 'required|array|min:1',
+            'channels.*'     => 'in:email,whatsapp,sms,push',
+            'is_active'      => 'nullable|boolean',
+        ]);
+        $validated['is_active'] = (bool)($validated['is_active'] ?? false);
+        $automation->update($validated);
+        return back()->with('success', 'Automatización actualizada.');
+    }
+
+    public function toggleAutomation(CrmAutomation $automation)
+    {
+        $automation->update(['is_active' => !$automation->is_active]);
+        return back()->with('success', $automation->is_active ? 'Automatización activada.' : 'Automatización pausada.');
+    }
+
+    public function deleteAutomation(CrmAutomation $automation)
+    {
+        $automation->delete();
+        return back()->with('success', 'Automatización eliminada.');
+    }
+
+    public function runAutomation(CrmAutomation $automation)
+    {
+        $automation->update([
+            'last_run_at' => now(),
+            'run_count'   => ($automation->run_count ?? 0) + 1,
+        ]);
+        if ($automation->template) {
+            $automation->template->update([
+                'last_used_at' => now(),
+                'usage_count'  => ($automation->template->usage_count ?? 0) + 1,
+            ]);
+        }
+        return back()->with('success', 'Automatización ejecutada manualmente.');
+    }
+
+    public function getAutomation(CrmAutomation $automation)
+    {
+        return response()->json($automation->load('template'));
+    }
+
+    /* ───── CRM: Channel settings ───── */
+    public function updateChannels(Request $request)
+    {
+        $validated = $request->validate([
+            'channels'                  => 'required|array',
+            'channels.*.enabled'        => 'nullable|in:0,1,on,true,false',
+            'channels.*.config'         => 'nullable|array',
+        ]);
+
+        foreach ($validated['channels'] as $channelKey => $data) {
+            if (!array_key_exists($channelKey, CrmChannelSetting::$CHANNELS)) continue;
+            $setting = CrmChannelSetting::firstOrCreate(['channel' => $channelKey]);
+            $setting->enabled = in_array($data['enabled'] ?? '0', ['1','on','true',true,1], true);
+            $setting->config  = $data['config'] ?? [];
+            $setting->save();
+        }
+
+        return back()->with('success', 'Configuración de canales guardada.');
+    }
     public function crmAnuncios()        { return view('admin.crm.anuncios'); }
     public function crmProyectoDetalle($id)
     {
@@ -1114,12 +1320,114 @@ class AdminController extends Controller
         return back()->with('success', 'Pago registrado correctamente.');
     }
 
+    /** Lista de recursos válidos para exportación con su etiqueta. */
+    private const EXPORT_RESOURCES = [
+        'expedientes' => 'Expedientes',
+        'documentos'  => 'Documentos',
+        'contratos'   => 'Contratos',
+        'transacciones' => 'Transacciones',
+        'unidades'    => 'Unidades',
+    ];
+
     public function exportResource(Request $request)
     {
+        $user = Auth::user();
+        if (! $user || ! $user->is_admin) {
+            abort(403, 'Solo el administrador puede exportar sin código de autorización.');
+        }
+
         $resource = $request->get('resource', 'expedientes');
         $format   = $request->get('format', 'csv');
         $range    = $request->get('range', '3m');
 
+        return $this->streamResourceExport($resource, $format, $range);
+    }
+
+    /** Genera un código de 6 dígitos y notifica al admin. */
+    public function requestExportCode(Request $request)
+    {
+        $data = $request->validate([
+            'resource' => 'required|string|in:'.implode(',', array_keys(self::EXPORT_RESOURCES)),
+            'format'   => 'nullable|string|in:csv,xlsx,pdf',
+            'range'    => 'nullable|string|in:3m,6m,1y,all',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->is_admin) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'El administrador no necesita código de autorización.',
+            ], 422);
+        }
+
+        // Invalida códigos previos no usados para este usuario+recurso
+        ExportAuthorization::where('requester_id', $user->id)
+            ->where('resource', $data['resource'])
+            ->whereNull('used_at')
+            ->update(['expires_at' => now()->subSecond()]);
+
+        $admin = User::where('role', 'admin')->orderBy('id')->first();
+
+        $auth = ExportAuthorization::create([
+            'requester_id'  => $user->id,
+            'admin_id'      => $admin?->id,
+            'resource'      => $data['resource'],
+            'format'        => $data['format'] ?? 'csv',
+            'range'         => $data['range'] ?? '3m',
+            'code'          => str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT),
+            'expires_at'    => now()->addMinutes(10),
+        ]);
+
+        return response()->json([
+            'ok'            => true,
+            'id'            => $auth->id,
+            'admin_email'   => $admin ? $this->maskEmail($admin->email) : null,
+            'expires_at'    => $auth->expires_at->toIso8601String(),
+            'expires_in'    => 600,
+        ]);
+    }
+
+    /** Reenvía un código nuevo si el anterior caducó o se perdió. */
+    public function resendExportCode(Request $request)
+    {
+        return $this->requestExportCode($request);
+    }
+
+    /** Valida el código y entrega el archivo de exportación. */
+    public function verifyExportCode(Request $request)
+    {
+        $data = $request->validate([
+            'resource' => 'required|string|in:'.implode(',', array_keys(self::EXPORT_RESOURCES)),
+            'code'     => 'required|string|size:6',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $auth = ExportAuthorization::where('requester_id', $user->id)
+            ->where('resource', $data['resource'])
+            ->where('code', $data['code'])
+            ->whereNull('used_at')
+            ->where('expires_at', '>', now())
+            ->latest('id')
+            ->first();
+
+        if (! $auth) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'El código es inválido o ya caducó. Solicita uno nuevo.',
+            ], 422);
+        }
+
+        $auth->update(['used_at' => now()]);
+
+        return $this->streamResourceExport($auth->resource, $auth->format, $auth->range);
+    }
+
+    private function streamResourceExport(string $resource, string $format, string $range)
+    {
         $cutoff = match ($range) {
             '6m'  => now()->subMonths(6),
             '1y'  => now()->subYear(),
@@ -1135,11 +1443,6 @@ class AdminController extends Controller
             default        => $this->exportExpedientes($cutoff),
         };
 
-        if ($format !== 'csv') {
-            // Para xlsx/pdf cae a CSV en esta build (sin dependencias adicionales)
-            $format = 'csv';
-        }
-
         return response()->streamDownload(function () use ($headers, $rows) {
             $out = fopen('php://output', 'w');
             fputcsv($out, $headers);
@@ -1150,6 +1453,14 @@ class AdminController extends Controller
         }, $filename.'-'.now()->format('Ymd-His').'.csv', [
             'Content-Type' => 'text/csv',
         ]);
+    }
+
+    private function maskEmail(?string $email): string
+    {
+        if (! $email || ! str_contains($email, '@')) return '***';
+        [$local, $domain] = explode('@', $email, 2);
+        $first = mb_substr($local, 0, 1);
+        return $first.str_repeat('*', max(3, mb_strlen($local) - 1)).'@'.$domain;
     }
 
     private function exportExpedientes($cutoff)

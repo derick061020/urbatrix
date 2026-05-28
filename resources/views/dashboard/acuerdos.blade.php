@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Acuerdos — MAKAI')
-@section('page_title', 'Mi Propiedad')
-@section('page_breadcrumb', 'Mi Propiedad · Acuerdos')
+@section('title', __('Acuerdos').' — MAKAI')
+@section('page_title', __('Mi propiedad'))
+@section('page_breadcrumb', __('Mi propiedad').' · '.__('Acuerdos'))
 @php $activeRoute = 'acuerdos'; @endphp
 
 @section('content')
@@ -62,10 +62,10 @@
     $total = $allPending->count() + $allCompleted->count();
 
     $typeMeta = [
-        'budget'           => ['Presupuesto y plan de pagos', 'warn', 'pi-calculator'],
-        'payment_plan'     => ['Plan de Pagos', 'ok', 'pi-calendar'],
-        'purchase_promise' => ['Promesa de Compraventa', 'info', 'pi-file'],
-        'contract'         => ['Contrato', 'info', 'pi-file'],
+        'budget'           => [__('Presupuesto y plan de pagos'), 'warn', 'pi-calculator'],
+        'payment_plan'     => [__('Plan de pagos'),                'ok', 'pi-calendar'],
+        'purchase_promise' => [__('Promesa de compraventa'),       'info', 'pi-file'],
+        'contract'         => [__('Contrato'),                     'info', 'pi-file'],
     ];
 
     // Obtener el nombre del admin/agente que configuró el presupuesto
@@ -155,8 +155,8 @@
     {{-- Header summary --}}
     <div class="px-5 py-4 rounded-2xl bg-ink-100/70 border border-ink-200 flex items-center justify-between flex-wrap gap-2">
         <div>
-            <div class="text-[15px] font-bold text-ink-950">{{ $total }} documento{{ $total === 1 ? '' : 's' }} · {{ $allPending->count() }} pendiente{{ $allPending->count() === 1 ? '' : 's' }} de tu acción</div>
-            <div class="text-[12px] text-ink-500 mt-0.5">Revisá lo que envió tu asesor, pedí cambios o firmá. Todo queda registrado.</div>
+            <div class="text-[15px] font-bold text-ink-950">{{ trans_choice('{0} :n documentos|{1} :n documento|[2,*] :n documentos', $total, ['n' => $total]) }} · {{ trans_choice('{0} :n pendientes de tu acción|{1} :n pendiente de tu acción|[2,*] :n pendientes de tu acción', $allPending->count(), ['n' => $allPending->count()]) }}</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">{{ __('Revisa lo que envió tu asesor, pide cambios o firma. Todo queda registrado.') }}</div>
         </div>
     </div>
 
@@ -165,7 +165,7 @@
         <div class="cli-card overflow-hidden">
             <div class="px-5 py-3 bg-warn-soft/60 border-b border-warn/15 flex items-center gap-2">
                 <i class="pi pi-clock text-warn-dark"></i>
-                <div class="text-[14px] font-bold text-warn-dark">Requiere tu atención</div>
+                <div class="text-[14px] font-bold text-warn-dark">{{ __('Requiere tu atención') }}</div>
             </div>
             <div class="divide-y divide-ink-100">
                 @foreach($allPending as $doc)
@@ -190,7 +190,7 @@
                         </div>
                         <button type="button" class="cli-btn bg-warn text-white border-warn hover:bg-warn-dark px-3 py-2 text-[12px] font-semibold rounded-lg inline-flex items-center gap-2 shrink-0"
                                 data-open-acuerdo="{{ $docId }}">
-                            <i class="pi pi-eye text-[11px]"></i> Revisar
+                            <i class="pi pi-eye text-[11px]"></i> {{ __('Revisar') }}
                         </button>
                     </div>
                 @endforeach
@@ -203,7 +203,7 @@
         <div class="cli-card overflow-hidden">
             <div class="px-5 py-3 bg-ok-soft/60 border-b border-ok/20 flex items-center gap-2">
                 <i class="pi pi-check-circle text-ok-dark"></i>
-                <div class="text-[14px] font-bold text-ok-dark">Completados</div>
+                <div class="text-[14px] font-bold text-ok-dark">{{ __('Completados') }}</div>
             </div>
             <div class="divide-y divide-ink-100">
                 @foreach($allCompleted as $doc)
@@ -227,7 +227,7 @@
                             </div>
                         </div>
                         <button type="button" class="cli-btn cli-btn-ghost text-[12px] py-2 px-3" data-open-acuerdo="{{ $docId }}">
-                            <i class="pi pi-eye text-[11px]"></i> Ver
+                            <i class="pi pi-eye text-[11px]"></i> {{ __('Ver') }}
                         </button>
                     </div>
                 @endforeach
@@ -238,7 +238,7 @@
     @if($allPending->isEmpty() && $allCompleted->isEmpty())
         <div class="cli-card p-10 text-center">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-folder-open text-[22px]"></i></div>
-            <div class="mt-3 text-[15px] font-bold text-ink-950">No tenés acuerdos por revisar</div>
+            <div class="mt-3 text-[15px] font-bold text-ink-950">{{ __('No tienes acuerdos por revisar') }}</div>
         </div>
     @endif
 </div>
@@ -250,8 +250,8 @@
 
             {{-- Header --}}
             <div class="px-5 py-3 border-b border-ink-100 flex items-center gap-3">
-                <div id="acm-title" class="font-display text-[16px] font-semibold text-ink-950 truncate flex-1">Documento</div>
-                <a id="acm-download" href="#" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-1.5 px-3"><i class="pi pi-download text-[11px]"></i> Descargar</a>
+                <div id="acm-title" class="font-display text-[16px] font-semibold text-ink-950 truncate flex-1">{{ __('Documento') }}</div>
+                <a id="acm-download" href="#" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-1.5 px-3"><i class="pi pi-download text-[11px]"></i> {{ __('Descargar') }}</a>
                 <button type="button" onclick="closeAcuerdoModal()" class="w-9 h-9 rounded-full border border-ink-200 text-ink-500 hover:bg-ink-50 flex items-center justify-center"><i class="pi pi-times text-[12px]"></i></button>
             </div>
 
@@ -260,25 +260,25 @@
                 <div class="bg-ink-100/60 p-4 sm:p-6 overflow-auto">
                     {{-- Budget breakdown card (only for budget docs) --}}
                     <div id="acm-budget-card" class="cli-card bg-white p-4 max-w-[760px] mx-auto mb-4" style="display:none;">
-                        <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-3">Resumen del plan propuesto</div>
+                        <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-3">{{ __('Resumen del plan propuesto') }}</div>
                         <div class="acm-bk-grid">
                             <div class="acm-bk-cell">
-                                <div class="lbl">Pago inicial</div>
+                                <div class="lbl">{{ __('Pago inicial') }}</div>
                                 <div class="val" id="acm-bk-initial">$—</div>
                                 <div class="meta" id="acm-bk-initial-meta">—</div>
                             </div>
                             <div class="acm-bk-cell">
-                                <div class="lbl">Durante construcción</div>
+                                <div class="lbl">{{ __('Durante construcción') }}</div>
                                 <div class="val" id="acm-bk-construction">$—</div>
                                 <div class="meta" id="acm-bk-construction-meta">—</div>
                             </div>
                             <div class="acm-bk-cell">
-                                <div class="lbl">A la entrega</div>
+                                <div class="lbl">{{ __('A la entrega') }}</div>
                                 <div class="val" id="acm-bk-delivery">$—</div>
                                 <div class="meta" id="acm-bk-delivery-meta">—</div>
                             </div>
                             <div class="acm-bk-cell total" style="grid-column: 1 / -1;">
-                                <div class="lbl">Precio total del inmueble</div>
+                                <div class="lbl">{{ __('Precio total del inmueble') }}</div>
                                 <div class="val" id="acm-bk-total">$—</div>
                                 <div class="meta" id="acm-bk-notes" style="display:none;"></div>
                             </div>
@@ -287,7 +287,7 @@
 
                     <div id="acm-preview-fallback" class="cli-card bg-white p-8 max-w-[760px] mx-auto text-center text-ink-500">
                         <i class="pi pi-file text-[48px] text-ink-300"></i>
-                        <div class="mt-3 text-[13px]">El documento aún no está disponible para previsualizar. Tu asesor lo enviará en breve.</div>
+                        <div class="mt-3 text-[13px]">{{ __('El documento aún no está disponible para previsualizar. Tu asesor lo enviará en breve.') }}</div>
                     </div>
                     <iframe id="acm-preview" class="hidden w-full h-[68vh] bg-white rounded-xl border border-ink-200 mx-auto" style="max-width:760px;"></iframe>
                 </div>
@@ -297,27 +297,27 @@
                     {{-- Top: type + title + meta + steps --}}
                     <div class="px-5 pt-5 pb-3 border-b border-ink-100">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span id="acm-type" class="text-[10px] uppercase font-bold tracking-wider text-warn-dark">PRESUPUESTO</span>
-                            <span id="acm-status-pill" class="acm-status-pill bg-warn-soft text-warn-dark">Pendiente</span>
+                            <span id="acm-type" class="text-[10px] uppercase font-bold tracking-wider text-warn-dark">{{ __('PRESUPUESTO') }}</span>
+                            <span id="acm-status-pill" class="acm-status-pill bg-warn-soft text-warn-dark">{{ __('Pendiente') }}</span>
                         </div>
-                        <div class="font-display text-[18px] font-semibold text-ink-950 mt-1" id="acm-fullTitle">Documento</div>
+                        <div class="font-display text-[18px] font-semibold text-ink-950 mt-1" id="acm-fullTitle">{{ __('Documento') }}</div>
                         @if($advisorName)<div class="text-[11px] text-ink-500 mt-1" id="acm-meta">{{ $advisorName }}</div>@endif
 
                         <div class="mt-4 flex items-center gap-1">
-                            <span class="acm-step-pill is-active" data-step="1"><span class="num">1</span> Revisar</span>
+                            <span class="acm-step-pill is-active" data-step="1"><span class="num">1</span> {{ __('Revisar') }}</span>
                             <span class="flex-1 h-px bg-ink-200 mx-1"></span>
-                            <span class="acm-step-pill" data-step="2"><span class="num">2</span> <span data-step-label-2>Aceptar</span></span>
+                            <span class="acm-step-pill" data-step="2"><span class="num">2</span> <span data-step-label-2>{{ __('Aceptar') }}</span></span>
                             <span class="flex-1 h-px bg-ink-200 mx-1"></span>
-                            <span class="acm-step-pill" data-step="3"><span class="num">3</span> Firmar</span>
+                            <span class="acm-step-pill" data-step="3"><span class="num">3</span> {{ __('Firmar') }}</span>
                         </div>
                     </div>
 
                     {{-- Tabs --}}
                     <div class="px-5 pt-4">
                         <div class="acm-tabs">
-                            <button type="button" class="acm-tab active" data-acm-tab="review">Revisar</button>
-                            <button type="button" class="acm-tab" data-acm-tab="observe">Observaciones</button>
-                            <button type="button" class="acm-tab" data-acm-tab="sign" id="acm-tab-sign">Firmar</button>
+                            <button type="button" class="acm-tab active" data-acm-tab="review">{{ __('Revisar') }}</button>
+                            <button type="button" class="acm-tab" data-acm-tab="observe">{{ __('Observaciones') }}</button>
+                            <button type="button" class="acm-tab" data-acm-tab="sign" id="acm-tab-sign">{{ __('Firmar') }}</button>
                         </div>
                     </div>
 
@@ -327,7 +327,7 @@
                         <div class="acm-panel active overflow-y-auto max-h-full" data-acm-panel="review">
                             @if($advisorName)
                             <div id="acm-advisor-block">
-                                <div class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mb-2">Mensaje de tu asesor</div>
+                                <div class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mb-2">{{ __('Mensaje de tu asesor') }}</div>
                                 <div class="rounded-xl border border-ink-200 bg-ink-50 p-3">
                                     <div class="text-[12px] font-bold text-ink-950">{{ $advisorName }} · <span id="acm-advisor-date" class="font-medium text-ink-500"></span></div>
                                     <div class="text-[12px] text-ink-700 mt-2 leading-relaxed whitespace-pre-line" id="acm-advisor-msg">—</div>
@@ -337,8 +337,8 @@
 
                             <div class="mt-4">
                                 <div class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mb-2 flex items-center justify-between">
-                                    <span>Conversación con tu asesor</span>
-                                    <span class="text-ink-400 normal-case font-normal" id="acm-conv-count">0 mensajes</span>
+                                    <span>{{ __('Conversación con tu asesor') }}</span>
+                                    <span class="text-ink-400 normal-case font-normal" id="acm-conv-count">{{ __('0 mensajes') }}</span>
                                 </div>
                                 <div id="acm-history" class="space-y-3 flex flex-col"></div>
                             </div>
@@ -347,16 +347,16 @@
                         {{-- ============ OBSERVATION PANEL ============ --}}
                         <div class="acm-panel" data-acm-panel="observe">
                             <div class="text-[12px] text-ink-700 mb-2">
-                                Si hay algo que necesita ajustarse, contale al asesor con tus palabras. Va a recibir tu observación y enviará una nueva versión.
+                                {{ __('Si hay algo que necesita ajustarse, cuéntaselo al asesor con tus palabras. Recibirá tu observación y enviará una nueva versión.') }}
                             </div>
-                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">Mensaje al asesor</label>
-                            <textarea id="acm-obs-text" rows="6" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] text-ink-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none" placeholder="Ej. El precio de la unidad es distinto al pactado, podrías revisarlo y enviar la versión corregida."></textarea>
+                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Mensaje al asesor') }}</label>
+                            <textarea id="acm-obs-text" rows="6" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] text-ink-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none" placeholder="{{ __('Ej. El precio de la unidad es distinto al pactado, podrías revisarlo y enviar la versión corregida.') }}"></textarea>
                             <div class="text-[10px] text-ink-400 mt-1 text-right"><span id="acm-obs-count">0</span>/2000</div>
 
                             <button type="button" id="acm-obs-send" onclick="submitAcuerdoObservation()" class="cli-btn cli-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 py-2.5">
-                                <i class="pi pi-send text-[11px]"></i> Enviar observación
+                                <i class="pi pi-send text-[11px]"></i> {{ __('Enviar observación') }}
                             </button>
-                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">Cancelar</button>
+                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Cancelar') }}</button>
                         </div>
 
                         {{-- ============ SIGN PANEL ============ --}}
@@ -364,37 +364,37 @@
                             <div id="acm-sign-blocked" class="hidden text-[12px] rounded-xl bg-ink-50 border border-ink-200 p-3 text-ink-700 mb-3"></div>
 
                             <div class="text-[12px] text-ink-700 mb-3">
-                                Tu firma equivale a una firma manuscrita. Al confirmar, declarás que leíste y aceptás el documento en su versión actual.
+                                {{ __('Tu firma equivale a una firma manuscrita. Al confirmar, declaras que leíste y aceptas el documento en su versión actual.') }}
                             </div>
 
-                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">Nombre completo</label>
-                            <input type="text" id="acm-sig-name" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Tal como aparece en tu documento">
+                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Nombre completo') }}</label>
+                            <input type="text" id="acm-sig-name" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="{{ __('Tal como aparece en tu documento') }}">
 
-                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mt-3 block">Firma</label>
+                            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mt-3 block">{{ __('Firma') }}</label>
                             <div class="acm-canvas-wrap mt-1" id="acm-canvas-wrap">
                                 <canvas id="acm-sig-canvas"></canvas>
-                                <div class="acm-empty-canvas">Firmá acá con el mouse o el dedo</div>
+                                <div class="acm-empty-canvas">{{ __('Firma aquí con el mouse o el dedo') }}</div>
                             </div>
                             <div class="flex items-center justify-between mt-1.5">
-                                <button type="button" onclick="acmClearSig()" class="text-[11px] text-ink-500 hover:text-ink-900 font-semibold inline-flex items-center gap-1"><i class="pi pi-refresh text-[10px]"></i> Limpiar</button>
-                                <span class="text-[10px] text-ink-400">Trazo manuscrito · obligatorio</span>
+                                <button type="button" onclick="acmClearSig()" class="text-[11px] text-ink-500 hover:text-ink-900 font-semibold inline-flex items-center gap-1"><i class="pi pi-refresh text-[10px]"></i> {{ __('Limpiar') }}</button>
+                                <span class="text-[10px] text-ink-400">{{ __('Trazo manuscrito · obligatorio') }}</span>
                             </div>
 
                             <label class="mt-4 flex items-start gap-2 text-[12px] text-ink-700 cursor-pointer">
                                 <input type="checkbox" id="acm-sig-accept" class="mt-0.5 accent-brand">
-                                <span>Leí y acepto los términos del documento. Entiendo que esta firma electrónica es legalmente vinculante.</span>
+                                <span>{{ __('Leí y acepto los términos del documento. Entiendo que esta firma electrónica es legalmente vinculante.') }}</span>
                             </label>
 
                             <button type="button" id="acm-sig-confirm" onclick="submitSignAcuerdo()" class="cli-btn cli-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 py-2.5">
-                                <i class="pi pi-check text-[11px]"></i> Firmar y confirmar
+                                <i class="pi pi-check text-[11px]"></i> {{ __('Firmar y confirmar') }}
                             </button>
-                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">Volver</button>
+                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Volver') }}</button>
                         </div>
                     </div>
 
                     {{-- Footer actions (only visible on Revisar tab) --}}
                     <div id="acm-footer" class="px-5 py-3 border-t border-ink-100 grid grid-cols-2 gap-2 bg-white">
-                        <button type="button" id="acm-btn-observe" onclick="acmGoTab('observe')" class="cli-btn border border-ink-200 text-ink-700 bg-white hover:bg-ink-50 py-2.5 inline-flex items-center justify-center gap-2"><i class="pi pi-comment text-[12px]"></i> Pedir cambios</button>
+                        <button type="button" id="acm-btn-observe" onclick="acmGoTab('observe')" class="cli-btn border border-ink-200 text-ink-700 bg-white hover:bg-ink-50 py-2.5 inline-flex items-center justify-center gap-2"><i class="pi pi-comment text-[12px]"></i> {{ __('Pedir cambios') }}</button>
                         <button type="button" id="acm-btn-primary" class="cli-btn cli-btn-primary py-2.5 inline-flex items-center justify-center gap-2"></button>
                     </div>
                 </aside>

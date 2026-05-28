@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
   <meta charset="UTF-8">
@@ -249,9 +249,13 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               DISCLAIMER
             </button>
-            <button type="button" class="mt-tab" onclick="sharePropertyPdf()">
+            <button type="button" class="mt-tab" onclick="openShareModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               SHARE
+            </button>
+            <button type="button" class="mt-tab mt-tab-download" onclick="downloadUnitSheet()" title="Descargar ficha PDF">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              DOWNLOAD
             </button>
           </div>
 
@@ -295,6 +299,289 @@
       </div><!-- /.mt-body -->
     </div><!-- /.mt-shell -->
   </div><!-- /#moreInfoModal -->
+
+
+  <!-- SHARE PROPERTY MODAL (YouTube-style) -->
+  <style>
+    .sh-overlay {
+        position:fixed; inset:0; z-index:1300;
+        background:rgba(15,17,24,.55);
+        display:none; align-items:center; justify-content:center;
+        padding:1rem;
+        animation: shFadeIn .18s ease-out;
+    }
+    .sh-overlay.open { display:flex; }
+    @keyframes shFadeIn { from { opacity:0 } to { opacity:1 } }
+    @keyframes shSlideIn { from { transform:translateY(12px) scale(.98); opacity:0 } to { transform:translateY(0) scale(1); opacity:1 } }
+
+    .sh-shell {
+        width:100%; max-width: 520px;
+        background:#fff; border-radius: 18px; overflow:hidden;
+        box-shadow: 0 30px 80px -20px rgba(10,13,20,.35);
+        animation: shSlideIn .22s cubic-bezier(.4,0,.2,1);
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+    .sh-head {
+        padding: 20px 22px 8px;
+        display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .sh-head-title {
+        font-family:'Inter Tight', 'Inter', sans-serif;
+        font-size:18px; font-weight:700; color:#171717;
+    }
+    .sh-head-sub { font-size:12px; color:#717784; margin-top:3px; }
+    .sh-close {
+        width:32px; height:32px; border-radius:8px;
+        background:#f5f7fa; border:none; cursor:pointer;
+        color:#717784; display:flex; align-items:center; justify-content:center;
+    }
+    .sh-close:hover { background:#eaecf0; color:#171717; }
+
+    .sh-socials {
+        padding: 14px 22px 6px;
+        display:flex; gap:10px; overflow-x:auto;
+    }
+    .sh-socials::-webkit-scrollbar { display:none; }
+    .sh-social-btn {
+        display:flex; flex-direction:column; align-items:center; gap:6px;
+        padding: 4px;
+        background:transparent; border:none; cursor:pointer;
+        font-size:11px; color:#525866; font-weight:500;
+        min-width: 64px;
+    }
+    .sh-social-btn:hover .sh-social-icon { transform: scale(1.05); }
+    .sh-social-icon {
+        width:48px; height:48px; border-radius:999px;
+        display:flex; align-items:center; justify-content:center;
+        background:#f2f5f8; color:#5c5c5c;
+        transition: transform .15s, background-color .15s;
+    }
+    .sh-social-btn.wa  .sh-social-icon { background:#25D366; color:#fff; }
+    .sh-social-btn.tg  .sh-social-icon { background:#229ED9; color:#fff; }
+    .sh-social-btn.fb  .sh-social-icon { background:#1877F2; color:#fff; }
+    .sh-social-btn.tw  .sh-social-icon { background:#000;     color:#fff; }
+    .sh-social-btn.em  .sh-social-icon { background:#5c7c68;  color:#fff; }
+    .sh-social-btn.sm  .sh-social-icon { background:#222530;  color:#fff; }
+
+    .sh-url-row {
+        margin: 8px 22px 0;
+        padding: 4px 4px 4px 14px;
+        background:#f5f7fa; border:1px solid #eaecf0; border-radius:12px;
+        display:flex; align-items:center; gap:10px;
+    }
+    .sh-url-row input {
+        flex:1; min-width:0; background:transparent; border:none; outline:none;
+        font-size:13px; color:#222530; padding: 10px 0;
+        text-overflow:ellipsis;
+    }
+    .sh-url-row input:focus { color:#171717; }
+    .sh-copy-btn {
+        flex-shrink:0;
+        padding: 9px 16px; border-radius: 9px;
+        background:#5c7c68; color:#fff; border:none; cursor:pointer;
+        font-size:13px; font-weight:600;
+        transition: background-color .15s;
+        display:inline-flex; align-items:center; gap:6px;
+    }
+    .sh-copy-btn:hover { background:#4a6354; }
+    .sh-copy-btn.copied { background:#1fc16b; }
+
+    .sh-divider {
+        margin: 16px 22px 0;
+        height:1px; background:#f2f5f8;
+    }
+
+    .sh-download {
+        margin: 14px 22px 22px;
+        display:flex; align-items:center; gap:12px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, #5c7c68 0%, #4a6354 100%);
+        border-radius: 14px;
+        cursor:pointer; border:none; width: calc(100% - 44px); text-align:left;
+        color:#fff;
+        transition: transform .12s, box-shadow .15s;
+        box-shadow: 0 6px 16px -8px rgba(92,124,104,.55);
+    }
+    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(92,124,104,.65); }
+    .sh-download:active { transform: translateY(0); }
+    .sh-download-icon {
+        width:42px; height:42px; border-radius:10px;
+        background: rgba(255,255,255,.18);
+        display:flex; align-items:center; justify-content:center;
+        flex-shrink:0;
+    }
+    .sh-download-body { flex:1; min-width:0; }
+    .sh-download-title { font-size:14px; font-weight:700; line-height:1.2; }
+    .sh-download-sub { font-size:11px; opacity:.85; margin-top:2px; line-height:1.3; }
+    .sh-download-arrow { opacity:.8; }
+
+    /* Smaller share tab in modal */
+    .mt-tab.mt-tab-download { color:#5c7c68; }
+    .mt-tab.mt-tab-download:hover { background:#eef2ef; }
+  </style>
+
+  <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="Compartir propiedad">
+    <div class="sh-shell">
+      <div class="sh-head">
+        <div>
+          <div class="sh-head-title">Compartir esta unidad</div>
+          <div class="sh-head-sub">Envía el link a un colega, familiar o socio.</div>
+        </div>
+        <button type="button" class="sh-close" onclick="closeShareModal()" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="sh-socials" id="shSocials">
+        <button type="button" class="sh-social-btn wa" data-net="wa">
+          <span class="sh-social-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></span>
+          WhatsApp
+        </button>
+        <button type="button" class="sh-social-btn tg" data-net="tg">
+          <span class="sh-social-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></span>
+          Telegram
+        </button>
+        <button type="button" class="sh-social-btn fb" data-net="fb">
+          <span class="sh-social-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg></span>
+          Facebook
+        </button>
+        <button type="button" class="sh-social-btn tw" data-net="tw">
+          <span class="sh-social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+          X / Twitter
+        </button>
+        <button type="button" class="sh-social-btn em" data-net="em">
+          <span class="sh-social-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          Email
+        </button>
+        <button type="button" class="sh-social-btn sm" data-net="sms">
+          <span class="sh-social-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+          SMS
+        </button>
+      </div>
+
+      <div class="sh-url-row">
+        <input type="text" id="shareUrlInput" readonly value="" aria-label="URL para compartir">
+        <button type="button" id="shareCopyBtn" class="sh-copy-btn" onclick="copyShareUrl()">
+          <i class="pi pi-copy" style="font-size:12px;"></i>
+          <span id="shareCopyLabel">Copiar</span>
+        </button>
+      </div>
+
+      <div class="sh-divider"></div>
+
+      <button type="button" class="sh-download" onclick="downloadUnitSheet()">
+        <span class="sh-download-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        </span>
+        <span class="sh-download-body">
+          <span class="sh-download-title">Descargar ficha de la unidad</span>
+          <span class="sh-download-sub">PDF con galería, precio, plano y datos clave</span>
+        </span>
+        <span class="sh-download-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Returns the canonical shareable URL for the currently opened unit.
+    function buildShareUrl() {
+      const unitId = (typeof currentOpenUnit !== 'undefined' && currentOpenUnit) ? currentOpenUnit : '';
+      const base = window.location.origin + '/';
+      return unitId ? base + '?unit=' + encodeURIComponent(unitId) : base;
+    }
+
+    window.openShareModal = function () {
+      if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
+        alert('Primero abrí los detalles de una unidad.');
+        return;
+      }
+      const url = buildShareUrl();
+      document.getElementById('shareUrlInput').value = url;
+      document.getElementById('shareModal').classList.add('open');
+      // Reset copy button label
+      const lbl = document.getElementById('shareCopyLabel');
+      if (lbl) lbl.textContent = 'Copiar';
+      document.getElementById('shareCopyBtn').classList.remove('copied');
+    };
+
+    window.closeShareModal = function () {
+      document.getElementById('shareModal').classList.remove('open');
+    };
+
+    document.getElementById('shareModal').addEventListener('click', function (e) {
+      if (e.target === this) closeShareModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.getElementById('shareModal').classList.contains('open')) {
+        closeShareModal();
+      }
+    });
+
+    window.copyShareUrl = async function () {
+      const input = document.getElementById('shareUrlInput');
+      const btn   = document.getElementById('shareCopyBtn');
+      const lbl   = document.getElementById('shareCopyLabel');
+      const value = input.value;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          input.select(); input.setSelectionRange(0, 99999);
+          document.execCommand('copy');
+        }
+        lbl.textContent = '¡Copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => { lbl.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+      } catch (e) {
+        lbl.textContent = 'Error';
+      }
+    };
+
+    document.querySelectorAll('#shSocials .sh-social-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const net  = btn.dataset.net;
+        const url  = buildShareUrl();
+        const unit = (document.getElementById('modalUnitNum')?.textContent || '').trim();
+        const text = 'Mira esta unidad de Makai Residences (' + unit + ')';
+        let target = '';
+        switch (net) {
+          case 'wa':  target = 'https://wa.me/?text=' + encodeURIComponent(text + ' — ' + url); break;
+          case 'tg':  target = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text); break;
+          case 'fb':  target = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url); break;
+          case 'tw':  target = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url); break;
+          case 'em':  target = 'mailto:?subject=' + encodeURIComponent('Makai Residences — Unidad ' + unit) + '&body=' + encodeURIComponent(text + '\n\n' + url); break;
+          case 'sms': target = 'sms:?body=' + encodeURIComponent(text + ' ' + url); break;
+        }
+        if (target.startsWith('mailto:') || target.startsWith('sms:')) {
+          window.location.href = target;
+        } else {
+          window.open(target, '_blank', 'noopener,width=720,height=620');
+        }
+      });
+    });
+
+    // Replaces the old prompt-based sharePropertyPdf — opens the PDF in a new tab
+    // for the currently opened unit, no prompt required. Hooked to both the
+    // DOWNLOAD tab and the green CTA inside the share modal.
+    window.downloadUnitSheet = function () {
+      if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
+        alert('Primero abrí los detalles de una unidad.');
+        return;
+      }
+      window.open('/property-pdf/' + encodeURIComponent(currentOpenUnit), '_blank', 'noopener');
+    };
+
+    // Auto-open a unit if URL has ?unit=<id> (so share links work)
+    document.addEventListener('DOMContentLoaded', function () {
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get('unit');
+      if (u && typeof openMoreInfo === 'function') {
+        setTimeout(() => openMoreInfo(u), 350);
+      }
+    });
+  </script>
 
 
   <!-- ADVISOR VIDEO CALL MODAL — Figma 812:50211 (modal-agendar-videollamada) -->
@@ -831,7 +1118,7 @@
           <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ $soldCount ?? 0 }} OF {{ $totalUnits ?? 0 }} UNITS SOLD</span>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
-            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>1</span> User Online Right Now</span>
+            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> Users Online Right Now</span>
           </div>
         </div>
         <style>
@@ -1166,6 +1453,20 @@
     <!-- Main Content -->
     <div id="main-unit-reserve-list" style="min-height:100vh;background:#f2f5f8;">
 
+      <!-- Empty state for projects without units (Naviva / Liv) -->
+      <div class="fg-project-empty" aria-hidden="true">
+        <div class="fg-project-empty-card">
+          <div class="fg-project-empty-icon" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h2 class="fg-project-empty-title">Estamos trabajando en ello</h2>
+          <p class="fg-project-empty-text">Las unidades de <span data-empty-project-name>este proyecto</span> aún no están disponibles. Estamos preparando todo para que muy pronto puedas explorarlas aquí.</p>
+          <button type="button" class="fg-project-empty-cta" onclick="toggleProjects()">Ver otros proyectos</button>
+        </div>
+      </div>
+
       <!-- Grid/List/Planta Toggle -->
       <div class="fg-toggle-bar">
         <div class="fg-toggle-container" role="tablist" aria-label="View mode">
@@ -1377,17 +1678,17 @@
 
               <!-- Top row: status badge (left) + ADD TO LIST (right) -->
               <div class="fg-chip-row">
-                @if($isHighDem)
-                  <span class="fg-status-badge high-demand">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
-                    HIGH DEMAND
-                  </span>
-                @elseif($isPending)
+                @if($isPending)
                   <span class="fg-status-badge pending">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     PENDING
                   </span>
-                @elseif($isSecond)
+                @elseif(!$isReserved && !$isSold && $isHighDem)
+                  <span class="fg-status-badge high-demand">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
+                    HIGH DEMAND
+                  </span>
+                @elseif(!$isReserved && !$isSold && $isSecond)
                   <span class="fg-status-badge second">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     2ND CHANCE
@@ -2463,29 +2764,30 @@
     let activeUsersInterval;
     let heartbeatInterval;
     let dynamicUsersInterval;
-    let currentDynamicUsers = 1;
+    const MIN_DYNAMIC_USERS = 22;
+    let currentDynamicUsers = 0;
 
     // Function to calculate dynamic users based on timezone
     function calculateDynamicUsers() {
       const now = new Date();
       const hour = now.getHours();
-      
+
       // Base users based on time of day (peak hours: 9-12, 14-18, 19-22)
       let baseUsers;
       if (hour >= 9 && hour < 12) {
-        baseUsers = Math.floor(Math.random() * 5) + 8; // 8-12 users
+        baseUsers = Math.floor(Math.random() * 12) + 42; // 42-53 users
       } else if (hour >= 14 && hour < 18) {
-        baseUsers = Math.floor(Math.random() * 6) + 10; // 10-15 users
+        baseUsers = Math.floor(Math.random() * 15) + 50; // 50-64 users
       } else if (hour >= 19 && hour < 22) {
-        baseUsers = Math.floor(Math.random() * 4) + 6; // 6-9 users
+        baseUsers = Math.floor(Math.random() * 10) + 36; // 36-45 users
       } else if (hour >= 6 && hour < 9) {
-        baseUsers = Math.floor(Math.random() * 3) + 3; // 3-5 users
+        baseUsers = Math.floor(Math.random() * 8) + 28; // 28-35 users
       } else if (hour >= 22 || hour < 6) {
-        baseUsers = Math.floor(Math.random() * 2) + 1; // 1-2 users
+        baseUsers = Math.floor(Math.random() * 6) + 22; // 22-27 users
       } else {
-        baseUsers = Math.floor(Math.random() * 4) + 4; // 4-7 users
+        baseUsers = Math.floor(Math.random() * 10) + 32; // 32-41 users
       }
-      
+
       return baseUsers;
     }
 
@@ -2493,16 +2795,16 @@
     function updateDynamicUsers() {
       const change = Math.random() > 0.5 ? 1 : -1;
       const shouldChange = Math.random() > 0.7; // 30% chance to change
-      
+
       if (shouldChange) {
-        currentDynamicUsers = Math.max(1, currentDynamicUsers + change);
-        
+        currentDynamicUsers = Math.max(MIN_DYNAMIC_USERS, currentDynamicUsers + change);
+
         // Occasionally reset to base calculation
         if (Math.random() > 0.95) {
           currentDynamicUsers = calculateDynamicUsers();
         }
       }
-      
+
       const elements = document.querySelectorAll('[data-active-users]');
       elements.forEach(element => {
         element.textContent = currentDynamicUsers;
@@ -2516,9 +2818,9 @@
         .then(data => {
           const elements = document.querySelectorAll('[data-active-users]');
           elements.forEach(element => {
-            // If real count is low (less than 3), use dynamic fake count
-            if (data.count < 3) {
-              if (currentDynamicUsers === 1) {
+            // If real count is below the floor, use dynamic fake count
+            if (data.count < MIN_DYNAMIC_USERS) {
+              if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
                 currentDynamicUsers = calculateDynamicUsers();
               }
               element.textContent = currentDynamicUsers;
@@ -2531,7 +2833,7 @@
         .catch(error => {
           console.error('Error fetching active users:', error);
           // Fallback to dynamic users on error
-          if (currentDynamicUsers === 1) {
+          if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
             currentDynamicUsers = calculateDynamicUsers();
           }
           const elements = document.querySelectorAll('[data-active-users]');
@@ -2552,12 +2854,12 @@
         })
         .then(response => response.json())
         .then(data => {
-          if (data.count) {
+          if (data.count !== undefined) {
             const elements = document.querySelectorAll('[data-active-users]');
             elements.forEach(element => {
-              // If real count is low (less than 3), use dynamic fake count
-              if (data.count < 3) {
-                if (currentDynamicUsers === 1) {
+              // If real count is below the floor, use dynamic fake count
+              if (data.count < MIN_DYNAMIC_USERS) {
+                if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
                   currentDynamicUsers = calculateDynamicUsers();
                 }
                 element.textContent = currentDynamicUsers;
@@ -2661,6 +2963,10 @@
           card.classList.remove('active');
         }
       });
+      // Reflect project name inside the empty-state card
+      document.querySelectorAll('[data-empty-project-name]').forEach(el => {
+        el.textContent = projectName || 'este proyecto';
+      });
       switchHeroProject(key);
       closeProjects();
     }
@@ -2681,6 +2987,15 @@
       root.style.setProperty('--brand-soft-3',  'rgba(' + tuple + ',0.18)');
       root.style.setProperty('--brand-ring',    'rgba(' + tuple + ',0.45)');
       root.style.setProperty('--brand-overlay', 'rgba(' + tuple + ',0.78)');
+      root.style.setProperty('--brand-toggle-shadow',
+        '0 55px 16px 0 rgba(' + tuple + ',0.01),' +
+        '0 36px 14px 0 rgba(' + tuple + ',0.05),' +
+        '0 20px 12px 0 rgba(' + tuple + ',0.16),' +
+        '0 9px 9px 0 rgba('  + tuple + ',0.27),' +
+        '0 2px 5px 0 rgba('  + tuple + ',0.31)');
+
+      // Mark active project on body so CSS can show/hide empty-state for projects without units
+      document.body.setAttribute('data-active-project', project);
       
       // Update logo images with smooth animation and spacing adjustment
       const logoPath = '/images/' + project + '-logo.png';
@@ -2880,55 +3195,49 @@
       updateCurrencyDisplay(currency);
     }
 
-    // Language selection
-    function setLanguage(lang) {
-      // Remove active state from all language buttons
+    // Language selection — actualiza la UI del toggle y persiste el idioma en el backend.
+    // El backend almacena el locale en sesión + cookie y se recarga la página para que
+    // todos los `__('...')` se rerendericen en el nuevo idioma.
+    function setLanguage(lang, opts = {}) {
       const langButtons = ['lang-es', 'lang-en'];
       const indicator = document.getElementById('lang-indicator');
-      
+
       langButtons.forEach(id => {
         const btn = document.getElementById(id);
         if (btn) {
           btn.style.opacity = '0.52';
           const textSpan = btn.querySelector('span');
           const svg = btn.querySelector('svg');
-          if (textSpan) {
-            textSpan.style.color = '#717784';
-          }
-          if (svg) {
-            svg.style.color = '#717784';
-          }
+          if (textSpan) textSpan.style.color = '#717784';
+          if (svg) svg.style.color = '#717784';
         }
       });
-      
-      // Set active state for selected language
+
       const activeBtn = document.getElementById('lang-' + lang);
       if (activeBtn) {
         activeBtn.style.opacity = '1';
         const textSpan = activeBtn.querySelector('span');
         const svg = activeBtn.querySelector('svg');
-        if (textSpan) {
-          textSpan.style.color = '#525866';
-        }
-        if (svg) {
-          svg.style.color = '#525866';
-        }
-        
-        // Move indicator
-        if (indicator) {
-          if (lang === 'es') {
-            indicator.style.left = '4px';
-          } else {
-            indicator.style.left = '156px';
-          }
-        }
+        if (textSpan) textSpan.style.color = '#525866';
+        if (svg) svg.style.color = '#525866';
+        if (indicator) indicator.style.left = (lang === 'es') ? '4px' : '156px';
       }
-      
-      // Store language preference
+
       localStorage.setItem('selectedLanguage', lang);
-      
-      // Update language display throughout the page
-      updateLanguageDisplay(lang);
+
+      const serverLang = (document.documentElement.getAttribute('lang') || 'es').toLowerCase().split('-')[0];
+      if (opts.skipServer || serverLang === lang) return;
+
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      fetch('{{ route("locale.update") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+        body: JSON.stringify({ locale: lang }),
+      }).then(r => r.ok ? r.json() : Promise.reject(r)).then(() => {
+        window.location.reload();
+      }).catch(() => {
+        // Si falla la persistencia, al menos la UI local quedó actualizada.
+      });
     }
 
     // Exchange rates (relative to 1 USD)
@@ -3015,13 +3324,16 @@
       // You can add logic here to update text throughout the page
     }
 
-    // Initialize currency and language on page load
+    // Initialize currency and language on page load.
+    // Para el idioma usamos lo que el servidor ya resolvió (html lang) y NO escribimos
+    // localStorage hasta que el usuario haga clic — así evitamos un reload infinito.
     document.addEventListener('DOMContentLoaded', function() {
       const savedCurrency = localStorage.getItem('selectedCurrency') || 'USD';
-      const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
-      
+      const serverLang = (document.documentElement.getAttribute('lang') || 'es').toLowerCase().split('-')[0];
+
       setCurrency(savedCurrency);
-      setLanguage(savedLanguage);
+      // skipServer: solo refleja el idioma actual del servidor en la UI del toggle.
+      setLanguage(serverLang, { skipServer: true });
     });
 
     // Buyer profile toggle (Para Vivir / Para Invertir)

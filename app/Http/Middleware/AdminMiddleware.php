@@ -32,6 +32,12 @@ class AdminMiddleware
         'admin.crm.message.send',
         'admin.profile.edit',
         'admin.profile.update',
+        'admin.search',
+        'admin.notifications',
+        'admin.notifications.read',
+        'admin.crm.export.request',
+        'admin.crm.export.resend',
+        'admin.crm.export.verify',
     ];
 
     public function handle(Request $request, Closure $next): Response

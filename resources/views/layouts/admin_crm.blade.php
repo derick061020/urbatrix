@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -158,6 +158,48 @@
       }
       .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
 
+      /* Search dropdown */
+      .search-dropdown {
+          position:absolute; top: calc(100% + 8px); left:0; right:0;
+          background:#fff; border:1px solid #ebebeb; border-radius:12px;
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,.15);
+          max-height: 420px; overflow-y:auto;
+          z-index: 60; display:none;
+      }
+      .search-dropdown.open { display:block; }
+      .search-dropdown__group + .search-dropdown__group { border-top:1px solid #f2f5f8; }
+      .search-dropdown__title {
+          padding: 10px 14px 4px; font-size:10px; font-weight:600;
+          text-transform:uppercase; letter-spacing:.08em; color:#a3a3a3;
+      }
+      .search-dropdown__item {
+          display:flex; align-items:center; gap:10px;
+          padding: 9px 14px; cursor:pointer; transition: background-color .12s;
+          text-decoration:none; color:#171717;
+      }
+      .search-dropdown__item:hover,
+      .search-dropdown__item.is-active { background:#f5f7f6; }
+      .search-dropdown__icon {
+          width:30px; height:30px; border-radius:8px; background:#f2f5f8;
+          display:flex; align-items:center; justify-content:center;
+          color:#5c5c5c; font-size:13px; flex-shrink:0;
+      }
+      .search-dropdown__label {
+          font-size:13px; font-weight:500; color:#171717; line-height:1.2;
+          white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .search-dropdown__sub {
+          font-size:11px; color:#717784; line-height:1.2; margin-top:2px;
+          white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .search-dropdown__empty {
+          padding: 22px 14px; text-align:center; font-size:12px; color:#a3a3a3;
+      }
+      .search-dropdown__spinner {
+          padding: 22px 14px; text-align:center; font-size:12px; color:#a3a3a3;
+      }
+      .search-dropdown mark { background:#fff5cf; color:#171717; padding:0 1px; border-radius:2px; }
+
       /* ============ RESPONSIVE ============ */
       #sidebar-backdrop { display:none; }
 
@@ -211,7 +253,7 @@
     {{-- ============= SIDEBAR (transparent on gray bg) ============= --}}
     <aside id="crm-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         {{-- Logo card --}}
-        <a href="{{ route('admin.crm.dashboard') }}" class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer no-underline">
+        <a href="/" class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer no-underline">
             <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#5c7c68">
                 <span class="block w-6 h-6">
                     <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full">
@@ -228,10 +270,10 @@
         @php $isBroker = Auth::user()->role === 'broker'; @endphp
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
             <a href="{{ route('admin.crm.dashboard') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.dashboard' ? 'active' : '' }}">
-                <i class="pi pi-th-large"></i> Dashboard
+                <i class="pi pi-th-large"></i> {{ __('Dashboard') }}
             </a>
 
-            <div class="crm-nav-section">Gestión</div>
+            <div class="crm-nav-section">{{ __('Gestión') }}</div>
             @php
                 $brokerUnitIds = $isBroker
                     ? Auth::user()->assignedUnits()->pluck('units.id')->all()
@@ -264,56 +306,56 @@
                 $tareasCount = $isBroker ? 0 : \App\Models\Task::whereIn('status', ['pendiente', 'en_proceso', 'vencida'])->count();
             @endphp
             <a href="{{ route('admin.crm.expedientes') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.expedientes' ? 'active' : '' }}">
-                <i class="pi pi-folder"></i> Expedientes @if($expedientesCount > 0)<span class="badge-count">{{ $expedientesCount }}</span>@endif
+                <i class="pi pi-folder"></i> {{ __('Expedientes') }} @if($expedientesCount > 0)<span class="badge-count">{{ $expedientesCount }}</span>@endif
             </a>
             <a href="{{ route('admin.crm.documentos') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.documentos' ? 'active' : '' }}">
-                <i class="pi pi-file"></i> Documentos @if($docsPendientesCount > 0)<span class="badge-count">{{ $docsPendientesCount }}</span>@endif
+                <i class="pi pi-file"></i> {{ __('Documentos') }} @if($docsPendientesCount > 0)<span class="badge-count">{{ $docsPendientesCount }}</span>@endif
             </a>
             <a href="{{ route('admin.crm.contratos') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.contratos' ? 'active' : '' }}">
-                <i class="pi pi-id-card"></i> Reservas y Contratos @if($contratosPendientesCount > 0)<span class="badge-count">{{ $contratosPendientesCount }}</span>@endif
+                <i class="pi pi-id-card"></i> {{ __('Reservas y Contratos') }} @if($contratosPendientesCount > 0)<span class="badge-count">{{ $contratosPendientesCount }}</span>@endif
             </a>
             <a href="{{ route('admin.transactions-report') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'transactions-report' ? 'active' : '' }}">
-                <i class="pi pi-credit-card"></i> Transacciones
+                <i class="pi pi-credit-card"></i> {{ __('Transacciones') }}
             </a>
 
             @unless($isBroker)
-                <div class="crm-nav-section">Proyectos</div>
+                <div class="crm-nav-section">{{ __('Proyectos') }}</div>
                 <a href="{{ route('admin.crm.proyectos') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.proyectos' ? 'active' : '' }}">
-                    <i class="pi pi-building"></i> Proyectos
+                    <i class="pi pi-building"></i> {{ __('Proyectos') }}
                 </a>
                 <a href="{{ route('admin.units') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'units' ? 'active' : '' }}">
-                    <i class="pi pi-home"></i> Unidades
+                    <i class="pi pi-home"></i> {{ __('Unidades') }}
                 </a>
                 <a href="{{ route('admin.crm.avance-obra') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.avance-obra' ? 'active' : '' }}">
-                    <i class="pi pi-chart-line"></i> Avance de Obra
+                    <i class="pi pi-chart-line"></i> {{ __('Avance de obra') }}
                 </a>
 
-                <div class="crm-nav-section">Comunicación</div>
+                <div class="crm-nav-section">{{ __('Comunicación') }}</div>
                 @php
                     $mensajesCount = \App\Models\Message::where('sender_role', 'client')->whereNull('read_at')->count();
                 @endphp
                 <a href="{{ route('admin.communication') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'communication' ? 'active' : '' }}">
-                    <i class="pi pi-comments"></i> Mensajes @if($mensajesCount > 0)<span class="badge-count">{{ $mensajesCount }}</span>@endif
+                    <i class="pi pi-comments"></i> {{ __('Mensajes') }} @if($mensajesCount > 0)<span class="badge-count">{{ $mensajesCount }}</span>@endif
                 </a>
                 <a href="{{ route('admin.crm.plantillas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.plantillas' ? 'active' : '' }}">
-                    <i class="pi pi-envelope"></i> Plantilla y Automatiz…
+                    <i class="pi pi-envelope"></i> {{ __('Plantillas y Automatizaciones') }}
                 </a>
                 <a href="{{ route('admin.crm.anuncios') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.anuncios' ? 'active' : '' }}">
-                    <i class="pi pi-megaphone"></i> Anuncios
+                    <i class="pi pi-megaphone"></i> {{ __('Anuncios') }}
                 </a>
 
-                <div class="crm-nav-section">Equipo</div>
+                <div class="crm-nav-section">{{ __('Equipo') }}</div>
                 <a href="{{ route('admin.profiles') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'profiles' ? 'active' : '' }}">
-                    <i class="pi pi-user"></i> Usuarios
+                    <i class="pi pi-user"></i> {{ __('Usuarios') }}
                 </a>
                 <a href="{{ route('admin.agents') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'agents' ? 'active' : '' }}">
-                    <i class="pi pi-briefcase"></i> Brokers
+                    <i class="pi pi-briefcase"></i> {{ __('Brokers') }}
                 </a>
                 <a href="{{ route('admin.crm.aprobaciones') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.aprobaciones' ? 'active' : '' }}">
-                    <i class="pi pi-check-square"></i> Aprobaciones @if($aprobacionesCount > 0)<span class="badge-count">{{ $aprobacionesCount }}</span>@endif
+                    <i class="pi pi-check-square"></i> {{ __('Aprobaciones') }} @if($aprobacionesCount > 0)<span class="badge-count">{{ $aprobacionesCount }}</span>@endif
                 </a>
                 <a href="{{ route('admin.crm.tareas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.tareas' ? 'active' : '' }}">
-                    <i class="pi pi-check"></i> Tareas @if($tareasCount > 0)<span class="badge-count">{{ $tareasCount }}</span>@endif
+                    <i class="pi pi-check"></i> {{ __('Tareas') }} @if($tareasCount > 0)<span class="badge-count">{{ $tareasCount }}</span>@endif
                 </a>
             @endunless
         </nav>
@@ -321,19 +363,23 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="Editar perfil" onclick="openSettingsModal()">
+                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
-                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="Editar perfil" onclick="openSettingsModal()">
+                <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     <div class="text-[13px] font-bold text-ink-950 truncate">{{ Auth::user()->name ?? 'Samuel Urbina' }}</div>
-                    <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'broker' ? 'Broker' : 'Administrador' }}</div>
+                    <div class="text-[11px] text-ink-500">{{ Auth::user()->role === 'broker' ? __('Brokers') : __('Administrador') }}</div>
                 </button>
                 <form method="POST" action="{{ route('logout') }}" class="m-0" data-logout-confirm>
                     @csrf
-                    <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="Cerrar sesión">
+                    <button type="submit" class="text-ink-400 hover:text-ink-700 p-1" title="{{ __('Cerrar sesión') }}">
                         <i class="pi pi-arrow-up-right text-xs"></i>
                     </button>
                 </form>
+            </div>
+            <div class="px-3 pb-3 pt-1 flex items-center justify-between gap-2">
+                <span class="text-[11px] text-ink-500">{{ __('Idioma') }}</span>
+                @include('partials.language-toggle', ['variant' => 'compact'])
             </div>
         </div>
     </aside>
@@ -342,7 +388,7 @@
     <div class="flex-1 min-w-0 flex flex-col rounded-2xl bg-white shadow-panel border border-ink-200 overflow-hidden">
 
         {{-- Topbar --}}
-        <header id="crm-topbar" class="h-[72px] bg-white border-b border-ink-100 flex items-center px-7 gap-5 shrink-0">
+        <header id="crm-topbar" class="h-[72px] bg-white border-b border-ink-100 flex items-center px-7 gap-3 shrink-0">
             <button id="mobile-toggle" type="button" class="topbar-icon-btn shrink-0"
                     onclick="document.getElementById('crm-sidebar').classList.toggle('open'); document.getElementById('sidebar-backdrop').classList.toggle('open');">
                 <i class="pi pi-bars"></i>
@@ -352,17 +398,15 @@
                 <p class="text-[11px] sm:text-[12px] text-ink-500 leading-tight mt-0.5 truncate">@yield('page_breadcrumb', 'Vista general')</p>
             </div>
             <div class="topbar-date hidden md:flex items-center text-[12px] text-ink-500 whitespace-nowrap">
-                {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                {{ \Carbon\Carbon::now()->locale(app()->getLocale())->isoFormat(app()->getLocale() === 'es' ? 'dddd, D [de] MMMM [de] YYYY' : 'dddd, MMMM D, YYYY') }}
             </div>
-            <div class="topbar-search-wrap relative w-64 hidden md:block">
+            <div class="topbar-search-wrap relative w-64 hidden md:block" data-search="admin">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                <input type="text" placeholder="Buscar cliente…" class="topbar-search pr-3" />
+                <input id="global-search-input" type="text" placeholder="{{ __('Buscar cliente, expediente, unidad…') }}" class="topbar-search pr-3" autocomplete="off" />
+                <div id="global-search-dropdown" class="search-dropdown" role="listbox"></div>
             </div>
-            <button type="button" class="topbar-icon-btn shrink-0" title="Notificaciones">
-                <i class="pi pi-bell"></i>
-                <span class="dot-indicator"></span>
-            </button>
-            <button type="button" class="topbar-icon-btn shrink-0" title="Configuración" onclick="openSettingsModal()">
+            @include('partials.notifications-dropdown', ['endpoint' => 'admin.notifications', 'readRoute' => 'admin.notifications.read'])
+            <button type="button" class="topbar-icon-btn shrink-0" title="{{ __('Configuración') }}" onclick="openSettingsModal()">
                 <i class="pi pi-cog"></i>
             </button>
         </header>
@@ -384,6 +428,8 @@
     });
 </script>
 @endif
+
+@include('partials.global-search', ['endpoint' => route('admin.search')])
 
 @stack('scripts')
 </body>
