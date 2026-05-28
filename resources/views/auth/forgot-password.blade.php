@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -131,6 +131,33 @@
       .panel-scroll { overflow-y: auto; overflow-x: hidden; }
       .panel-scroll::-webkit-scrollbar { width: 6px; }
       .panel-scroll::-webkit-scrollbar-thumb { background:#cacfd8; border-radius:6px; }
+
+      /* ---- Language dropdown (footer) ---- */
+      .auth-lang-wrap { position: relative; display: inline-block; }
+      .auth-lang-menu {
+        position: absolute; right: 0; bottom: calc(100% + 8px);
+        min-width: 140px;
+        background: #fff; border: 1px solid #ebebeb; border-radius: 10px;
+        box-shadow: 0 10px 30px -6px rgba(0,0,0,.12);
+        padding: 4px; z-index: 50;
+        animation: auth-lang-fade .15s ease-out;
+      }
+      @keyframes auth-lang-fade {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .auth-lang-item {
+        display: flex; align-items: center; gap: 8px;
+        width: 100%; padding: 8px 10px;
+        background: transparent; border: 0; border-radius: 6px;
+        color: #717784; font: 500 13px/1 'Inter', sans-serif;
+        cursor: pointer; text-align: left;
+        transition: background-color .12s, color .12s;
+      }
+      .auth-lang-item:hover { background: #f2f5f8; color: #171717; }
+      .auth-lang-item.is-active { color: #171717; font-weight: 600; }
+      .auth-lang-check { visibility: hidden; color: #5c7c68; }
+      .auth-lang-item.is-active .auth-lang-check { visibility: visible; }
     </style>
 </head>
 <body class="bg-white">
@@ -307,12 +334,46 @@
 
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
             <span>© 2026 MAKAI RESIDENCES</span>
-            <button class="flex items-center gap-1.5 hover:text-ink-700">
-                <i class="pi pi-globe text-[12px]"></i><span>ESP</span><i class="pi pi-angle-down text-[10px]"></i>
-            </button>
+            @include('auth._lang_select')
         </footer>
     </div>
 </section>
+
+<script>
+/* ---- Locale switcher (footer dropdown) ---- */
+window.toggleAuthLangMenu = function (e) {
+    e.stopPropagation();
+    const wrap = e.currentTarget.closest('.auth-lang-wrap');
+    if (!wrap) return;
+    const menu = wrap.querySelector('.auth-lang-menu');
+    const btn  = wrap.querySelector('button[aria-haspopup="true"]');
+    const open = !menu.classList.contains('hidden');
+    document.querySelectorAll('.auth-lang-menu').forEach(m => m.classList.add('hidden'));
+    document.querySelectorAll('.auth-lang-wrap button[aria-haspopup="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    if (!open) {
+        menu.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+};
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.auth-lang-wrap')) return;
+    document.querySelectorAll('.auth-lang-menu').forEach(m => m.classList.add('hidden'));
+    document.querySelectorAll('.auth-lang-wrap button[aria-haspopup="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+});
+window.setAuthLocale = function (lang) {
+    const current = (document.documentElement.getAttribute('lang') || 'es').toLowerCase().split('-')[0];
+    if (current === lang) return;
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    fetch('{{ route("locale.update") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+        body: JSON.stringify({ locale: lang }),
+        credentials: 'same-origin',
+    }).then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(() => window.location.reload())
+      .catch(() => {});
+};
+</script>
 
 <script>
 (function () {

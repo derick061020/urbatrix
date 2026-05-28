@@ -411,6 +411,24 @@ class DashboardController extends Controller
         // Build a unified event list from tasks/messages/payments related to this client
         $events = collect();
 
+        // Meetings (videollamadas con Google Meet)
+        if ($userId) {
+            $meetings = \App\Models\Meeting::where('user_id', $userId)
+                ->where('status', '!=', 'cancelled')
+                ->get();
+            foreach ($meetings as $m) {
+                $events->push((object) [
+                    'id'        => 'm-'.$m->id,
+                    'title'     => 'Videollamada con asesor',
+                    'start'     => \Carbon\Carbon::parse($m->scheduled_at),
+                    'end'       => \Carbon\Carbon::parse($m->scheduled_at)->addMinutes((int) $m->duration_minutes),
+                    'type'      => 'meeting',
+                    'meta'      => $m->google_meet_link,
+                    'meet_link' => $m->google_meet_link,
+                ]);
+            }
+        }
+
         // Tasks assigned to or about this client's reservation
         if ($reservation) {
             $tasks = \App\Models\Task::where('reservation_id', $reservation->id)

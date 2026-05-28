@@ -13,6 +13,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MeetingController;
 
 // Auth routes
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -114,6 +115,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Calendario
     Route::get('/dashboard/calendario', [DashboardController::class, 'calendario'])->name('dashboard.calendario');
+
+    // Videollamadas (Google Meet)
+    Route::get('/api/meetings/availability', [MeetingController::class, 'availability'])->name('meetings.availability');
+    Route::post('/meetings', [MeetingController::class, 'store'])->name('meetings.store');
 });
 
 // Active users routes

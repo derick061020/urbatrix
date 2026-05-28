@@ -692,6 +692,37 @@
         background:#5c7c68; border-color:#5c7c68; color:#fff;
         box-shadow:0 4px 12px -4px rgba(92,124,104,.45);
     }
+    .vc-slot[disabled], .vc-slot.disabled {
+        opacity:.45; cursor:not-allowed; text-decoration:line-through;
+        background:#f5f7fa; color:#99a0ae;
+    }
+    .vc-slot[disabled]:hover, .vc-slot.disabled:hover {
+        background:#f5f7fa; border-color:#eaecf0; color:#99a0ae;
+    }
+
+    .vc-success {
+        padding: 20px;
+        text-align: center;
+    }
+    .vc-success-icon {
+        width:56px; height:56px; border-radius:999px;
+        background:#e3f7ec; color:#1daf61;
+        display:inline-flex; align-items:center; justify-content:center;
+        margin-bottom:14px;
+    }
+    .vc-success-title { font-weight:700; font-size:16px; color:#171717; margin-bottom:6px; }
+    .vc-success-sub   { font-size:13px; color:#525866; margin-bottom:14px; }
+    .vc-meet-link {
+        display:flex; align-items:center; gap:8px;
+        background:#f4f5f7; border:1px solid #eaecf0; border-radius:10px;
+        padding:10px 12px; margin:12px 0;
+    }
+    .vc-meet-link a { flex:1; color:#1a73e8; text-decoration:none; font-size:13px; word-break:break-all; }
+    .vc-meet-link button {
+        background:#fff; border:1px solid #eaecf0; border-radius:8px;
+        padding:6px 10px; font-size:12px; cursor:pointer; color:#525866;
+    }
+    .vc-meet-link button:hover { background:#f5f7fa; }
 
     .vc-footer {
         display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -773,7 +804,7 @@
           <label class="vc-field-label">Horario disponible</label>
           <div class="vc-slots" role="radiogroup" aria-label="Horario disponible">
             @foreach(['9:00 AM','10:00 AM','11:00 AM','2:00 PM','3:00 PM','4:00 PM'] as $slot)
-              <button type="button" class="vc-slot" role="radio" aria-checked="false" onclick="selectAdvisorSlot(this)">{{ $slot }}</button>
+              <button type="button" class="vc-slot" data-slot="{{ $slot }}" role="radio" aria-checked="false" onclick="selectAdvisorSlot(this)">{{ $slot }}</button>
             @endforeach
           </div>
         </div>
@@ -787,9 +818,25 @@
         </div>
       </form>
 
-      <div class="vc-footer">
+      <div class="vc-footer" id="advisorFooter">
         <button type="button" class="vc-btn vc-btn-ghost" onclick="closeAdvisorVideoCall()">Cancelar</button>
-        <button type="submit" form="advisorForm" class="vc-btn vc-btn-primary">Confirmar solicitud</button>
+        <button type="submit" form="advisorForm" id="advisorSubmitBtn" class="vc-btn vc-btn-primary">Confirmar solicitud</button>
+      </div>
+
+      <div class="vc-success" id="advisorSuccess" style="display:none;">
+        <div class="vc-success-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="vc-success-title">¡Videollamada agendada!</div>
+        <div class="vc-success-sub" id="advisorSuccessSub">Te enviamos la invitación por email. También aparece en tu Google Calendar.</div>
+        <div class="vc-meet-link">
+          <i class="pi pi-video" style="color:#1a73e8;"></i>
+          <a id="advisorMeetLink" href="#" target="_blank" rel="noopener">Abrir en Google Meet</a>
+          <button type="button" onclick="copyAdvisorMeetLink()">Copiar</button>
+        </div>
+        <button type="button" class="vc-btn vc-btn-primary" style="width:100%;" onclick="closeAdvisorVideoCall()">Listo</button>
       </div>
     </div>
   </div>
@@ -3440,6 +3487,12 @@
     }
 
     function openAdvisorVideoCall(unitId) {
+      @auth
+      @else
+        window.location.href = '{{ route('login') }}';
+        return;
+      @endauth
+
       const modal = document.getElementById('advisorModal');
       document.getElementById('advisorModalUnitId').value = unitId || '';
 
@@ -3460,7 +3513,8 @@
 
       // Reset slots y note
       document.querySelectorAll('#advisorModal .vc-slot').forEach(s => {
-        s.classList.remove('active');
+        s.classList.remove('active', 'disabled');
+        s.disabled = false;
         s.setAttribute('aria-checked', 'false');
       });
       document.getElementById('advisorPreferredTime').value = '';
@@ -3468,21 +3522,73 @@
       if (note) { note.value = ''; document.getElementById('advisorNoteCount').textContent = '0/200'; }
       hideAdvisorAlert();
 
+      // Restablecer estado (volver a la vista de formulario)
+      document.getElementById('advisorForm').style.display = '';
+      document.getElementById('advisorFooter').style.display = '';
+      document.getElementById('advisorSuccess').style.display = 'none';
+      const submitBtn = document.getElementById('advisorSubmitBtn');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Confirmar solicitud'; }
+
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
+
+      // Cargar disponibilidad para la fecha + unidad seleccionadas
+      fetchAdvisorAvailability();
     }
     function closeAdvisorVideoCall() {
       document.getElementById('advisorModal').classList.remove('open');
       document.body.style.overflow = '';
     }
     function selectAdvisorSlot(btn) {
+      if (btn.disabled || btn.classList.contains('disabled')) return;
       document.querySelectorAll('#advisorModal .vc-slot').forEach(s => {
         s.classList.remove('active');
         s.setAttribute('aria-checked', 'false');
       });
       btn.classList.add('active');
       btn.setAttribute('aria-checked', 'true');
-      document.getElementById('advisorPreferredTime').value = btn.textContent.trim();
+      document.getElementById('advisorPreferredTime').value = btn.dataset.slot || btn.textContent.trim();
+    }
+    async function fetchAdvisorAvailability() {
+      const date = document.getElementById('advisorDate').value;
+      const unitId = document.getElementById('advisorModalUnitId').value
+        || document.getElementById('advisorUnitSelect').value;
+      if (!date) return;
+
+      const slots = document.querySelectorAll('#advisorModal .vc-slot');
+      slots.forEach(s => { s.classList.remove('disabled'); s.disabled = false; });
+
+      try {
+        const params = new URLSearchParams({ date });
+        if (unitId) params.append('unit_id', unitId);
+        const res = await fetch('/api/meetings/availability?' + params.toString(), {
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin',
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const taken = Array.isArray(data.taken) ? data.taken : [];
+        slots.forEach(s => {
+          const slotLabel = s.dataset.slot || s.textContent.trim();
+          if (taken.includes(slotLabel)) {
+            s.classList.add('disabled');
+            s.disabled = true;
+            if (s.classList.contains('active')) {
+              s.classList.remove('active');
+              s.setAttribute('aria-checked', 'false');
+              document.getElementById('advisorPreferredTime').value = '';
+            }
+          }
+        });
+      } catch (e) { /* silencioso */ }
+    }
+    function copyAdvisorMeetLink() {
+      const link = document.getElementById('advisorMeetLink').href;
+      if (!link) return;
+      navigator.clipboard?.writeText(link).then(() => {
+        const btn = event?.target;
+        if (btn) { const t = btn.textContent; btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = t, 1500); }
+      });
     }
     function updateAdvisorNoteCount(el) {
       document.getElementById('advisorNoteCount').textContent = (el.value.length || 0) + '/200';
@@ -3502,7 +3608,7 @@
       }
     });
 
-    function submitAdvisorVideoCall(e) {
+    async function submitAdvisorVideoCall(e) {
       e.preventDefault();
       const unitLabel = document.getElementById('advisorUnitSelect').value;
       const date      = document.getElementById('advisorDate').value;
@@ -3514,18 +3620,78 @@
       if (!date)      { showAdvisorAlert('Indicá una fecha preferida.', 'err'); return false; }
       if (!time)      { showAdvisorAlert('Elegí un horario disponible.', 'err'); return false; }
 
-      const subject = encodeURIComponent('Solicitud de videollamada - Makai Residences');
-      const body = encodeURIComponent(
-        'Unidad de interés: ' + unitLabel + '\n' +
-        'Fecha preferida: ' + date + '\n' +
-        'Horario: ' + time + '\n' +
-        (note ? ('Nota: ' + note + '\n') : '') +
-        'ID unidad: ' + (unitId || 'No especificada')
-      );
-      window.location.href = 'mailto:support+makai_residences@launchbase.co.za?subject=' + subject + '&body=' + body;
-      closeAdvisorVideoCall();
+      hideAdvisorAlert();
+      const submitBtn = document.getElementById('advisorSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Agendando...';
+
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+      try {
+        const res = await fetch('/meetings', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrf,
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify({
+            unit_id: unitId || null,
+            unit_label: 'Unit ' + unitLabel,
+            preferred_date: date,
+            preferred_time: time,
+            note: note || null,
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          if (res.status === 409) {
+            await fetchAdvisorAvailability();
+          }
+          showAdvisorAlert(data.error || 'No pudimos agendar la videollamada.', 'err');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirmar solicitud';
+          return false;
+        }
+
+        const link = data?.meeting?.meet_link;
+        const meetLinkEl = document.getElementById('advisorMeetLink');
+        if (link) {
+          meetLinkEl.href = link;
+          meetLinkEl.textContent = link;
+        } else {
+          meetLinkEl.textContent = 'Link disponible en el email';
+          meetLinkEl.removeAttribute('href');
+        }
+        document.getElementById('advisorSuccessSub').textContent =
+          'Te enviamos la invitación a ' + (data?.meeting?.advisor ? 'tu asesor (' + data.meeting.advisor + ') y a tu email.' : 'tu email.') +
+          ' También aparece en tu Google Calendar.';
+
+        document.getElementById('advisorForm').style.display = 'none';
+        document.getElementById('advisorFooter').style.display = 'none';
+        document.getElementById('advisorSuccess').style.display = 'block';
+      } catch (err) {
+        showAdvisorAlert('Error de red. Probá de nuevo.', 'err');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirmar solicitud';
+      }
       return false;
     }
+
+    // Listeners para refrescar slots al cambiar fecha/unidad
+    document.addEventListener('DOMContentLoaded', function() {
+      const dateInput = document.getElementById('advisorDate');
+      const unitSelect = document.getElementById('advisorUnitSelect');
+      if (dateInput) dateInput.addEventListener('change', fetchAdvisorAvailability);
+      if (unitSelect) unitSelect.addEventListener('change', function() {
+        document.getElementById('advisorModalUnitId').value = unitSelect.value;
+        fetchAdvisorAvailability();
+      });
+    });
 
     function openWhatsAppBroker() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
