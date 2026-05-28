@@ -76,7 +76,7 @@
         </aside>
 
         {{-- Conversation --}}
-        <section class="col-span-6 flex flex-col bg-ink-50">
+        <section id="conversation-section" class="col-span-6 flex flex-col bg-ink-50">
             @if($active)
                 @php
                     $aInit = strtoupper(substr($active->first_name ?? 'C',0,1).substr($active->last_name ?? 'M',0,1));
@@ -179,8 +179,20 @@
 
     function toggleRightRail() {
         const rightRail = document.getElementById('right-rail');
-        if (rightRail) {
+        const conversationSection = document.getElementById('conversation-section');
+        
+        if (rightRail && conversationSection) {
             rightRail.classList.toggle('hidden');
+            
+            if (rightRail.classList.contains('hidden')) {
+                // Menú oculto: conversación ocupa más espacio
+                conversationSection.classList.remove('col-span-6');
+                conversationSection.classList.add('col-span-9');
+            } else {
+                // Menú visible: conversación ocupa espacio normal
+                conversationSection.classList.remove('col-span-9');
+                conversationSection.classList.add('col-span-6');
+            }
         }
     }
 </script>
