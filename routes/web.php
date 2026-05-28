@@ -35,6 +35,10 @@ Route::post('/forgot-password/reset',   [AuthController::class, 'forgotPasswordR
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
+// Google Calendar refresh-token helper (one-time setup)
+Route::get('/admin/google-calendar/connect',  [\App\Http\Controllers\Admin\GoogleCalendarConnectController::class, 'connect']);
+Route::get('/admin/google-calendar/callback', [\App\Http\Controllers\Admin\GoogleCalendarConnectController::class, 'callback']);
+
 // Cambio de idioma — disponible sin autenticación
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
