@@ -195,6 +195,17 @@
             }
         }
     }
+
+    // Ajustar col-span al cargar la página si el menú está oculto por defecto
+    document.addEventListener('DOMContentLoaded', function() {
+        const rightRail = document.getElementById('right-rail');
+        const conversationSection = document.getElementById('conversation-section');
+        
+        if (rightRail && conversationSection && rightRail.classList.contains('hidden')) {
+            conversationSection.classList.remove('col-span-6');
+            conversationSection.classList.add('col-span-9');
+        }
+    });
 </script>
 @endpush
 @endsection
