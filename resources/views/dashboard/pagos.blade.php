@@ -145,28 +145,28 @@
                         </td>
                         <td class="px-3 py-3.5">
                             @if($isPaid)
-                                <span class="cli-pill bg-ok-soft text-ok-dark">PAGADO</span>
+                                <span class="cli-pill bg-ok-soft text-ok-dark">{{ __('PAGADO') }}</span>
                             @elseif($isOverdue)
-                                <span class="cli-pill bg-err-soft text-err">VENCIDO</span>
+                                <span class="cli-pill bg-err-soft text-err">{{ __('VENCIDO') }}</span>
                             @else
-                                <span class="cli-pill bg-warn-soft text-warn-dark">PENDIENTE</span>
+                                <span class="cli-pill bg-warn-soft text-warn-dark">{{ __('PENDIENTE') }}</span>
                             @endif
                         </td>
                         <td class="px-3 py-3.5 text-right">
                             @if($isNext)
-                                <button type="button" onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3">Pagar</button>
+                                <button type="button" onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3">{{ __('Pagar') }}</button>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-5 py-8 text-center text-[12px] text-ink-500">No hay cuotas registradas todavía.</td></tr>
+                    <tr><td colspan="7" class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('No hay cuotas registradas todavía.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
         @if($more > 0)
             <div class="px-5 py-3 text-center text-[12px] text-ink-500 bg-ink-50/60 border-t border-ink-100">
-                + {{ $more }} cuotas pendientes restantes · Total: ${{ number_format($totalMore, 0) }}
-                <button class="text-brand font-semibold hover:underline ml-2">Ver todos <i class="pi pi-angle-down text-[10px]"></i></button>
+                + {{ $more }} {{ __('cuotas pendientes restantes') }} · {{ __('Total') }}: ${{ number_format($totalMore, 0) }}
+                <button class="text-brand font-semibold hover:underline ml-2">{{ __('Ver todos') }} <i class="pi pi-angle-down text-[10px]"></i></button>
             </div>
         @endif
     </div>
