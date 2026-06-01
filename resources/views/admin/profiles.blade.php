@@ -200,21 +200,9 @@
                             <td class="text-right whitespace-nowrap">
                                 <div class="inline-flex items-center gap-3">
                                     <button type="button"
-                                            onclick="openActivity(this)"
-                                            data-name="{{ $fullName }}"
-                                            data-init="{{ $init ?: 'U' }}"
-                                            data-bg="{{ $bg }}"
-                                            data-email="{{ $u->email }}"
-                                            data-lastseen="{{ $u->last_seen ? \Carbon\Carbon::parse($u->last_seen)->diffForHumans() : 'Nunca' }}"
-                                            data-joined="{{ $u->created_at?->format('d/m/Y') }}"
-                                            data-estado="{{ $estado[0] }}"
-                                            data-unit="{{ $r ? ($r->unit->name ?? $r->unit->custom_id ?? '—') : 'Sin unidad' }}"
-                                            data-progress="{{ $pct }}"
-                                            data-phone="{{ $u->phone ?: '—' }}"
-                                            data-country="{{ $u->country ?: '—' }}"
-                                            data-res="{{ $userReservations->count() }}"
+                                            onclick="openUserDetail({{ $u->id }})"
                                             class="inline-flex items-center gap-1 text-[12px] text-ink-600 font-semibold hover:text-brand">
-                                        <i class="pi pi-chart-line text-[11px]"></i> Actividad
+                                        <i class="pi pi-user text-[11px]"></i> Ver perfil
                                     </button>
                                     <button type="button"
                                             onclick="openEditUser(this)"
@@ -230,7 +218,7 @@
                                         <i class="pi pi-pencil text-[11px]"></i> Editar
                                     </button>
                                     @if($r)
-                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
+                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Exp. &rarr;</a>
                                     @endif
                                 </div>
                             </td>
@@ -324,9 +312,8 @@
 @push('scripts')
 <script>
     const EU_BASE = "{{ url('admin/users') }}";
-    function openEditUser(btn) {
+    function openEditUserObj(d) {
         const f = document.getElementById('form-editar-usuario');
-        const d = btn.dataset;
         f.action = EU_BASE + '/' + d.id;
         document.getElementById('eu-id').value      = d.id || '';
         document.getElementById('eu-first').value   = d.first || '';
@@ -340,26 +327,36 @@
         f.querySelector('input[name=password_confirmation]').value = '';
         document.getElementById('modal-editar-usuario').showModal();
     }
+    function openEditUser(btn) { openEditUserObj(btn.dataset); }
 
-    function openActivity(btn) {
-        const d = btn.dataset;
-        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        const av = document.getElementById('act-avatar');
-        av.textContent = d.init || 'U'; av.style.background = d.bg || '#5c7c68';
-        set('act-name', d.name || '—');
-        set('act-email', d.email || '—');
-        set('act-lastseen', d.lastseen || '—');
-        set('act-joined', d.joined || '—');
-        set('act-estado', d.estado || '—');
-        set('act-unit', d.unit || '—');
-        set('act-phone', d.phone || '—');
-        set('act-country', d.country || '—');
-        set('act-res', d.res || '0');
-        const bar = document.getElementById('act-progress-bar');
-        const pct = parseInt(d.progress || '0', 10);
-        bar.style.width = pct + '%';
-        set('act-progress-val', pct + '%');
-        document.getElementById('modal-actividad').showModal();
+    // ── Modal de detalle de usuario (carga vía fetch) ──
+    const UD_BASE = "{{ url('admin/users') }}";
+    function closeUserDetail() { document.getElementById('modal-user-detail').close(); }
+    function switchUserTab(tab) {
+        document.querySelectorAll('#modal-user-detail .udt-tab').forEach(b => {
+            const on = b.dataset.tab === tab;
+            b.classList.toggle('text-brand', on);
+            b.classList.toggle('border-brand', on);
+            b.classList.toggle('text-ink-500', !on);
+            b.classList.toggle('border-transparent', !on);
+        });
+        document.querySelectorAll('#modal-user-detail .udt-panel').forEach(p => {
+            p.style.display = (p.dataset.panel === tab) ? '' : 'none';
+        });
+    }
+    async function openUserDetail(id, tab = 'info') {
+        const modal = document.getElementById('modal-user-detail');
+        const body  = document.getElementById('user-detail-body');
+        body.innerHTML = '<div class="py-16 text-center text-[13px] text-ink-400"><i class="pi pi-spin pi-spinner mr-2"></i> Cargando…</div>';
+        modal.showModal();
+        try {
+            const res = await fetch(UD_BASE + '/' + id + '/detail', { headers: { 'Accept': 'application/json' } });
+            const data = await res.json();
+            body.innerHTML = data.html;
+            if (tab !== 'info') switchUserTab(tab);
+        } catch (e) {
+            body.innerHTML = '<div class="py-16 text-center text-[13px] text-err">No se pudo cargar el detalle.</div>';
+        }
     }
 
     @if($errors->any() && old('edited_user_id'))
@@ -380,64 +377,9 @@
 </script>
 @endpush
 
-{{-- ====== Modal: Actividad del usuario ====== --}}
-<dialog id="modal-actividad" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto w-[480px] max-w-[94vw]">
-    <div class="bg-white rounded-2xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
-            <div id="act-avatar" class="crm-avatar" style="background:#5c7c68"></div>
-            <div class="flex-1 min-w-0">
-                <div id="act-name" class="text-[15px] font-bold text-ink-900 truncate">—</div>
-                <div id="act-email" class="text-[12px] text-ink-500 truncate">—</div>
-            </div>
-            <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-                <div class="p-3 rounded-xl bg-ink-50 border border-ink-100">
-                    <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1">Último acceso</div>
-                    <div id="act-lastseen" class="text-[13px] font-semibold text-ink-900">—</div>
-                </div>
-                <div class="p-3 rounded-xl bg-ink-50 border border-ink-100">
-                    <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1">Miembro desde</div>
-                    <div id="act-joined" class="text-[13px] font-semibold text-ink-900">—</div>
-                </div>
-            </div>
-
-            <div class="divide-y divide-ink-100 rounded-xl border border-ink-100">
-                <div class="px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Estado</span>
-                    <span id="act-estado" class="text-[13px] font-semibold text-ink-900">—</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Unidad</span>
-                    <span id="act-unit" class="text-[13px] font-semibold text-ink-900">—</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Reservas</span>
-                    <span id="act-res" class="text-[13px] font-semibold text-ink-900">0</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Teléfono</span>
-                    <span id="act-phone" class="text-[13px] font-semibold text-ink-900">—</span>
-                </div>
-                <div class="px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">País</span>
-                    <span id="act-country" class="text-[13px] font-semibold text-ink-900">—</span>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex items-center justify-between text-[12px] mb-1.5">
-                    <span class="text-ink-500">Progreso de documentación (KYC)</span>
-                    <span id="act-progress-val" class="font-semibold text-ink-700">0%</span>
-                </div>
-                <div class="crm-progress"><span id="act-progress-bar" class="bg-brand" style="width:0%"></span></div>
-            </div>
-        </div>
-        <div class="px-6 py-4 border-t border-ink-100 flex justify-end">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cerrar</button>
-        </div>
-    </div>
+{{-- ====== Modal: Detalle de usuario (Información / Propiedad / Documentos / Actividad) ====== --}}
+<dialog id="modal-user-detail" class="rounded-2xl p-0 backdrop:bg-black/50 m-auto w-[820px] max-w-[95vw]">
+    <div id="user-detail-body" class="bg-white rounded-2xl overflow-hidden"></div>
 </dialog>
 
 @php $units = \App\Models\Unit::orderBy('custom_id')->get(['id','custom_id','name','price']); @endphp

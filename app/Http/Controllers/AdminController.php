@@ -468,6 +468,83 @@ class AdminController extends Controller
     }
 
     /**
+     * Detalle de usuario para el modal de Usuarios (#3 del briefing):
+     * Información, Propiedad, Documentos y Actividad — datos reales.
+     * Devuelve el partial renderizado (se inyecta vía fetch).
+     */
+    public function userDetail($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        $reservation = Reservation::with(['unit.project', 'documents', 'payments'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        $unit  = $reservation?->unit;
+        $price = (float) ($unit->price ?? $reservation->unit_price ?? 0);
+        $paid  = $reservation ? (float) $reservation->payments->where('status', 'paid')->sum('amount') : 0;
+        $pct   = $price > 0 ? min(100, round($paid / $price * 100)) : 0;
+
+        // ── Actividad real (unit_views + last_seen + documentos) ──
+        $startMonth = now()->startOfMonth();
+        $viewsThisMonth = \App\Models\UnitView::where('user_id', $user->id)->where('viewed_at', '>=', $startMonth)->count();
+        $distinctUnits  = \App\Models\UnitView::where('user_id', $user->id)->distinct('unit_id')->count('unit_id');
+
+        $topViewed = \App\Models\UnitView::with('unit')
+            ->where('user_id', $user->id)
+            ->selectRaw('unit_id, COUNT(*) as total, MAX(viewed_at) as last_viewed')
+            ->groupBy('unit_id')
+            ->orderByDesc('total')
+            ->take(4)
+            ->get();
+
+        $recentActions = \App\Models\UnitView::with('unit')
+            ->where('user_id', $user->id)
+            ->orderByDesc('viewed_at')
+            ->take(5)
+            ->get();
+
+        $docsCount = $reservation ? $reservation->documents->count() : 0;
+
+        $platform = $viewsThisMonth >= 15 ? ['Actividad alta', 'ok']
+                  : ($viewsThisMonth >= 5 ? ['Actividad media', 'warn'] : ['Actividad baja', 'info']);
+
+        // ── Estado / etapa del proceso ──
+        $verif = $user->verification_status ?? 'approved';
+        $approvedDocs = $reservation ? $reservation->documents->where('status', 'approved')->count() : 0;
+        if (! $reservation) {
+            $stage = ['1 / 6', 'Registro']; $estado = ['Sin unidad', 'info'];
+        } elseif ($verif === 'pending') {
+            $stage = ['2 / 6', 'KYC / Docs']; $estado = ['KYC pendiente', 'warn'];
+        } elseif ($verif === 'rejected') {
+            $stage = ['2 / 6', 'KYC / Docs']; $estado = ['Rechazado', 'err'];
+        } elseif ($docsCount === 0) {
+            $stage = ['3 / 6', 'Documentación']; $estado = ['Documentación', 'warn'];
+        } elseif ($reservation->budget_status === 'sent') {
+            $stage = ['4 / 6', 'Presupuesto']; $estado = ['Presupuesto enviado', 'info'];
+        } elseif ($approvedDocs > 0 && $approvedDocs < $docsCount) {
+            $stage = ['5 / 6', 'Contrato']; $estado = ['En revisión', 'info'];
+        } elseif ($docsCount > 0 && $approvedDocs === $docsCount) {
+            $stage = ['6 / 6', 'Entrega']; $estado = ['Al día', 'ok'];
+        } else {
+            $stage = ['3 / 6', 'Documentación']; $estado = ['En revisión', 'info'];
+        }
+
+        $alerts = [];
+        if ($verif === 'pending') { $alerts[] = 'KYC'; }
+        if ($reservation && $docsCount === 0) { $alerts[] = 'DOCS'; }
+
+        $html = view('admin._partials.user_detail', compact(
+            'user', 'reservation', 'unit', 'price', 'paid', 'pct',
+            'viewsThisMonth', 'distinctUnits', 'topViewed', 'recentActions',
+            'docsCount', 'platform', 'stage', 'estado', 'alerts'
+        ))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    /**
      * Estadísticas de plataforma (#2 del briefing) — conectadas a datos reales:
      * usuarios activos, visitas (unit_views), propiedades más vistas y distribución por país.
      */

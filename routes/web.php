@@ -195,6 +195,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/transactions-report', [AdminController::class, 'transactionsReport'])->name('admin.transactions-report');
     Route::get('/profiles', [AdminController::class, 'profiles'])->name('admin.profiles');
     Route::get('/estadisticas', [AdminController::class, 'estadisticas'])->name('admin.estadisticas');
+    Route::get('/users/{userId}/detail', [AdminController::class, 'userDetail'])->name('admin.users.detail');
 
     // Gestión de materiales del broker (#16)
     Route::get('/materials',                       [MaterialController::class, 'index'])->name('admin.materials');
