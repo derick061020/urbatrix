@@ -37,6 +37,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
+            $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
             return redirect($user->postAuthRedirectPath());
         }
 

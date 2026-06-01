@@ -26,6 +26,10 @@ class DocumentController extends Controller
             abort(404, 'Documento no encontrado');
         }
 
+        if (auth()->check() && ! auth()->user()->is_admin) {
+            \App\Support\ActivityLogger::log(auth()->id(), 'document_download', 'Descargó '.($document->filename ?: 'un documento'), $document);
+        }
+
         return Response::download($absolute, $document->filename ?: basename($absolute));
     }
 
@@ -39,6 +43,11 @@ class DocumentController extends Controller
         if (! $absolute) {
             abort(404, 'Documento no encontrado');
         }
+
+        if (auth()->check() && ! auth()->user()->is_admin) {
+            \App\Support\ActivityLogger::log(auth()->id(), 'document_view', 'Visualizó '.($document->filename ?: 'un documento'), $document);
+        }
+
         $previewPath = $this->preparePreviewFile($absolute);
 
         $previewFilename = pathinfo($document->filename ?: basename($previewPath), PATHINFO_FILENAME)

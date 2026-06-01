@@ -486,10 +486,22 @@ class AdminController extends Controller
         $paid  = $reservation ? (float) $reservation->payments->where('status', 'paid')->sum('amount') : 0;
         $pct   = $price > 0 ? min(100, round($paid / $price * 100)) : 0;
 
-        // ── Actividad real (unit_views + last_seen + documentos) ──
+        // ── Actividad real (user_activities + unit_views + last_seen) ──
         $startMonth = now()->startOfMonth();
-        $viewsThisMonth = \App\Models\UnitView::where('user_id', $user->id)->where('viewed_at', '>=', $startMonth)->count();
-        $distinctUnits  = \App\Models\UnitView::where('user_id', $user->id)->distinct('unit_id')->count('unit_id');
+
+        $sessionsThisMonth = \App\Models\UserActivity::where('user_id', $user->id)
+            ->where('type', 'login')->where('created_at', '>=', $startMonth)->count();
+
+        $avgSeconds = (int) \App\Models\UserActivity::where('user_id', $user->id)
+            ->where('type', 'login')->whereNotNull('duration_seconds')
+            ->where('created_at', '>=', $startMonth)->avg('duration_seconds');
+        $avgSession = $avgSeconds > 0 ? sprintf('%dm %02ds', intdiv($avgSeconds, 60), $avgSeconds % 60) : '—';
+
+        $docsViewed = \App\Models\UserActivity::where('user_id', $user->id)
+            ->whereIn('type', ['document_view', 'document_download'])
+            ->where('created_at', '>=', $startMonth)->count();
+
+        $distinctUnits = \App\Models\UnitView::where('user_id', $user->id)->distinct('unit_id')->count('unit_id');
 
         $topViewed = \App\Models\UnitView::with('unit')
             ->where('user_id', $user->id)
@@ -499,16 +511,16 @@ class AdminController extends Controller
             ->take(4)
             ->get();
 
-        $recentActions = \App\Models\UnitView::with('unit')
-            ->where('user_id', $user->id)
-            ->orderByDesc('viewed_at')
-            ->take(5)
+        $recentActions = \App\Models\UserActivity::where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->take(6)
             ->get();
 
-        $docsCount = $reservation ? $reservation->documents->count() : 0;
+        $activityCount = \App\Models\UserActivity::where('user_id', $user->id)->where('created_at', '>=', $startMonth)->count();
+        $platform = $activityCount >= 20 ? ['Actividad alta', 'ok']
+                  : ($activityCount >= 8 ? ['Actividad media', 'warn'] : ['Actividad baja', 'info']);
 
-        $platform = $viewsThisMonth >= 15 ? ['Actividad alta', 'ok']
-                  : ($viewsThisMonth >= 5 ? ['Actividad media', 'warn'] : ['Actividad baja', 'info']);
+        $docsCount = $reservation ? $reservation->documents->count() : 0;
 
         // ── Estado / etapa del proceso ──
         $verif = $user->verification_status ?? 'approved';
@@ -537,8 +549,8 @@ class AdminController extends Controller
 
         $html = view('admin._partials.user_detail', compact(
             'user', 'reservation', 'unit', 'price', 'paid', 'pct',
-            'viewsThisMonth', 'distinctUnits', 'topViewed', 'recentActions',
-            'docsCount', 'platform', 'stage', 'estado', 'alerts'
+            'sessionsThisMonth', 'avgSession', 'docsViewed', 'distinctUnits',
+            'topViewed', 'recentActions', 'docsCount', 'platform', 'stage', 'estado', 'alerts'
         ))->render();
 
         return response()->json(['html' => $html]);

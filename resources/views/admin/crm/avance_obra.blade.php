@@ -35,9 +35,10 @@
     @if($projects->count())
     <div class="crm-card p-4 flex items-center gap-3 flex-wrap">
         @foreach($projects as $p)
-            <div class="px-4 py-2 rounded-lg border {{ optional($activeProject)->id === $p->id ? 'border-brand bg-brand-tint text-brand' : 'border-ink-200 text-ink-500' }} text-left">
+            @php $isActive = optional($activeProject)->id === $p->id; @endphp
+            <div class="px-4 py-2 rounded-lg border text-left {{ $isActive ? 'border-brand bg-brand-tint text-brand' : 'border-ink-200 text-ink-400 opacity-50 cursor-not-allowed' }}" @unless($isActive) title="Solo el proyecto activo registra avance de obra" @endunless>
                 <div class="text-[13px] font-semibold">{{ $p->name }}</div>
-                <div class="text-[10px] opacity-70">{{ $p->progress > 0 ? 'Activo · '.$p->progress.'%' : ($p->stage ?: 'En preparación') }}</div>
+                <div class="text-[10px] opacity-70">{{ $isActive ? 'Activo · '.$p->progress.'%' : ($p->stage ?: 'En preparación') }}</div>
             </div>
         @endforeach
     </div>
@@ -147,7 +148,8 @@
                     <select name="project_id" class="crm-input mt-1 w-full">
                         <option value="">— General —</option>
                         @foreach($projects as $p)
-                            <option value="{{ $p->id }}" @selected(optional($activeProject)->id === $p->id)>{{ $p->name }}</option>
+                            @php $isActive = optional($activeProject)->id === $p->id; @endphp
+                            <option value="{{ $p->id }}" @selected($isActive) @disabled(!$isActive)>{{ $p->name }}@unless($isActive) (no disponible)@endunless</option>
                         @endforeach
                     </select>
                 </div>

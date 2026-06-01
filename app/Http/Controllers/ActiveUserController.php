@@ -45,8 +45,14 @@ class ActiveUserController extends Controller
         });
         
         Cache::put('active_guests', $activeGuests, 300);
-        
+
         $totalActive = count($activeGuests);
+
+        // Mantén viva la sesión de actividad del usuario logueado y su last_seen
+        if (auth()->check()) {
+            auth()->user()->forceFill(['last_seen' => now()])->saveQuietly();
+            \App\Support\ActivityLogger::touchSession($request->session()->get('activity_login_id'));
+        }
 
         return response()->json(['success' => true, 'count' => $totalActive]);
     }

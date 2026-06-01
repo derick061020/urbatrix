@@ -144,6 +144,11 @@ class HomeController extends Controller
                 'views_today' => DB::raw('COALESCE(views_today, 0) + 1'),
                 'views_total' => DB::raw('COALESCE(views_total, 0) + 1'),
             ])->save();
+
+            if ($userId) {
+                $unitLabel = $unit->custom_id ?? $unit->name ?? ('Unidad '.$unit->id);
+                \App\Support\ActivityLogger::log($userId, 'property_view', 'Visitó '.$unitLabel, $unit);
+            }
         }
 
         return response()->json([

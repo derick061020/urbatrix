@@ -108,7 +108,7 @@
     </div>
 
     {{-- ===== PROPIEDAD ===== --}}
-    <div class="udt-panel hidden" data-panel="propiedad" style="display:none">
+    <div class="udt-panel" data-panel="propiedad" style="display:none">
         @if($reservation && $unit)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5">
                 @foreach([
@@ -131,7 +131,7 @@
     </div>
 
     {{-- ===== DOCUMENTOS ===== --}}
-    <div class="udt-panel hidden" data-panel="documentos" style="display:none">
+    <div class="udt-panel" data-panel="documentos" style="display:none">
         @php $docs = $reservation ? $reservation->documents : collect(); @endphp
         @forelse($docs as $doc)
             <div class="py-3 flex items-center gap-3 border-b border-ink-100">
@@ -149,14 +149,15 @@
     </div>
 
     {{-- ===== ACTIVIDAD ===== --}}
-    <div class="udt-panel hidden grid grid-cols-1 md:grid-cols-2 gap-8" data-panel="actividad" style="display:none">
+    <div class="udt-panel grid grid-cols-1 md:grid-cols-2 gap-8" data-panel="actividad" style="display:none">
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">Resumen de actividad</div>
             <div class="divide-y divide-ink-100">
                 @foreach([
-                    ['Visitas este mes', $viewsThisMonth],
+                    ['Sesiones este mes', $sessionsThisMonth],
                     ['Última conexión', $user->last_seen ? \Carbon\Carbon::parse($user->last_seen)->diffForHumans() : 'Nunca'],
-                    ['Documentos del expediente', $docsCount],
+                    ['Sesión promedio', $avgSession],
+                    ['Documentos visitados', $docsViewed],
                     ['Propiedades vistas', $distinctUnits],
                 ] as [$l, $v])
                     <div class="py-2.5 flex items-center justify-between">
@@ -174,12 +175,12 @@
             <div class="space-y-2.5">
                 @forelse($recentActions as $action)
                     <div class="flex items-center gap-3">
-                        <span class="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0"><i class="pi pi-home text-[11px]"></i></span>
-                        <span class="text-[12px] text-ink-700 flex-1 min-w-0 truncate">Visitó {{ optional($action->unit)->custom_id ?? optional($action->unit)->name ?? 'una unidad' }}</span>
-                        <span class="text-[11px] text-ink-400 whitespace-nowrap">{{ \Carbon\Carbon::parse($action->viewed_at)->diffForHumans(null, true) }}</span>
+                        <span class="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0"><i class="pi {{ $action->icon }} text-[11px]"></i></span>
+                        <span class="text-[12px] text-ink-700 flex-1 min-w-0 truncate">{{ $action->description ?: ucfirst(str_replace('_', ' ', $action->type)) }}</span>
+                        <span class="text-[11px] text-ink-400 whitespace-nowrap">{{ $action->created_at->diffForHumans(null, true) }}</span>
                     </div>
                 @empty
-                    <div class="text-[12px] text-ink-400">Sin actividad de navegación registrada.</div>
+                    <div class="text-[12px] text-ink-400">Sin actividad registrada todavía.</div>
                 @endforelse
             </div>
         </div>

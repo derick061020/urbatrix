@@ -382,6 +382,8 @@ class DashboardController extends Controller
                 'approval_status' => 'pending',
             ]);
 
+            \App\Support\ActivityLogger::log(Auth::id(), 'payment', 'Envió comprobante de pago · '.($payment->label ?: 'Cuota'), $payment);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Comprobante enviado para aprobación. Te notificaremos cuando sea revisado.'
