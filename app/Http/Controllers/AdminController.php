@@ -467,6 +467,51 @@ class AdminController extends Controller
         return view('admin.profiles');
     }
 
+    /**
+     * Estadísticas de plataforma (#2 del briefing) — conectadas a datos reales:
+     * usuarios activos, visitas (unit_views), propiedades más vistas y distribución por país.
+     */
+    public function estadisticas()
+    {
+        $now = now();
+
+        $activeUsers  = User::where('last_seen', '>=', $now->copy()->subMinutes(5))->count();
+        $totalUsers   = User::where('role', 'user')->count();
+        $newThisMonth = User::where('role', 'user')->where('created_at', '>=', $now->copy()->startOfMonth())->count();
+
+        $viewsTotal     = (int) \App\Models\UnitView::count();
+        $viewsThisMonth = (int) \App\Models\UnitView::where('created_at', '>=', $now->copy()->startOfMonth())->count();
+
+        $popularUnits = Unit::orderByDesc('views_total')->take(7)->get(['id', 'custom_id', 'name', 'views_total', 'project_id']);
+
+        $recentUsers = User::where('role', 'user')
+            ->whereNotNull('last_seen')
+            ->orderByDesc('last_seen')
+            ->take(6)
+            ->get(['id', 'name', 'email', 'last_seen', 'country']);
+
+        // Distribución por país (de las reservas con país definido)
+        $byCountry = Reservation::selectRaw('country, COUNT(*) as total')
+            ->whereNotNull('country')->where('country', '!=', '')
+            ->groupBy('country')->orderByDesc('total')->take(7)->get();
+        $byCountryTotal = max(1, $byCountry->sum('total'));
+
+        // Tendencia de registros (últimos 6 meses)
+        $trend = collect(range(5, 0))->map(function ($i) use ($now) {
+            $month = $now->copy()->subMonths($i);
+            return [
+                'label' => $month->translatedFormat('M'),
+                'count' => User::whereBetween('created_at', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])->count(),
+            ];
+        });
+
+        return view('admin.estadisticas', compact(
+            'activeUsers', 'totalUsers', 'newThisMonth',
+            'viewsTotal', 'viewsThisMonth', 'popularUnits',
+            'recentUsers', 'byCountry', 'byCountryTotal', 'trend'
+        ));
+    }
+
     public function transactionsReport()
     {
         $dealsQuery = Deal::with(['unit', 'agent']);
@@ -971,7 +1016,112 @@ class AdminController extends Controller
     }
 
     /* ───── CRM nuevas vistas (sólo UI, sin backend) ───── */
-    public function crmAvanceObra()      { return view('admin.crm.avance_obra'); }
+    public function crmAvanceObra()
+    {
+        $projects = Project::orderByDesc('progress')->get();
+        $activeProject = $projects->firstWhere('stage', 'active')
+            ?? $projects->firstWhere('progress', '>', 0)
+            ?? $projects->first();
+
+        $reports = \App\Models\ConstructionReport::with('project', 'author')
+            ->orderByDesc('published_at')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $latest = $reports->first();
+
+        return view('admin.crm.avance_obra', compact('projects', 'activeProject', 'reports', 'latest'));
+    }
+
+    /**
+     * Publica un nuevo reporte de avance y notifica a los compradores (#5, E-12).
+     */
+    public function storeConstructionReport(Request $request)
+    {
+        $data = $request->validate([
+            'project_id'         => 'nullable|exists:projects,id',
+            'period'             => 'required|string|max:120',
+            'title'              => 'required|string|max:160',
+            'description'        => 'nullable|string|max:2000',
+            'overall_progress'   => 'required|integer|min:0|max:100',
+            'estimated_delivery' => 'nullable|string|max:60',
+            'phases'             => 'nullable|array',
+            'photos.*'           => 'nullable|image|max:8192',
+            'notify'             => 'nullable|boolean',
+        ]);
+
+        $photoPaths = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $photoPaths[] = $photo->store('construction-reports', 'public');
+            }
+        }
+
+        $report = \App\Models\ConstructionReport::create([
+            'project_id'         => $data['project_id'] ?? null,
+            'period'             => $data['period'],
+            'title'              => $data['title'],
+            'description'        => $data['description'] ?? null,
+            'overall_progress'   => $data['overall_progress'],
+            'estimated_delivery' => $data['estimated_delivery'] ?? null,
+            'phases'             => $data['phases'] ?? [],
+            'photos'             => $photoPaths,
+            'created_by'         => Auth::id(),
+            'published_at'       => now(),
+        ]);
+
+        // Sincroniza el progreso global del proyecto
+        if ($report->project_id) {
+            Project::where('id', $report->project_id)->update(['progress' => $report->overall_progress]);
+        }
+
+        $notified = 0;
+        if ($request->boolean('notify', true)) {
+            $notified = $this->notifyConstructionReport($report, \App\Mail\NewReportMail::class);
+            $report->update(['notified_at' => now(), 'notified_count' => $notified]);
+        }
+
+        return back()->with('success', "Reporte publicado." . ($notified ? " Notificados {$notified} compradores." : ''));
+    }
+
+    /**
+     * Reenvía el reporte como "avance mensual" (E-04) a los compradores del proyecto.
+     */
+    public function notifyConstructionReportMonthly(\App\Models\ConstructionReport $report)
+    {
+        $notified = $this->notifyConstructionReport($report, \App\Mail\ConstructionProgressMail::class);
+        $report->update(['notified_at' => now(), 'notified_count' => $notified]);
+
+        return back()->with('success', "Avance mensual enviado a {$notified} compradores.");
+    }
+
+    /**
+     * Envía el mailable indicado a cada comprador activo del proyecto del reporte.
+     * Devuelve la cantidad de correos enviados.
+     */
+    private function notifyConstructionReport(\App\Models\ConstructionReport $report, string $mailable): int
+    {
+        $query = Reservation::with('unit', 'user')->whereNotNull('paid_at');
+        if ($report->project_id) {
+            $query->whereHas('unit', fn ($q) => $q->where('project_id', $report->project_id));
+        }
+
+        $sent = 0;
+        foreach ($query->get() as $reservation) {
+            $to = $reservation->email ?: optional($reservation->user)->email;
+            if (! $to) {
+                continue;
+            }
+            try {
+                \Illuminate\Support\Facades\Mail::to($to)->send(new $mailable($report, $reservation));
+                $sent++;
+            } catch (\Throwable $e) {
+                \Log::warning('No se pudo notificar avance de obra: '.$e->getMessage());
+            }
+        }
+
+        return $sent;
+    }
     public function crmPlantillas(Request $request)
     {
         $tab = $request->get('tab', 'plantillas');
@@ -1635,9 +1785,32 @@ class AdminController extends Controller
                 'paid_at' => now(),
             ]);
 
+            $this->sendPaymentReceipt($payment);
+
             return response()->json(['message' => 'Payment marked as paid successfully', 'payment' => $payment]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error marking payment as paid: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Envía el comprobante de pago por correo al comprador (#11 del briefing).
+     * Silencioso: nunca interrumpe el flujo de confirmación de pago.
+     */
+    private function sendPaymentReceipt(Payment $payment): void
+    {
+        try {
+            $payment->loadMissing('reservation.user');
+            $reservation = $payment->reservation;
+            if (! $reservation) {
+                return;
+            }
+            $to = $reservation->email ?: optional($reservation->user)->email;
+            if ($to) {
+                \Illuminate\Support\Facades\Mail::to($to)->send(new \App\Mail\PaymentReceiptMail($payment));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('No se pudo enviar el comprobante de pago: '.$e->getMessage());
         }
     }
 
@@ -1664,6 +1837,7 @@ class AdminController extends Controller
                     'approved_by' => Auth::id(),
                     'approved_at' => now(),
                 ]);
+                $this->sendPaymentReceipt($payment);
                 return back()->with('success', 'Pago aprobado exitosamente.');
             } else {
                 $payment->update([
@@ -2230,5 +2404,61 @@ class AdminController extends Controller
 
         $flash = $request->boolean('redirect_settings') ? 'settings_success' : 'success';
         return back()->with($flash, 'Perfil actualizado correctamente.');
+    }
+
+    /**
+     * Update another user's profile from the Usuarios (admin.profiles) page.
+     * Mirrors the fields of editProfile() but targets an arbitrary user by id;
+     * the admin can reset the password without knowing the current one.
+     */
+    public function updateUser(Request $request, $userId)
+    {
+        /** @var \App\Models\User $user */
+        $user = User::findOrFail($userId);
+
+        $data = $request->validate([
+            'first_name' => ['nullable', 'string', 'max:80'],
+            'last_name'  => ['nullable', 'string', 'max:80'],
+            'name'       => ['nullable', 'string', 'max:160'],
+            'email'      => ['required', 'email', 'max:160', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone'      => ['nullable', 'string', 'max:30'],
+            'country'    => ['nullable', 'string', 'max:10'],
+            'role'       => ['nullable', 'in:user,admin'],
+            'avatar'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_avatar' => ['nullable', 'boolean'],
+            'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (!empty($data['password'])) {
+            $user->password = $data['password']; // hashed via casts
+        }
+
+        if ($request->boolean('remove_avatar') && $user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->first_name = $data['first_name'] ?? $user->first_name;
+        $user->last_name  = $data['last_name']  ?? $user->last_name;
+        $user->email      = $data['email'];
+        $user->phone      = $data['phone']   ?? $user->phone;
+        $user->country    = $data['country'] ?? $user->country;
+        if (!empty($data['role'])) {
+            $user->role = $data['role'];
+        }
+
+        $composed = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        $user->name = !empty($data['name']) ? $data['name'] : ($composed !== '' ? $composed : $user->name);
+
+        $user->save();
+
+        return back()->with('success', "Usuario {$user->name} actualizado correctamente.");
     }
 }

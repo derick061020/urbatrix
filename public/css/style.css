@@ -588,7 +588,7 @@
       content: "";
       position: absolute;
       left: 0; right: 0; bottom: -1px;
-      height: 22%;
+      height: 6%;
       background: linear-gradient(to top,
         #ffffff 0%,
         rgba(255,255,255,0.92) 35%,
@@ -696,6 +696,21 @@
     }
     .fg-filter-btn:hover { background: #fafafa; border-color: #d4d4d4; }
     .fg-filter-btn .fg-caret { width: 20px; height: 20px; color: #5c5c5c; flex-shrink: 0; }
+    /* Active filter — corporate border + text so it's obvious a filter is set */
+    .fg-filter-btn.is-active {
+      border-color: var(--brand, #5c7c68);
+      color: var(--brand, #5c7c68);
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--brand, #5c7c68) inset;
+    }
+    .fg-filter-btn.is-active:hover { background: #fff; border-color: var(--brand, #5c7c68); }
+    .fg-filter-btn.is-active .fg-caret { color: var(--brand, #5c7c68); }
+    /* Active search box (Unit No.) */
+    .fg-search.is-active {
+      border-color: var(--brand, #5c7c68);
+      box-shadow: 0 0 0 1px var(--brand, #5c7c68) inset;
+    }
+    .fg-search.is-active input { color: var(--brand, #5c7c68); }
     .fg-filter-icon {
       width: 36px; height: 36px;
       display: inline-flex; align-items: center; justify-content: center;
@@ -857,7 +872,7 @@
     
     /* Floating round map-pin button — sits inside container next to toggle */
     .fg-location-button {
-      background: #ffffff;
+      background: transparent;
       border-radius: 100px;
       padding: 4px;
       display: inline-flex;
@@ -886,7 +901,18 @@
       height: 24px;
     }
     .fg-icon-location svg { color: var(--brand, #5c7c68); transition: color 0.6s ease; }
-    .fg-location-btn.active { background: var(--brand, #5c7c68); }
+    .fg-location-btn.active {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%),
+        var(--brand, rgb(92, 124, 104));
+      border: none;
+      box-shadow: var(--brand-toggle-shadow,
+        0 55px 16px 0 rgba(92,124,104,0.01),
+        0 36px 14px 0 rgba(92,124,104,0.05),
+        0 20px 12px 0 rgba(92,124,104,0.16),
+        0 9px 9px  0 rgba(92,124,104,0.27),
+        0 2px 5px  0 rgba(92,124,104,0.31));
+    }
     .fg-location-btn.active .fg-icon-location svg { color: #ffffff; }
     
     .fg-icon-grid,
@@ -1251,6 +1277,7 @@
     .fg-status-badge.pending     { background: #f59e0b; }
     .fg-status-badge.second      { background: #5b8def; }
     .fg-status-badge.sold        { background: #e2534e; }
+    .fg-status-badge.reserved    { background: #dc2626; }
     /* Gold "RESERVE FROM $5000" banner at bottom of image */
     .fg-reserve-banner {
       position: absolute;
@@ -1871,7 +1898,7 @@
       color: #1fc16b;
     }
     .fg-list-actions {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 8px;
       justify-content: flex-end;
@@ -2299,6 +2326,9 @@
       box-shadow: 0 32px 80px rgba(10, 13, 20, 0.35);
       display: flex;
       flex-direction: column;
+      /* Fixed height — modal stays the same size regardless of image/content.
+         The left panel (.mt-left-inner) scrolls internally when content is long. */
+      height: min(760px, calc(100vh - 48px));
       max-height: calc(100vh - 48px);
     }
     .mt-header {
@@ -2993,6 +3023,9 @@
       transition: all 0.15s ease;
     }
     .mt-tab:hover { color: #2b303b; }
+    /* Saved state for the modal "ADD TO LIST" toggle */
+    .mt-tab.is-fav { color: var(--brand, #5c7c68); }
+    .mt-tab.is-fav svg { fill: var(--brand, #5c7c68); stroke: var(--brand, #5c7c68); }
     .mt-tab-middle {
       border-left: 1px solid #eaecf0;
       border-right: 1px solid #eaecf0;
@@ -3108,7 +3141,9 @@
 
     @media (max-width: 900px) {
       .mt-overlay { padding: 12px; }
-      .mt-body { grid-template-columns: 1fr; }
+      /* Stacked layout — let the whole modal scroll instead of forcing a fixed height */
+      .mt-shell { height: auto; max-height: calc(100vh - 24px); }
+      .mt-body { grid-template-columns: 1fr; overflow-y: auto; }
       .mt-left { border-right: none; border-bottom: 1px solid #eaecf0; }
       .mt-right { min-height: 380px; }
       .mt-header { flex-wrap: wrap; }

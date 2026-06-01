@@ -200,6 +200,10 @@
       }
       .search-dropdown mark { background:#fff5cf; color:#171717; padding:0 1px; border-radius:2px; }
 
+      /* Hide scrollbar in sidebar nav (scroll still works) */
+      #crm-sidebar nav { scrollbar-width: none; -ms-overflow-style: none; }
+      #crm-sidebar nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
       /* ============ RESPONSIVE ============ */
       #sidebar-backdrop { display:none; }
 
@@ -269,6 +273,9 @@
         {{-- Nav --}}
         @php $isBroker = Auth::user()->role === 'broker'; @endphp
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
+            <a href="{{ route('admin.estadisticas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'estadisticas' ? 'active' : '' }}">
+                <i class="pi pi-chart-bar"></i> {{ __('Estadísticas') }}
+            </a>
             <a href="{{ route('admin.crm.dashboard') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.dashboard' ? 'active' : '' }}">
                 <i class="pi pi-th-large"></i> {{ __('Dashboard') }}
             </a>
@@ -350,6 +357,9 @@
                 </a>
                 <a href="{{ route('admin.agents') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'agents' ? 'active' : '' }}">
                     <i class="pi pi-briefcase"></i> {{ __('Brokers') }}
+                </a>
+                <a href="{{ route('admin.materials') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'materials' ? 'active' : '' }}">
+                    <i class="pi pi-folder-open"></i> {{ __('Material de Brokers') }}
                 </a>
                 <a href="{{ route('admin.crm.aprobaciones') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.aprobaciones' ? 'active' : '' }}">
                     <i class="pi pi-check-square"></i> {{ __('Aprobaciones') }} @if($aprobacionesCount > 0)<span class="badge-count">{{ $aprobacionesCount }}</span>@endif

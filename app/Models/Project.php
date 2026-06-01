@@ -27,6 +27,11 @@ class Project extends Model
         return $this->hasMany(Task::class);
     }
 
+    public function constructionReports()
+    {
+        return $this->hasMany(ConstructionReport::class)->latest('published_at');
+    }
+
     public function getSoldCountAttribute()
     {
         return $this->units()->where('status', 'SOLD')->count();

@@ -182,7 +182,7 @@
 
         <div class="w-full max-w-[640px] relative">
 
-            {{-- ====== STEP 1 — Datos básicos ====== }}
+            {{-- ====== STEP 1 — Datos básicos ====== --}}
             <div class="reg-step active" data-step="1">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
@@ -217,7 +217,7 @@
                 </div>
             </div>
 
-            {{-- ====== STEP 2 — Documento ====== }}
+            {{-- ====== STEP 2 — Documento ====== --}}
             <div class="reg-step" data-step="2">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
@@ -244,7 +244,7 @@
                     <div class="sm:col-span-2">
                         <label class="field-label">Foto del documento de identidad<span class="field-required">*</span></label>
 
-                        @if(! empty($existingKycDoc))
+                        @if(!empty($existingKycDoc))
                             @php $status = $existingKycDoc['status'] ?? 'pending'; @endphp
                             {{-- Already uploaded during registration — show summary card with option to replace --}}
                             <div id="existing-doc-card" class="flex items-center gap-3 p-4 rounded-xl border border-ink-200 bg-ink-50/50">
@@ -311,7 +311,7 @@
                 </div>
             </div>
 
-            {{-- ====== STEP 3 — Información personal ====== }}
+            {{-- ====== STEP 3 — Información personal ====== --}}
             <div class="reg-step" data-step="3">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
@@ -387,7 +387,7 @@
                     </div>
                 </div>
 
-                {{-- ============ TITULARES SECUNDARIOS ============ }}
+                {{-- ============ TITULARES SECUNDARIOS ============ --}}
                 <div id="coBuyersPanel" class="mt-7" style="display:none;">
                     <div class="h-px bg-ink-200/70 mb-5"></div>
                     <div class="flex items-center justify-between mb-4">

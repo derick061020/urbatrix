@@ -241,11 +241,11 @@
 
           <!-- Tabs -->
           <div class="mt-tabs">
-            <button type="button" class="mt-tab">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              ADD TO LIST
+            <button type="button" class="mt-tab" id="modalAddToListBtn" onclick="toggleModalWishlist()">
+              <svg id="modalAddToListIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span id="modalAddToListLabel">ADD TO LIST</span>
             </button>
-            <button type="button" class="mt-tab mt-tab-middle">
+            <button type="button" class="mt-tab mt-tab-middle" onclick="openDisclaimer()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               DISCLAIMER
             </button>
@@ -416,7 +416,7 @@
     .sh-download-arrow { opacity:.8; }
 
     /* Smaller share tab in modal */
-    .mt-tab.mt-tab-download { color:#5c7c68; }
+    .mt-tab.mt-tab-download { color:#5c7c68;border-left: 1px solid #eaecf0;}
     .mt-tab.mt-tab-download:hover { background:#eef2ef; }
   </style>
 
@@ -483,6 +483,50 @@
       </button>
     </div>
   </div>
+
+  <!-- DISCLAIMER MODAL (reuses the share modal styles) -->
+  <div id="disclaimerModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="Disclaimer" onclick="if(event.target===this)closeDisclaimer()">
+    <div class="sh-shell" style="max-width:560px;">
+      <div class="sh-head">
+        <div>
+          <div class="sh-head-title">Disclaimer / Aviso legal</div>
+          <div class="sh-head-sub">Información importante sobre esta unidad</div>
+        </div>
+        <button type="button" class="sh-close" onclick="closeDisclaimer()" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div style="padding:8px 22px 22px;font-family:'Inter',system-ui,sans-serif;font-size:13px;line-height:1.65;color:#525866;max-height:62vh;overflow-y:auto;">
+        <p style="margin:0 0 12px;">
+          <strong>Información de prueba.</strong> Las imágenes, planos, medidas, precios y disponibilidad
+          mostrados son meramente ilustrativos y pueden variar respecto del producto final.
+        </p>
+        <p style="margin:0 0 12px;">
+          Las áreas internas y externas son aproximadas y están sujetas a verificación en sitio.
+          Los renders y plantas son representaciones artísticas; los acabados, mobiliario y vistas
+          pueden diferir de la unidad construida.
+        </p>
+        <p style="margin:0 0 12px;">
+          Los precios están expresados en USD y no incluyen impuestos, gastos de escrituración,
+          comisiones ni cargos administrativos, salvo indicación expresa. Toda promoción o descuento
+          está sujeto a disponibilidad y a sus términos y condiciones.
+        </p>
+        <p style="margin:0 0 12px;">
+          Esta información no constituye una oferta vinculante ni asesoramiento financiero o de inversión.
+          Cualquier proyección de rentabilidad (ROI) es estimada y no garantiza resultados futuros.
+        </p>
+        <p style="margin:0;">
+          Para datos definitivos, consultá con tu asesor antes de tomar cualquier decisión de compra o reserva.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DISCLAIMER modal — opened from the unit modal "DISCLAIMER" tab.
+    window.openDisclaimer  = function () { document.getElementById('disclaimerModal')?.classList.add('open'); };
+    window.closeDisclaimer = function () { document.getElementById('disclaimerModal')?.classList.remove('open'); };
+  </script>
 
   <script>
     // Returns the canonical shareable URL.
@@ -1359,8 +1403,8 @@
                   @endif
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
-                  <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;white-space:nowrap;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
-                  <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;min-width:max-content;">{{ auth()->check() ? auth()->user()->email : 'samuelurbi@gmail.com' }}</div>
+                  <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
+                  <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->email : 'samuelurbi@gmail.com' }}</div>
                 </div>
                 <div style="position:relative;">
                   <button type="button" class="fg-filter-btn" onclick="toggleCurrencyDropdown()" id="currencyBtn">
@@ -1428,17 +1472,15 @@
                 </div>
               </a>
 
-              <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.profile.edit') : route('dashboard.profile.edit') }}" style="text-decoration:none;display:block;width:100%">
-                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
-                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                  </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
+              <div class="menu-item" onclick="openProfileModal()" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
                 </div>
-              </a>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
+              </div>
 
               <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" style="text-decoration:none;display:block;width:100%">
                 <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
@@ -1626,7 +1668,6 @@
       <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="Naviva Residences">
       <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="Liv Residences">
 
-      <img class="fg-hero-layer fg-hero-clouds" src="/images/hero/clouds.png" alt="" aria-hidden="true">
     </div>
     <div class="fg-hero-spacer" aria-hidden="true"></div>
 
@@ -1821,7 +1862,7 @@
             <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          {{ $units->count() }} Matches
+          Mostrando {{ $units->count() }} de {{ $units->count() }} unidades
         </button>
       </div>
       <!-- Cards Grid -->
@@ -1885,7 +1926,12 @@
 
               <!-- Top row: status badge (left) + ADD TO LIST (right) -->
               <div class="fg-chip-row">
-                @if($isPending)
+                @if($isReserved)
+                  <span class="fg-status-badge reserved">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    RESERVED
+                  </span>
+                @elseif($isPending)
                   <span class="fg-status-badge pending">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     PENDING
@@ -2035,7 +2081,7 @@
             </div>
           </div>
 
-          @if($isHighDem)
+          @if($isHighDem && !$isReserved && !$isPending && !$isSecond)
             <div class="fg-card-status-strip">
               <span class="fg-card-status-dot"></span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2095,7 +2141,7 @@
               <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
-            {{ $units->count() }} Matches
+            Mostrando {{ $units->count() }} de {{ $units->count() }} unidades
           </button>
         </div>
         <table class="fg-list-table" id="fgListTable">
@@ -2489,12 +2535,18 @@
           if (unitPrice) {
             unitPrice.dataset.usd = unit.price || 0;
             unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
+            // Default the modal currency toggle to whatever was picked on the
+            // home (hamburger menu), persisted in localStorage.
+            const selectedCur = localStorage.getItem('selectedCurrency') || 'USD';
             const modalToggle = document.querySelector('#moreInfoModal .mt-currency-toggle');
             if (modalToggle) {
               modalToggle.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-              const usdBtn = modalToggle.querySelector('button[data-cur="USD"]');
-              if (usdBtn) usdBtn.classList.add('active');
+              const curBtn = modalToggle.querySelector(`button[data-cur="${selectedCur}"]`)
+                          || modalToggle.querySelector('button[data-cur="USD"]');
+              if (curBtn) curBtn.classList.add('active');
             }
+            // Render the price in that currency (only if a real price exists).
+            if (unit.price) updateModalCurrencyDisplay(selectedCur);
           }
 
           // Stat boxes — populate from DB; show — when missing
@@ -2518,6 +2570,13 @@
           // Shortlisted count
           const sl = document.getElementById('modalShortlistedCount');
           if (sl) sl.textContent = unit.shortlisted_count || 0;
+
+          // Reflect saved state on the modal "ADD TO LIST" toggle (read from the
+          // matching card heart, which renders the user's current wishlist state).
+          if (typeof setModalAddToListState === 'function') {
+            const favBtn = document.querySelector(`[data-wishlist-toggle][data-unit-id="${unit.id}"]`);
+            setModalAddToListState(favBtn ? favBtn.classList.contains('is-fav') : false, unit.shortlisted_count || 0);
+          }
 
           // Financial rows — hide when no DB value
           const fmtMoney = v => '$' + number_format(v, 0, ',', ',');
@@ -4131,36 +4190,53 @@
       }
     }
 
+    // Mark a filter button as active (corporate border + text) by its label id.
+    function setFilterActive(labelId, active) {
+      const el = document.getElementById(labelId);
+      const btn = el ? el.closest('.fg-filter-btn') : null;
+      if (btn) btn.classList.toggle('is-active', !!active);
+    }
+
     // Update filter labels
     function updatePriceLabel() {
       const label = document.getElementById('priceLabel');
-      if (currentFilters.minPrice || currentFilters.maxPrice) {
+      const active = !!(currentFilters.minPrice || currentFilters.maxPrice);
+      if (active) {
         const min = currentFilters.minPrice ? `$${number_format(currentFilters.minPrice, 0)}` : 'Any';
         const max = currentFilters.maxPrice ? `$${number_format(currentFilters.maxPrice, 0)}` : 'Any';
         label.textContent = `${min} - ${max}`;
       } else {
         label.textContent = 'Price';
       }
+      setFilterActive('priceLabel', active);
     }
 
     function updateTypeLabel() {
       const label = document.getElementById('typeLabel');
-      label.textContent = currentFilters.types.length > 0 ? `Types (${currentFilters.types.length})` : 'Unit Type';
+      const active = currentFilters.types.length > 0;
+      label.textContent = active ? `Types (${currentFilters.types.length})` : 'Unit Type';
+      setFilterActive('typeLabel', active);
     }
 
     function updateDirectionLabel() {
       const label = document.getElementById('directionLabel');
-      label.textContent = currentFilters.directions.length > 0 ? `Directions (${currentFilters.directions.length})` : 'Direction';
+      const active = currentFilters.directions.length > 0;
+      label.textContent = active ? `Directions (${currentFilters.directions.length})` : 'Direction';
+      setFilterActive('directionLabel', active);
     }
 
     function updateOutlookLabel() {
       const label = document.getElementById('outlookLabel');
-      label.textContent = currentFilters.outlooks.length > 0 ? `Outlooks (${currentFilters.outlooks.length})` : 'Outlook';
+      const active = currentFilters.outlooks.length > 0;
+      label.textContent = active ? `Outlooks (${currentFilters.outlooks.length})` : 'Outlook';
+      setFilterActive('outlookLabel', active);
     }
 
     function updateFloorLabel() {
       const label = document.getElementById('floorLabel');
-      label.textContent = currentFilters.floors.length > 0 ? `Floors (${currentFilters.floors.length})` : 'Floor';
+      const active = currentFilters.floors.length > 0;
+      label.textContent = active ? `Floors (${currentFilters.floors.length})` : 'Floor';
+      setFilterActive('floorLabel', active);
     }
 
     function updateSortLabel() {
@@ -4175,6 +4251,8 @@
         'custom_id': 'Unit #'
       };
       label.textContent = sortOptions[currentFilters.sort] || 'Sort';
+      // Default sort (Unit #) is not considered an active filter
+      setFilterActive('sortLabel', !!currentFilters.sort && currentFilters.sort !== 'custom_id');
     }
 
     // Animate a card/row in or out. Uses CSS keyframes (.is-fading-in /
@@ -4217,6 +4295,8 @@
       const unitNumberInput = document.querySelector('input[placeholder="Unit No."]');
       if (unitNumberInput) {
         currentFilters.unitNumber = (unitNumberInput.value || '').trim();
+        const searchBox = unitNumberInput.closest('.fg-search');
+        if (searchBox) searchBox.classList.toggle('is-active', currentFilters.unitNumber.length > 0);
       }
 
       const f = currentFilters;
@@ -4480,7 +4560,10 @@
         pill.dataset.lastCount = String(newCount);
       }
     }
-    // Update match count — the green "N Matches" pill in the grid filter bar.
+    // Total public units rendered on the page (denominator for the pill text).
+    const TOTAL_UNITS = {{ $units->count() }};
+    // Update match count — the pill in the grid filter bar now reads
+    // "Mostrando X de Y unidades" (X = visible/matched, Y = total).
     function updateMatchCount(count) {
       const pill = document.querySelector('.fg-filter-bar .fg-pill-matches');
       if (!pill) return;
@@ -4489,10 +4572,10 @@
           <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
         </svg>
-        ${count} Matches`;
+        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
       pulseMatchPill(pill, count);
     }
-    // The list view also has its own "N Matches" pill in the toolbar.
+    // The list view also has its own pill in the toolbar.
     function updateListMatchCount(count) {
       const pill = document.querySelector('#fgListWrap .fg-pill-matches');
       if (!pill) return;
@@ -4501,7 +4584,7 @@
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
-        ${count} Matches`;
+        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
       pulseMatchPill(pill, count);
     }
 
@@ -4612,10 +4695,76 @@
         closeMenu();
         closeProjects();
         closeProfileMenu();
+        if (typeof closeDisclaimer === 'function') closeDisclaimer();
         // Close all filter dropdowns
         document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
       }
     });
+
+    // ============================
+    // WISHLIST — shared UI sync between cards, the unit modal and the header
+    // ============================
+    // Reflect saved/unsaved state on the modal "ADD TO LIST" toggle.
+    function setModalAddToListState(wishlisted, unitCount) {
+      const btn = document.getElementById('modalAddToListBtn');
+      if (btn) {
+        btn.classList.toggle('is-fav', !!wishlisted);
+        btn.setAttribute('aria-pressed', wishlisted ? 'true' : 'false');
+        const icon = document.getElementById('modalAddToListIcon');
+        if (icon) icon.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
+        const lbl = document.getElementById('modalAddToListLabel');
+        if (lbl) lbl.textContent = wishlisted ? 'SAVED' : 'ADD TO LIST';
+      }
+      if (typeof unitCount !== 'undefined') {
+        const sl = document.getElementById('modalShortlistedCount');
+        if (sl) sl.textContent = unitCount;
+      }
+    }
+
+    // Sync every piece of wishlist UI for a unit: card hearts + counts, the
+    // header "Guardados (N)" counter, and the modal toggle if that unit is open.
+    function syncWishlistUI(unitId, wishlisted, unitCount, total) {
+      document.querySelectorAll(`[data-wishlist-toggle][data-unit-id="${unitId}"]`).forEach(b => {
+        b.classList.toggle('is-fav', !!wishlisted);
+        b.setAttribute('aria-pressed', wishlisted ? 'true' : 'false');
+        const svg = b.querySelector('svg');
+        if (svg) svg.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
+        const label = b.querySelector('.label');
+        if (label) label.textContent = wishlisted ? 'Saved' : 'Add to list';
+      });
+      if (typeof unitCount !== 'undefined') {
+        document.querySelectorAll(`[data-unit-count="${unitId}"]`).forEach(el => el.textContent = unitCount);
+      }
+      if (typeof total !== 'undefined') {
+        const headerCnt = document.querySelector('[data-saved-count]');
+        if (headerCnt) headerCnt.textContent = `Guardados (${total})`;
+      }
+      if (typeof currentOpenUnit !== 'undefined' && String(currentOpenUnit) === String(unitId)) {
+        setModalAddToListState(!!wishlisted, unitCount);
+      }
+    }
+
+    // Toggle wishlist for the unit currently open in the modal.
+    window.toggleModalWishlist = function () {
+      if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) return;
+      const unitId = currentOpenUnit;
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      const btn = document.getElementById('modalAddToListBtn');
+      const wasFav = btn ? btn.classList.contains('is-fav') : false;
+      // Optimistic flip
+      setModalAddToListState(!wasFav);
+      fetch(`/api/wishlist/toggle/${unitId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+        credentials: 'same-origin',
+      }).then(r => r.ok ? r.json() : Promise.reject(r))
+        .then(data => {
+          if (data && data.success) syncWishlistUI(unitId, data.wishlisted, data.unit_count, data.total);
+        }).catch(err => {
+          setModalAddToListState(wasFav);
+          if (err && err.status === 401) window.location.href = '/login';
+        });
+    };
 
     // ============================
     // WISHLIST TOGGLE — hearts on cards persist to the DB for logged-in users
@@ -4666,6 +4815,10 @@
               if (cnt && typeof data.unit_count !== 'undefined') cnt.textContent = data.unit_count;
               const headerCnt = document.querySelector('[data-saved-count]');
               if (headerCnt && typeof data.total !== 'undefined') headerCnt.textContent = `Guardados (${data.total})`;
+              // Keep the modal toggle in sync if this unit happens to be open
+              if (typeof currentOpenUnit !== 'undefined' && String(currentOpenUnit) === String(unitId)) {
+                setModalAddToListState(!!data.wishlisted, data.unit_count);
+              }
             }
           }).catch(err => {
             // Revert optimistic UI
@@ -4820,6 +4973,7 @@
   </script>
 
 @include('partials.logout-modal')
+@include('partials.profile-modal')
 </body>
 
 </html>

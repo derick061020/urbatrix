@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'first_name', 'last_name', 'email', 'password', 'role', 'last_seen', 'google_id', 'avatar', 'phone', 'country', 'verification_status', 'kyc_id_document'])]
+#[Fillable(['name', 'first_name', 'last_name', 'email', 'password', 'role', 'last_seen', 'google_id', 'apple_id', 'avatar', 'phone', 'country', 'verification_status', 'kyc_id_document'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -19,7 +19,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'first_name', 'last_name', 'email', 'password', 'role',
-        'last_seen', 'google_id', 'avatar',
+        'last_seen', 'google_id', 'apple_id', 'avatar',
         'phone', 'country', 'verification_status', 'kyc_id_document',
     ];
 
@@ -64,6 +64,9 @@ class User extends Authenticatable
 
     public function postAuthRedirectPath(): string
     {
+        if ($this->role === 'broker') {
+            return '/broker';
+        }
         return $this->hasActiveReservation() ? '/dashboard' : '/';
     }
 

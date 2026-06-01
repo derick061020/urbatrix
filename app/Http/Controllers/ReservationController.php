@@ -78,7 +78,10 @@ class ReservationController extends Controller
         $phone  = $validated['phone']      ?? $user?->phone      ?? '';
         $country= $validated['country']    ?? $user?->country    ?? '';
 
-        // Create reservation
+        // Create reservation in "pending_payment" — the unit is NOT held yet.
+        // It only becomes RESERVED after the $5,000 reservation fee is paid
+        // (see confirmPayment). This gives the user time to pay without
+        // blocking the unit for others on an unpaid intent.
         $reservation = Reservation::create([
             'first_name' => $first,
             'last_name'  => $last,
@@ -89,28 +92,234 @@ class ReservationController extends Controller
             'unit_name'  => $unit->custom_id ?? $unit->name,
             'unit_price' => $unit->price,
             'reservation_code' => $reservationCode,
-            'status'     => 'pending',
-            'expires_at' => Carbon::now()->addMinutes(10),
+            'status'     => 'pending_payment',
+            'reservation_fee' => (float) config('services.stripe.reservation_fee', 5000),
+            'expires_at' => Carbon::now()->addMinutes(30),
             'user_id'    => $userId,
         ]);
 
-        // Place the unit on a 48h hold tied to this reservation
-        $unit->update([
-            'status' => 'RESERVED',
-            'reserved_until' => Carbon::now()->addHours(48),
-            'reserved_by_reservation_id' => $reservation->id,
-        ]);
-
-        // Store reservation in session for the form page
+        // Store reservation in session for the checkout page
         session(['reservation' => $reservation]);
 
-        // Return JSON response instead of redirect
+        // Return JSON response instead of redirect — go to checkout (payment) first
         return response()->json([
             'success' => true,
             'message' => 'Reservation created successfully',
             'reservation_code' => $reservation->reservation_code,
-            'redirect_to' => '/form'
+            'redirect_to' => '/checkout'
         ]);
+    }
+
+    /**
+     * Resolve the pending-payment reservation for the current session/user.
+     * Always returns the persisted DB row (not the session snapshot) so we can
+     * safely mutate payment state. Returns null when missing/expired/foreign.
+     */
+    private function currentReservation()
+    {
+        $data = session('reservation');
+        if (!$data) return null;
+
+        $id = is_array($data) ? ($data['id'] ?? null) : ($data->id ?? null);
+        $code = is_array($data) ? ($data['reservation_code'] ?? null) : ($data->reservation_code ?? null);
+
+        $query = Reservation::query();
+        if ($id) {
+            $query->where('id', $id);
+        } elseif ($code) {
+            $query->where('reservation_code', $code);
+        } else {
+            return null;
+        }
+
+        $reservation = $query->first();
+        if (!$reservation) return null;
+
+        // Only the owner may operate on it
+        if (Auth::check() && $reservation->user_id && $reservation->user_id !== Auth::id()) {
+            return null;
+        }
+        return $reservation;
+    }
+
+    /**
+     * Show the checkout (payment) page — collects the $5,000 reservation fee
+     * via Stripe before the unit is held. Mirrors showForm()'s session guard.
+     */
+    public function showCheckout()
+    {
+        $reservation = $this->currentReservation();
+
+        if (!$reservation) {
+            return redirect('/')->with('error', 'No reservation found. Please start a new reservation.');
+        }
+        if ($reservation->isExpired() && $reservation->status === 'pending_payment') {
+            return redirect('/')->with('error', 'Reservation expired. Please start a new reservation.');
+        }
+        // If it was already paid, skip straight to the KYC form
+        if ($reservation->paid_at) {
+            return redirect('/form');
+        }
+
+        $unit = Unit::find($reservation->unit_id);
+        $stripeKey = config('services.stripe.key');
+
+        return view('checkout', compact('reservation', 'unit', 'stripeKey'));
+    }
+
+    /**
+     * Create (or reuse) a Stripe PaymentIntent for the reservation fee.
+     * Re-checks unit availability before charging.
+     */
+    public function createPaymentIntent(Request $request)
+    {
+        $reservation = $this->currentReservation();
+        if (!$reservation || $reservation->status !== 'pending_payment') {
+            return response()->json(['success' => false, 'message' => 'Reserva no encontrada o ya procesada.'], 422);
+        }
+
+        $secret = config('services.stripe.secret');
+        if (empty($secret)) {
+            return response()->json(['success' => false, 'message' => 'Stripe no está configurado. Falta STRIPE_SECRET.'], 500);
+        }
+
+        // Make sure the unit is still grabbable (not held by someone else / sold)
+        Unit::releaseExpiredHolds();
+        $unit = Unit::find($reservation->unit_id);
+        if (!$unit) {
+            return response()->json(['success' => false, 'message' => 'La unidad ya no está disponible.'], 409);
+        }
+        if (in_array(strtoupper($unit->status), ['RESERVED', 'SOLD']) && $unit->isOnHold()) {
+            $mine = $unit->reserved_by_reservation_id == $reservation->id;
+            if (!$mine) {
+                return response()->json(['success' => false, 'message' => 'Esta unidad acaba de ser reservada por otra persona.'], 409);
+            }
+        }
+
+        try {
+            \Stripe\Stripe::setApiKey($secret);
+
+            $amount = (int) round(((float) ($reservation->reservation_fee ?: config('services.stripe.reservation_fee', 5000))) * 100);
+
+            $intent = \Stripe\PaymentIntent::create([
+                'amount'   => $amount,
+                'currency' => 'usd',
+                'description' => 'Reserva '.$reservation->reservation_code.' · Unidad '.$reservation->unit_name,
+                'metadata' => [
+                    'reservation_id'   => $reservation->id,
+                    'reservation_code' => $reservation->reservation_code,
+                    'unit_id'          => $reservation->unit_id,
+                ],
+                'automatic_payment_methods' => ['enabled' => true, 'allow_redirects' => 'never'],
+            ]);
+
+            $reservation->update(['stripe_payment_intent' => $intent->id]);
+
+            return response()->json([
+                'success'       => true,
+                'client_secret' => $intent->client_secret,
+                'amount'        => $amount,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Stripe PaymentIntent error: '.$e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se pudo iniciar el pago. Intenta de nuevo.'], 500);
+        }
+    }
+
+    /**
+     * Confirm the payment server-side and ONLY THEN hold the unit.
+     * Trusts Stripe's PaymentIntent.status, never the client.
+     */
+    public function confirmPayment(Request $request)
+    {
+        $reservation = $this->currentReservation();
+        if (!$reservation) {
+            return response()->json(['success' => false, 'message' => 'Reserva no encontrada.'], 422);
+        }
+
+        // Idempotent: already paid → just succeed
+        if ($reservation->paid_at) {
+            return response()->json([
+                'success' => true,
+                'reservation_code' => $reservation->reservation_code,
+                'redirect_to' => '/form',
+            ]);
+        }
+
+        $secret = config('services.stripe.secret');
+        if (empty($secret)) {
+            return response()->json(['success' => false, 'message' => 'Stripe no está configurado.'], 500);
+        }
+
+        $intentId = $request->input('payment_intent_id') ?: $reservation->stripe_payment_intent;
+        if (!$intentId) {
+            return response()->json(['success' => false, 'message' => 'Falta el identificador de pago.'], 422);
+        }
+
+        try {
+            \Stripe\Stripe::setApiKey($secret);
+            $intent = \Stripe\PaymentIntent::retrieve($intentId);
+
+            if (!$intent || $intent->status !== 'succeeded') {
+                return response()->json(['success' => false, 'message' => 'El pago no se completó.'], 402);
+            }
+            // Guard: the intent must belong to this reservation
+            if (($intent->metadata->reservation_id ?? null) != $reservation->id) {
+                return response()->json(['success' => false, 'message' => 'El pago no corresponde a esta reserva.'], 422);
+            }
+
+            // Mark reservation paid and ready for KYC. Keep 'pending' so the
+            // existing form update() flow can auto-confirm it afterwards.
+            $reservation->update([
+                'paid_at'               => now(),
+                'status'                => 'pending',
+                'stripe_payment_intent' => $intent->id,
+                'expires_at'            => Carbon::now()->addHours(48),
+            ]);
+
+            // Record the reservation fee in the payments ledger
+            try {
+                $payment = \App\Models\Payment::create([
+                    'reservation_id' => $reservation->id,
+                    'payment_type'   => 'initial',
+                    'label'          => 'Reserva (seña) — '.$reservation->reservation_code,
+                    'amount'         => (float) ($reservation->reservation_fee ?: config('services.stripe.reservation_fee', 5000)),
+                    'due_date'       => now()->toDateString(),
+                    'status'         => 'paid',
+                    'paid_at'        => now(),
+                    'payment_method' => 'card',
+                    'notes'          => 'Stripe PaymentIntent '.$intent->id,
+                ]);
+
+                // Comprobante de pago por correo (#11 del briefing)
+                if ($to = ($reservation->email ?: optional($reservation->user)->email)) {
+                    \Illuminate\Support\Facades\Mail::to($to)->send(new \App\Mail\PaymentReceiptMail($payment));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Could not record/notify reservation payment: '.$e->getMessage());
+            }
+
+            // NOW hold the unit — 48h, tied to this reservation
+            $unit = Unit::find($reservation->unit_id);
+            if ($unit) {
+                $unit->update([
+                    'status'                     => 'RESERVED',
+                    'reserved_until'             => Carbon::now()->addHours(48),
+                    'reserved_by_reservation_id' => $reservation->id,
+                ]);
+            }
+
+            session(['reservation' => $reservation]);
+
+            return response()->json([
+                'success'          => true,
+                'reservation_code' => $reservation->reservation_code,
+                'redirect_to'      => '/form',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Stripe confirm error: '.$e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se pudo verificar el pago.'], 500);
+        }
     }
 
     /**

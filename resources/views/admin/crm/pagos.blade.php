@@ -110,6 +110,7 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
+                    <a href="{{ route('reservations.wire', $reservation) }}" target="_blank" class="border border-[#667b6a] text-[#667b6a] rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#667b6a]/10">Datos transferencia</a>
                     <a href="/dashboard?reservation={{ $reservation->id }}" class="bg-[#667b6a] text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#5a6d5e]">Ver Expediente</a>
                 </div>
             </div>
@@ -271,6 +272,11 @@
                                     
                                     <!-- Action Buttons -->
                                     <div class="flex gap-2">
+                                        @if($isPaid && $existingPayment)
+                                            <a href="{{ route('payments.receipt', $existingPayment) }}" target="_blank" class="bg-[#667b6a] text-white px-3 py-1 rounded text-sm hover:bg-[#5a6d5e]">
+                                                Comprobante
+                                            </a>
+                                        @endif
                                         @if(!$isPaid)
                                             <button onclick="markAsPaid({{ $existingPayment->id ?? 0 }}, '{{ $paymentItem['type'] }}', '{{ $paymentItem['installment_number'] ?? '' }}', {{ $paymentItem['amount'] }}, '{{ $paymentItem['due_date'] }}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                                                 Marcar Pagado

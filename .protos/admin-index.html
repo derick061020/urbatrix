@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duna CRM — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>
+    // Runs inline before any ES module — no caching concerns.
+    // Processes #role=admin/route or #role=broker/route links from the briefing.
+    (function () {
+      var raw = location.hash.replace('#', '').trim();
+      if (raw.indexOf('role=') === 0) {
+        var rest  = raw.slice('role='.length);
+        var slash = rest.indexOf('/');
+        var role  = slash >= 0 ? rest.slice(0, slash) : rest;
+        var route = slash >= 0 ? rest.slice(slash + 1) : '';
+        var valid = ['admin','broker','comprador','agente','agente-senior'];
+        if (valid.indexOf(role) >= 0) {
+          localStorage.setItem('duna_role', role);
+          location.hash = route;
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">D</div>
+        <span class="logo-name">Duna</span>
+      </div>
+      <div class="logo-sub">CRM · Administrador</div>
+    </div>
+
+    <!-- Nav (rendered dynamically por app.js según rol) -->
+    <nav id="sidebar-nav"></nav>
+
+    <!-- User (rendered dinámicamente) -->
+    <div class="sidebar-user" id="sidebar-user"></div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <div class="main">
+
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <div class="header-title" id="header-title">Dashboard</div>
+        <div class="header-breadcrumb" id="header-breadcrumb">Vista global · todos los proyectos</div>
+      </div>
+      <div class="header-search">
+        <span class="search-ico">⌕</span>
+        <input type="text" placeholder="Buscar cliente, expediente, unidad…" id="global-search">
+      </div>
+      <div class="header-actions">
+        <div class="hdr-btn" id="notif-btn" title="Notificaciones">
+          🔔<span class="notif-dot" id="notif-dot"></span>
+        </div>
+        <div class="hdr-btn" title="Fecha" id="header-date" style="width:auto;padding:0 10px;font-size:10px;color:var(--sub);"></div>
+        <div class="hdr-avatar" title="Admin Duna">A</div>
+      </div>
+    </header>
+
+    <!-- Content (vistas renderizadas aquí) -->
+    <div class="content" id="content">
+      <!-- Las vistas se inyectan aquí por el router -->
+    </div>
+
+  </div><!-- /main -->
+
+</div><!-- /app -->
+
+<!-- Notifications panel -->
+<div id="notif-panel"></div>
+
+<!-- Dev role switcher (solo prototipo) -->
+<div id="dev-switcher"></div>
+
+<!-- Modal overlay global -->
+<div id="modal-overlay" style="display:none"></div>
+
+<script src="js/data.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

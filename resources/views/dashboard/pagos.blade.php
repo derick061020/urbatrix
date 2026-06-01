@@ -28,9 +28,15 @@
     @if(session('success'))<div class="px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
 
     {{-- Sub header --}}
-    <div class="px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200">
-        <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
-        <div class="text-[12px] text-ink-500">Makai Residences · Cap Cana, Punta Cana</div>
+    <div class="px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200 flex items-center gap-3">
+        <div class="min-w-0">
+            <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
+            <div class="text-[12px] text-ink-500">Makai Residences · Cap Cana, Punta Cana</div>
+        </div>
+        <a href="{{ route('reservations.wire', $reservation) }}" target="_blank"
+           class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
+            <i class="pi pi-building-columns text-[12px]"></i> {{ __('Datos para transferencia') }}
+        </a>
     </div>
 
     {{-- KPIs --}}
@@ -235,9 +241,11 @@
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
+                            <a href="{{ route('payments.receipt', $p) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</a>
                             @if($p->receipt_path)
-                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Descargar') }}</a>
-                            @else — @endif
+                                <span class="text-ink-300 mx-1">·</span>
+                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-ink-600 hover:underline">{{ __('Adjunto') }}</a>
+                            @endif
                         </td>
                     </tr>
                 @empty

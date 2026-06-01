@@ -60,9 +60,21 @@ class DashboardController extends Controller
     public function progress(Request $request)
     {
         $reservation = $this->resolveReservation($request);
+        $projectId = optional(optional($reservation)->unit)->project_id;
+
+        $reportsQuery = \App\Models\ConstructionReport::published()->with('project');
+        if ($projectId) {
+            $reportsQuery->where(function ($q) use ($projectId) {
+                $q->where('project_id', $projectId)->orWhereNull('project_id');
+            });
+        }
+        $reports = $reportsQuery->orderByDesc('published_at')->get();
+
         return view('dashboard.obra', [
             'activeRoute' => 'progress',
             'reservation' => $reservation,
+            'report'      => $reports->first(),
+            'reports'     => $reports,
         ]);
     }
 

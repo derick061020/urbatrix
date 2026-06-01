@@ -14,6 +14,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\PaymentDocumentController;
+use App\Http\Controllers\BrokerController;
+use App\Http\Controllers\Admin\MaterialController;
 
 // Auth routes
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -35,6 +38,11 @@ Route::post('/forgot-password/reset',   [AuthController::class, 'forgotPasswordR
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
+// Apple OAuth routes. Apple posts the callback back (response_mode=form_post)
+// when name/email scopes are requested, so the callback accepts GET and POST.
+Route::get('/auth/apple', [\App\Http\Controllers\Auth\AppleController::class, 'redirect'])->name('auth.apple');
+Route::match(['get', 'post'], '/auth/apple/callback', [\App\Http\Controllers\Auth\AppleController::class, 'callback'])->name('auth.apple.callback');
+
 // Google Calendar refresh-token helper (one-time setup)
 Route::get('/admin/google-calendar/connect',  [\App\Http\Controllers\Admin\GoogleCalendarConnectController::class, 'connect']);
 Route::get('/admin/google-calendar/callback', [\App\Http\Controllers\Admin\GoogleCalendarConnectController::class, 'callback']);
@@ -50,6 +58,14 @@ Route::get('/form', [ReservationController::class, 'showForm']);
 Route::post('/reservations/update', [ReservationController::class, 'update']);
 Route::post('/reservations/confirm', [ReservationController::class, 'confirm']);
 Route::get('/api/reservations/{code}', [ReservationController::class, 'getByCode']);
+
+// Checkout (Stripe) — the $5,000 reservation fee is paid here BEFORE the unit
+// is held. Requires an authenticated buyer with a pending reservation.
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', [ReservationController::class, 'showCheckout']);
+    Route::post('/checkout/payment-intent', [ReservationController::class, 'createPaymentIntent']);
+    Route::post('/checkout/confirm', [ReservationController::class, 'confirmPayment']);
+});
 
 // Dashboard route (protected)
 Route::middleware(['auth'])->group(function () {
@@ -123,6 +139,20 @@ Route::middleware(['auth'])->group(function () {
     // Videollamadas (Google Meet)
     Route::get('/api/meetings/availability', [MeetingController::class, 'availability'])->name('meetings.availability');
     Route::post('/meetings', [MeetingController::class, 'store'])->name('meetings.store');
+
+    // Documentos imprimibles (comprobante de pago / datos de transferencia)
+    // Acceso: admin o el comprador dueño de la reserva (validado en el controlador).
+    Route::get('/payments/{payment}/receipt', [PaymentDocumentController::class, 'receipt'])->name('payments.receipt');
+    Route::get('/reservations/{reservation}/wire-instructions', [PaymentDocumentController::class, 'wireInstructions'])->name('reservations.wire');
+});
+
+// ── Portal Broker (login propio, rol broker) ──────────────────────────────
+Route::prefix('broker')->middleware(['broker'])->group(function () {
+    Route::get('/',            [BrokerController::class, 'index'])->name('broker.home');
+    Route::get('/comisiones',  [BrokerController::class, 'comisiones'])->name('broker.comisiones');
+    Route::get('/contrato',    [BrokerController::class, 'contrato'])->name('broker.contrato');
+    Route::get('/material',    [BrokerController::class, 'material'])->name('broker.material');
+    Route::get('/materiales/{material}/download', [BrokerController::class, 'download'])->name('broker.materials.download');
 });
 
 // Active users routes
@@ -164,6 +194,14 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     
     Route::get('/transactions-report', [AdminController::class, 'transactionsReport'])->name('admin.transactions-report');
     Route::get('/profiles', [AdminController::class, 'profiles'])->name('admin.profiles');
+    Route::get('/estadisticas', [AdminController::class, 'estadisticas'])->name('admin.estadisticas');
+
+    // Gestión de materiales del broker (#16)
+    Route::get('/materials',                       [MaterialController::class, 'index'])->name('admin.materials');
+    Route::post('/materials',                      [MaterialController::class, 'store'])->name('admin.materials.store');
+    Route::put('/materials/{material}',            [MaterialController::class, 'update'])->name('admin.materials.update');
+    Route::post('/materials/{material}/toggle',    [MaterialController::class, 'toggleVisible'])->name('admin.materials.toggle');
+    Route::delete('/materials/{material}',         [MaterialController::class, 'destroy'])->name('admin.materials.destroy');
 
     Route::get('/agents', [AdminController::class, 'agents'])->name('admin.agents');
     Route::post('/agents', [AdminController::class, 'storeAgent'])->name('admin.agents.store');
@@ -207,6 +245,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // CRM nuevas páginas (sin backend, sólo vista)
     Route::get('/crm/avance-obra',  [AdminController::class, 'crmAvanceObra'])->name('admin.crm.avance-obra');
+    Route::post('/crm/avance-obra', [AdminController::class, 'storeConstructionReport'])->name('admin.crm.avance-obra.store');
+    Route::post('/crm/avance-obra/{report}/notify-monthly', [AdminController::class, 'notifyConstructionReportMonthly'])->name('admin.crm.avance-obra.notify');
     Route::get('/crm/plantillas',   [AdminController::class, 'crmPlantillas'])->name('admin.crm.plantillas');
     Route::get('/crm/anuncios',     [AdminController::class, 'crmAnuncios'])->name('admin.crm.anuncios');
     Route::get('/crm/proyectos/{id}', [AdminController::class, 'crmProyectoDetalle'])->name('admin.crm.proyecto.detalle');
@@ -214,6 +254,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // KYC verification (approve/reject user registration docs)
     Route::post('/users/{userId}/verify-kyc', [AdminController::class, 'verifyUserKyc'])->name('admin.users.verify-kyc');
+
+    // Edit a user's profile from the Usuarios page
+    Route::post('/users/{userId}', [AdminController::class, 'updateUser'])->name('admin.users.update');
 
     // CRM acciones desde modales
     Route::post('/crm/reservation/create', [AdminController::class, 'createReservationQuick'])->name('admin.crm.reservation.create');

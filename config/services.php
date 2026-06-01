@@ -18,6 +18,12 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    'stripe' => [
+        'key'             => env('STRIPE_KEY'),
+        'secret'          => env('STRIPE_SECRET'),
+        'reservation_fee' => env('STRIPE_RESERVATION_FEE', 5000),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],
@@ -42,6 +48,20 @@ return [
         'calendar_refresh_token' => env('GOOGLE_CALENDAR_REFRESH_TOKEN'),
         'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
         'calendar_timezone' => env('GOOGLE_CALENDAR_TIMEZONE'),
+    ],
+
+    // Sign in with Apple. The `client_secret` is a short-lived JWT that we
+    // generate at runtime from the .p8 private key (see AppleController), so
+    // here we only need the raw credentials issued in the Apple Developer
+    // portal. `client_id` is the Services ID identifier (e.g. com.makai.web).
+    'apple' => [
+        'client_id'     => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'), // optional: pre-generated JWT
+        'redirect'      => env('APPLE_REDIRECT_URI'),
+        'team_id'       => env('APPLE_TEAM_ID'),
+        'key_id'        => env('APPLE_KEY_ID'),
+        'private_key'   => env('APPLE_PRIVATE_KEY'),       // raw .p8 contents
+        'private_key_path' => env('APPLE_PRIVATE_KEY_PATH'), // or a path to the .p8 file
     ],
 
 ];

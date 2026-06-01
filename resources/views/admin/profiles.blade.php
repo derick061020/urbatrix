@@ -198,9 +198,41 @@
                             <td><span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }}">{{ $estado[0] }}</span></td>
                             <td class="text-[12px] text-ink-500">{{ $u->created_at?->diffForHumans() }}</td>
                             <td class="text-right whitespace-nowrap">
-                                @if($r)
-                                    <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
-                                @endif
+                                <div class="inline-flex items-center gap-3">
+                                    <button type="button"
+                                            onclick="openActivity(this)"
+                                            data-name="{{ $fullName }}"
+                                            data-init="{{ $init ?: 'U' }}"
+                                            data-bg="{{ $bg }}"
+                                            data-email="{{ $u->email }}"
+                                            data-lastseen="{{ $u->last_seen ? \Carbon\Carbon::parse($u->last_seen)->diffForHumans() : 'Nunca' }}"
+                                            data-joined="{{ $u->created_at?->format('d/m/Y') }}"
+                                            data-estado="{{ $estado[0] }}"
+                                            data-unit="{{ $r ? ($r->unit->name ?? $r->unit->custom_id ?? '—') : 'Sin unidad' }}"
+                                            data-progress="{{ $pct }}"
+                                            data-phone="{{ $u->phone ?: '—' }}"
+                                            data-country="{{ $u->country ?: '—' }}"
+                                            data-res="{{ $userReservations->count() }}"
+                                            class="inline-flex items-center gap-1 text-[12px] text-ink-600 font-semibold hover:text-brand">
+                                        <i class="pi pi-chart-line text-[11px]"></i> Actividad
+                                    </button>
+                                    <button type="button"
+                                            onclick="openEditUser(this)"
+                                            data-id="{{ $u->id }}"
+                                            data-first="{{ $u->first_name }}"
+                                            data-last="{{ $u->last_name }}"
+                                            data-name="{{ $u->name }}"
+                                            data-email="{{ $u->email }}"
+                                            data-phone="{{ $u->phone }}"
+                                            data-country="{{ $u->country }}"
+                                            data-role="{{ $u->role }}"
+                                            class="inline-flex items-center gap-1 text-[12px] text-ink-600 font-semibold hover:text-brand">
+                                        <i class="pi pi-pencil text-[11px]"></i> Editar
+                                    </button>
+                                    @if($r)
+                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -212,6 +244,201 @@
         <div class="px-4 py-3 border-t border-ink-100">{{ $users->withQueryString()->links() }}</div>
     </div>
 </div>
+
+{{-- ====== Modal: Editar usuario ====== --}}
+<dialog id="modal-editar-usuario" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
+    <form id="form-editar-usuario" method="POST" action="" class="w-[560px] max-w-[95vw] bg-white rounded-2xl overflow-hidden">
+        @csrf
+        <input type="hidden" name="edited_user_id" id="eu-id">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-user-edit"></i></div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">Editar usuario</div>
+            <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+            @if($errors->any())
+                <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px]">
+                    <div class="flex items-center gap-2 mb-1 font-semibold"><i class="pi pi-exclamation-circle"></i> Revisa los datos:</div>
+                    <ul class="list-disc pl-5">
+                        @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Nombre</label>
+                    <input type="text" name="first_name" id="eu-first" class="crm-input pl-3 mt-1" placeholder="Nombre">
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Apellido</label>
+                    <input type="text" name="last_name" id="eu-last" class="crm-input pl-3 mt-1" placeholder="Apellido">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="text-[12px] font-semibold text-ink-700">Nombre para mostrar <span class="text-ink-400 font-normal">(opcional)</span></label>
+                    <input type="text" name="name" id="eu-name" class="crm-input pl-3 mt-1" placeholder="Nombre completo">
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Correo electrónico</label>
+                    <input type="email" name="email" id="eu-email" required class="crm-input pl-3 mt-1" placeholder="usuario@correo.com">
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+                    <input type="text" name="phone" id="eu-phone" class="crm-input pl-3 mt-1" placeholder="+57 300 000 0000">
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">País</label>
+                    <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="Colombia">
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Rol</label>
+                    <select name="role" id="eu-role" class="crm-input pl-3 mt-1">
+                        <option value="user">Usuario</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="border-t border-ink-100 pt-4">
+                <div class="text-[13px] font-semibold text-ink-900 mb-1">Restablecer contraseña</div>
+                <div class="text-[11px] text-ink-500 mb-3">Déjalo en blanco para no cambiarla.</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Nueva contraseña</label>
+                        <input type="password" name="password" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="Mín. 8 caracteres">
+                    </div>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Confirmar</label>
+                        <input type="password" name="password_confirmation" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="Repite la contraseña">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+        </div>
+    </form>
+</dialog>
+
+@push('scripts')
+<script>
+    const EU_BASE = "{{ url('admin/users') }}";
+    function openEditUser(btn) {
+        const f = document.getElementById('form-editar-usuario');
+        const d = btn.dataset;
+        f.action = EU_BASE + '/' + d.id;
+        document.getElementById('eu-id').value      = d.id || '';
+        document.getElementById('eu-first').value   = d.first || '';
+        document.getElementById('eu-last').value    = d.last || '';
+        document.getElementById('eu-name').value    = d.name || '';
+        document.getElementById('eu-email').value   = d.email || '';
+        document.getElementById('eu-phone').value   = d.phone || '';
+        document.getElementById('eu-country').value = d.country || '';
+        document.getElementById('eu-role').value    = d.role || 'user';
+        f.querySelector('input[name=password]').value = '';
+        f.querySelector('input[name=password_confirmation]').value = '';
+        document.getElementById('modal-editar-usuario').showModal();
+    }
+
+    function openActivity(btn) {
+        const d = btn.dataset;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        const av = document.getElementById('act-avatar');
+        av.textContent = d.init || 'U'; av.style.background = d.bg || '#5c7c68';
+        set('act-name', d.name || '—');
+        set('act-email', d.email || '—');
+        set('act-lastseen', d.lastseen || '—');
+        set('act-joined', d.joined || '—');
+        set('act-estado', d.estado || '—');
+        set('act-unit', d.unit || '—');
+        set('act-phone', d.phone || '—');
+        set('act-country', d.country || '—');
+        set('act-res', d.res || '0');
+        const bar = document.getElementById('act-progress-bar');
+        const pct = parseInt(d.progress || '0', 10);
+        bar.style.width = pct + '%';
+        set('act-progress-val', pct + '%');
+        document.getElementById('modal-actividad').showModal();
+    }
+
+    @if($errors->any() && old('edited_user_id'))
+    document.addEventListener('DOMContentLoaded', function () {
+        const f = document.getElementById('form-editar-usuario');
+        f.action = EU_BASE + '/' + @json(old('edited_user_id'));
+        document.getElementById('eu-id').value      = @json(old('edited_user_id'));
+        document.getElementById('eu-first').value   = @json(old('first_name'));
+        document.getElementById('eu-last').value    = @json(old('last_name'));
+        document.getElementById('eu-name').value    = @json(old('name'));
+        document.getElementById('eu-email').value   = @json(old('email'));
+        document.getElementById('eu-phone').value   = @json(old('phone'));
+        document.getElementById('eu-country').value = @json(old('country'));
+        document.getElementById('eu-role').value    = @json(old('role', 'user'));
+        document.getElementById('modal-editar-usuario').showModal();
+    });
+    @endif
+</script>
+@endpush
+
+{{-- ====== Modal: Actividad del usuario ====== --}}
+<dialog id="modal-actividad" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto w-[480px] max-w-[94vw]">
+    <div class="bg-white rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div id="act-avatar" class="crm-avatar" style="background:#5c7c68"></div>
+            <div class="flex-1 min-w-0">
+                <div id="act-name" class="text-[15px] font-bold text-ink-900 truncate">—</div>
+                <div id="act-email" class="text-[12px] text-ink-500 truncate">—</div>
+            </div>
+            <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-ink-50 border border-ink-100">
+                    <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1">Último acceso</div>
+                    <div id="act-lastseen" class="text-[13px] font-semibold text-ink-900">—</div>
+                </div>
+                <div class="p-3 rounded-xl bg-ink-50 border border-ink-100">
+                    <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-1">Miembro desde</div>
+                    <div id="act-joined" class="text-[13px] font-semibold text-ink-900">—</div>
+                </div>
+            </div>
+
+            <div class="divide-y divide-ink-100 rounded-xl border border-ink-100">
+                <div class="px-4 py-2.5 flex items-center justify-between">
+                    <span class="text-[12px] text-ink-500">Estado</span>
+                    <span id="act-estado" class="text-[13px] font-semibold text-ink-900">—</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between">
+                    <span class="text-[12px] text-ink-500">Unidad</span>
+                    <span id="act-unit" class="text-[13px] font-semibold text-ink-900">—</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between">
+                    <span class="text-[12px] text-ink-500">Reservas</span>
+                    <span id="act-res" class="text-[13px] font-semibold text-ink-900">0</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between">
+                    <span class="text-[12px] text-ink-500">Teléfono</span>
+                    <span id="act-phone" class="text-[13px] font-semibold text-ink-900">—</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between">
+                    <span class="text-[12px] text-ink-500">País</span>
+                    <span id="act-country" class="text-[13px] font-semibold text-ink-900">—</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between text-[12px] mb-1.5">
+                    <span class="text-ink-500">Progreso de documentación (KYC)</span>
+                    <span id="act-progress-val" class="font-semibold text-ink-700">0%</span>
+                </div>
+                <div class="crm-progress"><span id="act-progress-bar" class="bg-brand" style="width:0%"></span></div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex justify-end">
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cerrar</button>
+        </div>
+    </div>
+</dialog>
 
 @php $units = \App\Models\Unit::orderBy('custom_id')->get(['id','custom_id','name','price']); @endphp
 @include('admin.crm._partials.modal_nueva_reserva', ['units' => $units])

@@ -57,12 +57,17 @@ class Reservation extends Model
         'unit_price',
         'reservation_code',
         'status',
+        'paid_at',
+        'stripe_payment_intent',
+        'reservation_fee',
         'expires_at',
         'user_id',
     ];
 
     protected $casts = [
         'unit_price' => 'decimal:2',
+        'reservation_fee' => 'decimal:2',
+        'paid_at' => 'datetime',
         'expires_at' => 'datetime',
         'budget_sent_at' => 'datetime',
         'budget_observations' => 'array',
