@@ -55,11 +55,14 @@
        =========================================================== */
     .sv-scope .fg-units-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 16px;
         align-items: start;
     }
     @media (max-width: 1280px) {
+        .sv-scope .fg-units-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 1024px) {
         .sv-scope .fg-units-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 700px) {
@@ -77,6 +80,7 @@
         max-width: 316px;
         margin-inline: auto;
         background: #ffffff;
+        border: 1px solid #eaecf0;
         border-radius: 28px;
         overflow: hidden;
         isolation: isolate;
@@ -434,6 +438,12 @@
     }
 
     /* Status variants */
+    .sv-scope .fg-card.is-high-demand,
+    .sv-scope .fg-card.is-pending,
+    .sv-scope .fg-card.is-second-chance,
+    .sv-scope .fg-card.is-reserved {
+        border-color: transparent;
+    }
     .sv-scope .fg-card.is-high-demand {
         --status-color: #fa7319;
         box-shadow: 0 0 0 3px #ffe6d5, 0 1px 2px rgba(10,13,20,0.03);
