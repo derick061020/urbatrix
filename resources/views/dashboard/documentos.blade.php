@@ -91,8 +91,8 @@
         <div class="px-5 py-3 flex items-center gap-3 bg-ink-50/60 border-b border-ink-100">
             <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-id-card"></i></div>
             <div class="flex-1">
-                <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos de identidad') }}</div>
-                <div class="text-[11px] text-ink-500">{{ __('Tus archivos KYC entregados al expediente') }}</div>
+                <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos') }}</div>
+                <div class="text-[11px] text-ink-500">{{ __('Tus documetos usados en tu compra') }}</div>
             </div>
             <span class="text-[11px] text-ink-500">{{ trans_choice('{0} :count archivos|{1} :count archivo|[2,*] :count archivos', $kycDocs->count(), ['count' => $kycDocs->count()]) }}</span>
         </div>
