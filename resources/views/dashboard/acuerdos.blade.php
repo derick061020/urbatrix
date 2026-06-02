@@ -76,6 +76,31 @@
     }
 
     $breakdown = $reservation ? \App\Helpers\PaymentPlanHelper::calculatePaymentBreakdown($reservation) : null;
+
+    /* ---- Contratos y planes firmados/aprobados (movido desde Documentos) ---- */
+    $userId = auth()->id();
+    $reservationDocs = $reservation ? $reservation->documents : collect();
+    $userDocs = \App\Models\Document::whereNull('reservation_id')
+        ->where(function($q) use ($userId) {
+            $q->where('metadata->user_id', $userId)
+              ->orWhere('metadata->source', 'register');
+        })
+        ->get();
+    $signedDocs = $reservationDocs->merge($userDocs)->unique('id')->filter(function($d) {
+        return in_array($d->status, ['signed', 'approved', 'completed'])
+            && in_array($d->document_type, ['payment_plan', 'purchase_promise', 'contract']);
+    })->sortByDesc('signed_at');
+
+    $signedTypeLabel = [
+        'payment_plan'     => __('Plan de pagos'),
+        'purchase_promise' => __('Promesa de compraventa'),
+        'contract'         => __('Contrato'),
+    ];
+    $signedStatusPill = [
+        'signed'    => [__('FIRMADO'),    'ok'],
+        'approved'  => [__('APROBADO'),   'ok'],
+        'completed' => [__('COMPLETADO'), 'ok'],
+    ];
 @endphp
 
 @push('styles')
@@ -239,6 +264,62 @@
         <div class="cli-card p-10 text-center">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-folder-open text-[22px]"></i></div>
             <div class="mt-3 text-[15px] font-bold text-ink-950">{{ __('No tienes acuerdos por revisar') }}</div>
+        </div>
+    @endif
+
+    {{-- ============ Contratos y planes firmados ============ --}}
+    @if($signedDocs->isNotEmpty())
+        <div class="cli-card overflow-hidden">
+            <div class="px-5 py-3 flex items-center gap-3 bg-ok-soft/60 border-b border-ok/20">
+                <div class="w-8 h-8 rounded-full bg-ok-soft border border-ok/30 flex items-center justify-center text-ok-dark"><i class="pi pi-check-circle"></i></div>
+                <div class="flex-1">
+                    <div class="text-[14px] font-bold text-ink-950">{{ __('Contratos y planes firmados') }}</div>
+                    <div class="text-[11px] text-ink-500">{{ __('Documentos finalizados de tu expediente') }}</div>
+                </div>
+                <span class="text-[11px] text-ink-500">{{ trans_choice('{0} :count archivos|{1} :count archivo|[2,*] :count archivos', $signedDocs->count(), ['count' => $signedDocs->count()]) }}</span>
+            </div>
+
+            <table class="w-full">
+                <thead class="bg-white">
+                    <tr>
+                        <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Documento') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Firmado') }}</th>
+                        <th class="text-right px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Acciones') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-ink-100">
+                    @foreach($signedDocs as $d)
+                        @php
+                            $st = $signedStatusPill[$d->status] ?? [__('COMPLETADO'),'ok'];
+                            $when = $d->signed_at ?? $d->updated_at ?? $d->created_at;
+                        @endphp
+                        <tr class="hover:bg-ink-50">
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-10 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
+                                    <div>
+                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->title ?? ($signedTypeLabel[$d->document_type] ?? __('Documento')) }}</div>
+                                        <div class="text-[11px] text-ink-500">{{ $signedTypeLabel[$d->document_type] ?? $d->document_type }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-4"><span class="cli-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
+                            <td class="px-3 py-4 text-[12px] text-ink-700">{{ $when ? \Carbon\Carbon::parse($when)->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMM YYYY' : 'MMM D, YYYY') : '—' }}</td>
+                            <td class="px-3 py-4 text-right">
+                                <div class="flex items-center gap-2 justify-end">
+                                    @if($d->file_path)
+                                        <a href="{{ route('documents.preview', $d->id) }}" target="_blank" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</a>
+                                        <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
+                                    @else
+                                        <span class="text-[11px] text-ink-400">{{ __('Sin archivo') }}</span>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     @endif
 </div>
