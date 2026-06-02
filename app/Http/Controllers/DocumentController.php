@@ -286,7 +286,9 @@ class DocumentController extends Controller
         $this->authorizeAccess($document);
 
         // Gate: the purchase_promise (and any later contract) can only be signed AFTER
-        // the payment plan is signed AND the client explicitly accepted the contract.
+        // the payment plan is signed. The contract additionally requires an explicit
+        // acceptance step; the purchase_promise does NOT — for the promise the signature
+        // itself implies acceptance, so it is signed directly.
         if (in_array($document->document_type, ['purchase_promise', 'contract'])) {
             $reservation = $document->reservation;
             $planDoc = $reservation?->documents->firstWhere('document_type', 'payment_plan');
@@ -296,7 +298,7 @@ class DocumentController extends Controller
                     'message' => 'Primero tenés que firmar el plan de pagos.',
                 ], 400);
             }
-            if (empty(data_get($document->metadata, 'accepted_at'))) {
+            if ($document->document_type === 'contract' && empty(data_get($document->metadata, 'accepted_at'))) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Aceptá el contrato antes de firmarlo.',

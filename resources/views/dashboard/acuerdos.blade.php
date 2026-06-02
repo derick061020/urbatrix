@@ -497,6 +497,7 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     $isBudget   = ($d['document_type'] ?? '') === 'budget';
     $isPayment  = ($d['document_type'] ?? '') === 'payment_plan';
     $isContract = in_array($d['document_type'] ?? '', ['purchase_promise','contract']);
+    $isPromise  = ($d['document_type'] ?? '') === 'purchase_promise';
 
     /* Observations source */
     if ($isBudget) {
@@ -543,9 +544,11 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     elseif ($awaitingAdmin) $statusLabel = 'Pendiente de respuesta del asesor';
     else $statusLabel = 'Pendiente de tu respuesta';
 
-    /* Can-accept / can-sign / can-observe */
-    $canAccept  = !$accepted && !$signed && ($isBudget || $isContract);
-    $canSign    = !$signed && ($isPayment || ($isContract && $accepted));
+    /* Can-accept / can-sign / can-observe
+       La promesa de compraventa se firma directamente: la firma implica la aceptación,
+       por lo que no tiene paso previo de "Aceptar". */
+    $canAccept  = !$accepted && !$signed && ($isBudget || ($isContract && !$isPromise));
+    $canSign    = !$signed && ($isPayment || $isPromise || ($isContract && $accepted));
     $canObserve = !$accepted && !$signed;
 
     /* Sign block reason (when sign disabled) */
@@ -554,7 +557,7 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
         $planDoc = $reservation?->documents->firstWhere('document_type', 'payment_plan');
         if (!$planDoc || !in_array($planDoc->status, ['signed','approved'])) {
             $signBlocked = 'Primero tenés que firmar el plan de pagos. Una vez firmado, podrás continuar con este contrato.';
-        } elseif (!$accepted) {
+        } elseif (!$isPromise && !$accepted) {
             $signBlocked = 'Aceptá el contrato antes de firmarlo (botón "Aceptar contrato" en Revisar).';
         }
     }
