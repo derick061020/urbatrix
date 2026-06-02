@@ -220,7 +220,7 @@
     .sv-scope .fg-reserve-banner {
         position: absolute;
         left: 0; right: 0; bottom: 0;
-        padding: 10px;
+        padding: 3px;
         background: rgba(205, 150, 0, 0.12);
         backdrop-filter: blur(2px);
         -webkit-backdrop-filter: blur(2px);
