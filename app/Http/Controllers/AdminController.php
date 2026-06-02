@@ -2093,112 +2093,8 @@ class AdminController extends Controller
         // No status gate: generation works at any stage (draft / sent / approved / signed
         // edits to the plan). The data needed lives on the reservation.
         try {
-            // Template path
-            $templatePath = storage_path('app/templates/plan_de_pagos.docx');
-            
-            if (!file_exists($templatePath)) {
-                return back()->with('error', 'Template file not found: ' . $templatePath);
-            }
-
-            // Create TemplateProcessor
-            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
-
-            // Calculate payment breakdown using helper
-            $breakdown = \App\Helpers\PaymentPlanHelper::calculatePaymentBreakdown($reservation);
-            $totalPrice = $breakdown['total_sin_legales'];
-
-            // Generate installment dates and data
-            $cuotas = [];
-            if ($breakdown['cantidad_cuotas'] > 0) {
-                $fechaInicio = new \DateTime();
-
-                for ($i = 1; $i <= $breakdown['cantidad_cuotas']; $i++) {
-                    $fecha = clone $fechaInicio;
-                    $fecha->add(new \DateInterval('P' . $i . 'M'));
-
-                    $cuotas[] = [
-                        'numero' => $i,
-                        'fecha' => $fecha->format('d/m/Y'),
-                        'monto' => number_format($breakdown['cuota'], 2, '.', ','),
-                        'estado' => 'Pendiente'
-                    ];
-                }
-
-                // Clone rows for installments table
-                try {
-                    $templateProcessor->cloneRow('cuota_numero#1', $breakdown['cantidad_cuotas']);
-
-                    foreach ($cuotas as $index => $cuotaData) {
-                        $num = $index + 1;
-                        $templateProcessor->setValue("cuota_numero#1#$num", "Cuota " . $cuotaData['numero']);
-                        $templateProcessor->setValue("cuota_monto#1#$num", '$'.$cuotaData['monto']);
-                    }
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning('Could not clone installment rows: ' . $e->getMessage());
-                }
-            }
-
-            // Prepare replacements
-            $replacements = [
-                '${unit}' => $reservation->unit_name ?? $reservation->unit->name ?? 'Unit ' . $reservation->unit_id,
-                '${reserva}' => number_format($totalPrice, 2, '.', ','),
-                '${pago_inicial}' => number_format($breakdown['pago_inicial'], 2, '.', ','),
-                '${pago_inicial_porcentaje}' => $breakdown['porcentaje_inicial'] . '%',
-                '${pago_en_construccion}' => number_format($breakdown['pago_construccion'], 2, '.', ','),
-                '${pago_en_construccion_porcentaje}' => $breakdown['porcentaje_construccion'] . '%',
-                '${pago_en_entrega}' => number_format($breakdown['pago_entrega'], 2, '.', ','),
-                '${pago_en_entrega_porcentaje}' => $breakdown['porcentaje_entrega'] . '%',
-                '${cantidad_cuotas}' => $breakdown['cantidad_cuotas'],
-                '${cuota}' => number_format($breakdown['cuota'], 2, '.', ','),
-                '${pago_inicial_cuotas}' => number_format($breakdown['pago_inicial'] + $breakdown['pago_construccion'], 2, '.', ','),
-                '${costos_legales}' => number_format($breakdown['costos_legales'], 2, '.', ','),
-                '${cliente_nombre}' => $reservation->first_name . ' ' . $reservation->last_name,
-                '${cliente_dni}' => $reservation->document_number,
-                '${cliente_email}' => $reservation->email,
-                '${cliente_telefono}' => $reservation->phone,
-                '${cliente_direccion}' => $reservation->address,
-                '${codigo_reserva}' => $reservation->reservation_code,
-                '${fecha_actual}' => date('d/m/Y'),
-                '${plan_seleccionado}' => $reservation->payment_method,
-            ];
-
-            // Replace all variables
-            foreach ($replacements as $search => $replace) {
-                $templateProcessor->setValue($search, $replace);
-            }
-
-            // Ensure documents directory exists
-            $documentsDir = storage_path('app/public/documents');
-            if (!is_dir($documentsDir)) {
-                mkdir($documentsDir, 0755, true);
-            }
-            
-            // Save the document
-            $fileName = 'plan_de_pagos_' . $reservation->reservation_code . '.docx';
-            $filePath = 'documents/' . $fileName;
-            $templateProcessor->saveAs(storage_path('app/public/' . $filePath));
-            
-            // Create or update document record
-            $document = \App\Services\DocumentService::getDocumentByType($reservation, 'payment_plan');
-            if ($document) {
-                $document->update([
-                    'file_path' => $filePath,
-                    'filename' => $fileName,
-                    'status' => 'generated',
-                    'generated_at' => now(),
-                ]);
-            } else {
-                \App\Services\DocumentService::createDocument(
-                    $reservation,
-                    'payment_plan',
-                    'Plan de Pagos - ' . $reservation->reservation_code,
-                    $filePath,
-                    $fileName
-                )->markAsGenerated();
-            }
-            
-            return response()->download(storage_path('app/public/' . $filePath));
-
+            // Render the printable HTML view (open in browser → "Descargar PDF")
+            return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'payment_plan');
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar el plan de pagos: ' . $e->getMessage());
         }
@@ -2211,61 +2107,8 @@ class AdminController extends Controller
     {
         // Same as generatePaymentPlan: no status gate. Generation always works.
         try {
-            // Template path — fall back to the misspelled filename if the canonical one is missing
-            $templatePath = storage_path('app/templates/promesa_compraventa.docx');
-            if (! file_exists($templatePath)) {
-                $alt = storage_path('app/templates/promesa_compravente.docx');
-                if (file_exists($alt)) {
-                    $templatePath = $alt;
-                } else {
-                    return back()->with('error', 'Template file not found: ' . $templatePath);
-                }
-            }
-
-            // Create TemplateProcessor
-            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
-
-            // Use the same replacement set as the contract — the promise template shares
-            // the buyer/unit placeholders (${nombre_del_comprador}, ${tipo_de comprador_es},
-            // ${identificacion_de comprador}, etc., some of which contain a literal space).
-            $replacements = $this->getContractReplacements($reservation);
-
-            foreach ($replacements as $search => $replace) {
-                $templateProcessor->setValue($search, $replace);
-            }
-
-            // Ensure documents directory exists
-            $documentsDir = storage_path('app/public/documents');
-            if (!is_dir($documentsDir)) {
-                mkdir($documentsDir, 0755, true);
-            }
-
-            // Save the document
-            $fileName = 'promesa_compraventa_' . $reservation->reservation_code . '.docx';
-            $filePath = 'documents/' . $fileName;
-            $templateProcessor->saveAs(storage_path('app/public/' . $filePath));
-
-            // Create or update document record
-            $document = \App\Services\DocumentService::getDocumentByType($reservation, 'purchase_promise');
-            if ($document) {
-                $document->update([
-                    'file_path' => $filePath,
-                    'filename' => $fileName,
-                    'status' => 'generated',
-                    'generated_at' => now(),
-                ]);
-            } else {
-                \App\Services\DocumentService::createDocument(
-                    $reservation,
-                    'purchase_promise',
-                    'Promesa de Compraventa - ' . $reservation->reservation_code,
-                    $filePath,
-                    $fileName
-                )->markAsGenerated();
-            }
-
-            return response()->download(storage_path('app/public/' . $filePath));
-
+            // Render the printable HTML view (open in browser → "Descargar PDF")
+            return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'purchase_promise');
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar la promesa de compraventa: ' . $e->getMessage());
         }

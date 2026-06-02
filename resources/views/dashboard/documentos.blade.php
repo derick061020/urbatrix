@@ -244,7 +244,7 @@
         frame.removeAttribute('src');
         image.removeAttribute('src');
 
-        if (['pdf', 'doc', 'docx'].includes(extension)) {
+        if (['pdf', 'doc', 'docx', 'html'].includes(extension)) {
             frame.src = payload.url;
             frame.classList.remove('hidden');
         } else if (imageTypes.includes(extension)) {

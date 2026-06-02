@@ -30,6 +30,12 @@ class DocumentController extends Controller
             \App\Support\ActivityLogger::log(auth()->id(), 'document_download', 'Descargó '.($document->filename ?: 'un documento'), $document);
         }
 
+        // Los documentos HTML imprimibles (plan de pagos / promesa) se sirven inline:
+        // el navegador los renderiza y el botón "Descargar PDF" usa window.print().
+        if (strtolower(pathinfo($absolute, PATHINFO_EXTENSION)) === 'html') {
+            return Response::file($absolute, ['Content-Type' => 'text/html; charset=UTF-8']);
+        }
+
         return Response::download($absolute, $document->filename ?: basename($absolute));
     }
 
