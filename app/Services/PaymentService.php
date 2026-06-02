@@ -85,8 +85,10 @@ class PaymentService
             ];
         }
         
-        // Create all payments
+        // Create all payments. approval_status stays null until the client
+        // submits a receipt — otherwise every installment would show "en revisión".
         foreach ($payments as $paymentData) {
+            $paymentData['approval_status'] = null;
             $reservation->payments()->create($paymentData);
         }
         
