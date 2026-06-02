@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Unit;
 use App\Models\UnitImage;
 use App\Models\Agent;
+use App\Models\BrokerDocument;
 use App\Models\Deal;
 use App\Models\Reservation;
 use App\Models\Document;
@@ -297,11 +298,15 @@ class AdminController extends Controller
     public function agents()
     {
         $brokers = User::where('role', 'broker')
-            ->with('assignedUnits:id,custom_id,name,price,status')
+            ->with(['assignedUnits:id,custom_id,name,price,status', 'brokerDocuments'])
             ->orderBy('created_at', 'desc')
             ->get();
         $units = Unit::orderBy('custom_id')->get(['id', 'custom_id', 'name', 'status']);
-        return view('admin.agents', compact('brokers', 'units'));
+
+        // Tasa de comisión por broker (vive en el Agent vinculado por email)
+        $rates = Agent::whereIn('email', $brokers->pluck('email'))->pluck('commission_rate', 'email');
+
+        return view('admin.agents', compact('brokers', 'units', 'rates'));
     }
 
     public function storeAgent(Request $request)
@@ -347,11 +352,13 @@ class AdminController extends Controller
             'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($broker->id)],
             'phone'    => 'nullable|string|max:30',
             'active'   => 'nullable|boolean',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
             'unit_ids' => 'nullable|array',
             'unit_ids.*' => 'integer|exists:units,id',
         ]);
 
         $parts = preg_split('/\s+/', trim($data['name']), 2);
+        $oldEmail = $broker->email;
 
         $broker->update([
             'name'       => $data['name'],
@@ -364,6 +371,22 @@ class AdminController extends Controller
 
         if ($request->has('unit_ids')) {
             $broker->assignedUnits()->sync($data['unit_ids'] ?? []);
+        }
+
+        // Tasa de comisión: vive en el Agent vinculado por email.
+        if ($request->filled('commission_rate')) {
+            $agent = Agent::where('email', $oldEmail)->orWhere('email', $data['email'])->first();
+            if ($agent) {
+                $agent->update(['email' => $data['email'], 'name' => $data['name'], 'commission_rate' => $data['commission_rate']]);
+            } else {
+                Agent::create([
+                    'name'            => $data['name'],
+                    'email'           => $data['email'],
+                    'phone'           => $data['phone'] ?? null,
+                    'commission_rate' => $data['commission_rate'],
+                    'active'          => true,
+                ]);
+            }
         }
 
         return redirect()->route('admin.agents')
@@ -390,6 +413,48 @@ class AdminController extends Controller
 
         return redirect()->route('admin.agents')
             ->with('success', "Unidades asignadas a {$broker->name}.");
+    }
+
+    public function storeBrokerDocument(Request $request, $agent)
+    {
+        $broker = User::where('role', 'broker')->findOrFail($agent);
+
+        $data = $request->validate([
+            'title'    => 'required|string|max:160',
+            'category' => 'nullable|string|max:40',
+            'file'     => 'required|file|max:51200', // 50 MB
+        ]);
+
+        $file = $request->file('file');
+        $bytes = $file->getSize();
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $i = $bytes > 0 ? min((int) floor(log($bytes, 1024)), count($units) - 1) : 0;
+
+        $broker->brokerDocuments()->create([
+            'title'      => $data['title'],
+            'category'   => $data['category'] ?: 'Contrato',
+            'format'     => strtoupper($file->getClientOriginalExtension()),
+            'file_path'  => $file->store('broker-documents', 'public'),
+            'file_size'  => round($bytes / (1024 ** $i), 1) . ' ' . $units[$i],
+            'created_by' => Auth::id(),
+        ]);
+
+        return redirect()->route('admin.agents')
+            ->with('success', "Documento agregado a {$broker->name}.");
+    }
+
+    public function destroyBrokerDocument($agent, $document)
+    {
+        $broker = User::where('role', 'broker')->findOrFail($agent);
+        $doc = $broker->brokerDocuments()->findOrFail($document);
+
+        if ($doc->file_path) {
+            Storage::disk('public')->delete($doc->file_path);
+        }
+        $doc->delete();
+
+        return redirect()->route('admin.agents')
+            ->with('success', 'Documento eliminado.');
     }
 
     public function deals()

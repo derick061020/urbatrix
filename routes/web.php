@@ -153,6 +153,7 @@ Route::prefix('broker')->middleware(['broker'])->group(function () {
     Route::get('/contrato',    [BrokerController::class, 'contrato'])->name('broker.contrato');
     Route::get('/material',    [BrokerController::class, 'material'])->name('broker.material');
     Route::get('/materiales/{material}/download', [BrokerController::class, 'download'])->name('broker.materials.download');
+    Route::get('/documentos/{document}/download', [BrokerController::class, 'downloadDocument'])->name('broker.documents.download');
 });
 
 // Active users routes
@@ -209,6 +210,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::put('/agents/{agent}', [AdminController::class, 'updateAgent'])->name('admin.agents.update');
     Route::delete('/agents/{agent}', [AdminController::class, 'deleteAgent'])->name('admin.agents.delete');
     Route::post('/agents/{agent}/units', [AdminController::class, 'assignBrokerUnits'])->name('admin.agents.units');
+
+    // Contratos / documentos por broker
+    Route::post('/agents/{agent}/documents',               [AdminController::class, 'storeBrokerDocument'])->name('admin.agents.documents.store');
+    Route::delete('/agents/{agent}/documents/{document}',  [AdminController::class, 'destroyBrokerDocument'])->name('admin.agents.documents.destroy');
 
     Route::get('/communication', [AdminController::class, 'communication'])->name('admin.communication');
     Route::get('/communication/conversation/{id}', [AdminController::class, 'communicationConversation'])->name('admin.communication.conversation');

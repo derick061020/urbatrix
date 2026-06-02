@@ -30,15 +30,16 @@
     </div>
 
     {{-- Tabs --}}
-    <div x-data="{ tab: '{{ $contractDocs->count() ? 'documentos' : 'terminos' }}' }">
+    @php $totalDocs = $brokerDocs->count() + $contractDocs->count(); @endphp
+    <div x-data="{ tab: '{{ $totalDocs ? 'documentos' : 'terminos' }}' }">
         <div class="flex items-center gap-1 border-b border-ink-200">
             @foreach(['terminos'=>'Términos','documentos'=>'Documentos','ejecutivo'=>'Tu ejecutivo'] as $key=>$label)
                 <button @click="tab='{{ $key }}'"
                     :class="tab==='{{ $key }}' ? 'text-brand border-brand' : 'text-ink-500 border-transparent'"
                     class="px-4 py-2.5 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
                     {{ $label }}
-                    @if($key==='documentos' && $contractDocs->where('category','Anexo')->count())
-                        <span class="brk-pill bg-warn-soft text-warn-dark ml-1">{{ $contractDocs->count() }}</span>
+                    @if($key==='documentos' && $totalDocs)
+                        <span class="brk-pill bg-warn-soft text-warn-dark ml-1">{{ $totalDocs }}</span>
                     @endif
                 </button>
             @endforeach
@@ -55,22 +56,47 @@
         </div>
 
         {{-- Documentos --}}
-        <div x-show="tab==='documentos'" class="brk-card mt-4 overflow-hidden" style="display:none">
-            <div class="divide-y divide-ink-100">
-                @forelse($contractDocs as $doc)
-                    <div class="px-5 py-3.5 flex items-center gap-3">
-                        <span class="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi {{ $doc->icon }}"></i></span>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-[13px] font-semibold text-ink-950 truncate">{{ $doc->title }}</div>
-                            <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
-                        </div>
-                        @if($doc->downloadUrl())
-                            <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> Descargar</a>
-                        @endif
+        <div x-show="tab==='documentos'" class="mt-4 space-y-4" style="display:none">
+            @if($brokerDocs->count())
+                <div class="brk-card overflow-hidden">
+                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">Tus contratos</div>
+                    <div class="divide-y divide-ink-100">
+                        @foreach($brokerDocs as $doc)
+                            <div class="px-5 py-3.5 flex items-center gap-3">
+                                <span class="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi {{ $doc->icon }}"></i></span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-[13px] font-semibold text-ink-950 truncate">{{ $doc->title }}</div>
+                                    <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
+                                </div>
+                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> Descargar</a>
+                            </div>
+                        @endforeach
                     </div>
-                @empty
-                    <div class="px-5 py-10 text-center text-[12px] text-ink-400">No hay documentos de contrato disponibles. Duna los publicará aquí cuando estén listos.</div>
-                @endforelse
+                </div>
+            @endif
+
+            <div class="brk-card overflow-hidden">
+                @if($brokerDocs->count())
+                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">Documentos generales</div>
+                @endif
+                <div class="divide-y divide-ink-100">
+                    @forelse($contractDocs as $doc)
+                        <div class="px-5 py-3.5 flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi {{ $doc->icon }}"></i></span>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[13px] font-semibold text-ink-950 truncate">{{ $doc->title }}</div>
+                                <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
+                            </div>
+                            @if($doc->downloadUrl())
+                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> Descargar</a>
+                            @endif
+                        </div>
+                    @empty
+                        @if(! $brokerDocs->count())
+                            <div class="px-5 py-10 text-center text-[12px] text-ink-400">No hay documentos de contrato disponibles. Duna los publicará aquí cuando estén listos.</div>
+                        @endif
+                    @endforelse
+                </div>
             </div>
         </div>
 

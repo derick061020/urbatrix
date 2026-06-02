@@ -47,6 +47,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Unit::class, 'broker_unit')->withTimestamps();
     }
 
+    public function brokerDocuments()
+    {
+        return $this->hasMany(BrokerDocument::class)->latest();
+    }
+
     public function reservations()
     {
         return $this->hasMany(Reservation::class);

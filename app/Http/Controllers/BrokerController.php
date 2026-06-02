@@ -6,6 +6,7 @@ use App\Models\Agent;
 use App\Models\BrokerMaterial;
 use App\Models\Deal;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class BrokerController extends Controller
@@ -108,11 +109,18 @@ class BrokerController extends Controller
             ['Tasa de comisión',    $rate.'% sobre el valor de cada cierre'],
         ];
 
-        // Documentos de contrato disponibles (materiales categoría "Contrato"/"Legal")
+        // Documentos generales de contrato (materiales categoría "Contrato"/"Legal")
         $contractDocs = BrokerMaterial::visible()
             ->whereIn('category', ['Contrato', 'Legal', 'Anexo'])
             ->orderBy('sort_order')
             ->get();
+
+        // Contratos propios subidos por el admin a este broker
+        $user = Auth::user();
+        $brokerUser = $user->role === 'broker'
+            ? $user
+            : User::where('email', $agent?->email)->where('role', 'broker')->first();
+        $brokerDocs = $brokerUser ? $brokerUser->brokerDocuments : collect();
 
         return view('broker.contrato', [
             'activeRoute'  => 'contrato',
@@ -120,6 +128,7 @@ class BrokerController extends Controller
             'rate'         => $rate,
             'terms'        => $terms,
             'contractDocs' => $contractDocs,
+            'brokerDocs'   => $brokerDocs,
             'previewAdmin' => $this->previewAdmin(),
         ]);
     }
@@ -157,5 +166,24 @@ class BrokerController extends Controller
         $material->increment('downloads');
 
         return \Storage::disk('public')->download($material->file_path, $material->title . '.' . strtolower($material->format));
+    }
+
+    /**
+     * Descarga de un documento/contrato propio del broker. Lo puede bajar
+     * el admin o el broker dueño del documento.
+     */
+    public function downloadDocument(\App\Models\BrokerDocument $document)
+    {
+        $user = Auth::user();
+        abort_unless($user->is_admin || $document->user_id === $user->id, 403);
+
+        abort_unless($document->file_path && \Storage::disk('public')->exists($document->file_path), 404);
+
+        $document->increment('downloads');
+
+        return \Storage::disk('public')->download(
+            $document->file_path,
+            $document->title . '.' . strtolower($document->format)
+        );
     }
 }

@@ -88,6 +88,7 @@
                                 default    => ['ACTIVO','ok'],
                             };
                             $assignedIds = $b->assignedUnits->pluck('id')->all();
+                            $rate = (float) ($rates[$b->email] ?? 0);
                         @endphp
                         <tr>
                             <td><input type="checkbox" class="w-4 h-4 accent-brand"></td>
@@ -118,9 +119,9 @@
                             <td class="text-[12px] text-ink-500">{{ $b->created_at?->diffForHumans() }}</td>
                             <td>
                                 <button type="button"
-                                        onclick="openAssignUnits({{ $b->id }})"
+                                        onclick="document.getElementById('modal-broker-{{ $b->id }}').showModal()"
                                         class="crm-btn crm-btn-ghost text-[11px]">
-                                    <i class="pi pi-home"></i> Asignar unidades
+                                    <i class="pi pi-eye"></i> Ver broker
                                 </button>
                             </td>
                             <td class="text-right">
@@ -132,34 +133,7 @@
                             </td>
                         </tr>
 
-                        {{-- modal asignar unidades por broker --}}
-                        <dialog id="modal-units-{{ $b->id }}" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
-                            <form method="POST" action="{{ route('admin.agents.units', $b->id) }}" class="w-[560px] bg-white rounded-2xl overflow-hidden">@csrf
-                                <div class="px-6 py-4 border-b border-ink-100">
-                                    <div class="text-[15px] font-bold text-ink-900">Asignar unidades · {{ $b->name }}</div>
-                                    <div class="text-[11px] text-ink-500 mt-0.5">El broker solo verá expedientes de las unidades seleccionadas.</div>
-                                </div>
-                                <div class="p-6 space-y-2 max-h-[460px] overflow-y-auto">
-                                    @forelse($units as $u)
-                                        <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ink-50 cursor-pointer border border-ink-100">
-                                            <input type="checkbox" name="unit_ids[]" value="{{ $u->id }}"
-                                                   {{ in_array($u->id, $assignedIds) ? 'checked' : '' }}
-                                                   class="w-4 h-4 accent-brand">
-                                            <div class="flex-1">
-                                                <div class="text-[13px] font-semibold text-ink-900">{{ $u->custom_id ?? $u->name }}</div>
-                                                <div class="text-[11px] text-ink-500">{{ $u->name }} · {{ $u->status }}</div>
-                                            </div>
-                                        </label>
-                                    @empty
-                                        <div class="text-[12px] text-ink-500 text-center py-6">No hay unidades disponibles.</div>
-                                    @endforelse
-                                </div>
-                                <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-                                    <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-                                    <button type="submit" class="crm-btn crm-btn-primary">Guardar asignación</button>
-                                </div>
-                            </form>
-                        </dialog>
+                        @include('admin._partials.broker_modal', ['b' => $b, 'rate' => $rate, 'init' => $init, 'bg' => $bg, 'units' => $units, 'assignedIds' => $assignedIds])
                     @empty
                         <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-8">No hay brokers todavía. <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="text-brand font-semibold hover:underline">Crear uno</button></td></tr>
                     @endforelse
@@ -205,10 +179,82 @@
     </form>
 </dialog>
 
+{{-- ===== Modal compartido: previsualización de contrato ===== --}}
+<dialog id="brkDocPreview" class="rounded-2xl p-0 backdrop:bg-black/50 m-auto w-[860px] max-w-[95vw]">
+    <div class="bg-white rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-eye"></i></div>
+            <div class="min-w-0 flex-1">
+                <div class="text-[15px] font-bold text-ink-900 truncate" id="brkDocTitle">Vista previa</div>
+                <div class="text-[11px] text-ink-400 uppercase tracking-wider" id="brkDocFmt"></div>
+            </div>
+            <a href="#" id="brkDocDownload" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> Descargar</a>
+            <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1 ml-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div class="flex-1 overflow-auto bg-ink-50 flex items-center justify-center p-4" id="brkDocBody" style="min-height:420px"></div>
+    </div>
+</dialog>
+
+{{-- ===== Modal compartido: confirmar eliminación de contrato ===== --}}
+<dialog id="brkDocDelete" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto w-[420px] max-w-[94vw]">
+    <form method="POST" id="brkDocDeleteForm" class="bg-white rounded-2xl overflow-hidden">
+        @csrf @method('DELETE')
+        <div class="p-6 text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-err-soft flex items-center justify-center text-err mb-3"><i class="pi pi-trash text-[20px]"></i></div>
+            <div class="text-[15px] font-bold text-ink-900">Eliminar contrato</div>
+            <p class="text-[13px] text-ink-500 mt-1.5">¿Seguro que querés eliminar <b class="text-ink-700" id="brkDocDeleteName">este documento</b>? Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex justify-center gap-2">
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
+            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> Eliminar</button>
+        </div>
+    </form>
+</dialog>
+
 <script>
-    function openAssignUnits(id) {
-        const dlg = document.getElementById('modal-units-' + id);
-        if (dlg) dlg.showModal();
+    // Tabs del modal de broker
+    function brkTab(id, name) {
+        const root = document.getElementById('modal-broker-' + id);
+        if (!root) return;
+        root.querySelectorAll('[data-panel]').forEach(p => p.style.display = (p.dataset.panel === name ? '' : 'none'));
+        root.querySelectorAll('[data-tab]').forEach(t => {
+            const on = t.dataset.tab === name;
+            t.classList.toggle('text-brand', on);
+            t.classList.toggle('border-brand', on);
+            t.classList.toggle('text-ink-500', !on);
+            t.classList.toggle('border-transparent', !on);
+        });
+    }
+
+    // Previsualización de contrato
+    function openBrokerDoc(m) {
+        document.getElementById('brkDocTitle').textContent = m.title || 'Vista previa';
+        document.getElementById('brkDocFmt').textContent = m.format || '';
+        document.getElementById('brkDocDownload').href = m.download || m.url;
+        const body = document.getElementById('brkDocBody');
+        if (m.kind === 'pdf') {
+            body.innerHTML = '<iframe src="' + m.url + '" class="w-full rounded-lg bg-white" style="height:72vh;border:0"></iframe>';
+        } else if (m.kind === 'image') {
+            body.innerHTML = '<img src="' + m.url + '" alt="" class="max-w-full max-h-[72vh] rounded-lg object-contain shadow-sm">';
+        } else if (m.kind === 'video') {
+            body.innerHTML = '<video src="' + m.url + '" controls class="max-w-full max-h-[72vh] rounded-lg bg-black"></video>';
+        } else {
+            body.innerHTML = '<div class="text-center py-10">'
+                + '<div class="w-14 h-14 mx-auto rounded-xl bg-ink-100 flex items-center justify-center text-ink-500 mb-3"><i class="pi pi-file text-[22px]"></i></div>'
+                + '<div class="text-[13px] text-ink-600">Este formato no admite vista previa.</div>'
+                + '<div class="text-[12px] text-ink-400 mt-1">Usá el botón <b>Descargar</b> para abrirlo.</div></div>';
+        }
+        document.getElementById('brkDocPreview').showModal();
+    }
+    document.getElementById('brkDocPreview').addEventListener('close', () => {
+        document.getElementById('brkDocBody').innerHTML = '';
+    });
+
+    // Confirmar borrado de contrato
+    function openBrokerDocDelete(m) {
+        document.getElementById('brkDocDeleteForm').action = m.url;
+        document.getElementById('brkDocDeleteName').textContent = m.title ? '«' + m.title + '»' : 'este documento';
+        document.getElementById('brkDocDelete').showModal();
     }
 </script>
 
