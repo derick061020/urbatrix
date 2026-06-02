@@ -582,71 +582,8 @@ class ContractController extends Controller
         }
 
         try {
-            // Template path
-            $templatePath = storage_path('app/templates/promesa_compraventa.docx');
-
-            if (!file_exists($templatePath)) {
-                return back()->with('error', 'Template file not found: ' . $templatePath);
-            }
-
-            // Create TemplateProcessor
-            $templateProcessor = new TemplateProcessor($templatePath);
-
-            // Prepare replacements
-            $replacements = [
-                '${cliente_nombre}' => $reservation->first_name . ' ' . $reservation->last_name,
-                '${cliente_dni}' => $reservation->document_number ?? 'N/A',
-                '${cliente_email}' => $reservation->email,
-                '${cliente_telefono}' => $reservation->phone,
-                '${cliente_direccion}' => $this->formatAddress($reservation),
-                '${codigo_reserva}' => $reservation->reservation_code,
-                '${nombre_unidad}' => $reservation->unit_name ?? $reservation->unit->name ?? 'Unit ' . $reservation->unit_id,
-                '${precio_total}' => number_format($reservation->unit_price, 2, '.', ','),
-                '${precio_literal_es}' => $this->convertNumberToWords($reservation->unit_price, 'es'),
-                '${precio_literal_en}' => $this->convertNumberToWords($reservation->unit_price, 'en'),
-                '${fecha_actual}' => date('d/m/Y'),
-                '${fecha_actual_en}' => date('m/d/Y'),
-                '${plan_de_pagos_es}' => $this->getPaymentPlanDescription($reservation, 'es'),
-                '${plan_de_pagos_en}' => $this->getPaymentPlanDescription($reservation, 'en'),
-            ];
-
-            // Replace all variables
-            foreach ($replacements as $search => $replace) {
-                $templateProcessor->setValue($search, $replace);
-            }
-
-            // Ensure documents directory exists
-            $documentsDir = storage_path('app/public/documents');
-            if (!is_dir($documentsDir)) {
-                mkdir($documentsDir, 0755, true);
-            }
-
-            // Save the document
-            $fileName = 'promesa_compraventa_' . $reservation->reservation_code . '.docx';
-            $filePath = 'documents/' . $fileName;
-            $templateProcessor->saveAs(storage_path('app/public/' . $filePath));
-
-            // Create or update document record
-            $document = DocumentService::getDocumentByType($reservation, 'purchase_promise');
-            if ($document) {
-                $document->update([
-                    'file_path' => $filePath,
-                    'filename' => $fileName,
-                    'status' => 'generated',
-                    'generated_at' => now(),
-                ]);
-            } else {
-                DocumentService::createDocument(
-                    $reservation,
-                    'purchase_promise',
-                    'Promesa de Compraventa - ' . $reservation->reservation_code,
-                    $filePath,
-                    $fileName
-                )->markAsGenerated();
-            }
-
-            return response()->download(storage_path('app/public/' . $filePath));
-
+            // Render the printable HTML view (open in browser → "Descargar PDF")
+            return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'purchase_promise');
         } catch (\Exception $e) {
             return back()->with('error', 'Error al generar la promesa de compraventa: ' . $e->getMessage());
         }
