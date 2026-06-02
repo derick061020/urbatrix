@@ -2198,7 +2198,7 @@
                   data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
                   data-filter-status="{{ $st }}"
                   data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
-                <td><b>{{ $unitId }}</b></td>
+                <td><b>{{ $unit->name }}</b></td>
                 <td>
                     <span class="fg-list-status {{ $statusCls }}">{{ strtoupper($statusLabel) }}</span>
                     @if($statusCls === 'reserved' && !empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture())
