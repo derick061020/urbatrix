@@ -1984,7 +1984,7 @@
               <!-- Head: name + ROI, subtitle, divider, price, discount -->
               <div class="fg-card-head">
                 <div class="fg-card-title-row">
-                  <span class="name">{{ $unitId }}</span>
+                  <span class="name">{{ $unit->name }}</span>
                   @if(!empty($unit->roi_percent) && (float) $unit->roi_percent > 0)
                     <span class="roi">{{ rtrim(rtrim(number_format((float) $unit->roi_percent, 1, '.', ''), '0'), '.') }}% ROI</span>
                   @endif
