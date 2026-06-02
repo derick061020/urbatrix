@@ -90,10 +90,8 @@
                             @php $matJson = \Illuminate\Support\Js::from($m->only(['id','title','description','category','external_url','sort_order','visible'])); @endphp
                             <button type="button" class="text-ink-500 hover:text-brand mr-3" title="Editar"
                                 onclick="openEditMaterial({{ $matJson }})"><i class="pi pi-pencil"></i></button>
-                            <form method="POST" action="{{ route('admin.materials.destroy', $m) }}" class="inline" onsubmit="return confirm('¿Eliminar este material?')">
-                                @csrf @method('DELETE')
-                                <button class="text-ink-400 hover:text-err" title="Eliminar"><i class="pi pi-trash"></i></button>
-                            </form>
+                            <button type="button" class="text-ink-400 hover:text-err" title="Eliminar"
+                                onclick="openDeleteMaterial({{ \Illuminate\Support\Js::from(['url' => route('admin.materials.destroy', $m), 'title' => $m->title]) }})"><i class="pi pi-trash"></i></button>
                         </td>
                     </tr>
                 @empty
@@ -166,6 +164,22 @@
     </form>
 </dialog>
 
+{{-- ===== Modal: confirmar eliminación ===== --}}
+<dialog id="matDelete" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto w-[420px] max-w-[94vw]">
+    <form method="POST" id="matDeleteForm" class="bg-white rounded-2xl overflow-hidden">
+        @csrf @method('DELETE')
+        <div class="p-6 text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-err-soft flex items-center justify-center text-err mb-3"><i class="pi pi-trash text-[20px]"></i></div>
+            <div class="text-[15px] font-bold text-ink-900">Eliminar material</div>
+            <p class="text-[13px] text-ink-500 mt-1.5">¿Seguro que querés eliminar <b class="text-ink-700" id="matDeleteName">este material</b>? Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex justify-center gap-2">
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
+            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> Eliminar</button>
+        </div>
+    </form>
+</dialog>
+
 {{-- ===== Modal: previsualización ===== --}}
 <dialog id="matPreview" class="rounded-2xl p-0 backdrop:bg-black/50 m-auto w-[860px] max-w-[95vw]">
     <div class="bg-white rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -216,6 +230,12 @@
         document.getElementById('matInputVisible').checked = true;
         document.getElementById('matModal').showModal();
     });
+
+    function openDeleteMaterial(m) {
+        document.getElementById('matDeleteForm').action = m.url;
+        document.getElementById('matDeleteName').textContent = m.title ? '«' + m.title + '»' : 'este material';
+        document.getElementById('matDelete').showModal();
+    }
 
     function openPreviewMaterial(m) {
         document.getElementById('matPreviewTitle').textContent = m.title || 'Vista previa';
