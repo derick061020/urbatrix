@@ -198,18 +198,8 @@
 
                     {{-- Billing address --}}
                     <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mt-8 mb-3">Dirección de facturación</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                        <label class="pay-card selected flex items-center gap-3" data-billing="same">
-                            <input type="radio" name="billing_choice" value="same" class="w-4 h-4 accent-brand" checked onchange="onBillingChoice()">
-                            <span class="text-[13px] font-semibold text-ink-950">Igual que mi cuenta</span>
-                        </label>
-                        <label class="pay-card flex items-center gap-3" data-billing="other">
-                            <input type="radio" name="billing_choice" value="other" class="w-4 h-4 accent-brand" onchange="onBillingChoice()">
-                            <span class="text-[13px] font-semibold text-ink-950">Otra dirección</span>
-                        </label>
-                    </div>
 
-                    <div id="billing-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4" style="display:none;">
+                    <div id="billing-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="sm:col-span-2">
                             <label class="field-label">País</label>
                             <select id="billing_country" class="auth-input auth-select">
@@ -324,14 +314,6 @@
         paySpinner.classList.toggle('hidden', !on);
     }
 
-    window.onBillingChoice = function () {
-        const choice = document.querySelector('input[name="billing_choice"]:checked')?.value;
-        document.getElementById('billing-fields').style.display = (choice === 'other') ? 'grid' : 'none';
-        document.querySelectorAll('.pay-card[data-billing]').forEach(c => {
-            c.classList.toggle('selected', c.dataset.billing === choice);
-        });
-    };
-
     if (!STRIPE_KEY) {
         showError('Stripe no está configurado. Falta la clave pública (STRIPE_KEY) en .env.');
         setLoading(true);
@@ -374,19 +356,14 @@
             if (!piRes.ok || !piData.success) { showError(piData.message || 'No se pudo iniciar el pago.'); setLoading(false); return; }
 
             // 2) Confirm the card payment with Stripe
-            const billingChoice = document.querySelector('input[name="billing_choice"]:checked')?.value;
             const billing_details = { name };
             const zip = document.getElementById('billing_zip').value.trim();
-            if (billingChoice === 'other') {
-                billing_details.address = {
-                    country: document.getElementById('billing_country').value || undefined,
-                    line1:   document.getElementById('billing_line1').value.trim() || undefined,
-                    city:    document.getElementById('billing_city').value.trim() || undefined,
-                    postal_code: document.getElementById('billing_postal').value.trim() || zip || undefined,
-                };
-            } else if (zip) {
-                billing_details.address = { postal_code: zip };
-            }
+            billing_details.address = {
+                country: document.getElementById('billing_country').value || undefined,
+                line1:   document.getElementById('billing_line1').value.trim() || undefined,
+                city:    document.getElementById('billing_city').value.trim() || undefined,
+                postal_code: document.getElementById('billing_postal').value.trim() || zip || undefined,
+            };
 
             const result = await stripe.confirmCardPayment(piData.client_secret, {
                 payment_method: { card: cardNumber, billing_details },
