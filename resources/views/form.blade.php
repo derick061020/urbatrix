@@ -558,7 +558,7 @@
                     {{-- Property Image --}}
                     <div class="relative h-48 sm:h-56 bg-gradient-to-br from-brand-soft to-ink-50 overflow-hidden">
                         @if($unit && $unit->images && $unit->images->count() > 0)
-                            <img src="{{ $unit->images->first()->image_path ?? asset('images/hero/hero.png') }}"
+                            <img src="{{ $unit->images->first()->path ?? asset('images/hero/hero.png') }}"
                                  alt="Unidad {{ $reservation->unit_name ?? '' }}"
                                  class="w-full h-full object-cover">
                         @else
