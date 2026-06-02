@@ -112,7 +112,7 @@
     .acm-step-pill.is-done { color:#1daf61; }
     .acm-step-pill.is-done .num { background:#1fc16b; color:#fff; }
 
-    .acm-tabs { display:flex; gap:6px; padding:4px; background:#f5f7fa; border-radius:10px; }
+    .acm-tabs { display:none; gap:6px; padding:4px; background:#f5f7fa; border-radius:10px; }
     .acm-tab {
         flex:1; padding:7px 10px; border-radius:8px;
         background:transparent; border:none; cursor:pointer;
@@ -309,7 +309,7 @@
                             <td class="px-3 py-4 text-right">
                                 <div class="flex items-center gap-2 justify-end">
                                     @if($d->file_path)
-                                        <a href="{{ route('documents.preview', $d->id) }}" target="_blank" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</a>
+                                        <button type="button" data-open-acuerdo="{{ $d->id }}" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                         <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                     @else
                                         <span class="text-[11px] text-ink-400">{{ __('Sin archivo') }}</span>
@@ -491,7 +491,7 @@
 $acceptBudgetUrl = $reservation ? route('dashboard.budget.accept', $reservation->id) : null;
 $obsBudgetUrl    = $reservation ? route('dashboard.budget.observation', $reservation->id) : null;
 
-$__acuerdosData = $allPending->merge($allCompleted)->map(function($d) use ($typeMeta, $advisorName, $reservation, $breakdown, $acceptBudgetUrl, $obsBudgetUrl) {
+$__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique('id')->map(function($d) use ($typeMeta, $advisorName, $reservation, $breakdown, $acceptBudgetUrl, $obsBudgetUrl) {
     [$typeLabel] = $typeMeta[$d['document_type'] ?? ''] ?? ['Documento'];
 
     $isBudget   = ($d['document_type'] ?? '') === 'budget';
@@ -520,7 +520,7 @@ $__acuerdosData = $allPending->merge($allCompleted)->map(function($d) use ($type
         $observations = data_get($d['metadata'] ?? [], 'observations', []);
         $advisorMsg = data_get($d['metadata'] ?? [], 'advisor_message');
         $accepted = !empty(data_get($d['metadata'] ?? [], 'accepted_at'));
-        $signed = false; // Arrays don't have methods, use status instead
+        $signed = in_array($d['status'] ?? '', ['signed','approved','completed']);
         $docId = $d['id'] ?? '';
         $previewUrl = ($d['file_path'] ?? '') ? route('documents.preview', $docId) : null;
         $downloadUrl = ($d['file_path'] ?? '') ? route('documents.download', $docId) : null;
