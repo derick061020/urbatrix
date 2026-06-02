@@ -406,6 +406,40 @@
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.document_preview_modal')
 
+{{-- Wire Transfer Modal --}}
+<div id="wireTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Datos para Transferencia en USD</h3>
+                <button onclick="closeWireTransferModal()" class="text-white hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6" id="wireTransferContent">
+                <div class="text-center py-8">
+                    <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <div class="text-sm text-gray-500 mt-2">Cargando datos...</div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2 bg-gray-50">
+                <button onclick="downloadWireTransferPDF()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Descargar PDF
+                </button>
+                <button onclick="closeWireTransferModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- KYC view modal(s) — one per kyc Document in the expediente --}}
 @foreach($reservation->documents->where('document_type', 'kyc') as $kycDoc)
     @include('admin.crm._partials.modal_kyc', [
@@ -417,11 +451,73 @@
 
 @push('scripts')
 <script>
+const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
+
 // Auto-scroll the Comunicaciones chat to the bottom on load
 (function() {
     const el = document.getElementById('admin-msg-scroll');
     if (el) el.scrollTop = el.scrollHeight;
 })();
+
+// Open wire transfer modal
+function openWireTransferModal() {
+    const modal = document.getElementById('wireTransferModal');
+    const content = document.getElementById('wireTransferContent');
+    
+    modal.classList.remove('hidden');
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div class="text-sm text-gray-500 mt-2">Cargando datos...</div>
+        </div>
+    `;
+    
+    fetch(wireTransferUrl)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const pageContent = doc.querySelector('.page');
+            
+            if (pageContent) {
+                content.innerHTML = '';
+                content.appendChild(pageContent.cloneNode(true));
+                content.querySelector('.page').style.maxHeight = '60vh';
+                content.querySelector('.page').style.overflowY = 'auto';
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-sm text-gray-500 mt-2">Error al cargar los datos</div>
+                </div>
+            `;
+        });
+}
+
+// Close wire transfer modal
+function closeWireTransferModal() {
+    document.getElementById('wireTransferModal').classList.add('hidden');
+}
+
+// Download wire transfer PDF
+function downloadWireTransferPDF() {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = wireTransferUrl;
+    document.body.appendChild(iframe);
+    
+    iframe.onload = function() {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+}
 
 function syncSignNow(docId, btn) {
     const csrf = document.querySelector('meta[name=csrf-token]')?.content;

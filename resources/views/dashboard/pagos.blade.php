@@ -33,10 +33,9 @@
             <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
             <div class="text-[12px] text-ink-500">Makai Residences · Cap Cana, Punta Cana</div>
         </div>
-        <a href="{{ route('reservations.wire', $reservation) }}" target="_blank"
-           class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
+        <button onclick="openWireTransferModal()" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
             <i class="pi pi-building-columns text-[12px]"></i> {{ __('Datos para transferencia') }}
-        </a>
+        </button>
     </div>
 
     {{-- KPIs --}}
@@ -309,14 +308,87 @@
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
+            <button type="button" onclick="openWireTransferModal()" class="cli-btn cli-btn-ghost text-brand"><i class="pi pi-building-columns"></i> {{ __('Ver datos de transferencia') }}</button>
             <button type="button" onclick="this.closest('dialog').close()" class="cli-btn cli-btn-ghost">{{ __('Cancelar') }}</button>
             <button type="submit" id="submitPaymentBtn" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> {{ __('Enviar para aprobación') }}</button>
         </div>
     </form>
 </dialog>
 
+{{-- Wire Transfer Modal --}}
+<dialog id="modal-wire-transfer" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto max-w-4xl">
+    <div class="bg-white rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-building-columns"></i></div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Datos para transferencia en USD') }}</div>
+            <button type="button" onclick="document.getElementById('modal-wire-transfer').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div class="p-6" id="wire-transfer-content">
+            <div class="text-center py-8">
+                <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
+                <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando datos...') }}</div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
+            <button type="button" onclick="downloadWireTransferPDF()" class="cli-btn cli-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+            <button type="button" onclick="document.getElementById('modal-wire-transfer').close()" class="cli-btn cli-btn-ghost">{{ __('Cerrar') }}</button>
+        </div>
+    </div>
+</dialog>
+
 <script>
 const paymentSubmitUrl = "{{ route('dashboard.payments.submit', $reservation) }}";
+const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
+
+// Open wire transfer modal
+function openWireTransferModal() {
+    const modal = document.getElementById('modal-wire-transfer');
+    const content = document.getElementById('wire-transfer-content');
+    
+    modal.showModal();
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
+            <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando datos...') }}</div>
+        </div>
+    `;
+    
+    fetch(wireTransferUrl)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const pageContent = doc.querySelector('.page');
+            
+            if (pageContent) {
+                content.innerHTML = '';
+                content.appendChild(pageContent.cloneNode(true));
+                content.querySelector('.page').style.maxHeight = '60vh';
+                content.querySelector('.page').style.overflowY = 'auto';
+            }
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="pi pi-exclamation-circle text-err text-[24px]"></i>
+                    <div class="text-[13px] text-ink-500 mt-2">{{ __('Error al cargar los datos') }}</div>
+                </div>
+            `;
+        });
+}
+
+// Download wire transfer PDF
+function downloadWireTransferPDF() {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = wireTransferUrl;
+    document.body.appendChild(iframe);
+    
+    iframe.onload = function() {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+}
 
 // Show selected file name
 document.getElementById('receiptInput').addEventListener('change', function(e) {

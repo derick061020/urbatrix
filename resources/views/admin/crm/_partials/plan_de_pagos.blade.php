@@ -44,9 +44,14 @@
         <i class="pi pi-calculator text-ink-500"></i>
         <div class="text-[13px] font-bold text-ink-700">Plan de pagos</div>
         <span class="crm-pill bg-{{ $stateLabel[1] }}-soft text-{{ $stateLabel[1] }} ml-2">{{ $stateLabel[0] }}</span>
-        <span class="ml-auto text-[11px] text-ink-500">
-            Total contrato: <b class="text-ink-900">${{ number_format((float) $r->unit_price, 0) }}</b>
-        </span>
+        <div class="ml-auto flex items-center gap-3">
+            <button onclick="openWireTransferModal()" class="text-[11px] text-ink-600 hover:text-brand flex items-center gap-1">
+                <i class="pi pi-building-columns"></i> Datos transferencia
+            </button>
+            <span class="text-[11px] text-ink-500">
+                Total contrato: <b class="text-ink-900">${{ number_format((float) $r->unit_price, 0) }}</b>
+            </span>
+        </div>
     </div>
 
     @if(! empty($observations))
