@@ -29,14 +29,20 @@
 
     // Step indicator: Reserva, KYC, Promesa, Plan de Pago, Doc Pago, Contrato
     // stepCount = the step the client is CURRENTLY on (active). Earlier steps render as done.
-    $stepCount = 1; // On Reserva
-    if ($kycSubmitted) $stepCount = 2; // KYC submitted, under review
-    if ($kycApproved)  $stepCount = 3; // KYC approved, next step
-    if ($reservation->isBudgetSent()) $stepCount = 3;
-    if ($reservation->documents->where('document_type', 'purchase_promise')->where('status', 'signed')->isNotEmpty()) $stepCount = 4;
-    if ($reservation->documents->where('document_type', 'payment_plan')->where('status', 'approved')->isNotEmpty()) $stepCount = 5;
-    if ($reservation->payments->where('status', 'paid')->count() > 0) $stepCount = 6;
-    if (in_array($reservation->status, ['contract_signed', 'signed'])) $stepCount = 6;
+    $promesaSigned  = $reservation->documents->where('document_type', 'purchase_promise')->where('status', 'signed')->isNotEmpty();
+    $planApproved   = $reservation->documents->where('document_type', 'payment_plan')->where('status', 'approved')->isNotEmpty();
+    $paymentPaid    = $reservation->payments->where('status', 'paid')->count() > 0;
+    $contractSigned = in_array($reservation->status, ['contract_signed', 'signed']);
+
+    // Sequential progression: a step only becomes active when EVERY previous step is complete.
+    // The reservation deposit can be paid up-front, so a paid payment must NOT skip KYC/Promesa/Plan.
+    $stepCount = 1;                                                  // Reserva
+    if ($kycSubmitted)                                $stepCount = 2; // KYC (submitted, under review)
+    if ($kycApproved || $reservation->isBudgetSent()) $stepCount = 3; // Promesa
+    if ($stepCount >= 3 && $promesaSigned)            $stepCount = 4; // Plan de pago
+    if ($stepCount >= 4 && $planApproved)             $stepCount = 5; // Doc. de pago
+    if ($stepCount >= 5 && $paymentPaid)              $stepCount = 6; // Contrato
+    if ($contractSigned)                              $stepCount = 6;
 
     $steps = [
         [__('Reserva'),      'check-circle'],

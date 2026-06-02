@@ -46,11 +46,50 @@
         'generated' => [__('GENERADO'),    'info'],
         'rejected'  => [__('RECHAZADO'),   'err'],
     ];
+
+    /* KYC status — consistent with mi-propiedad: submitted if a kyc/id_front/id_back doc exists. */
+    $kycDoc       = $all->firstWhere('document_type', 'kyc');
+    $kycSubmitted = $kycDocs->isNotEmpty();
+    $kycApproved  = $kycDoc ? $kycDoc->status === 'approved' : false;
+    $kycRejected  = $kycDoc ? $kycDoc->status === 'rejected' : false;
 @endphp
 
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
     @if(session('success'))<div class="px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
+    @if(session('error'))<div class="px-4 py-2 rounded-lg bg-err-soft text-err text-[12px]">{{ session('error') }}</div>@endif
+
+    {{-- ============ Requerimiento: completar KYC ============ --}}
+    @if($reservation && ($kycRejected || ! $kycSubmitted))
+        <div class="cli-card overflow-hidden border border-err/30">
+            <div class="px-5 py-4 flex items-start gap-3 bg-err-soft/50">
+                <div class="w-9 h-9 rounded-full bg-err-soft border border-err/30 flex items-center justify-center text-err shrink-0"><i class="pi pi-exclamation-circle"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[14px] font-bold text-ink-950">
+                        {{ $kycRejected ? __('Acción requerida: tu KYC fue rechazado') : __('Acción requerida: completá tu KYC') }}
+                    </div>
+                    <div class="text-[12px] text-ink-600 mt-0.5">
+                        {{ $kycRejected
+                            ? __('Tu documentación fue rechazada. Volvé a subir tu documento de identidad para continuar con tu expediente.')
+                            : __('Necesitamos verificar tu identidad para continuar con tu expediente. Subí tu documento de identidad (frente y reverso) en un archivo PDF o imagen.') }}
+                    </div>
+                    <form action="{{ route('reservations.documents.upload', $reservation) }}" method="POST" enctype="multipart/form-data" class="mt-3 flex flex-wrap items-center gap-2">
+                        @csrf
+                        <input type="hidden" name="document_type" value="kyc">
+                        <input type="hidden" name="title" value="{{ __('Identidad (KYC)') }}">
+                        <input type="file" name="file" required accept=".pdf,.jpg,.jpeg,.png"
+                               class="text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-ink-100 file:text-ink-700 file:text-[12px] file:font-semibold file:cursor-pointer">
+                        <button type="submit" class="cli-btn cli-btn-primary text-[12px] py-2"><i class="pi pi-upload text-[10px]"></i> {{ __('Subir KYC') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @elseif($reservation && $kycSubmitted && ! $kycApproved)
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-warn-soft border border-warn/30 text-[13px] text-ink-700">
+            <i class="pi pi-clock text-warn"></i>
+            <span><span class="font-bold text-ink-950">{{ __('KYC en revisión') }}</span> — {{ __('Tu documentación está siendo verificada por nuestro equipo. Te avisaremos cuando esté aprobada.') }}</span>
+        </div>
+    @endif
 
     {{-- Header --}}
     <div>
