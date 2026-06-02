@@ -157,7 +157,7 @@
             </div>
 
             <!-- Amenities — For Living -->
-            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;">Amenities &amp; Lifestyle</p>
+            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;margin-top:10px;">Amenities &amp; Lifestyle</p>
             <div class="mt-living-extras mt-living-only">
               <div class="mt-living-row" id="modalRowAmen" style="display:none;">
                 <span class="txt" id="modalAmenities">—</span>
