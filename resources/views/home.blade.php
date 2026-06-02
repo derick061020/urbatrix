@@ -2097,7 +2097,7 @@
             <div class="fg-card-status-strip">
               <span class="fg-card-status-dot"></span>
               @php
-                $releasedDays = $unit->released_at ? \Carbon\Carbon::parse($unit->released_at)->diffInDays(now()) : null;
+                $releasedDays = $unit->released_at ? (int) \Carbon\Carbon::parse($unit->released_at)->diffInDays(now()) : null;
               @endphp
               <span>This unit was released {{ $releasedDays !== null ? ($releasedDays === 0 ? 'today' : $releasedDays.' '.\Illuminate\Support\Str::plural('day', $releasedDays).' ago') : 'recently' }}</span>
             </div>
