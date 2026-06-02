@@ -16,8 +16,10 @@ class PaymentService
      */
     public static function generatePayments(Reservation $reservation)
     {
-        // Delete existing payments for this reservation
-        $reservation->payments()->delete();
+        // Delete existing payments for this reservation, but PRESERVE already-paid
+        // ones (notably the reservation deposit / seña recorded at reservation time).
+        // Wiping a paid payment would lose its receipt and skew the paid progress.
+        $reservation->payments()->where('status', '!=', 'paid')->delete();
         
         // Get payment breakdown
         $breakdown = PaymentPlanHelper::calculatePaymentBreakdown($reservation);

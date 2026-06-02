@@ -91,7 +91,12 @@ class DocumentService
         // As soon as the payment plan is signed, materialize the installment
         // calendar so the client sees the cuotas in "Plan de Pagos". The
         // purchase_promise signing comes later and shouldn't be a blocker.
-        if ($paymentPlan && $paymentPlan->isSigned() && $reservation->payments()->count() === 0) {
+        // NOTE: the reservation deposit (seña) is recorded as a paid payment at
+        // reservation time, so we must NOT gate on the total payment count —
+        // doing so would leave the seña as the only payment and the schedule
+        // would never be generated. Gate on the absence of an unpaid schedule.
+        if ($paymentPlan && $paymentPlan->isSigned()
+            && $reservation->payments()->where('status', '!=', 'paid')->count() === 0) {
             try {
                 $paymentsCount = \App\Services\PaymentService::generatePayments($reservation);
                 \Illuminate\Support\Facades\Log::info('Payments generated after payment_plan signed: ' . $paymentsCount);
