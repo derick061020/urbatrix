@@ -37,32 +37,35 @@
 
             {{-- ===== Panel: Datos & comisión ===== --}}
             <div data-panel="datos">
-                <form method="POST" action="{{ route('admin.agents.update', $b->id) }}" class="p-6 space-y-4">
+                <form method="POST" action="{{ route('admin.agents.update', $b->id) }}">
                     @csrf @method('PUT')
-                    <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Nombre completo</label>
-                        <input type="text" name="name" value="{{ $b->name }}" required class="crm-input pl-3 mt-1">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="p-6 space-y-4">
                         <div>
-                            <label class="text-[12px] font-semibold text-ink-700">Email</label>
-                            <input type="email" name="email" value="{{ $b->email }}" required class="crm-input pl-3 mt-1">
+                            <label class="text-[12px] font-semibold text-ink-700">Nombre completo</label>
+                            <input type="text" name="name" value="{{ $b->name }}" required class="crm-input pl-3 mt-1.5">
                         </div>
-                        <div>
-                            <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
-                            <input type="text" name="phone" value="{{ $b->phone }}" class="crm-input pl-3 mt-1">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[12px] font-semibold text-ink-700">Email</label>
+                                <input type="email" name="email" value="{{ $b->email }}" required class="crm-input pl-3 mt-1.5">
+                            </div>
+                            <div>
+                                <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+                                <input type="text" name="phone" value="{{ $b->phone }}" class="crm-input pl-3 mt-1.5">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 items-end">
+                            <div>
+                                <label class="text-[12px] font-semibold text-ink-700">Tasa de comisión (%)</label>
+                                <input type="number" name="commission_rate" value="{{ rtrim(rtrim(number_format($rate, 2), '0'), '.') }}" step="0.01" min="0" max="100" class="crm-input pl-3 mt-1.5">
+                            </div>
+                            <label class="flex items-center gap-2 text-[13px] text-ink-700 h-9 px-1">
+                                <input type="checkbox" name="active" value="1" {{ ($b->verification_status ?? 'approved') === 'approved' ? 'checked' : '' }} class="w-4 h-4 accent-brand"> Broker activo
+                            </label>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 items-end">
-                        <div>
-                            <label class="text-[12px] font-semibold text-ink-700">Tasa de comisión (%)</label>
-                            <input type="number" name="commission_rate" value="{{ rtrim(rtrim(number_format($rate, 2), '0'), '.') }}" step="0.01" min="0" max="100" class="crm-input pl-3 mt-1">
-                        </div>
-                        <label class="flex items-center gap-2 text-[13px] text-ink-700 h-9 px-1">
-                            <input type="checkbox" name="active" value="1" {{ ($b->verification_status ?? 'approved') === 'approved' ? 'checked' : '' }} class="w-4 h-4 accent-brand"> Broker activo
-                        </label>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-1">
+                    <div class="px-6 py-4 border-t border-ink-100 bg-ink-50 flex items-center justify-end gap-2">
+                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
                         <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
                     </div>
                 </form>
@@ -114,25 +117,28 @@
 
             {{-- ===== Panel: Unidades ===== --}}
             <div data-panel="unidades" style="display:none">
-                <form method="POST" action="{{ route('admin.agents.units', $b->id) }}" class="p-6 space-y-3">
+                <form method="POST" action="{{ route('admin.agents.units', $b->id) }}">
                     @csrf
-                    <div class="text-[11px] text-ink-500">El broker solo verá expedientes de las unidades seleccionadas.</div>
-                    <div class="space-y-2 max-h-[360px] overflow-y-auto">
-                        @forelse($units as $u)
-                            <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ink-50 cursor-pointer border border-ink-100">
-                                <input type="checkbox" name="unit_ids[]" value="{{ $u->id }}"
-                                       {{ in_array($u->id, $assignedIds) ? 'checked' : '' }}
-                                       class="w-4 h-4 accent-brand">
-                                <div class="flex-1">
-                                    <div class="text-[13px] font-semibold text-ink-900">{{ $u->custom_id ?? $u->name }}</div>
-                                    <div class="text-[11px] text-ink-500">{{ $u->name }} · {{ $u->status }}</div>
-                                </div>
-                            </label>
-                        @empty
-                            <div class="text-[12px] text-ink-500 text-center py-6">No hay unidades disponibles.</div>
-                        @endforelse
+                    <div class="p-6 space-y-3">
+                        <div class="text-[11px] text-ink-500">El broker solo verá expedientes de las unidades seleccionadas.</div>
+                        <div class="space-y-2 max-h-[360px] overflow-y-auto">
+                            @forelse($units as $u)
+                                <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ink-50 cursor-pointer border border-ink-100">
+                                    <input type="checkbox" name="unit_ids[]" value="{{ $u->id }}"
+                                           {{ in_array($u->id, $assignedIds) ? 'checked' : '' }}
+                                           class="w-4 h-4 accent-brand">
+                                    <div class="flex-1">
+                                        <div class="text-[13px] font-semibold text-ink-900">{{ $u->custom_id ?? $u->name }}</div>
+                                        <div class="text-[11px] text-ink-500">{{ $u->name }} · {{ $u->status }}</div>
+                                    </div>
+                                </label>
+                            @empty
+                                <div class="text-[12px] text-ink-500 text-center py-6">No hay unidades disponibles.</div>
+                            @endforelse
+                        </div>
                     </div>
-                    <div class="flex justify-end gap-2 pt-1">
+                    <div class="px-6 py-4 border-t border-ink-100 bg-ink-50 flex items-center justify-end gap-2">
+                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
                         <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar asignación</button>
                     </div>
                 </form>
