@@ -70,17 +70,12 @@
                     </div>
                     <div class="text-[12px] text-ink-600 mt-0.5">
                         {{ $kycRejected
-                            ? __('Tu documentación fue rechazada. Volvé a subir tu documento de identidad para continuar con tu expediente.')
-                            : __('Necesitamos verificar tu identidad para continuar con tu expediente. Subí tu documento de identidad (frente y reverso) en un archivo PDF o imagen.') }}
+                            ? __('Tu formulario de verificación fue rechazado. Volvé a completar el formulario KYC para continuar con tu expediente.')
+                            : __('Necesitamos verificar tu identidad para continuar con tu expediente. Completá el formulario KYC con tus datos personales y de contacto.') }}
                     </div>
-                    <form action="{{ route('reservations.documents.upload', $reservation) }}" method="POST" enctype="multipart/form-data" class="mt-3 flex flex-wrap items-center gap-2">
-                        @csrf
-                        <input type="hidden" name="document_type" value="kyc">
-                        <input type="hidden" name="title" value="{{ __('Identidad (KYC)') }}">
-                        <input type="file" name="file" required accept=".pdf,.jpg,.jpeg,.png"
-                               class="text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-ink-100 file:text-ink-700 file:text-[12px] file:font-semibold file:cursor-pointer">
-                        <button type="submit" class="cli-btn cli-btn-primary text-[12px] py-2"><i class="pi pi-upload text-[10px]"></i> {{ __('Subir KYC') }}</button>
-                    </form>
+                    <a href="{{ url('/form') }}" class="cli-btn cli-btn-primary text-[12px] py-2 mt-3 inline-flex">
+                        <i class="pi pi-id-card text-[10px]"></i> {{ $kycRejected ? __('Volver a completar KYC') : __('Completar formulario KYC') }}
+                    </a>
                 </div>
             </div>
         </div>

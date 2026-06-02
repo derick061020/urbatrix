@@ -118,6 +118,83 @@ class DocumentDataHelper
     }
 
     /**
+     * Data for resources/views/documents/kyc.blade.php
+     *
+     * El KYC es el formulario que el cliente completó en /form, no el documento
+     * de identidad. Acá lo poblamos con lo que el cliente rellenó en la reserva.
+     */
+    public static function kyc(Reservation $reservation): array
+    {
+        $kycDoc = $reservation->relationLoaded('documents')
+            ? $reservation->documents->firstWhere('document_type', 'kyc')
+            : $reservation->documents()->where('document_type', 'kyc')->first();
+        $status = $kycDoc->status ?? 'pending';
+
+        $estados = ['pending' => 'En revisión', 'approved' => 'Aprobado', 'rejected' => 'Rechazado'];
+        $clases  = ['pending' => 'pending', 'approved' => 'approved', 'rejected' => 'rejected'];
+
+        $advisor = \App\Models\Agent::where('active', true)->orderBy('id')->first();
+
+        // Imagen del documento de identidad, si el cliente la adjuntó.
+        $idPath = $reservation->id_document_path ?: ($kycDoc->file_path ?? null);
+        $idImagenUrl = null;
+        if ($idPath && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $idPath)) {
+            $idImagenUrl = \Illuminate\Support\Facades\Storage::disk('public')->exists($idPath)
+                ? \Illuminate\Support\Facades\Storage::disk('public')->url($idPath)
+                : asset(ltrim($idPath, '/'));
+        }
+
+        return [
+            'referencia'       => $reservation->reservation_code,
+            'proyecto'         => 'Makai Residences',
+            'unidad'           => self::unidadNombre($reservation),
+            'comprador_nombre' => trim($reservation->first_name . ' ' . $reservation->last_name) ?: 'N/A',
+            'nombres'          => $reservation->first_name ?: 'N/A',
+            'apellidos'        => $reservation->last_name ?: 'N/A',
+            'fecha_llenado'    => optional($reservation->updated_at)->format('d / m / Y') ?: date('d / m / Y'),
+            'estado'           => $estados[$status] ?? 'En revisión',
+            'estado_clase'     => $clases[$status] ?? 'pending',
+            'asesor'           => $advisor->name ?? 'Duna Development Group',
+
+            'fecha_nacimiento' => $reservation->birth_date ? $reservation->birth_date->format('d / m / Y') : 'N/A',
+            'nacionalidad'     => $reservation->nationality ?: 'N/A',
+            'pais_residencia'  => $reservation->country ?: 'N/A',
+
+            'id_tipo'          => $reservation->id_type ?: 'N/A',
+            'id_numero'        => $reservation->document_number ?: 'N/A',
+            'id_expedicion'    => $reservation->expedition_date
+                ? $reservation->expedition_date->format('m / Y')
+                : ($reservation->expedition_place ?: 'N/A'),
+            'id_imagen_url'    => $idImagenUrl,
+
+            'telefono'         => $reservation->phone ?: 'N/A',
+            'email'            => $reservation->email ?: 'N/A',
+            'direccion'        => self::formatAddress($reservation),
+        ];
+    }
+
+    /**
+     * Renderiza el formulario KYC a HTML y lo persiste en storage, devolviendo
+     * la ruta relativa (para guardarla en Document->file_path). No toca el
+     * registro Document — el estado de revisión lo maneja el flujo de KYC.
+     */
+    public static function renderKycHtml(Reservation $reservation): string
+    {
+        $html = view('documents.kyc', self::kyc($reservation))->render();
+
+        $documentsDir = storage_path('app/public/documents');
+        if (! is_dir($documentsDir)) {
+            mkdir($documentsDir, 0755, true);
+        }
+
+        $fileName = 'kyc_' . $reservation->reservation_code . '.html';
+        $filePath = 'documents/' . $fileName;
+        file_put_contents(storage_path('app/public/' . $filePath), $html);
+
+        return $filePath;
+    }
+
+    /**
      * Renderiza la vista imprimible, guarda el HTML en storage para que
      * preview/descarga sigan funcionando, registra el Document y devuelve
      * la vista lista para mostrarse (e imprimirse a PDF) en el navegador.

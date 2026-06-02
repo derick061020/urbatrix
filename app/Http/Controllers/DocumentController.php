@@ -78,6 +78,22 @@ class DocumentController extends Controller
             }
         }
 
+        // El KYC es un formulario imprimible: se regenera desde los datos que el
+        // cliente cargó, salvo que ya esté aprobado (congelado para revisión).
+        if ($document->document_type === 'kyc') {
+            if ($document->isApproved() || ! $document->reservation) {
+                return $document;
+            }
+            try {
+                $path = \App\Helpers\DocumentDataHelper::renderKycHtml($document->reservation);
+                $document->update(['file_path' => $path, 'filename' => basename($path)]);
+                $document->refresh();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('KYC HTML generation failed: '.$e->getMessage());
+            }
+            return $document;
+        }
+
         $regenerableTypes = ['payment_plan', 'purchase_promise', 'contract'];
         if (! in_array($document->document_type, $regenerableTypes) || $document->isSigned() || $document->isApproved()) {
             return $document;

@@ -328,7 +328,13 @@ class ReservationController extends Controller
     public function showForm()
     {
         $reservationData = session('reservation');
-        
+
+        // Cliente logueado que vuelve a completar su KYC desde el panel: si no hay
+        // reserva en sesión, usamos su última reserva persistida.
+        if (!$reservationData && Auth::check()) {
+            $reservationData = Reservation::where('user_id', Auth::id())->latest()->first();
+        }
+
         if (!$reservationData) {
             return redirect('/')->with('error', 'No reservation found. Please start a new reservation.');
         }
@@ -343,8 +349,9 @@ class ReservationController extends Controller
             $reservation = $reservationData;
         }
 
-        // Check if reservation is expired
-        if ($reservation->isExpired()) {
+        // La expiración solo bloquea reservas que aún están pendientes de confirmar;
+        // una reserva confirmada (KYC en curso) sigue siendo accesible.
+        if ($reservation->status === 'pending' && $reservation->isExpired()) {
             return redirect('/')->with('error', 'Reservation expired. Please start a new reservation.');
         }
 
@@ -548,13 +555,25 @@ class ReservationController extends Controller
                         'postal_code'       => $reservation->postal_code,
                         'country'           => $reservation->country,
                         'co_buyers'         => $reservation->co_buyers ?? [],
+                        // El documento de identidad se conserva como referencia; el KYC en sí
+                        // es el formulario imprimible que se genera abajo.
+                        'id_document_path'  => $idDocumentPath,
                     ];
+
+                    // Generar el formulario KYC imprimible (HTML) con lo que cargó el cliente.
+                    $kycHtmlPath = null;
+                    try {
+                        $kycHtmlPath = \App\Helpers\DocumentDataHelper::renderKycHtml($reservation);
+                    } catch (\Throwable $e) {
+                        \Log::warning('No se pudo generar el HTML del KYC: '.$e->getMessage());
+                    }
+
                     \App\Models\Document::updateOrCreate(
                         ['reservation_id' => $reservation->id, 'document_type' => 'kyc'],
                         [
                             'title'        => 'KYC — '.trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')),
-                            'filename'     => $idDocumentPath ? basename($idDocumentPath) : null,
-                            'file_path'    => $idDocumentPath,
+                            'filename'     => $kycHtmlPath ? basename($kycHtmlPath) : ($idDocumentPath ? basename($idDocumentPath) : null),
+                            'file_path'    => $kycHtmlPath ?: $idDocumentPath,
                             'status'       => 'pending',
                             'generated_at' => now(),
                             'metadata'     => $kycMeta,
