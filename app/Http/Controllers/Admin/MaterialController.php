@@ -27,7 +27,9 @@ class MaterialController extends Controller
             $file = $request->file('file');
             $data['file_path'] = $file->store('broker-materials', 'public');
             $data['file_size'] = $this->humanSize($file->getSize());
-            $data['format'] = $data['format'] ?: strtoupper($file->getClientOriginalExtension());
+            $data['format'] = strtoupper($file->getClientOriginalExtension());
+        } elseif (! empty($data['external_url'])) {
+            $data['format'] = $this->formatFromUrl($data['external_url']);
         }
 
         BrokerMaterial::create($data);
@@ -47,7 +49,9 @@ class MaterialController extends Controller
             $file = $request->file('file');
             $data['file_path'] = $file->store('broker-materials', 'public');
             $data['file_size'] = $this->humanSize($file->getSize());
-            $data['format'] = $data['format'] ?: strtoupper($file->getClientOriginalExtension());
+            $data['format'] = strtoupper($file->getClientOriginalExtension());
+        } elseif (! empty($data['external_url']) && $data['external_url'] !== $material->external_url) {
+            $data['format'] = $this->formatFromUrl($data['external_url']);
         }
 
         $material->update($data);
@@ -78,11 +82,18 @@ class MaterialController extends Controller
             'title'        => 'required|string|max:160',
             'description'  => 'nullable|string|max:1000',
             'category'     => 'nullable|string|max:80',
-            'format'       => 'nullable|string|max:12',
             'external_url' => 'nullable|url|max:500',
             'file'         => 'nullable|file|max:2097152', // 2 GB
             'sort_order'   => 'nullable|integer|min:0',
         ]);
+    }
+
+    /** Deriva el formato (extensión en mayúsculas) desde la URL externa. */
+    private function formatFromUrl(string $url): string
+    {
+        $ext = strtoupper(pathinfo(parse_url($url, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+
+        return $ext !== '' ? substr($ext, 0, 12) : 'LINK';
     }
 
     private function humanSize(int $bytes): string

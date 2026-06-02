@@ -64,4 +64,24 @@ class BrokerMaterial extends Model
         }
         return $this->file_path ? route('broker.materials.download', $this) : null;
     }
+
+    /** URL directa al archivo para previsualización en línea (sin contar descarga). */
+    public function fileUrl(): ?string
+    {
+        if ($this->external_url) {
+            return $this->external_url;
+        }
+        return $this->file_path ? \Storage::disk('public')->url($this->file_path) : null;
+    }
+
+    /** Tipo de previsualización admitida: pdf | image | video | null. */
+    public function previewKind(): ?string
+    {
+        return match (strtoupper((string) $this->format)) {
+            'PDF'                                => 'pdf',
+            'IMG', 'PNG', 'JPG', 'JPEG', 'GIF', 'WEBP' => 'image',
+            'MP4', 'WEBM', 'MOV'                 => 'video',
+            default                              => null,
+        };
+    }
 }

@@ -407,34 +407,23 @@
 @include('admin.crm._partials.document_preview_modal')
 
 {{-- Wire Transfer Modal --}}
-<div id="wireTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+<div id="wireTransferModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white">Datos para Transferencia en USD</h3>
-                <button onclick="closeWireTransferModal()" class="text-white hover:text-gray-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#f2f5f8] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg border border-[#eaecf0] flex items-center justify-center text-[#525866]"><i class="pi pi-building-columns"></i></div>
+                <div class="text-[15px] font-bold text-[#222530] flex-1">Datos para transferencia en USD</div>
+                <button type="button" onclick="closeWireTransferModal()" class="text-[#99a0ae] hover:text-[#2b303b] p-1"><i class="pi pi-times text-[12px]"></i></button>
             </div>
             <div id="wireTransferContent" style="width:794px;max-width:90vw;background:#f0efec">
                 <div class="text-center py-8">
-                    <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <div class="text-sm text-gray-500 mt-2">Cargando datos...</div>
+                    <i class="pi pi-spin pi-spinner text-[#99a0ae] text-[24px]"></i>
+                    <div class="text-[13px] text-[#717784] mt-2">Cargando datos...</div>
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2 bg-gray-50">
-                <button onclick="downloadWireTransferPDF()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
-                    Descargar PDF
-                </button>
-                <button onclick="closeWireTransferModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cerrar</button>
+            <div class="px-6 py-4 border-t border-[#f2f5f8] flex items-center gap-2 justify-end bg-[#f5f7fa]">
+                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> Descargar PDF</button>
+                <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">Cerrar</button>
             </div>
         </div>
     </div>
