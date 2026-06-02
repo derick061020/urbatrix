@@ -11,7 +11,7 @@
     $pagado  = (float) ($reservation->payments?->where('status', 'paid')->sum('amount') ?? 0);
     $saldo   = max(0, $precio - $pagado);
     $pct     = $precio > 0 ? round(($pagado / $precio) * 100) : 0;
-    $nextPay = $reservation->payments->where('status', 'pending')->sortBy('due_date')->first();
+    $nextPay = $reservation->payments->where('status', 'pending')->where('approval_status', '!=', 'pending')->sortBy('due_date')->first();
 
     $pendientes = $reservation->payments->where('status', 'pending')->where('approval_status', '!=', 'pending')->sortBy('due_date');
     $vencidos   = $reservation->payments->where('status', 'overdue')->sortBy('due_date');
@@ -113,16 +113,17 @@
             </thead>
             <tbody class="divide-y divide-ink-100">
                 @php
-                    $rows = $pagados->concat($vencidos)->concat($upcoming);
+                    $rows = $pagados->concat($enRevision)->concat($vencidos)->concat($upcoming);
                 @endphp
                 @forelse($rows as $i => $p)
                     @php
-                        $isOverdue = $p->status === 'overdue';
-                        $isPaid    = $p->status === 'paid';
-                        $isNext    = $nextPay && $p->id === $nextPay->id;
-                        $rowBg     = $isNext ? 'bg-warn-soft/40' : '';
-                        $bullet    = $isPaid ? 'bg-ok' : ($isOverdue ? 'bg-err' : ($isNext ? 'bg-warn' : 'bg-ink-200'));
-                        $balance   = $isPaid ? 0 : $p->amount;
+                        $isPaid     = $p->status === 'paid';
+                        $inReview   = ! $isPaid && $p->approval_status === 'pending';
+                        $isOverdue  = ! $inReview && $p->status === 'overdue';
+                        $isNext     = ! $inReview && $nextPay && $p->id === $nextPay->id;
+                        $rowBg      = $isNext ? 'bg-warn-soft/40' : '';
+                        $bullet     = $isPaid ? 'bg-ok' : ($inReview ? 'bg-info' : ($isOverdue ? 'bg-err' : ($isNext ? 'bg-warn' : 'bg-ink-200')));
+                        $balance    = $isPaid ? 0 : $p->amount;
                     @endphp
                     <tr class="{{ $rowBg }}">
                         <td class="px-5 py-3.5">
@@ -151,6 +152,8 @@
                         <td class="px-3 py-3.5">
                             @if($isPaid)
                                 <span class="cli-pill bg-ok-soft text-ok-dark">{{ __('PAGADO') }}</span>
+                            @elseif($inReview)
+                                <span class="cli-pill bg-info-soft text-info">{{ __('EN REVISIÓN') }}</span>
                             @elseif($isOverdue)
                                 <span class="cli-pill bg-err-soft text-err">{{ __('VENCIDO') }}</span>
                             @else
@@ -175,45 +178,6 @@
             </div>
         @endif
     </div>
-
-    {{-- Pagos en revisión --}}
-    @if($enRevision->count() > 0)
-    <div class="cli-card overflow-hidden">
-        <div class="px-5 py-3 flex items-center gap-3 bg-warn-soft/40 border-b border-ink-100">
-            <div class="w-8 h-8 rounded-full bg-warn-soft flex items-center justify-center text-warn-dark"><i class="pi pi-clock"></i></div>
-            <div class="text-[14px] font-bold text-ink-950">{{ __('Pagos en revisión') }}</div>
-            <span class="ml-auto text-[11px] text-warn-dark">{{ $enRevision->count() }} {{ __('en revisión') }}</span>
-        </div>
-        <table class="w-full">
-            <thead class="bg-white">
-                <tr>
-                    <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Concepto') }}</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Monto') }}</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Fecha') }}</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
-                    <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Comprobante') }}</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-ink-100">
-                @foreach($enRevision as $p)
-                    <tr>
-                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Cuota') }}</td>
-                        <td class="px-3 py-3.5 text-[13px] font-bold text-warn-dark">${{ number_format($p->amount, 0) }}</td>
-                        <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
-                        <td class="px-3 py-3.5">
-                            <span class="cli-pill bg-warn-soft text-warn-dark">{{ __('EN REVISIÓN') }}</span>
-                        </td>
-                        <td class="px-3 py-3.5 text-[12px] text-ink-500">
-                            @if($p->receipt_path)
-                                <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Ver') }}</a>
-                            @else — @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
 
     {{-- Pagos confirmados --}}
     <div class="cli-card overflow-hidden">
@@ -240,7 +204,7 @@
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
-                            <a href="{{ route('payments.receipt', $p) }}" target="_blank" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</a>
+                            <button type="button" onclick="openReceiptModal('{{ route('payments.receipt', $p) }}')" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</button>
                             @if($p->receipt_path)
                                 <span class="text-ink-300 mx-1">·</span>
                                 <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-ink-600 hover:underline">{{ __('Adjunto') }}</a>
@@ -339,6 +303,27 @@
     </div>
 </dialog>
 
+{{-- Receipt Modal --}}
+<dialog id="modal-receipt" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
+    <div class="bg-white rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-receipt"></i></div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Comprobante de pago') }}</div>
+            <button type="button" onclick="document.getElementById('modal-receipt').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div id="receipt-content" style="width:794px;max-width:90vw;background:#f0efec">
+            <div class="text-center py-8">
+                <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
+                <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando comprobante...') }}</div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
+            <button type="button" onclick="printReceipt()" class="cli-btn cli-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+            <button type="button" onclick="document.getElementById('modal-receipt').close()" class="cli-btn cli-btn-ghost">{{ __('Cerrar') }}</button>
+        </div>
+    </div>
+</dialog>
+
 <script>
 const paymentSubmitUrl = "{{ route('dashboard.payments.submit', $reservation) }}";
 const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
@@ -351,6 +336,27 @@ function openWireTransferModal() {
 
     modal.showModal();
     content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="{{ __('Datos para transferencia en USD') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
+}
+
+// Open receipt modal — render the payment receipt inside an iframe so its own
+// styles are preserved, mirroring the wire transfer modal pattern.
+function openReceiptModal(url) {
+    const modal = document.getElementById('modal-receipt');
+    const content = document.getElementById('receipt-content');
+
+    modal.showModal();
+    content.innerHTML = `<iframe id="receipt-iframe" src="${url}" title="{{ __('Comprobante de pago') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
+}
+
+// Download/print the receipt — print the already-loaded iframe.
+function printReceipt() {
+    const frame = document.getElementById('receipt-iframe');
+    if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    } else if (frame) {
+        window.open(frame.src, '_blank');
+    }
 }
 
 // Download wire transfer PDF — print the already-loaded iframe.
