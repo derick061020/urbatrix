@@ -371,8 +371,8 @@
                             </div>
                             <div class="st-row-right">
                                 <select name="locale" class="st-value" style="border:none; outline:none;">
-                                    <option value="es" selected>Español</option>
-                                    <option value="en">English</option>
+                                    <option value="es" @selected(app()->getLocale() === 'es')>Español</option>
+                                    <option value="en" @selected(app()->getLocale() === 'en')>English</option>
                                 </select>
                             </div>
                         </div>
@@ -382,10 +382,11 @@
                                 <div class="st-row-desc">Las fechas y horas se muestran en esta zona.</div>
                             </div>
                             <div class="st-row-right">
+                                @php $stTz = session('timezone', request()->cookie('app_timezone', 'America/Santo_Domingo')); @endphp
                                 <select name="timezone" class="st-value" style="border:none; outline:none;">
-                                    <option value="America/Santo_Domingo" selected>America/Santo_Domingo</option>
-                                    <option value="America/Bogota">America/Bogota</option>
-                                    <option value="America/Mexico_City">America/Mexico_City</option>
+                                    <option value="America/Santo_Domingo" @selected($stTz === 'America/Santo_Domingo')>America/Santo_Domingo</option>
+                                    <option value="America/Bogota" @selected($stTz === 'America/Bogota')>America/Bogota</option>
+                                    <option value="America/Mexico_City" @selected($stTz === 'America/Mexico_City')>America/Mexico_City</option>
                                 </select>
                             </div>
                         </div>

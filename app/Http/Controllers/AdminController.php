@@ -2459,6 +2459,8 @@ class AdminController extends Controller
             'remove_avatar' => ['nullable', 'boolean'],
             'password'         => ['nullable', 'string', 'min:8', 'confirmed'],
             'current_password' => ['nullable', 'required_with:password', 'string'],
+            'locale'   => ['nullable', Rule::in(config('app.supported_locales', ['es', 'en']))],
+            'timezone' => ['nullable', 'string', 'max:64'],
         ]);
 
         if (!empty($data['password'])) {
@@ -2490,6 +2492,17 @@ class AdminController extends Controller
         $user->name = !empty($data['name']) ? $data['name'] : ($composed !== '' ? $composed : $user->name);
 
         $user->save();
+
+        // Idioma y región: persistir en sesión + cookie (mismo mecanismo que LocaleController)
+        // para que el middleware SetLocale lo aplique en el próximo request.
+        if (!empty($data['locale'])) {
+            $request->session()->put('locale', $data['locale']);
+            \Illuminate\Support\Facades\Cookie::queue('app_locale', $data['locale'], 60 * 24 * 365);
+        }
+        if (!empty($data['timezone'])) {
+            $request->session()->put('timezone', $data['timezone']);
+            \Illuminate\Support\Facades\Cookie::queue('app_timezone', $data['timezone'], 60 * 24 * 365);
+        }
 
         $flash = $request->boolean('redirect_settings') ? 'settings_success' : 'success';
         return back()->with($flash, 'Perfil actualizado correctamente.');
