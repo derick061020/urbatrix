@@ -418,7 +418,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="p-6" id="wireTransferContent">
+            <div id="wireTransferContent" style="width:794px;max-width:90vw;background:#f0efec">
                 <div class="text-center py-8">
                     <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -459,46 +459,14 @@ const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
     if (el) el.scrollTop = el.scrollHeight;
 })();
 
-// Open wire transfer modal
+// Open wire transfer modal — render the print sheet inside an iframe so its own
+// CSS (defined in the document <head>) is preserved and the design shows correctly.
 function openWireTransferModal() {
     const modal = document.getElementById('wireTransferModal');
     const content = document.getElementById('wireTransferContent');
-    
+
     modal.classList.remove('hidden');
-    content.innerHTML = `
-        <div class="text-center py-8">
-            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <div class="text-sm text-gray-500 mt-2">Cargando datos...</div>
-        </div>
-    `;
-    
-    fetch(wireTransferUrl)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const pageContent = doc.querySelector('.page');
-            
-            if (pageContent) {
-                content.innerHTML = '';
-                content.appendChild(pageContent.cloneNode(true));
-                content.querySelector('.page').style.maxHeight = '60vh';
-                content.querySelector('.page').style.overflowY = 'auto';
-            }
-        })
-        .catch(error => {
-            content.innerHTML = `
-                <div class="text-center py-8">
-                    <svg class="w-12 h-12 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div class="text-sm text-gray-500 mt-2">Error al cargar los datos</div>
-                </div>
-            `;
-        });
+    content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="Datos para transferencia en USD" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
 }
 
 // Close wire transfer modal
@@ -506,17 +474,15 @@ function closeWireTransferModal() {
     document.getElementById('wireTransferModal').classList.add('hidden');
 }
 
-// Download wire transfer PDF
+// Download wire transfer PDF — print the already-loaded iframe.
 function downloadWireTransferPDF() {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = wireTransferUrl;
-    document.body.appendChild(iframe);
-    
-    iframe.onload = function() {
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-    };
+    const frame = document.getElementById('wire-iframe');
+    if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    } else {
+        window.open(wireTransferUrl, '_blank');
+    }
 }
 
 function syncSignNow(docId, btn) {

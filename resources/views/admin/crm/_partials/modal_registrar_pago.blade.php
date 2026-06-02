@@ -1,13 +1,14 @@
 {{-- ====== Modal: Registrar pago ====== --}}
 <dialog id="modal-registrar-pago" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
-    <form method="POST" action="{{ $action ?? route('admin.crm.payment.create') }}" enctype="multipart/form-data" class="w-[520px] bg-white rounded-2xl overflow-hidden">
+    <form method="POST" action="{{ $action ?? route('admin.crm.payment.create') }}" enctype="multipart/form-data" class="w-[824px] max-w-[95vw] bg-white rounded-2xl overflow-hidden">
         @csrf
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-credit-card"></i></div>
             <div class="text-[15px] font-bold text-ink-900 flex-1">Registrar pago</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
-        <div class="p-6 space-y-4">
+        <div class="flex items-stretch">
+        <div class="flex-1 min-w-0 p-6 space-y-4">
             @if(!isset($reservationId))
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">Expediente / Cliente</label>
@@ -72,6 +73,8 @@
                 <label class="text-[12px] font-semibold text-ink-700">Notas <span class="text-ink-400 font-normal">(Opcional)</span></label>
                 <textarea name="notes" rows="3" maxlength="200" placeholder="Referencia bancaria, número de comprobante" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea>
             </div>
+        </div>
+        @include('_partials.bank_panel')
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
             <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>

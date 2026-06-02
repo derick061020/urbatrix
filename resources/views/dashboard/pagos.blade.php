@@ -257,7 +257,7 @@
 
 {{-- Modal pagar (reuses admin modal markup) --}}
 <dialog id="modal-pagar" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
-    <form id="paymentForm" enctype="multipart/form-data" class="w-[520px] bg-white rounded-2xl overflow-hidden">
+    <form id="paymentForm" enctype="multipart/form-data" class="w-[824px] max-w-[95vw] bg-white rounded-2xl overflow-hidden">
         @csrf
         <input type="hidden" name="payment_id" value="{{ $nextPay->id ?? '' }}">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
@@ -265,7 +265,8 @@
             <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Subir comprobante de pago') }}</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
-        <div class="p-6 space-y-4">
+        <div class="flex items-stretch">
+        <div class="flex-1 min-w-0 p-6 space-y-4">
             <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Concepto') }}</label>
                 <input type="text" name="label" required value="{{ $nextPay->label ?? __('Cuota') }}" class="cli-input pl-3 mt-1" readonly>
@@ -307,6 +308,8 @@
                 <textarea name="notes" rows="2" class="cli-input pl-3 pt-2 mt-1 h-auto resize-none" placeholder="{{ __('Referencia, descripción, etc.') }}"></textarea>
             </div>
         </div>
+        @include('_partials.bank_panel')
+        </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
             <button type="button" onclick="openWireTransferModal()" class="cli-btn cli-btn-ghost text-brand"><i class="pi pi-building-columns"></i> {{ __('Ver datos de transferencia') }}</button>
             <button type="button" onclick="this.closest('dialog').close()" class="cli-btn cli-btn-ghost">{{ __('Cancelar') }}</button>
@@ -323,7 +326,7 @@
             <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Datos para transferencia en USD') }}</div>
             <button type="button" onclick="document.getElementById('modal-wire-transfer').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
-        <div class="p-6" id="wire-transfer-content">
+        <div id="wire-transfer-content" style="width:794px;max-width:90vw;background:#f0efec">
             <div class="text-center py-8">
                 <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
                 <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando datos...') }}</div>
@@ -340,54 +343,25 @@
 const paymentSubmitUrl = "{{ route('dashboard.payments.submit', $reservation) }}";
 const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
 
-// Open wire transfer modal
+// Open wire transfer modal — render the print sheet inside an iframe so its own
+// CSS (defined in the document <head>) is preserved and the design shows correctly.
 function openWireTransferModal() {
     const modal = document.getElementById('modal-wire-transfer');
     const content = document.getElementById('wire-transfer-content');
-    
+
     modal.showModal();
-    content.innerHTML = `
-        <div class="text-center py-8">
-            <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
-            <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando datos...') }}</div>
-        </div>
-    `;
-    
-    fetch(wireTransferUrl)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const pageContent = doc.querySelector('.page');
-            
-            if (pageContent) {
-                content.innerHTML = '';
-                content.appendChild(pageContent.cloneNode(true));
-                content.querySelector('.page').style.maxHeight = '60vh';
-                content.querySelector('.page').style.overflowY = 'auto';
-            }
-        })
-        .catch(error => {
-            content.innerHTML = `
-                <div class="text-center py-8">
-                    <i class="pi pi-exclamation-circle text-err text-[24px]"></i>
-                    <div class="text-[13px] text-ink-500 mt-2">{{ __('Error al cargar los datos') }}</div>
-                </div>
-            `;
-        });
+    content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="{{ __('Datos para transferencia en USD') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
 }
 
-// Download wire transfer PDF
+// Download wire transfer PDF — print the already-loaded iframe.
 function downloadWireTransferPDF() {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = wireTransferUrl;
-    document.body.appendChild(iframe);
-    
-    iframe.onload = function() {
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-    };
+    const frame = document.getElementById('wire-iframe');
+    if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    } else {
+        window.open(wireTransferUrl, '_blank');
+    }
 }
 
 // Show selected file name
