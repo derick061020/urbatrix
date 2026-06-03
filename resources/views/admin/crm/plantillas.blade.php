@@ -261,9 +261,22 @@
                     <textarea class="pa-textarea" name="body" id="pa-tpl-body" required placeholder="Escribe el contenido del mensaje. Usa variables como @{{cliente_nombre}} para personalizar."></textarea>
                     <div class="text-[11px] text-ink-500 mt-2">
                         <span class="font-semibold">Variables disponibles (clic para insertar):</span><br>
-                        @foreach(['cliente_nombre','cliente_email','unidad','proyecto','monto','fecha_vencimiento','fecha_reserva','portal_url','avance'] as $v)
+                        @php
+                            $paVars = [
+                                'cliente_nombre'    => 'Nombre del cliente',
+                                'cliente_email'     => 'Email del cliente',
+                                'unidad'            => 'Unidad',
+                                'proyecto'          => 'Proyecto',
+                                'monto'             => 'Monto',
+                                'fecha_vencimiento' => 'Fecha de vencimiento',
+                                'fecha_reserva'     => 'Fecha de reserva',
+                                'portal_url'        => 'URL del portal',
+                                'avance'            => 'Avance',
+                            ];
+                        @endphp
+                        @foreach($paVars as $v => $label)
                             @php $token = '{{' . $v . '}}'; @endphp
-                            <span class="pa-var" onclick="paInsertVar('{{ $token }}')">{{ $token }}</span>
+                            <span class="pa-var" onclick="paInsertVar('{{ $token }}')" title="Inserta {{ $token }}">{{ $label }}</span>
                         @endforeach
                     </div>
                 </div>
