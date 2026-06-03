@@ -87,6 +87,48 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Client uploads a file to fulfill a document the admin requested.
+     * The placeholder Document (file_path='pending', metadata.requested=true)
+     * gets the real file attached and goes back to "pendiente revisión".
+     */
+    public function uploadRequestedDocument(Request $request, \App\Models\Document $document)
+    {
+        // Must be a request belonging to the authenticated client's reservation
+        $reservation = $document->reservation;
+        if (! $reservation || $reservation->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if (! data_get($document->metadata, 'requested')) {
+            abort(404);
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('documents', 'public');
+
+        $metadata = $document->metadata ?? [];
+        $metadata['uploaded_by'] = Auth::id();
+        $metadata['uploaded_at'] = now()->toDateTimeString();
+
+        $document->update([
+            'file_path'    => $path,
+            'filename'     => $file->getClientOriginalName(),
+            'status'       => 'pending',
+            'generated_at' => now(),
+            'approved_at'  => null,
+            'approved_by'  => null,
+            'metadata'     => $metadata,
+        ]);
+
+        \App\Support\ActivityLogger::log(Auth::id(), 'document_upload', 'Subió '.($document->title ?: 'un documento solicitado'), $document);
+
+        return back()->with('success', 'Documento subido. Quedó en revisión por nuestro equipo.');
+    }
+
     public function payments(Request $request)
     {
         $reservation = $this->resolveReservation($request);

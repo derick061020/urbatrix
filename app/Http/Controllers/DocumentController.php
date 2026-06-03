@@ -386,7 +386,23 @@ class DocumentController extends Controller
         $absolute = $this->resolveAbsolutePath($document->file_path);
         if (! $absolute || ! is_file($absolute)) return;
 
+        $signerName = trim((string)($data['signer_name'] ?? ''));
+        $ts = $data['timestamp'] ?? now()->toIso8601String();
+        try {
+            $when = \Carbon\Carbon::parse($ts)->format('d/m/Y H:i');
+        } catch (\Throwable $e) {
+            $when = now()->format('d/m/Y H:i');
+        }
+
         $ext = strtolower(pathinfo($absolute, PATHINFO_EXTENSION));
+
+        // Documentos imprimibles (plan de pagos / promesa) ahora se generan como
+        // HTML: la firma se inyecta directamente en el recuadro de firma del HTML.
+        if (in_array($ext, ['html', 'htm'])) {
+            $this->embedSignatureInHtml($absolute, $data['signature_image'], $signerName, $when);
+            return;
+        }
+
         if (! in_array($ext, ['doc', 'docx'])) return;
 
         $tmpDir = storage_path('app/tmp_signatures');
@@ -416,14 +432,6 @@ class DocumentController extends Controller
                 'height' => 90,
                 'wrappingStyle' => 'inline',
             ]);
-
-            $signerName = trim((string)($data['signer_name'] ?? ''));
-            $ts = $data['timestamp'] ?? now()->toIso8601String();
-            try {
-                $when = \Carbon\Carbon::parse($ts)->format('d/m/Y H:i');
-            } catch (\Throwable $e) {
-                $when = now()->format('d/m/Y H:i');
-            }
 
             $section->addTextBreak(1);
             if ($signerName !== '') {
@@ -459,6 +467,62 @@ class DocumentController extends Controller
             );
         } finally {
             if (is_file($sigPath)) @unlink($sigPath);
+        }
+    }
+
+    /**
+     * Inyecta la firma del cliente dentro del recuadro de firma del documento
+     * HTML imprimible (plan de pagos / promesa). Reemplaza el primer
+     * `.sig-box` vacío (el del comprador) por la imagen de la firma y completa
+     * la fecha en su etiqueta. Best-effort: ante cualquier fallo, no lanza.
+     */
+    private function embedSignatureInHtml(string $absolute, string $signatureDataUri, string $signerName, string $when): void
+    {
+        try {
+            $html = @file_get_contents($absolute);
+            if ($html === false || $html === '') return;
+
+            // Evitar doble firma si el documento se vuelve a firmar.
+            if (str_contains($html, 'data-signature="1"')) {
+                return;
+            }
+
+            $img = '<img data-signature="1" src="' . htmlspecialchars($signatureDataUri, ENT_QUOTES)
+                . '" alt="Firma" style="max-height:46px; max-width:200px; object-fit:contain; display:block; margin:2px auto 0;">';
+
+            $sigBox = '<div class="sig-box" style="height:auto; min-height:38px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px;">'
+                . $img . '</div>';
+
+            $label = '<div class="sig-label">Firma &middot; Fecha: ' . htmlspecialchars($when, ENT_QUOTES) . '</div>';
+
+            $replaced = 0;
+            // Reemplaza el primer recuadro de firma vacío junto con su etiqueta.
+            $newHtml = preg_replace(
+                '#<div class="sig-box">\s*</div>\s*<div class="sig-label">.*?</div>#s',
+                $sigBox . $label,
+                $html,
+                1,
+                $replaced
+            );
+
+            // Fallback: si no existe la dupla box+label, reemplaza solo el primer box vacío.
+            if ($replaced === 0) {
+                $newHtml = preg_replace(
+                    '#<div class="sig-box">\s*</div>#s',
+                    $sigBox,
+                    $html,
+                    1,
+                    $replaced
+                );
+            }
+
+            if ($replaced > 0 && is_string($newHtml)) {
+                @file_put_contents($absolute, $newHtml);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning(
+                'Could not embed signature into HTML document ' . $absolute . ': ' . $e->getMessage()
+            );
         }
     }
 
@@ -528,17 +592,21 @@ class DocumentController extends Controller
         $this->authorizeAccess($document);
 
         $isKycReview = in_array($document->document_type, ['id_front', 'id_back', 'kyc']) && $document->isPending();
+        // Admin-requested docs the client uploaded: reviewed (approved/rejected) directly, not signed.
+        $isRequestedReview = data_get($document->metadata, 'requested') && $document->isPending();
         $isAdmin = Auth::user()?->role === 'admin';
 
-        // Signed contracts go through DocumentService; pending KYC docs are approved directly by admins.
-        if (! $document->isSigned() && ! ($isAdmin && $isKycReview)) {
+        // Signed contracts go through DocumentService; pending KYC / requested docs are approved directly by admins.
+        if (! $document->isSigned() && ! ($isAdmin && ($isKycReview || $isRequestedReview))) {
             return back()->with('error', 'El documento debe estar firmado antes de poder aprobarlo');
         }
 
         try {
-            if ($isAdmin && $isKycReview) {
+            if ($isAdmin && ($isKycReview || $isRequestedReview)) {
                 $document->markAsApproved(Auth::id(), $request->input('notes'));
-                $this->maybeApproveUserFromKyc($document);
+                if ($isKycReview) {
+                    $this->maybeApproveUserFromKyc($document);
+                }
             } else {
                 DocumentService::approveDocument($document, Auth::id(), $request->input('notes'));
             }

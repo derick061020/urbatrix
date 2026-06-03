@@ -72,6 +72,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/progress', [DashboardController::class, 'progress'])->name('dashboard.progress');
     Route::get('/dashboard/documents', [DashboardController::class, 'documents'])->name('dashboard.documents');
+    // Client uploads a file to fulfill an admin-requested document
+    Route::post('/dashboard/documents/{document}/upload', [DashboardController::class, 'uploadRequestedDocument'])->name('dashboard.documents.upload');
     Route::get('/dashboard/payments', [DashboardController::class, 'payments'])->name('dashboard.payments');
     Route::get('/dashboard/messages', [DashboardController::class, 'messages'])->name('dashboard.messages');
     Route::post('/dashboard/messages', [DashboardController::class, 'sendMessage'])->name('dashboard.messages.send');
@@ -267,6 +269,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // CRM acciones desde modales
     Route::post('/crm/reservation/create', [AdminController::class, 'createReservationQuick'])->name('admin.crm.reservation.create');
     Route::post('/crm/document/upload',    [AdminController::class, 'uploadDocumentQuick'])->name('admin.crm.document.upload');
+    // Admin requests a document from the client + removes a request/document
+    Route::post('/crm/expedientes/{reservation}/document/request', [AdminController::class, 'requestDocument'])->name('admin.crm.document.request');
+    Route::post('/crm/document/{document}/delete', [AdminController::class, 'deleteDocumentQuick'])->name('admin.crm.document.delete');
     Route::post('/crm/payment/create',     [AdminController::class, 'createPaymentQuick'])->name('admin.crm.payment.create');
     Route::get('/crm/export',              [AdminController::class, 'exportResource'])->name('admin.crm.export');
     Route::post('/crm/export/request-code', [AdminController::class, 'requestExportCode'])->name('admin.crm.export.request');

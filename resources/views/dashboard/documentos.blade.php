@@ -23,6 +23,17 @@
     $kycDocs = $all->whereIn('document_type', ['id_front', 'id_back', 'kyc'])
         ->sortByDesc('created_at');
 
+    /* Documentos solicitados por el equipo (admin) — placeholders requeridos.
+       file_path='pending' = todavía sin subir. */
+    $requirementDocs = $all->filter(fn($d) => data_get($d->metadata, 'requested') === true);
+    $docHasFile = fn($d) => $d->file_path && $d->file_path !== 'pending';
+    $pendingRequirements = $requirementDocs
+        ->filter(fn($d) => ! $docHasFile($d) || $d->status === 'rejected')
+        ->sortByDesc('created_at');
+    $uploadedRequirements = $requirementDocs
+        ->filter(fn($d) => $docHasFile($d) && $d->status !== 'rejected')
+        ->sortByDesc('created_at');
+
     $typeLabel = [
         'payment_plan'     => __('Plan de pagos'),
         'purchase_promise' => __('Promesa de compraventa'),
@@ -86,6 +97,51 @@
         <p class="text-[13px] text-ink-500 mt-1">{!! __('Acá ves los documentos de tu expediente. Tus contratos y planes firmados están en :acuerdos.', ['acuerdos' => '<a href="'.route('dashboard.acuerdos').'" class="text-brand font-semibold hover:underline">'.__('Acuerdos').'</a>']) !!}</p>
     </div>
 
+    {{-- ============ Documentos requeridos (solicitados por el equipo) ============ --}}
+    @if($pendingRequirements->isNotEmpty())
+        <div class="cli-card overflow-hidden border border-err/30">
+            <div class="px-5 py-4 flex items-start gap-3 bg-err-soft/40 border-b border-err/20">
+                <div class="w-9 h-9 rounded-full bg-err-soft border border-err/30 flex items-center justify-center text-err shrink-0"><i class="pi pi-exclamation-circle"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos requeridos') }}</div>
+                    <div class="text-[12px] text-ink-600 mt-0.5">{{ __('Completá estos documentos para avanzar tu expediente.') }}</div>
+                </div>
+            </div>
+            <div class="divide-y divide-ink-100">
+                @foreach($pendingRequirements as $d)
+                    <div class="px-5 py-4 flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-ink-100 flex items-center justify-center text-ink-500 shrink-0"><i class="pi pi-file"></i></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[13px] font-semibold text-ink-950 flex items-center gap-2">
+                                {{ $d->title }}
+                                @if($d->status === 'rejected')
+                                    <span class="cli-pill bg-err-soft text-err">{{ __('RECHAZADO') }}</span>
+                                @endif
+                            </div>
+                            @if(data_get($d->metadata, 'description'))
+                                <div class="text-[11px] text-ink-500">{{ data_get($d->metadata, 'description') }}</div>
+                            @endif
+                            @php $due = data_get($d->metadata, 'due_date'); @endphp
+                            @if($due)
+                                <div class="text-[11px] text-ink-400 mt-0.5">{{ __('Fecha límite') }}: {{ \Illuminate\Support\Carbon::parse($due)->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMM YYYY' : 'MMM D, YYYY') }}</div>
+                            @endif
+                            @if($d->status === 'rejected' && $d->notes)
+                                <div class="text-[11px] text-err mt-0.5">{{ $d->notes }}</div>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('dashboard.documents.upload', $d->id) }}" enctype="multipart/form-data" class="shrink-0">
+                            @csrf
+                            <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="hidden" onchange="this.form.submit()">
+                            <button type="button" onclick="this.previousElementSibling.click()" class="cli-btn cli-btn-primary text-[12px] py-2 px-4">
+                                {{ $d->status === 'rejected' ? __('Volver a subir') : __('Subir') }} <i class="pi pi-upload text-[10px]"></i>
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- ============ Documentos de identidad (KYC) ============ --}}
     <div class="cli-card overflow-hidden">
         <div class="px-5 py-3 flex items-center gap-3 bg-ink-50/60 border-b border-ink-100">
@@ -140,6 +196,55 @@
             </table>
         @endif
     </div>
+
+    {{-- ============ Documentos subidos (solicitados, ya cargados) ============ --}}
+    @if($uploadedRequirements->isNotEmpty())
+        <div class="cli-card overflow-hidden">
+            <div class="px-5 py-3 flex items-center gap-3 bg-ink-50/60 border-b border-ink-100">
+                <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-cloud-upload"></i></div>
+                <div class="flex-1">
+                    <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos subidos') }}</div>
+                    <div class="text-[11px] text-ink-500">{{ __('Documentos que subiste a pedido del equipo.') }}</div>
+                </div>
+            </div>
+            <table class="w-full">
+                <thead class="bg-white">
+                    <tr>
+                        <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Documento') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Subido') }}</th>
+                        <th class="text-right px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Acciones') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-ink-100">
+                    @foreach($uploadedRequirements as $d)
+                        @php $st = $statusPill[$d->status] ?? [__('EN REVISIÓN'),'warn']; @endphp
+                        <tr class="hover:bg-ink-50">
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-10 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
+                                    <div>
+                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->title }}</div>
+                                        @if(data_get($d->metadata, 'description'))
+                                            <div class="text-[11px] text-ink-500">{{ data_get($d->metadata, 'description') }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-4"><span class="cli-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
+                            <td class="px-3 py-4 text-[12px] text-ink-700">{{ optional($d->generated_at ?? $d->created_at)->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMM YYYY' : 'MMM D, YYYY') }}</td>
+                            <td class="px-3 py-4 text-right">
+                                <div class="flex items-center gap-2 justify-end">
+                                    <button type="button" onclick="openDocumentPreview({{ json_encode(['url' => route('documents.preview', $d->id), 'title' => $d->title, 'filename' => $d->filename ?? basename((string) $d->file_path)]) }})" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                    <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     {{-- Trust footer --}}
     <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200 text-[12px] text-ink-600">

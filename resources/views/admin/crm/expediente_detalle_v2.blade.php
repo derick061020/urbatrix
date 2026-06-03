@@ -142,10 +142,17 @@
                     </div>
                 @endif
 
+                @php
+                    $statusLabel = ['pending' => ['Pendiente','warn'],'generated' => ['Generado','info'],'signed' => ['Firmado','ok'],'approved' => ['Aprobado','ok'],'rejected' => ['Rechazado','err']];
+                @endphp
+
                 <div class="crm-card overflow-hidden">
                     <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
                         <div class="text-[13px] font-bold text-ink-700"><i class="pi pi-file"></i> Documentos del expediente</div>
-                        <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Subir documento</button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="document.getElementById('modal-solicitar-documento').showModal()" class="crm-btn crm-btn-ghost text-[11px] py-1.5 px-3"><i class="pi pi-inbox text-[10px]"></i> Solicitar documento</button>
+                            <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Subir documento</button>
+                        </div>
                     </div>
                     <table class="w-full crm-table">
                         <thead class="bg-white">
@@ -153,18 +160,24 @@
                         </thead>
                         <tbody>
                             @php
-                                $statusLabel = ['pending' => ['Pendiente','warn'],'generated' => ['Generado','info'],'signed' => ['Firmado','ok'],'approved' => ['Aprobado','ok'],'rejected' => ['Rechazado','err']];
                                 // Include KYC docs uploaded at register (reservation_id=null, metadata.user_id) so admin can review them here too
                                 $kycDocs = $reservation->user_id
                                     ? \App\Models\Document::whereNull('reservation_id')
                                         ->where('metadata->user_id', $reservation->user_id)
                                         ->get()
                                     : collect();
-                                $allDocs = $reservation->documents->merge($kycDocs)->unique('id')->sortByDesc('created_at');
+                                $allDocs = $reservation->documents
+                                    ->merge($kycDocs)->unique('id')->sortByDesc('created_at');
                             @endphp
                             @forelse($allDocs as $d)
                                 @php
-                                    $st = $statusLabel[$d->status] ?? ['—','ink-500'];
+                                    $isRequested = data_get($d->metadata, 'requested') === true;
+                                    $hasFile     = $d->file_path && $d->file_path !== 'pending';
+                                    if ($isRequested && ! $hasFile) {
+                                        $st = ['Solicitado','ink-500'];
+                                    } else {
+                                        $st = $statusLabel[$d->status] ?? ['—','ink-500'];
+                                    }
                                     $previewPayload = [
                                         'url' => route('documents.preview', $d->id),
                                         'title' => $d->title ?: 'Documento',
@@ -177,16 +190,22 @@
                                             <div class="w-8 h-9 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
                                             <div>
                                                 <div class="text-[13px] font-semibold text-ink-900">{{ $d->title }}</div>
-                                                <div class="text-[11px] text-ink-500">Subido {{ optional($d->generated_at ?? $d->created_at)->format('Y-m-d') }}</div>
+                                                @if($isRequested && ! $hasFile)
+                                                    <div class="text-[11px] text-ink-500">{{ data_get($d->metadata, 'description') ?: 'Solicitado al cliente' }}</div>
+                                                @else
+                                                    <div class="text-[11px] text-ink-500">Subido {{ optional($d->generated_at ?? $d->created_at)->format('Y-m-d') }}</div>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
-                                    <td><span class="crm-pill bg-ink-100 text-ink-600">{{ ucfirst($d->document_type ?? '—') }}</span></td>
+                                    <td><span class="crm-pill bg-ink-100 text-ink-600">{{ $isRequested ? 'Requerido' : ucfirst($d->document_type ?? '—') }}</span></td>
                                     <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                                     <td class="text-[12px] text-ink-700">{{ optional($d->updated_at)->format('Y-m-d') }}</td>
                                     <td class="text-[12px] text-ink-500">
-                                        @if($d->file_path)
+                                        @if($hasFile)
                                             <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-brand hover:underline text-left">{{ $d->filename }}</button>
+                                        @elseif($isRequested)
+                                            <span class="text-ink-400">Pendiente de subir</span>
                                         @else
                                             {{ $d->filename }}
                                         @endif
@@ -202,15 +221,16 @@
                                         @if($hasSignNow && ! $d->isSigned())
                                             <button type="button" onclick="syncSignNow({{ $d->id }}, this)" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1" title="Verificar si el cliente ya firmó en SignNow"><i class="pi pi-refresh text-[10px]"></i> Sincronizar firma</button>
                                         @endif
-                                        @if($d->status === 'pending' && ! $isAutoGen)
+                                        @if($d->status === 'pending' && ! $isAutoGen && $hasFile)
                                             <form method="POST" action="{{ route('documents.approve', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1">Aprobar</button></form>
                                             <form method="POST" action="{{ route('documents.reject', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Rechazar</button></form>
                                         @endif
-                                        @if($d->document_type !== 'kyc')
-                                            @if($d->file_path)
-                                                <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> Ver</button>
-                                            @endif
-                                            <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> Descargar</a>
+                                        @if($d->document_type !== 'kyc' && $hasFile)
+                                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> Ver</button>
+                                            <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> Descargar</a>
+                                        @endif
+                                        @if($isRequested)
+                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm('¿Eliminar esta solicitud de documento?');">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="Eliminar solicitud"><i class="pi pi-trash text-[10px]"></i></button></form>
                                         @endif
                                     </td>
                                 </tr>
@@ -403,6 +423,7 @@
 </div>
 
 @include('admin.crm._partials.modal_subir_documento', ['reservationId' => $reservation->id])
+@include('admin.crm._partials.modal_solicitar_documento', ['reservation' => $reservation])
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.document_preview_modal')
 

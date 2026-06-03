@@ -1594,6 +1594,65 @@ class AdminController extends Controller
         return back()->with('success', 'Documento subido correctamente.');
     }
 
+    /**
+     * Admin requests a document from the client. Creates a placeholder Document
+     * (no file yet) that shows up as "requerido" in the client's documents tab,
+     * where the client can upload the file. Uses file_path='pending' as the
+     * "no file yet" sentinel and metadata.requested=true to flag it.
+     */
+    public function requestDocument(Request $request, Reservation $reservation)
+    {
+        if (Auth::user()->role === 'broker') {
+            $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
+            if (! in_array((string) $reservation->unit_id, $allowed, true)) {
+                abort(403, 'No tienes acceso a este expediente.');
+            }
+        }
+
+        $data = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'due_date'    => 'nullable|date',
+        ]);
+
+        Document::create([
+            'reservation_id' => $reservation->id,
+            'document_type'  => 'requested',
+            'title'          => $data['title'],
+            'filename'       => '',
+            'file_path'      => 'pending',
+            'status'         => 'pending',
+            'metadata'       => [
+                'requested'    => true,
+                'description'  => $data['description'] ?? null,
+                'due_date'     => $data['due_date'] ?? null,
+                'requested_by' => Auth::id(),
+                'requested_at' => now()->toDateTimeString(),
+            ],
+        ]);
+
+        return back()->with('success', 'Documento solicitado al cliente.');
+    }
+
+    /**
+     * Remove a document (or a pending request) from an expediente. Form-based
+     * counterpart to the JSON documents.delete endpoint, so it can redirect back.
+     */
+    public function deleteDocumentQuick(Document $document)
+    {
+        $reservation = $document->reservation;
+        if ($reservation && Auth::user()->role === 'broker') {
+            $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
+            if (! in_array((string) $reservation->unit_id, $allowed, true)) {
+                abort(403, 'No tienes acceso a este expediente.');
+            }
+        }
+
+        \App\Services\DocumentService::deleteDocument($document);
+
+        return back()->with('success', 'Documento eliminado.');
+    }
+
     public function createPaymentQuick(Request $request)
     {
         $data = $request->validate([
