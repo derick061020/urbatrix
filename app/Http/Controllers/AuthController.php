@@ -177,6 +177,10 @@ class AuthController extends Controller
                 if ($key === 'id_front' && Schema::hasColumn('users', 'kyc_id_document')) {
                     $user->update(['kyc_id_document' => $stored]);
                 }
+                // Remember the reverse side too, so /form can reuse it as well
+                if ($key === 'id_back' && Schema::hasColumn('users', 'kyc_id_document_back')) {
+                    $user->update(['kyc_id_document_back' => $stored]);
+                }
             }
 
             // Create a Document row tied to the user (so admin sees it in CRM/Documentos)

@@ -129,11 +129,12 @@
     <div class="border border-gray-200 rounded p-6 bg-white mb-6">
         <h3 class="text-lg font-semibold text-[#625441] mb-4">Documentos del Cliente</h3>
         
-        @if($reservation->id_document_path)
+        @if($reservation->id_document_path || $reservation->id_document_back_path)
             <div class="space-y-4">
+                @if($reservation->id_document_path)
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-sm font-semibold text-[#625441]">Documento de Identidad</h4>
+                        <h4 class="text-sm font-semibold text-[#625441]">Documento de Identidad (Frente)</h4>
                         <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Subido</span>
                     </div>
                     
@@ -200,6 +201,55 @@
                     </div>
                     @endif
                 </div>
+                @endif
+
+                @if($reservation->id_document_back_path)
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-semibold text-[#625441]">Documento de Identidad (Reverso)</h4>
+                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Subido</span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        @if(strtolower(pathinfo($reservation->id_document_back_path, PATHINFO_EXTENSION)) === 'pdf')
+                            <div class="flex items-center gap-2 text-red-600">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H12V16H10V19M10,14H12V10H10V14M10,9H12V5H10V9Z"/>
+                                </svg>
+                                <span class="text-sm font-medium">PDF</span>
+                            </div>
+                        @else
+                            <div class="w-16 h-16 border border-gray-300 rounded overflow-hidden bg-gray-100">
+                                <img src="{{ asset($reservation->id_document_back_path) }}"
+                                     alt="Documento de Identidad (Reverso)"
+                                     class="w-full h-full object-cover">
+                            </div>
+                        @endif
+
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-600 mb-2">{{ basename($reservation->id_document_back_path) }}</p>
+                            <div class="flex gap-2">
+                                <a href="{{ asset($reservation->id_document_back_path) }}"
+                                   target="_blank"
+                                   class="inline-flex items-center gap-2 px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                    Ver Documento
+                                </a>
+                                <a href="{{ asset($reservation->id_document_back_path) }}"
+                                   download="{{ basename($reservation->id_document_back_path) }}"
+                                   class="inline-flex items-center gap-2 px-3 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Descargar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         @else
             <div class="text-center py-8 bg-gray-50 rounded-lg">

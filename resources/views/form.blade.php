@@ -156,12 +156,11 @@
         <div id="step-indicator" class="hidden lg:flex items-center gap-5">
             @php
                 $steps = [
-                    ['Datos básicos',   1],
-                    ['Documento',       2],
-                    ['Información',     3],
-                    ['Dirección',       4],
-                    ['Profesión',       5],
-                    ['Forma de pago',   6],
+                    ['Datos y documentos', 1],
+                    ['Información',         2],
+                    ['Dirección',          3],
+                    ['Profesión',          4],
+                    ['Forma de pago',      5],
                 ];
             @endphp
             @foreach($steps as $s)
@@ -180,10 +179,6 @@
                 <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Reserva</div>
                 <div class="text-[11px] font-bold text-ink-950">{{ $reservation->reservation_code ?? '—' }}</div>
             </div>
-            <div class="text-right">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Expira en</div>
-                <div id="countdown" class="font-display text-[14px] font-bold text-warn">--:--</div>
-            </div>
             <a href="/" class="auth-btn auth-btn-ghost w-10 px-0" title="Cerrar"><i class="pi pi-times text-[12px]"></i></a>
         </div>
     </header>
@@ -192,56 +187,49 @@
     <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> Volver</button>
 
     {{-- ============= BODY ============= --}}
-    <main class="flex-1 flex items-start justify-center px-5 py-8 relative">
+    <main class="flex-1 px-5 py-8 relative">
         <div class="absolute inset-x-0 top-0 h-[300px] bg-pattern opacity-50 pointer-events-none" aria-hidden="true"></div>
 
-        <div class="w-full max-w-[640px] relative">
+        <div class="w-full max-w-[1040px] mx-auto relative flex flex-col lg:flex-row lg:gap-10 gap-8 items-start">
 
-            {{-- ====== STEP 1 — Datos básicos ====== --}}
+            {{-- ===================== FORM COLUMN ===================== --}}
+            <div class="w-full lg:flex-1 lg:max-w-[600px]">
+
+            {{-- ====== STEP 1 — Datos básicos y documentos ====== --}}
             <div class="reg-step active" data-step="1">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-user text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Datos básicos</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Información de contacto del adquiriente</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Datos básicos y documentos</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">Información de contacto y documento del adquiriente</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
+                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Datos de contacto</div>
+
+                {{-- Los campos que ya trae la cuenta llegan bloqueados; los que falten quedan
+                     editables para que el cliente pueda completarlos. --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="field-label">Nombre <span class="field-required">*</span></label>
-                        <input type="text" class="auth-input" value="{{ $reservation->first_name ?? '' }}" readonly>
+                        <input type="text" class="auth-input" data-name="first_name" value="{{ $reservation->first_name ?? '' }}" placeholder="Tu nombre" {{ !empty($reservation->first_name) ? 'readonly' : '' }}>
                     </div>
                     <div>
                         <label class="field-label">Apellido <span class="field-required">*</span></label>
-                        <input type="text" class="auth-input" value="{{ $reservation->last_name ?? '' }}" readonly>
+                        <input type="text" class="auth-input" data-name="last_name" value="{{ $reservation->last_name ?? '' }}" placeholder="Tu apellido" {{ !empty($reservation->last_name) ? 'readonly' : '' }}>
                     </div>
                     <div>
                         <label class="field-label">E-mail <span class="field-required">*</span></label>
-                        <input type="email" class="auth-input" value="{{ $reservation->email ?? '' }}" readonly>
+                        <input type="email" class="auth-input" data-name="email" value="{{ $reservation->email ?? '' }}" placeholder="tu@email.com" {{ !empty($reservation->email) ? 'readonly' : '' }}>
                     </div>
                     <div>
                         <label class="field-label">Teléfono <span class="field-required">*</span></label>
-                        <input type="tel" class="auth-input" value="{{ $reservation->phone ?? '' }}" readonly>
+                        <input type="tel" class="auth-input" data-name="phone" value="{{ $reservation->phone ?? '' }}" placeholder="+1 809 000 0000" {{ !empty($reservation->phone) ? 'readonly' : '' }}>
                     </div>
                 </div>
 
-                <div class="mt-8">
-                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
-                </div>
-            </div>
-
-            {{-- ====== STEP 2 — Documento ====== --}}
-            <div class="reg-step" data-step="2">
-                <div class="text-center mb-7">
-                    <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
-                        <i class="pi pi-id-card text-ink-600 text-[26px]"></i>
-                    </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Documento de identidad</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Información de tu documento oficial</p>
-                </div>
-                <div class="h-px bg-ink-200/70 mb-6"></div>
+                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mt-7 mb-4">Documento de identidad</div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -257,58 +245,89 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Foto del documento de identidad<span class="field-required">*</span></label>
+                        <label class="field-label">Foto del documento de identidad <span class="field-required">*</span></label>
+                        <p class="text-[11px] text-ink-500 -mt-1 mb-3">Subí el <b>frente</b> y el <b>reverso</b> de tu documento · PDF, JPG o PNG · máx. 4 MB</p>
 
-                        @if(!empty($existingKycDoc))
-                            @php $status = $existingKycDoc['status'] ?? 'pending'; @endphp
-                            {{-- Already uploaded during registration — show summary card with option to replace --}}
-                            <div id="existing-doc-card" class="flex items-center gap-3 p-4 rounded-xl border border-ink-200 bg-ink-50/50">
-                                <div class="w-11 h-11 rounded-lg bg-white border border-ink-200 flex items-center justify-center text-ok shrink-0">
-                                    <i class="pi pi-check-circle text-[18px]"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-[13px] font-semibold text-ink-950">Documento ya cargado</div>
-                                    <div class="text-[11px] text-ink-500 truncate">{{ $existingKycDoc['name'] }}</div>
-                                    @if($status === 'approved')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-ok-soft text-ok-dark text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-check text-[8px]"></i> Aprobado</span>
-                                    @elseif($status === 'rejected')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> Rechazado · vuelve a subir</span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-warn-soft text-warn text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-clock text-[8px]"></i> En verificación</span>
-                                    @endif
-                                </div>
-                                <a href="{{ $existingKycDoc['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-3" title="Ver documento"><i class="pi pi-eye text-[11px]"></i> Ver</a>
-                                <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-3" onclick="document.getElementById('existing-doc-card').classList.add('hidden'); document.getElementById('replace-doc-card').classList.remove('hidden'); document.getElementById('idDocument').required = true;">Reemplazar</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                            {{-- ============ FRENTE ============ --}}
+                            <div data-uploader>
+                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">Frente <span class="field-required">*</span></div>
+                                @if(!empty($existingKycDoc))
+                                    @php $status = $existingKycDoc['status'] ?? 'pending'; @endphp
+                                    <div data-existing class="flex items-center gap-3 p-3 rounded-xl border border-ink-200 bg-ink-50/50">
+                                        <div class="w-10 h-10 rounded-lg bg-white border border-ink-200 flex items-center justify-center text-ok shrink-0"><i class="pi pi-check-circle text-[16px]"></i></div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-[12px] font-semibold text-ink-950">Cargado</div>
+                                            <div class="text-[10px] text-ink-500 truncate">{{ $existingKycDoc['name'] }}</div>
+                                            @if($status === 'rejected')
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> Rechazado</span>
+                                            @endif
+                                        </div>
+                                        <a href="{{ $existingKycDoc['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="Ver documento"><i class="pi pi-eye text-[11px]"></i></a>
+                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="Cambiar"><i class="pi pi-refresh text-[11px]"></i></button>
+                                    </div>
+                                    <div data-replace class="hidden mt-2">
+                                        <div class="file-drop" onclick="pickFile(this)">
+                                            <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
+                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir nuevo frente</div>
+                                            <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
+                                            <input type="file" id="idDocument" name="id_document" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
+                                            <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
+                                        </div>
+                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">Cancelar</button>
+                                    </div>
+                                    <input type="hidden" name="kyc_document_reused" value="1">
+                                @else
+                                    <div class="file-drop" onclick="pickFile(this)">
+                                        <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
+                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir frente</div>
+                                        <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
+                                        <input type="file" id="idDocument" name="id_document" required class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
+                                        <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
+                                    </div>
+                                @endif
                             </div>
-                            {{-- Hidden replacement uploader, shown when user clicks "Reemplazar" --}}
-                            <div id="replace-doc-card" class="hidden mt-3">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[11px] text-ink-500">Subir un nuevo archivo</span>
-                                    <button type="button" class="text-[11px] text-brand font-semibold hover:underline"
-                                            onclick="document.getElementById('replace-doc-card').classList.add('hidden'); document.getElementById('existing-doc-card').classList.remove('hidden'); document.getElementById('idDocument').value = ''; document.getElementById('idDocument').required = false; document.getElementById('fileName').textContent = ''; document.getElementById('fileSize').textContent = '0.00 / 4 MB';">Cancelar</button>
-                                </div>
-                                <div class="file-drop" onclick="document.getElementById('idDocument').click()">
-                                    <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
-                                    <div class="text-[13px] font-semibold text-ink-700 mt-2">Arrastra aquí o haz clic para seleccionar</div>
-                                    <div class="text-[11px] text-ink-500 mt-1">PDF, JPG o PNG · máx. 4 MB · <span id="fileSize">0.00 / 4 MB</span></div>
-                                    <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); document.getElementById('idDocument').click()">Buscar archivo</button>
-                                    <input type="file" id="idDocument" name="id_document" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
-                                    <div id="fileName" class="text-[11px] text-brand font-semibold mt-2"></div>
-                                </div>
+
+                            {{-- ============ REVERSO ============ --}}
+                            <div data-uploader>
+                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">Reverso</div>
+                                @if(!empty($existingKycDocBack))
+                                    @php $statusB = $existingKycDocBack['status'] ?? 'pending'; @endphp
+                                    <div data-existing class="flex items-center gap-3 p-3 rounded-xl border border-ink-200 bg-ink-50/50">
+                                        <div class="w-10 h-10 rounded-lg bg-white border border-ink-200 flex items-center justify-center text-ok shrink-0"><i class="pi pi-check-circle text-[16px]"></i></div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-[12px] font-semibold text-ink-950">Cargado</div>
+                                            <div class="text-[10px] text-ink-500 truncate">{{ $existingKycDocBack['name'] }}</div>
+                                            @if($statusB === 'rejected')
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> Rechazado</span>
+                                            @endif
+                                        </div>
+                                        <a href="{{ $existingKycDocBack['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="Ver documento"><i class="pi pi-eye text-[11px]"></i></a>
+                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="Cambiar"><i class="pi pi-refresh text-[11px]"></i></button>
+                                    </div>
+                                    <div data-replace class="hidden mt-2">
+                                        <div class="file-drop" onclick="pickFile(this)">
+                                            <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
+                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir nuevo reverso</div>
+                                            <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
+                                            <input type="file" id="idDocumentBack" name="id_document_back" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
+                                            <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
+                                        </div>
+                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">Cancelar</button>
+                                    </div>
+                                @else
+                                    <div class="file-drop" onclick="pickFile(this)">
+                                        <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
+                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir reverso</div>
+                                        <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
+                                        <input type="file" id="idDocumentBack" name="id_document_back" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
+                                        <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
+                                    </div>
+                                @endif
                             </div>
-                            <input type="hidden" name="kyc_document_reused" value="1">
-                        @else
-                            {{-- No existing doc — show upload zone --}}
-                            <div class="text-ink-400 text-[11px] font-normal mb-2" id="fileSize">0.00 / 4 MB</div>
-                            <div class="file-drop" onclick="document.getElementById('idDocument').click()">
-                                <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
-                                <div class="text-[13px] font-semibold text-ink-700 mt-2">Arrastra aquí o haz clic para seleccionar</div>
-                                <div class="text-[11px] text-ink-500 mt-1">Pasaporte / Cédula / Licencia · PDF, JPG o PNG · máx. 4 MB</div>
-                                <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); document.getElementById('idDocument').click()">Buscar archivo</button>
-                                <input type="file" id="idDocument" name="id_document" required class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
-                                <div id="fileName" class="text-[11px] text-brand font-semibold mt-2"></div>
-                            </div>
-                        @endif
+
+                        </div>
                     </div>
 
                     <div>
@@ -322,12 +341,12 @@
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 3 — Información personal ====== --}}
-            <div class="reg-step" data-step="3">
+            {{-- ====== STEP 2 — Información personal ====== --}}
+            <div class="reg-step" data-step="2">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-info-circle text-ink-600 text-[26px]"></i>
@@ -394,7 +413,7 @@
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Agregar titular secundario <span class="field-required">*</span></label>
+                        <label class="field-label">Agregar titular adicional <span class="field-required">*</span></label>
                         <select id="addCoBuyer" class="auth-input auth-select" onchange="toggleCoBuyersPanel(this.value)">
                             <option value="no">No</option>
                             <option value="si">Sí</option>
@@ -482,12 +501,12 @@
                 </template>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 4 — Dirección ====== --}}
-            <div class="reg-step" data-step="4">
+            {{-- ====== STEP 3 — Dirección ====== --}}
+            <div class="reg-step" data-step="3">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-map-marker text-ink-600 text-[26px]"></i>
@@ -533,18 +552,18 @@
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(5)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 5 — Profesión & Unidad ====== --}}
-            <div class="reg-step" data-step="5">
+            {{-- ====== STEP 4 — Profesión ====== --}}
+            <div class="reg-step" data-step="4">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-briefcase text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Profesión y unidad</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Información laboral y datos de la unidad reservada</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Profesión</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">Información laboral del adquiriente</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -567,51 +586,7 @@
                     </div>
                 </div>
 
-                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mt-7 mb-4">Unidad reservada</div>
-
-                <div class="rounded-2xl border border-ink-200 overflow-hidden bg-white shadow-sm">
-                    {{-- Property Image --}}
-                    <div class="relative h-48 sm:h-56 bg-gradient-to-br from-brand-soft to-ink-50 overflow-hidden">
-                        @if($unit && $unit->images && $unit->images->count() > 0)
-                            <img src="{{ $unit->images->first()->path ?? asset('images/hero/hero.png') }}"
-                                 alt="Unidad {{ $reservation->unit_name ?? '' }}"
-                                 class="w-full h-full object-cover">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-soft to-ink-50">
-                                <div class="text-center">
-                                    <i class="pi pi-home text-brand text-[48px] mb-3"></i>
-                                    <div class="text-ink-600 font-semibold text-[14px]">{{ $reservation->unit_name ?? 'Unidad' }}</div>
-                                </div>
-                            </div>
-                        @endif
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                            <div class="text-white font-display text-[18px] font-bold">{{ $reservation->unit_name ?? 'Unidad' }}</div>
-                            <div class="text-white/80 text-[12px]">Nivel {{ $unit->floor ?? 'N/A' }}</div>
-                        </div>
-                    </div>
-
-                    {{-- Unit Details --}}
-                    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="field-label">Unidad</label>
-                            <input type="text" class="auth-input" value="{{ $reservation->unit_name ?? '' }}" readonly>
-                        </div>
-                        <div>
-                            <label class="field-label">Nivel</label>
-                            <input type="text" class="auth-input" value="{{ $unit->floor ?? 'N/A' }}" readonly>
-                        </div>
-                        <div>
-                            <label class="field-label">Precio de lista</label>
-                            <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
-                        </div>
-                        <div>
-                            <label class="field-label">Precio final</label>
-                            <input type="text" class="auth-input" value="{{ $reservation->formatted_price ?? '' }}" readonly>
-                        </div>
-                    </div>
-                </div>
-
-                <label class="flex items-start gap-2 cursor-pointer mt-5">
+                <label class="flex items-start gap-2 cursor-pointer mt-7">
                     <input type="checkbox" id="terms-checkbox" checked class="w-4 h-4 rounded accent-brand mt-0.5">
                     <span class="text-[13px] text-ink-600">
                         Acepto los <a href="#" class="text-ink-950 hover:text-brand underline">Términos</a> y la
@@ -620,12 +595,12 @@
                 </label>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(6)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(5)" class="auth-btn auth-btn-primary w-full">Continuar</button>
                 </div>
             </div>
 
-            {{-- ====== STEP 6 — Forma de pago ====== --}}
-            <div class="reg-step" data-step="6">
+            {{-- ====== STEP 5 — Forma de pago ====== --}}
+            <div class="reg-step" data-step="5">
                 <div class="text-center mb-7">
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-credit-card text-ink-600 text-[26px]"></i>
@@ -714,6 +689,94 @@
                     <span class="redirect-text">Redirigiendo a tu panel…</span>
                 </div>
             </div>
+
+            </div>{{-- /form column --}}
+
+            {{-- ===================== PROPERTY PANEL ===================== --}}
+            <aside class="w-full lg:w-[330px] lg:shrink-0 lg:sticky lg:top-8">
+                <div class="rounded-2xl border border-ink-200 overflow-hidden bg-white shadow-sm">
+                    {{-- Property image --}}
+                    <div class="relative h-52 bg-gradient-to-br from-brand-soft to-ink-50 overflow-hidden">
+                        @if($unit && $unit->images && $unit->images->count() > 0)
+                            <img src="{{ $unit->images->first()->path ?? asset('images/hero/hero.png') }}"
+                                 alt="Unidad {{ $reservation->unit_name ?? '' }}"
+                                 class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="pi pi-home text-brand text-[44px] mb-2"></i>
+                                    <div class="text-ink-600 font-semibold text-[14px]">{{ $reservation->unit_name ?? 'Unidad' }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-semibold uppercase tracking-wider text-ink-700">
+                            <i class="pi pi-bookmark-fill text-brand text-[9px]"></i> Reservada
+                        </span>
+                        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/65 to-transparent p-4">
+                            <div class="text-white font-display text-[18px] font-bold leading-tight">{{ $reservation->unit_name ?? 'Unidad' }}</div>
+                            <div class="text-white/80 text-[12px]">Nivel {{ $unit->floor ?? 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    {{-- Property details --}}
+                    <div class="p-5">
+                        <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Resumen de la reserva</div>
+
+                        @if($unit && ($unit->bedrooms || $unit->bathrooms || $unit->total_area))
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            @if($unit->bedrooms)
+                            <div class="rounded-xl border border-ink-200 bg-ink-50/50 px-2 py-3 text-center">
+                                <i class="pi pi-home text-ink-400 text-[14px]"></i>
+                                <div class="text-[14px] font-bold text-ink-950 mt-1">{{ $unit->bedrooms }}</div>
+                                <div class="text-[10px] text-ink-500">Hab.</div>
+                            </div>
+                            @endif
+                            @if($unit->bathrooms)
+                            <div class="rounded-xl border border-ink-200 bg-ink-50/50 px-2 py-3 text-center">
+                                <i class="pi pi-inbox text-ink-400 text-[14px]"></i>
+                                <div class="text-[14px] font-bold text-ink-950 mt-1">{{ rtrim(rtrim((string) $unit->bathrooms, '0'), '.') }}</div>
+                                <div class="text-[10px] text-ink-500">Baños</div>
+                            </div>
+                            @endif
+                            @if($unit->total_area)
+                            <div class="rounded-xl border border-ink-200 bg-ink-50/50 px-2 py-3 text-center">
+                                <i class="pi pi-expand text-ink-400 text-[14px]"></i>
+                                <div class="text-[14px] font-bold text-ink-950 mt-1">{{ rtrim(rtrim((string) $unit->total_area, '0'), '.') }}</div>
+                                <div class="text-[10px] text-ink-500">m²</div>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+
+                        <div class="space-y-3 text-[13px]">
+                            <div class="flex items-center justify-between">
+                                <span class="text-ink-500">Código</span>
+                                <span class="font-semibold text-ink-950">{{ $reservation->reservation_code ?? '—' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-ink-500">Unidad</span>
+                                <span class="font-semibold text-ink-950">{{ $reservation->unit_name ?? '—' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-ink-500">Nivel</span>
+                                <span class="font-semibold text-ink-950">{{ $unit->floor ?? 'N/A' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="h-px bg-ink-200/70 my-4"></div>
+
+                        <div class="flex items-end justify-between">
+                            <span class="text-[12px] text-ink-500">Precio</span>
+                            <span class="font-display text-[20px] font-bold text-ink-950">{{ $reservation->formatted_price ?? '—' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mt-4 flex items-start gap-2 text-[12px] text-ink-500 leading-relaxed">
+                    <i class="pi pi-shield text-brand text-[12px] mt-0.5"></i>
+                    Tus datos se procesan de forma segura y solo se usan para formalizar esta reserva.
+                </p>
+            </aside>
 
         </div>
     </main>
@@ -820,18 +883,43 @@
         }
     });
 
-    /* ---------- File upload feedback ---------- */
+    /* ---------- File upload helpers (front + back) ---------- */
+    const uploaderOf = (el) => el.closest('[data-uploader]');
+
+    window.pickFile = (el) => {
+        const input = uploaderOf(el)?.querySelector('input[type=file]');
+        input?.click();
+    };
+
+    window.replaceDoc = (btn) => {
+        const u = uploaderOf(btn);
+        u?.querySelector('[data-existing]')?.classList.add('hidden');
+        u?.querySelector('[data-replace]')?.classList.remove('hidden');
+    };
+
+    window.cancelReplace = (btn) => {
+        const u = uploaderOf(btn);
+        const input = u?.querySelector('input[type=file]');
+        if (input) input.value = '';
+        const size = u?.querySelector('[data-file-size]');
+        const name = u?.querySelector('[data-file-name]');
+        if (size) { size.textContent = '0.00 / 4 MB'; size.style.color = '#a3a3a3'; }
+        if (name) name.textContent = '';
+        u?.querySelector('[data-replace]')?.classList.add('hidden');
+        u?.querySelector('[data-existing]')?.classList.remove('hidden');
+    };
+
     window.updateFileSize = (input) => {
-        const size = document.getElementById('fileSize');
-        const name = document.getElementById('fileName');
+        const drop = input.closest('.file-drop') || uploaderOf(input);
+        const size = drop?.querySelector('[data-file-size]');
+        const name = drop?.querySelector('[data-file-name]');
         if (input.files && input.files[0]) {
             const mb = (input.files[0].size / (1024 * 1024)).toFixed(2);
-            size.textContent = mb + ' / 4 MB';
-            size.style.color = mb > 4 ? '#fb3748' : '#a3a3a3';
-            name.textContent = '✓ ' + input.files[0].name;
+            if (size) { size.textContent = mb + ' / 4 MB'; size.style.color = mb > 4 ? '#fb3748' : '#a3a3a3'; }
+            if (name) name.textContent = '✓ ' + input.files[0].name;
         } else {
-            size.textContent = '0.00 / 4 MB';
-            name.textContent = '';
+            if (size) { size.textContent = '0.00 / 4 MB'; size.style.color = '#a3a3a3'; }
+            if (name) name.textContent = '';
         }
     };
 
@@ -1006,9 +1094,11 @@
             if (c3?.value) fd.append('custom_payment_3', c3.value);
         }
 
-        // ID document upload
+        // ID document upload (frente + reverso)
         const idFile = document.getElementById('idDocument');
         if (idFile && idFile.files[0]) fd.append('id_document', idFile.files[0]);
+        const idFileBack = document.getElementById('idDocumentBack');
+        if (idFileBack && idFileBack.files[0]) fd.append('id_document_back', idFileBack.files[0]);
 
         try {
             const res = await fetch('/reservations/update', {
@@ -1040,23 +1130,6 @@
         document.getElementById('success-state').classList.remove('hidden');
         setTimeout(() => { window.location.href = '{{ route('dashboard') }}'; }, 3500);
     }
-
-    /* ---------- Countdown timer ---------- */
-    const expiresAt = new Date('{{ $reservation->expires_at ?? now()->addMinutes(10) }}');
-    const countdownEl = document.getElementById('countdown');
-    function tick() {
-        const diff = expiresAt - new Date();
-        if (diff <= 0) {
-            countdownEl.textContent = 'EXPIRADO';
-            countdownEl.className = 'font-display text-[14px] font-bold text-err';
-            return;
-        }
-        const mm = Math.floor(diff / 60000);
-        const ss = Math.floor((diff % 60000) / 1000);
-        countdownEl.textContent = mm + ':' + String(ss).padStart(2,'0');
-        if (mm < 5) countdownEl.className = 'font-display text-[14px] font-bold text-err';
-    }
-    tick(); setInterval(tick, 1000);
 })();
 </script>
 

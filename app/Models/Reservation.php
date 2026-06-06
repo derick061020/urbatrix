@@ -40,6 +40,7 @@ class Reservation extends Model
         'budget_client_response_at',
         'terms_accepted',
         'id_document_path',
+        'id_document_back_path',
         'expedition_date',
         'expedition_place',
         'birth_date',

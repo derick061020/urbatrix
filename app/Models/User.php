@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'first_name', 'last_name', 'email', 'password', 'role', 'last_seen', 'google_id', 'apple_id', 'avatar', 'phone', 'country', 'verification_status', 'kyc_id_document'])]
+#[Fillable(['name', 'first_name', 'last_name', 'email', 'password', 'role', 'last_seen', 'google_id', 'apple_id', 'avatar', 'phone', 'country', 'verification_status', 'kyc_id_document', 'kyc_id_document_back'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -20,7 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'first_name', 'last_name', 'email', 'password', 'role',
         'last_seen', 'google_id', 'apple_id', 'avatar',
-        'phone', 'country', 'verification_status', 'kyc_id_document',
+        'phone', 'country', 'verification_status', 'kyc_id_document', 'kyc_id_document_back',
     ];
 
     protected function casts(): array
@@ -79,6 +79,12 @@ class User extends Authenticatable
     {
         if (! $this->kyc_id_document) return false;
         return \Illuminate\Support\Facades\Storage::disk('public')->exists($this->kyc_id_document);
+    }
+
+    public function hasKycDocumentBack(): bool
+    {
+        if (! $this->kyc_id_document_back) return false;
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($this->kyc_id_document_back);
     }
 
     public function isPendingVerification(): bool

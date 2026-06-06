@@ -375,7 +375,17 @@ class ReservationController extends Controller
             ]
             : null;
 
-        return view('form', compact('reservation', 'unit', 'existingKycDoc'));
+        // Same for the reverse side of the document, if it was uploaded before
+        $existingKycDocBack = ($user && \Schema::hasColumn('users', 'kyc_id_document_back') && $user->hasKycDocumentBack())
+            ? [
+                'path'   => $user->kyc_id_document_back,
+                'url'    => \Storage::disk('public')->url($user->kyc_id_document_back),
+                'name'   => basename($user->kyc_id_document_back),
+                'status' => $user->verification_status ?? 'pending',
+            ]
+            : null;
+
+        return view('form', compact('reservation', 'unit', 'existingKycDoc', 'existingKycDocBack'));
     }
 
     /**
@@ -421,7 +431,13 @@ class ReservationController extends Controller
             'economic_dependent' => 'nullable|string|in:Sí,No',
             'payment_method' => 'nullable|string',
             'terms_accepted' => 'required|accepted',
-            'id_document' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:1024', // Max 1MB
+            'id_document' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096', // Frente · máx 4MB
+            'id_document_back' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096', // Reverso · máx 4MB
+            // Datos básicos — solo se completan si la cuenta no los tenía aún
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
             'expedition_date' => 'nullable|date',
             'expedition_place' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
@@ -471,7 +487,28 @@ class ReservationController extends Controller
                 $idDocumentPath = Auth::user()->kyc_id_document;
                 \Log::info('Reusing existing KYC doc for reservation: ' . $idDocumentPath);
             }
-            
+
+            // Handle reverse side of the document — same logic as the front
+            $idDocumentBackPath = null;
+            if ($request->hasFile('id_document_back')) {
+                $file = $request->file('id_document_back');
+                $filename = 'id_back_' . $reservation->reservation_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('documents'), $filename);
+                $idDocumentBackPath = 'documents/' . $filename;
+                \Log::info('ID document (back) uploaded: ' . $idDocumentBackPath);
+
+                if (Auth::check() && \Schema::hasColumn('users', 'kyc_id_document_back')) {
+                    $auth = Auth::user();
+                    $copyPath = 'onboarding/'.$auth->id.'/id_back.'.$file->getClientOriginalExtension();
+                    \Storage::disk('public')->copy($idDocumentBackPath, $copyPath); // best-effort
+                    $auth->update(['kyc_id_document_back' => $copyPath]);
+                }
+            } elseif (Auth::check() && \Schema::hasColumn('users', 'kyc_id_document_back') && Auth::user()->hasKycDocumentBack()) {
+                // Reuse the reverse the user uploaded during register
+                $idDocumentBackPath = Auth::user()->kyc_id_document_back;
+                \Log::info('Reusing existing KYC back doc for reservation: ' . $idDocumentBackPath);
+            }
+
             // Get payment plan configuration if payment method is selected
             $paymentPlanData = [];
             if (!empty($validated['payment_method'])) {
@@ -485,14 +522,34 @@ class ReservationController extends Controller
                 ];
             }
             
+            // Datos básicos — completar solo los que aún estén vacíos en la reserva
+            // (los campos del form vienen bloqueados cuando la cuenta ya los tenía).
+            $basicData = [];
+            foreach (['first_name', 'last_name', 'email', 'phone'] as $basicField) {
+                $incoming = trim((string) ($validated[$basicField] ?? ''));
+                if ($incoming !== '' && empty($reservation->{$basicField})) {
+                    $basicData[$basicField] = $incoming;
+                }
+            }
+            // Reflejar también en la cuenta del cliente si la tenía incompleta
+            if (!empty($basicData) && Auth::check()) {
+                $authUser = Auth::user();
+                $userPatch = [];
+                foreach ($basicData as $k => $v) {
+                    if (empty($authUser->{$k})) $userPatch[$k] = $v;
+                }
+                if (!empty($userPatch)) $authUser->update($userPatch);
+            }
+
             // Update additional fields
-            $reservation->update(array_merge([
+            $reservation->update(array_merge($basicData, [
                 'profession' => $validated['profession'] ?? null,
                 'occupation' => $validated['occupation'] ?? null,
                 'economic_dependent' => $validated['economic_dependent'] ?? null,
                 'payment_method' => $validated['payment_method'] ?? null,
                 'terms_accepted' => true,
                 'id_document_path' => $idDocumentPath,
+                'id_document_back_path' => $idDocumentBackPath,
                 'expedition_date' => $validated['expedition_date'] ?? null,
                 'expedition_place' => $validated['expedition_place'] ?? null,
                 'birth_date' => $validated['birth_date'] ?? null,
@@ -564,7 +621,37 @@ class ReservationController extends Controller
                         // El documento de identidad se conserva como referencia; el KYC en sí
                         // es el formulario imprimible que se genera abajo.
                         'id_document_path'  => $idDocumentPath,
+                        'id_document_back_path' => $idDocumentBackPath,
                     ];
+
+                    // Surface front/back ID images as their own Document rows so the client
+                    // sees them in their panel and admins in the CRM. Reuse any existing
+                    // register-time row (reservation_id null) to avoid duplicates.
+                    foreach ([['id_front', $idDocumentPath], ['id_back', $idDocumentBackPath]] as [$docType, $docPath]) {
+                        if (! $docPath) continue;
+                        try {
+                            $existing = \App\Models\Document::where('document_type', $docType)
+                                ->where(function ($q) use ($reservation) {
+                                    $q->where('reservation_id', $reservation->id)
+                                      ->orWhere('metadata->user_id', $reservation->user_id);
+                                })->first();
+                            $payload = [
+                                'reservation_id' => $reservation->id,
+                                'document_type'  => $docType,
+                                'title'          => ($docType === 'id_front' ? 'Documento de identidad (Frente) — ' : 'Documento de identidad (Reverso) — ')
+                                                    . trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')),
+                                'filename'       => basename($docPath),
+                                'file_path'      => $docPath,
+                                'status'         => 'pending',
+                                'generated_at'   => now(),
+                                'metadata'       => ['user_id' => $reservation->user_id, 'source' => 'kyc_form'],
+                            ];
+                            if ($existing) $existing->update($payload);
+                            else \App\Models\Document::create($payload);
+                        } catch (\Throwable $e) {
+                            \Log::warning("No se pudo registrar el Document {$docType}: ".$e->getMessage());
+                        }
+                    }
 
                     // Generar el formulario KYC imprimible (HTML) con lo que cargó el cliente.
                     $kycHtmlPath = null;
