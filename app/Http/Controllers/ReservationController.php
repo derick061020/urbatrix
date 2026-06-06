@@ -310,6 +310,11 @@ class ReservationController extends Controller
                 ]);
             }
 
+            // Pagada la seña: bienvenida al cliente (E-01) + aviso interno al equipo (E-09).
+            \App\Services\CrmDispatcher::event('reservation_confirmed', [
+                'reservation' => $reservation->fresh('unit'),
+            ]);
+
             session(['reservation' => $reservation]);
 
             return response()->json([
@@ -528,11 +533,6 @@ class ReservationController extends Controller
                         'reserved_by_reservation_id' => $reservation->id,
                     ]);
                 }
-
-                // Bienvenida al cliente (E-01) + aviso interno de nueva reserva (E-09).
-                \App\Services\CrmDispatcher::event('reservation_confirmed', [
-                    'reservation' => $reservation->fresh('unit'),
-                ]);
                 
                 // Create a consolidated 'kyc' Document row so admins can review
                 // the full KYC dossier in one place from the expediente detail.

@@ -24,7 +24,9 @@
       "Bash(php -r \"json_decode\\(file_get_contents\\('/home/kira/Escritorio/projects/launchbase/launchbase/lang/es.json'\\), true\\); echo json_last_error_msg\\(\\).PHP_EOL;\")",
       "Bash(php -r \"json_decode\\(file_get_contents\\('/home/kira/Escritorio/projects/launchbase/launchbase/lang/en.json'\\), true\\); echo json_last_error_msg\\(\\).PHP_EOL;\")",
       "Bash(php -r ' *)",
-      "Bash(composer require *)"
+      "Bash(composer require *)",
+      "Bash(rg -rn \"route\\('dashboard\" resources/views/layouts/)",
+      "Bash(rg -rln \"dashboard.acuerdos\" resources/views/)"
     ]
   }
 }
