@@ -1363,12 +1363,22 @@
 
         <!-- RIGHT: Saved counter + Avatar + Hamburger -->
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+          @php $isAdminUser = auth()->check() && (auth()->user()->role ?? '') === 'admin'; @endphp
+          @if($isAdminUser)
+          <span aria-label="Saved units" aria-disabled="true" title="No disponible para administradores" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:not-allowed;border-radius:9999px;text-decoration:none;opacity:0.4;pointer-events:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;">Guardados</span>
+          </span>
+          @else
           <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
             <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;" data-saved-count>Guardados ({{ count($wishlistIds ?? []) }})</span>
           </a>
+          @endif
 
           <span aria-hidden="true" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
 
@@ -1482,6 +1492,18 @@
                 <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
               </div>
 
+              @if($isAdminUser)
+              <div aria-disabled="true" title="No disponible para administradores" style="text-decoration:none;display:block;width:100%;cursor:not-allowed;opacity:0.4;pointer-events:none;">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
+                </div>
+              </div>
+              @else
               <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" style="text-decoration:none;display:block;width:100%">
                 <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
                   <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
@@ -1492,6 +1514,7 @@
                   <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
                 </div>
               </a>
+              @endif
 
               <!-- Divider -->
               <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">

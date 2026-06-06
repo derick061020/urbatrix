@@ -633,6 +633,15 @@ class ContractController extends Controller
             $reservation->status = 'contract_signed';
             $reservation->save();
 
+            // Comisión desbloqueada para el/los broker(s) de la unidad (E-05).
+            try {
+                \App\Services\CrmDispatcher::event('commission_unlocked', [
+                    'reservation' => $reservation->fresh('unit'),
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('No se pudo notificar comisión desbloqueada: ' . $e->getMessage());
+            }
+
             // Generate payments after contract approval
             try {
                 $paymentsCount = PaymentService::generatePayments($reservation);

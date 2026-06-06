@@ -20,6 +20,8 @@ class CrmTemplate extends Model
         'subject',
         'body',
         'variables',
+        'doc_label',
+        'audience',
         'last_used_at',
         'usage_count',
         'is_active',
@@ -38,6 +40,8 @@ class CrmTemplate extends Model
         'pagos'       => 'Pagos',
         'legal'       => 'Legal',
         'proyectos'   => 'Proyectos',
+        'profesional' => 'Profesional',
+        'interno'     => 'Interno',
         'otro'        => 'Otro',
     ];
 

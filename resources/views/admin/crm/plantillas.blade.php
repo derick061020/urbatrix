@@ -54,6 +54,8 @@
         'pagos'       => ['bg' => '#fff3eb', 'text' => '#e16614'],
         'legal'       => ['bg' => '#ffebec', 'text' => '#e93544'],
         'proyectos'   => ['bg' => '#e3f7ec', 'text' => '#1daf61'],
+        'profesional' => ['bg' => '#fdf3e7', 'text' => '#b8962e'],
+        'interno'     => ['bg' => '#eef0f3', 'text' => '#3a4250'],
         'otro'        => ['bg' => '#f2f5f8', 'text' => '#525866'],
     ];
     $triggerEvents = \App\Models\CrmAutomation::$TRIGGER_EVENTS;
@@ -254,24 +256,43 @@
                 </div>
                 <div class="pa-field md:col-span-2">
                     <label>Asunto (solo email)</label>
-                    <input class="pa-input" name="subject" id="pa-tpl-subject" maxlength="255" placeholder="Ej.: ¡Bienvenido a Makai, @{{cliente_nombre}}!">
+                    <input class="pa-input" name="subject" id="pa-tpl-subject" maxlength="255" placeholder="Ej.: ¡Bienvenido a Makai, @{{nombre_cliente}}!">
                 </div>
                 <div class="pa-field md:col-span-2">
                     <label>Cuerpo del mensaje *</label>
-                    <textarea class="pa-textarea" name="body" id="pa-tpl-body" required placeholder="Escribe el contenido del mensaje. Usa variables como @{{cliente_nombre}} para personalizar."></textarea>
+                    <textarea class="pa-textarea" name="body" id="pa-tpl-body" required placeholder="Contenido del mensaje (HTML para email). Usa variables como @{{nombre_cliente}} para personalizar."></textarea>
                     <div class="text-[11px] text-ink-500 mt-2">
                         <span class="font-semibold">Variables disponibles (clic para insertar):</span><br>
                         @php
                             $paVars = [
-                                'cliente_nombre'    => 'Nombre del cliente',
-                                'cliente_email'     => 'Email del cliente',
-                                'unidad'            => 'Unidad',
-                                'proyecto'          => 'Proyecto',
-                                'monto'             => 'Monto',
-                                'fecha_vencimiento' => 'Fecha de vencimiento',
-                                'fecha_reserva'     => 'Fecha de reserva',
-                                'portal_url'        => 'URL del portal',
-                                'avance'            => 'Avance',
+                                'nombre_cliente'         => 'Nombre del cliente',
+                                'cliente_email'          => 'Email del cliente',
+                                'nombre_asesor'          => 'Nombre del asesor',
+                                'tel_asesor'             => 'Teléfono del asesor',
+                                'nombre_profesional'     => 'Nombre del broker',
+                                'proyecto'               => 'Proyecto',
+                                'unidad'                 => 'Unidad',
+                                'precio_venta'           => 'Precio de venta',
+                                'monto_reserva'          => 'Monto de reserva',
+                                'monto_downpayment'      => 'Monto inicial',
+                                'monto_comision'         => 'Monto de comisión',
+                                'monto'                  => 'Monto del pago',
+                                'moneda'                 => 'Moneda',
+                                'monto_en_letras'        => 'Monto en letras',
+                                'concepto_pago'          => 'Concepto del pago',
+                                'metodo_pago'            => 'Método de pago',
+                                'referencia_transaccion' => 'Referencia',
+                                'fecha_pago'             => 'Fecha de pago',
+                                'fecha_vencimiento'      => 'Fecha de vencimiento',
+                                'fecha_entrega'          => 'Fecha de entrega',
+                                'total_pagado'           => 'Total pagado',
+                                'saldo_pendiente'        => 'Saldo pendiente',
+                                'pct_obra'               => '% de obra',
+                                'mes_reporte'            => 'Mes del reporte',
+                                'num_fotos'              => 'N.º de fotos',
+                                'hitos_actualizados'     => 'Hitos actualizados',
+                                'link_portal'            => 'Enlace al portal',
+                                'link_comprobante'       => 'Enlace al comprobante',
                             ];
                         @endphp
                         @foreach($paVars as $v => $label)
@@ -307,8 +328,9 @@
                 <div class="pa-preview-block" id="pa-prev-subject">—</div>
             </div>
             <div>
-                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">Cuerpo</div>
-                <div class="pa-preview-block" id="pa-prev-body">—</div>
+                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">Vista previa del correo</div>
+                <iframe id="pa-prev-frame" title="Vista previa del correo"
+                        style="width:100%;height:46vh;border:1px solid #eaecf0;border-radius:10px;background:#EFEDE8;"></iframe>
             </div>
             <form id="pa-test-form" method="POST" class="border-t border-ink-100 pt-3">
                 @csrf
@@ -650,7 +672,7 @@
             const channels = Array.isArray(t.channels) ? t.channels.join(' · ') : '—';
             document.getElementById('pa-prev-meta').textContent = `${t.category} · ${channels}`;
             document.getElementById('pa-prev-subject').textContent = t.subject || '(sin asunto)';
-            document.getElementById('pa-prev-body').textContent = t.body || '';
+            document.getElementById('pa-prev-frame').src = `${TPL_BASE}/${id}/preview`;
             document.getElementById('pa-test-form').action = `${TPL_BASE}/${id}/test`;
             document.getElementById('pa-prev-edit-btn').onclick = () => {
                 paCloseModal('pa-modal-preview');

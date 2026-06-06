@@ -113,6 +113,21 @@
           margin: 0 auto 18px;
       }
 
+      /* Redirect loader shown on the success state */
+      .redirect-box {
+          display:inline-flex; align-items:center; gap:10px;
+          margin-top:20px; padding:10px 18px;
+          background:#f1f5f2; border:1px solid #d9e2dc; border-radius:999px;
+      }
+      .redirect-spinner {
+          width:18px; height:18px; border-radius:999px;
+          border:2.5px solid #c5d3ca; border-top-color:#5c7c68;
+          animation: redirect-spin .7s linear infinite;
+          flex-shrink:0;
+      }
+      .redirect-text { font-size:13px; font-weight:600; color:#3f5547; }
+      @keyframes redirect-spin { to { transform: rotate(360deg); } }
+
       /* Responsive */
       @media (max-width: 640px) {
           #step-indicator { display:none !important; }
@@ -694,7 +709,10 @@
                 <div class="check-circle"><i class="pi pi-check text-[28px] font-bold"></i></div>
                 <h2 class="font-display text-[26px] font-medium text-ink-950">Formulario enviado</h2>
                 <p class="text-[14px] text-ink-500 mt-2">Tu reserva ha sido procesada exitosamente.</p>
-                <p class="text-[12px] text-ink-400 mt-1">Te redirigiremos a la página principal…</p>
+                <div class="redirect-box">
+                    <span class="redirect-spinner"></span>
+                    <span class="redirect-text">Redirigiendo a tu panel…</span>
+                </div>
             </div>
 
         </div>
@@ -1020,7 +1038,7 @@
         document.getElementById('step-indicator')?.classList.add('hidden');
         document.getElementById('back-btn')?.classList.add('hidden');
         document.getElementById('success-state').classList.remove('hidden');
-        setTimeout(() => { window.location.href = '/'; }, 3500);
+        setTimeout(() => { window.location.href = '{{ route('dashboard') }}'; }, 3500);
     }
 
     /* ---------- Countdown timer ---------- */

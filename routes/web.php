@@ -306,6 +306,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::delete('/crm/plantillas/{template}',             [AdminController::class, 'deleteTemplate'])->name('admin.crm.plantillas.delete');
     Route::post('/crm/plantillas/{template}/duplicate',     [AdminController::class, 'duplicateTemplate'])->name('admin.crm.plantillas.duplicate');
     Route::get('/crm/plantillas/{template}/data',           [AdminController::class, 'getTemplate'])->name('admin.crm.plantillas.data');
+    Route::get('/crm/plantillas/{template}/preview',        [AdminController::class, 'previewTemplate'])->name('admin.crm.plantillas.preview');
     Route::post('/crm/plantillas/{template}/test',          [AdminController::class, 'sendTestTemplate'])->name('admin.crm.plantillas.test');
 
     // CRM Automatizaciones CRUD

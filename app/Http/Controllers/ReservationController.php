@@ -291,10 +291,11 @@ class ReservationController extends Controller
                     'notes'          => 'Stripe PaymentIntent '.$intent->id,
                 ]);
 
-                // Comprobante de pago por correo (#11 del briefing)
-                if ($to = ($reservation->email ?: optional($reservation->user)->email)) {
-                    \Illuminate\Support\Facades\Mail::to($to)->send(new \App\Mail\PaymentReceiptMail($payment));
-                }
+                // Comprobante de pago al cliente (E-11) vía automatizaciones del CRM.
+                \App\Services\CrmDispatcher::event('payment_received', [
+                    'payment'     => $payment,
+                    'reservation' => $reservation,
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('Could not record/notify reservation payment: '.$e->getMessage());
             }
@@ -516,7 +517,7 @@ class ReservationController extends Controller
             // Auto-confirm reservation when form is completed
             if ($reservation->status === 'pending') {
                 $reservation->update(['status' => 'confirmed']);
-                
+
                 // Update unit status to 'reserved' when reservation is confirmed
                 // and clear the 48h auto-release timer since the deal is moving forward
                 $unit = Unit::find($reservation->unit_id);
@@ -527,6 +528,11 @@ class ReservationController extends Controller
                         'reserved_by_reservation_id' => $reservation->id,
                     ]);
                 }
+
+                // Bienvenida al cliente (E-01) + aviso interno de nueva reserva (E-09).
+                \App\Services\CrmDispatcher::event('reservation_confirmed', [
+                    'reservation' => $reservation->fresh('unit'),
+                ]);
                 
                 // Create a consolidated 'kyc' Document row so admins can review
                 // the full KYC dossier in one place from the expediente detail.

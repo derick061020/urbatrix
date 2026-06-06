@@ -52,10 +52,15 @@
     }
     .logout-confirm-actions {
         display: flex;
-        justify-content: flex-end;
         gap: 10px;
     }
+    /* Cada acción (botón Cancelar y el form de Cerrar sesión) ocupa 50% del ancho */
+    .logout-confirm-actions > * {
+        flex: 1 1 0;
+        min-width: 0;
+    }
     .logout-confirm-btn {
+        width: 100%;
         height: 40px;
         border-radius: 10px;
         border: 1px solid #e5e7eb;

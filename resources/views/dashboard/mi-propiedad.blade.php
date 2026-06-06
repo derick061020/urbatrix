@@ -33,6 +33,9 @@
     $planApproved   = $reservation->documents->where('document_type', 'payment_plan')->where('status', 'approved')->isNotEmpty();
     $paymentPaid    = $reservation->payments->where('status', 'paid')->count() > 0;
     $contractSigned = in_array($reservation->status, ['contract_signed', 'signed']);
+    // Todas las cuotas finalizadas: hay pagos y todos están en estado 'paid'.
+    $allPaid        = $reservation->payments->isNotEmpty()
+                      && $reservation->payments->where('status', 'paid')->count() === $reservation->payments->count();
 
     // Sequential progression: a step only becomes active when EVERY previous step is complete.
     // The reservation deposit can be paid up-front, so a paid payment must NOT skip KYC/Promesa/Plan.
@@ -42,15 +45,17 @@
     if ($stepCount >= 3 && $promesaSigned)            $stepCount = 4; // Plan de pago
     if ($stepCount >= 4 && $planApproved)             $stepCount = 5; // Doc. de pago
     if ($stepCount >= 5 && $paymentPaid)              $stepCount = 6; // Contrato
-    if ($contractSigned)                              $stepCount = 6;
+    if ($contractSigned)                              $stepCount = 7; // Contrato firmado ⇒ Contrato en verde, Transferencia activa
+    if ($contractSigned && $allPaid)                  $stepCount = 8; // Cuotas completas ⇒ Transferencia hecha
 
     $steps = [
-        [__('Reserva'),      'check-circle'],
-        [__('KYC'),          'id-card'],
-        [__('Promesa'),      'file-edit'],
-        [__('Plan de pago'), 'calculator'],
-        [__('Doc. de pago'), 'credit-card'],
-        [__('Contrato'),     'file'],
+        [__('Reserva'),         'check-circle'],
+        [__('KYC'),             'id-card'],
+        [__('Promesa'),         'file-edit'],
+        [__('Plan de pago'),    'calculator'],
+        [__('Doc. de pago'),    'credit-card'],
+        [__('Contrato'),        'file'],
+        [__('Transferencia'),   'key'],
     ];
 
     $nextPay  = $reservation->payments->where('status', 'pending')->sortBy('due_date')->first();

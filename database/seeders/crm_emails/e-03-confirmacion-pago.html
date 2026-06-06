@@ -1,0 +1,67 @@
+<!-- HERO -->
+        <tr>
+          <td style="background-color:#0f2710;padding:26px 36px 22px 36px;">
+            <p style="margin:0 0 7px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:rgba(241,237,227,0.4);letter-spacing:0.24em;text-transform:uppercase;">Pago recibido · Cliente final</p>
+            <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:22px;font-weight:300;color:#F1EDE3;letter-spacing:-0.02em;line-height:1.15;">Hemos recibido tu pago &nbsp;<span style="font-size:14px;font-weight:300;color:rgba(241,237,227,0.45);">· {{proyecto}}</span></p>
+          </td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="background-color:#ffffff;padding:32px 36px 0 36px;">
+            <p style="margin:0 0 6px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#4a4a46;line-height:1.6;">Estimado/a <strong style="color:#1a1a18;font-weight:600;">{{nombre_cliente}}</strong>,</p>
+            <p style="margin:0 0 28px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#6a6a64;line-height:1.65;">Confirmamos la recepción de tu pago para la <strong style="color:#1a1a18;">Unidad {{unidad}}</strong> en <strong style="color:#1a1a18;">{{proyecto}}</strong>. Tu plan de pagos actualizado y el comprobante de recepción están disponibles en tu portal.</p>
+
+            <p style="margin:0 0 12px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:600;color:#8a8a84;letter-spacing:0.22em;text-transform:uppercase;">Detalle del pago</p>
+
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top:1px solid #e8e7e3;">
+              <tr>
+                <td style="width:50%;padding:14px 0;border-bottom:1px solid #e8e7e3;vertical-align:top;padding-right:16px;">
+                  <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:#8a8a84;letter-spacing:0.14em;text-transform:uppercase;">Unidad</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:16px;font-weight:300;color:#1a1a18;">{{unidad}}</p>
+                </td>
+                <td style="width:50%;padding:14px 0;border-bottom:1px solid #e8e7e3;vertical-align:top;border-left:1px solid #e8e7e3;padding-left:16px;">
+                  <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:#8a8a84;letter-spacing:0.14em;text-transform:uppercase;">Proyecto</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:16px;font-weight:300;color:#1a1a18;">{{proyecto}}</p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="background-color:#0b1c0a;padding:14px 16px;">
+                  <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:rgba(184,150,46,0.7);letter-spacing:0.14em;text-transform:uppercase;">Pago registrado</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:18px;font-weight:600;color:#F1EDE3;">{{monto_downpayment}}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="background-color:#ffffff;padding:24px 36px 0 36px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td style="background-color:#0b1c0a;">
+                  <a href="{{link_portal}}" style="display:inline-block;padding:11px 24px;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;color:#F1EDE3;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">Ver mi plan de pagos</a>
+                </td>
+                <td style="width:16px;"></td>
+                <td style="vertical-align:middle;"><span style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;color:#8a8a84;">{{link_portal}}</span></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ADVISOR -->
+        <tr>
+          <td style="background-color:#ffffff;padding:20px 36px 32px 36px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="padding:0 0 0 20px;border-left:2px solid #B8962E;">
+                  <p style="margin:0 0 2px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:12px;color:#6a6a64;line-height:1.6;">Si tienes alguna pregunta sobre tu plan de pagos, no dudes en contactar a tu asesor <strong style="color:#1a1a18;font-weight:600;">{{nombre_asesor}}</strong>.</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:12px;color:#6a6a64;">Gracias por tu puntualidad.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- SIGNATURE -->

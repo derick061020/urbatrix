@@ -1231,7 +1231,8 @@ class AdminController extends Controller
 
         $notified = 0;
         if ($request->boolean('notify', true)) {
-            $notified = $this->notifyConstructionReport($report, \App\Mail\NewReportMail::class);
+            // Nuevo reporte publicado (E-12).
+            $notified = $this->notifyConstructionReport($report, 'report_uploaded');
             $report->update(['notified_at' => now(), 'notified_count' => $notified]);
         }
 
@@ -1243,17 +1244,17 @@ class AdminController extends Controller
      */
     public function notifyConstructionReportMonthly(\App\Models\ConstructionReport $report)
     {
-        $notified = $this->notifyConstructionReport($report, \App\Mail\ConstructionProgressMail::class);
+        $notified = $this->notifyConstructionReport($report, 'progress_update');
         $report->update(['notified_at' => now(), 'notified_count' => $notified]);
 
         return back()->with('success', "Avance mensual enviado a {$notified} compradores.");
     }
 
     /**
-     * Envía el mailable indicado a cada comprador activo del proyecto del reporte.
-     * Devuelve la cantidad de correos enviados.
+     * Dispara la automatización del CRM ($event) por cada comprador activo del
+     * proyecto del reporte. Devuelve la cantidad de correos enviados.
      */
-    private function notifyConstructionReport(\App\Models\ConstructionReport $report, string $mailable): int
+    private function notifyConstructionReport(\App\Models\ConstructionReport $report, string $event): int
     {
         $query = Reservation::with('unit', 'user')->whereNotNull('paid_at');
         if ($report->project_id) {
@@ -1262,16 +1263,10 @@ class AdminController extends Controller
 
         $sent = 0;
         foreach ($query->get() as $reservation) {
-            $to = $reservation->email ?: optional($reservation->user)->email;
-            if (! $to) {
-                continue;
-            }
-            try {
-                \Illuminate\Support\Facades\Mail::to($to)->send(new $mailable($report, $reservation));
-                $sent++;
-            } catch (\Throwable $e) {
-                \Log::warning('No se pudo notificar avance de obra: '.$e->getMessage());
-            }
+            $sent += \App\Services\CrmDispatcher::event($event, [
+                'report'      => $report,
+                'reservation' => $reservation,
+            ]);
         }
 
         return $sent;
@@ -1359,15 +1354,43 @@ class AdminController extends Controller
         return response()->json($template);
     }
 
+    /**
+     * Vista previa HTML de la plantilla con datos de ejemplo (para el iframe del modal).
+     */
+    public function previewTemplate(CrmTemplate $template)
+    {
+        $rendered = \App\Support\CrmTemplateRenderer::render(
+            $template,
+            \App\Support\CrmTemplateRenderer::SAMPLE
+        );
+
+        return response($rendered['html'])->header('Content-Type', 'text/html; charset=UTF-8');
+    }
+
     public function sendTestTemplate(Request $request, CrmTemplate $template)
     {
-        $request->validate([
-            'to' => 'required|string|max:160',
+        $validated = $request->validate([
+            'to' => 'required|email|max:160',
         ]);
-        $template->last_used_at = now();
-        $template->usage_count = ($template->usage_count ?? 0) + 1;
-        $template->save();
-        return back()->with('success', 'Prueba enviada a ' . $request->input('to') . '.');
+
+        $rendered = \App\Support\CrmTemplateRenderer::render(
+            $template,
+            \App\Support\CrmTemplateRenderer::SAMPLE
+        );
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($validated['to'])
+                ->send(new \App\Mail\CrmTemplateMail('[PRUEBA] ' . $rendered['subject'], $rendered['html']));
+        } catch (\Throwable $e) {
+            return back()->with('error', 'No se pudo enviar la prueba: ' . $e->getMessage());
+        }
+
+        $template->forceFill([
+            'last_used_at' => now(),
+            'usage_count'  => ($template->usage_count ?? 0) + 1,
+        ])->save();
+
+        return back()->with('success', 'Prueba enviada a ' . $validated['to'] . '.');
     }
 
     /* ───── CRM: Automations CRUD ───── */
@@ -1419,17 +1442,36 @@ class AdminController extends Controller
 
     public function runAutomation(CrmAutomation $automation)
     {
-        $automation->update([
+        $template = $automation->template;
+        if (! $template) {
+            return back()->with('error', 'La automatización no tiene plantilla asignada.');
+        }
+
+        // Ejecución manual: envía una muestra de la plantilla al correo del admin
+        // (no dispara envíos masivos a clientes reales).
+        $to = Auth::user()->email;
+        $rendered = \App\Support\CrmTemplateRenderer::render(
+            $template,
+            \App\Support\CrmTemplateRenderer::SAMPLE
+        );
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($to)
+                ->send(new \App\Mail\CrmTemplateMail('[FLUJO] ' . $rendered['subject'], $rendered['html']));
+        } catch (\Throwable $e) {
+            return back()->with('error', 'No se pudo ejecutar el flujo: ' . $e->getMessage());
+        }
+
+        $automation->forceFill([
             'last_run_at' => now(),
             'run_count'   => ($automation->run_count ?? 0) + 1,
-        ]);
-        if ($automation->template) {
-            $automation->template->update([
-                'last_used_at' => now(),
-                'usage_count'  => ($automation->template->usage_count ?? 0) + 1,
-            ]);
-        }
-        return back()->with('success', 'Automatización ejecutada manualmente.');
+        ])->save();
+        $template->forceFill([
+            'last_used_at' => now(),
+            'usage_count'  => ($template->usage_count ?? 0) + 1,
+        ])->save();
+
+        return back()->with('success', 'Flujo ejecutado: muestra enviada a ' . $to . '.');
     }
 
     public function getAutomation(CrmAutomation $automation)
@@ -2018,10 +2060,11 @@ class AdminController extends Controller
             if (! $reservation) {
                 return;
             }
-            $to = $reservation->email ?: optional($reservation->user)->email;
-            if ($to) {
-                \Illuminate\Support\Facades\Mail::to($to)->send(new \App\Mail\PaymentReceiptMail($payment));
-            }
+            // Comprobante de pago (E-11) vía automatizaciones del CRM.
+            \App\Services\CrmDispatcher::event('payment_received', [
+                'payment'     => $payment,
+                'reservation' => $reservation,
+            ]);
         } catch (\Throwable $e) {
             \Log::warning('No se pudo enviar el comprobante de pago: '.$e->getMessage());
         }

@@ -207,7 +207,7 @@ class NotificationController extends Controller
                     'title'      => 'Presupuesto disponible',
                     'body'       => 'Revisa el presupuesto de tu reserva '.($r->reservation_code ? '#'.$r->reservation_code : ''),
                     'created_at' => $r->budget_sent_at ?: $r->updated_at,
-                    'url'        => route('dashboard.budget', $r->id),
+                    'url'        => route('dashboard.acuerdos'),
                 ]);
             }
         }

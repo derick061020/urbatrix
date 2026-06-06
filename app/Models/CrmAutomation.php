@@ -43,6 +43,8 @@ class CrmAutomation extends Model
         'contract_ready'         => 'Contrato listo',
         'contract_signed'        => 'Contrato firmado',
         'progress_update'        => 'Actualización de avance de obra',
+        'report_uploaded'        => 'Nuevo reporte de obra subido',
+        'commission_unlocked'    => 'Comisión desbloqueada (broker)',
         'document_uploaded'      => 'Documento subido',
         'aftersale_created'      => 'Caso de postventa creado',
     ];

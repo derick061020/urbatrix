@@ -1,0 +1,73 @@
+<!-- HERO -->
+        <tr>
+          <td style="background-color:#0f2710;padding:26px 36px 22px 36px;">
+            <p style="margin:0 0 7px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:rgba(241,237,227,0.4);letter-spacing:0.24em;text-transform:uppercase;">Avance de obra · Cliente final</p>
+            <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:22px;font-weight:300;color:#F1EDE3;letter-spacing:-0.02em;line-height:1.15;">Novedades de <strong style="font-weight:700;">{{proyecto}}</strong> &nbsp;<span style="font-size:14px;font-weight:300;color:rgba(241,237,227,0.45);">· Reporte mensual</span></p>
+          </td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="background-color:#ffffff;padding:32px 36px 0 36px;">
+            <p style="margin:0 0 6px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#4a4a46;line-height:1.6;">Estimado/a <strong style="color:#1a1a18;font-weight:600;">{{nombre_cliente}}</strong>,</p>
+            <p style="margin:0 0 28px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#6a6a64;line-height:1.65;">Nos complace compartirte las últimas novedades del avance de construcción de tu inversión en <strong style="color:#1a1a18;">{{proyecto}}</strong>. Estamos trabajando con el mayor compromiso para entregarte una propiedad de la más alta calidad.</p>
+
+            <!-- Progress display -->
+            <p style="margin:0 0 12px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:600;color:#8a8a84;letter-spacing:0.22em;text-transform:uppercase;">Progreso actual</p>
+
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top:1px solid #e8e7e3;">
+              <tr>
+                <td style="width:50%;padding:14px 0;border-bottom:1px solid #e8e7e3;vertical-align:top;padding-right:16px;">
+                  <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:#8a8a84;letter-spacing:0.14em;text-transform:uppercase;">Completado</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:32px;font-weight:700;color:#4A5E3F;letter-spacing:-0.02em;line-height:1;">{{pct_obra}}<span style="font-size:16px;font-weight:400;color:#8a8a84;">%</span></p>
+                </td>
+                <td style="width:50%;padding:14px 0;border-bottom:1px solid #e8e7e3;vertical-align:top;border-left:1px solid #e8e7e3;padding-left:16px;">
+                  <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:#8a8a84;letter-spacing:0.14em;text-transform:uppercase;">Entrega estimada</p>
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:16px;font-weight:300;color:#1a1a18;letter-spacing:-0.01em;">{{fecha_entrega}}</p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Progress bar -->
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:16px;margin-bottom:28px;">
+              <tr>
+                <td style="background-color:#e8e7e3;height:4px;border-radius:2px;">
+                  <!-- Note: width should match {{pct_obra}}% — set manually or via template engine -->
+                  <div style="background-color:#4A5E3F;height:4px;width:{{pct_obra}}%;max-width:100%;"></div>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0 0 28px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#6a6a64;line-height:1.65;">Accede a la galería fotográfica completa y al detalle de los hitos de construcción en tu portal.</p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="background-color:#ffffff;padding:0 36px 0 36px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td style="background-color:#0b1c0a;">
+                  <a href="{{link_portal}}" style="display:inline-block;padding:11px 24px;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;color:#F1EDE3;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">Ver galería y reporte</a>
+                </td>
+                <td style="width:16px;"></td>
+                <td style="vertical-align:middle;"><span style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;color:#8a8a84;">{{link_portal}}</span></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ADVISOR -->
+        <tr>
+          <td style="background-color:#ffffff;padding:20px 36px 32px 36px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="padding:0 0 0 20px;border-left:2px solid #B8962E;">
+                  <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:12px;color:#6a6a64;line-height:1.6;">Ante cualquier consulta, tu asesor <strong style="color:#1a1a18;font-weight:600;">{{nombre_asesor}}</strong> está a tu disposición en <strong style="color:#4A5E3F;">{{tel_asesor}}</strong>.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- SIGNATURE -->
