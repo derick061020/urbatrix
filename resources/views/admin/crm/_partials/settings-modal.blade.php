@@ -382,11 +382,39 @@
                                 <div class="st-row-desc">Las fechas y horas se muestran en esta zona.</div>
                             </div>
                             <div class="st-row-right">
-                                @php $stTz = session('timezone', request()->cookie('app_timezone', 'America/Santo_Domingo')); @endphp
+                                @php
+                                    $stTz = session('timezone', request()->cookie('app_timezone', 'America/Santo_Domingo'));
+                                    // Husos horarios disponibles. El offset GMT se calcula en vivo
+                                    // (respeta horario de verano) y se muestra como "(GMT-04:00) Ciudad".
+                                    $stTzList = [
+                                        'America/Santo_Domingo'           => 'Santo Domingo',
+                                        'America/New_York'                => 'Nueva York',
+                                        'America/Bogota'                  => 'Bogotá / Lima',
+                                        'America/Mexico_City'             => 'Ciudad de México',
+                                        'America/Chicago'                 => 'Chicago',
+                                        'America/Los_Angeles'             => 'Los Ángeles',
+                                        'America/Caracas'                 => 'Caracas',
+                                        'America/Santiago'                => 'Santiago',
+                                        'America/Argentina/Buenos_Aires'  => 'Buenos Aires',
+                                        'America/Sao_Paulo'               => 'São Paulo',
+                                        'Europe/Madrid'                   => 'Madrid',
+                                        'Europe/London'                   => 'Londres',
+                                        'UTC'                             => 'UTC',
+                                    ];
+                                    // Si la zona guardada no está en la lista, la agregamos para no perderla.
+                                    if ($stTz && !array_key_exists($stTz, $stTzList)) {
+                                        $stTzList = [$stTz => \Illuminate\Support\Str::of($stTz)->afterLast('/')->replace('_', ' ')] + $stTzList;
+                                    }
+                                @endphp
                                 <select name="timezone" class="st-value" style="border:none; outline:none;">
-                                    <option value="America/Santo_Domingo" @selected($stTz === 'America/Santo_Domingo')>America/Santo_Domingo</option>
-                                    <option value="America/Bogota" @selected($stTz === 'America/Bogota')>America/Bogota</option>
-                                    <option value="America/Mexico_City" @selected($stTz === 'America/Mexico_City')>America/Mexico_City</option>
+                                    @foreach($stTzList as $tzId => $tzCity)
+                                        @php
+                                            try {
+                                                $tzOffset = (new \DateTime('now', new \DateTimeZone($tzId)))->format('P');
+                                            } catch (\Throwable $e) { $tzOffset = '+00:00'; }
+                                        @endphp
+                                        <option value="{{ $tzId }}" @selected($stTz === $tzId)>(GMT{{ $tzOffset }}) {{ $tzCity }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

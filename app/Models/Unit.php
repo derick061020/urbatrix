@@ -101,6 +101,24 @@ class Unit extends Model
         'school_proximity',
     ];
 
+    /**
+     * Cuando se elimina una unidad (desde el admin o donde sea), se borran
+     * también las entradas de wishlist de los usuarios que la tenían guardada.
+     * La migración ya define cascadeOnDelete, pero lo hacemos explícito acá para
+     * garantizarlo aunque el motor no fuerce las claves foráneas.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Unit $unit) {
+            \App\Models\Wishlist::where('unit_id', $unit->id)->delete();
+        });
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(\App\Models\Wishlist::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(\App\Models\Project::class);

@@ -14,6 +14,18 @@
 
 <body data-view="grid">
 
+  @php
+    // Etiquetas de "Vista" (outlook). Las claves COINCIDEN con los valores que
+    // guarda el formulario de unidad del admin (form_fields.blade.php), de modo
+    // que el filtro de la home matchee y se muestre una etiqueta legible.
+    $outlookLabels = [
+        'golf_course' => 'Vista al campo de golf',
+        'lake'        => 'Vista al lago',
+        'ocean_lake'  => 'Vista al mar y al lago',
+        'ocean'       => 'Vista al mar',
+        'mountain'    => 'Vista a la montaña',
+    ];
+  @endphp
 
   <!-- MORE INFO MODAL — Figma 220:20041 (modal-tipologia) -->
   <div id="moreInfoModal" class="mt-overlay" style="display:none;">
@@ -467,9 +479,9 @@
         </button>
       </div>
 
-      <div class="sh-divider"></div>
+      <div class="sh-divider" id="shDownloadDivider"></div>
 
-      <button type="button" class="sh-download" onclick="downloadUnitSheet()">
+      <button type="button" class="sh-download" id="shDownloadBtn" onclick="downloadUnitSheet()">
         <span class="sh-download-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
         </span>
@@ -545,11 +557,22 @@
       return window.location.origin + window.location.pathname + (qs ? '?' + qs : '');
     }
 
+    // El botón de "Descargar ficha PDF" sólo aplica a una unidad concreta.
+    // Cuando se comparte el resultado de los filtros (sin unidad abierta) se oculta.
+    function setShareDownloadVisible(visible) {
+      const btn = document.getElementById('shDownloadBtn');
+      const div = document.getElementById('shDownloadDivider');
+      if (btn) btn.style.display = visible ? '' : 'none';
+      if (div) div.style.display = visible ? '' : 'none';
+    }
+
     // Triggered by the green "N Matches" pill — copies the filtered URL.
     window.shareMatches = function () {
       const url = buildShareUrl();
       const input = document.getElementById('shareUrlInput');
       if (input) input.value = url;
+      // Compartir matches de filtros: sin descarga de PDF de unidad.
+      setShareDownloadVisible(false);
       document.getElementById('shareModal').classList.add('open');
       const lbl = document.getElementById('shareCopyLabel');
       if (lbl) lbl.textContent = 'Copiar';
@@ -560,6 +583,9 @@
       // Allow sharing even with no unit open — falls back to the filtered URL.
       const url = buildShareUrl();
       document.getElementById('shareUrlInput').value = url;
+      // Sólo mostramos la descarga de ficha si hay una unidad abierta.
+      const hasUnit = (typeof currentOpenUnit !== 'undefined' && currentOpenUnit);
+      setShareDownloadVisible(!!hasUnit);
       document.getElementById('shareModal').classList.add('open');
       // Reset copy button label
       const lbl = document.getElementById('shareCopyLabel');
@@ -1844,12 +1870,10 @@
             </button>
             <div id="outlookDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:140px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Lake" onchange="applyOutlookFilter()"> Lake</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Garden" onchange="applyOutlookFilter()"> Garden</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Pool" onchange="applyOutlookFilter()"> Pool</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Ocean" onchange="applyOutlookFilter()"> Ocean</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="City" onchange="applyOutlookFilter()"> City</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Mountain" onchange="applyOutlookFilter()"> Mountain</label>
+                {{-- Las opciones (value) coinciden con las del formulario de unidad en el admin. --}}
+                @foreach($outlookLabels as $outlookKey => $outlookText)
+                  <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="{{ $outlookKey }}" onchange="applyOutlookFilter()"> {{ $outlookText }}</label>
+                @endforeach
               </div>
             </div>
           </div>
@@ -2015,7 +2039,7 @@
                 <div class="fg-card-subtitle">
                   {{ $unit->floor ? ucfirst($unit->floor) . ' Floor' : 'Ground Floor' }}
                   @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
-                  @if($unit->outlook) · {{ $unit->outlook }} {{ str_contains(strtolower($unit->outlook), 'view') ? '' : 'View' }} @endif
+                  @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>
                 <div class="fg-card-divider"></div>
                 <div class="fg-card-price">
@@ -2230,7 +2254,12 @@
                 </td>
                 <td>{{ $unit->floor ? ucfirst($unit->floor) : 'Ground' }}</td>
                 <td>{{ ($unit->bedrooms ?? 0) }} Bed{{ ($unit->bedrooms ?? 0) > 1 ? '' : '' }}</td>
-                <td>{{ strtoupper($unit->direction ?? '—') }}</td>
+                <td>
+                    {{ strtoupper($unit->direction ?? '—') }}
+                    @if($unit->outlook)
+                        <div style="font-size:10px;color:#a3a3a3;line-height:1.2;">{{ $outlookLabels[$unit->outlook] ?? $unit->outlook }}</div>
+                    @endif
+                </td>
                 <td>{{ ($unit->bedrooms ?? 0) }} / {{ ($unit->bathrooms ?? 0) }}</td>
                 <td>{{ number_format($unit->internal_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
                 <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
@@ -2773,12 +2802,13 @@
           }
           
           // Build description
+          const outlookLabels = @json($outlookLabels);
           let description = '';
           if (unit.floor) description += unit.floor.charAt(0).toUpperCase() + unit.floor.slice(1);
           if (unit.bedrooms) description += ` | ${unit.bedrooms} Bed`;
           if (unit.bathrooms) description += ` | ${unit.bathrooms} Bath`;
           if (unit.direction) description += ` | ${unit.direction.toUpperCase()}`;
-          if (unit.outlook) description += ` | ${unit.outlook}`;
+          if (unit.outlook) description += ` | ${outlookLabels[unit.outlook] || unit.outlook}`;
           if (unitDesc) unitDesc.textContent = description || 'Unit details';
 
           // Update images

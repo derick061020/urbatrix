@@ -185,7 +185,9 @@
         <div class="space-y-4">
             {{-- Mis documentos card --}}
             <a href="{{ route('dashboard.documents') }}" class="cli-card p-4 block hover:shadow-card transition-shadow relative">
-                @if(! $kycApproved)
+                @if($kycSubmitted && ! $kycApproved && ! $kycRejected)
+                    <span class="absolute top-3 right-4 cli-pill bg-warn-soft text-warn"><i class="pi pi-clock text-[10px]"></i> {{ __('En revisión') }}</span>
+                @elseif(! $kycApproved)
                     <span class="absolute top-3 right-4 cli-pill bg-err-soft text-err"><i class="pi pi-exclamation-circle text-[10px]"></i> {{ __('Acción necesaria') }}</span>
                 @endif
                 <div class="flex items-center gap-3">
@@ -195,7 +197,7 @@
                         <div class="text-[11px] text-ink-500">{{ __('Sube y gestiona tus docs') }}</div>
                     </div>
                 </div>
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400 mt-3 pt-3 border-t border-ink-100">{{ $kycApproved ? __('KYC completado') : __('Completa KYC') }}</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400 mt-3 pt-3 border-t border-ink-100">{{ $kycApproved ? __('KYC completado') : ($kycSubmitted && ! $kycRejected ? __('KYC en revisión') : __('Completa KYC')) }}</div>
             </a>
 
             {{-- Plan de pagos card --}}

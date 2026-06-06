@@ -34,6 +34,17 @@ class SetLocale
         // Carbon hereda el locale del helper App si está disponible.
         try { \Carbon\Carbon::setLocale($locale); } catch (\Throwable $e) {}
 
+        // Zona horaria: sesión -> cookie -> config. Se aplica a PHP/Carbon para
+        // que todas las fechas/horas se muestren en el huso elegido por el usuario.
+        $timezone = $request->session()->get('timezone')
+            ?? $request->cookie('app_timezone')
+            ?? config('app.timezone', 'UTC');
+
+        if (in_array($timezone, timezone_identifiers_list(), true)) {
+            config(['app.timezone' => $timezone]);
+            date_default_timezone_set($timezone);
+        }
+
         return $next($request);
     }
 }
