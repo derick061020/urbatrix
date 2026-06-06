@@ -18,6 +18,7 @@ class Payment extends Model
         'due_date',
         'status',
         'paid_at',
+        'overdue_notified_at',
         'payment_method',
         'receipt_path',
         'notes',
@@ -30,6 +31,7 @@ class Payment extends Model
     protected $casts = [
         'due_date' => 'date',
         'paid_at' => 'datetime',
+        'overdue_notified_at' => 'datetime',
         'amount' => 'decimal:2',
     ];
 
