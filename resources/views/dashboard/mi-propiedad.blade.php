@@ -97,12 +97,9 @@
     {{-- Hero card with property summary --}}
     <div class="cli-card overflow-hidden relative">
         <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#5c7c68 0%, #3f5848 100%)">
-            {{-- Decorative concentric circles top-right --}}
-            <div class="absolute -top-20 -right-32 w-[440px] h-[440px] pointer-events-none opacity-25" style="background:
-                radial-gradient(circle at center, transparent 47%, rgba(255,255,255,.5) 47.5%, rgba(255,255,255,.5) 48.5%, transparent 49%),
-                radial-gradient(circle at center, transparent 35%, rgba(255,255,255,.45) 35.5%, rgba(255,255,255,.45) 36.5%, transparent 37%),
-                radial-gradient(circle at center, transparent 22%, rgba(255,255,255,.4) 22.5%, rgba(255,255,255,.4) 23.5%, transparent 24%),
-                radial-gradient(circle at center, transparent 9%, rgba(255,255,255,.35) 9.5%, rgba(255,255,255,.35) 11%, transparent 11.5%);"></div>
+            {{-- Decorative Makai isotipo top-right (matches login) --}}
+            <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt=""
+                 class="absolute -top-16 -right-24 w-[360px] h-[360px] pointer-events-none opacity-20 select-none" />
 
             <div class="relative z-10">
                 <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
