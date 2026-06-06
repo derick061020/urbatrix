@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -77,7 +79,9 @@ class AuthController extends Controller
             'verified'  => false,
         ]);
 
-        // In production: send via Mail/SMS. For demo, return code so UI shows it.
+        // Envía el código de verificación por correo.
+        $this->sendCode($data['email'], $code, 'register', $data['full_name']);
+
         return response()->json([
             'ok'   => true,
             'code' => app()->environment('production') ? null : $code,
@@ -92,6 +96,9 @@ class AuthController extends Controller
         $code = (string) random_int(100000, 999999);
         $reg['code'] = $code;
         $request->session()->put('register', $reg);
+
+        // Reenvía el código por correo.
+        $this->sendCode($reg['email'], $code, 'register', $reg['full_name'] ?? '');
 
         return response()->json([
             'ok'   => true,
@@ -241,7 +248,9 @@ class AuthController extends Controller
             'verified' => false,
         ]);
 
-        // TODO: send via Mail in production. For now we surface the code in dev.
+        // Envía el código de restablecimiento por correo.
+        $this->sendCode($data['email'], $code, 'reset', $user->name ?? '');
+
         return response()->json([
             'ok'   => true,
             'code' => app()->environment('production') ? null : $code,
@@ -304,6 +313,19 @@ class AuthController extends Controller
             'ok'       => true,
             'redirect' => route('login'),
         ]);
+    }
+
+    /**
+     * Envía el código de verificación por correo. Nunca interrumpe el flujo:
+     * si el correo falla, se registra y el proceso continúa.
+     */
+    private function sendCode(string $email, string $code, string $purpose, string $name = ''): void
+    {
+        try {
+            Mail::to($email)->send(new \App\Mail\VerificationCodeMail($code, $purpose, $name, 60));
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo enviar el código de verificación ('.$purpose.') a '.$email.': '.$e->getMessage());
+        }
     }
 
     private function humanDocLabel(string $key, string $userName): string
