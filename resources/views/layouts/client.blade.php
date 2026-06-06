@@ -346,6 +346,7 @@
     'stLogoutRoute'  => 'logout',
 ])
 @include('partials.logout-modal')
+@include('partials.confirm-dialog')
 
 @if (session('settings_success'))
 <script>

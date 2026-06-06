@@ -73,6 +73,16 @@
     }
     .st-nav-item.active .chev { opacity: 1; }
 
+    /* Cerrar sesión — empujado al fondo del sidebar */
+    .st-logout {
+        margin-top: auto;
+        color: #e93544;
+        font-weight: 600;
+    }
+    .st-logout .pi { color: #e93544; }
+    .st-logout:hover { background: rgba(233,53,68,.07); color: #c81e2c; }
+    .st-logout:hover .pi { color: #c81e2c; }
+
     .st-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; height: 100%; max-height: calc(100vh - 48px); }
     .st-head {
         padding: 22px 28px 0;
@@ -231,6 +241,12 @@
                 <i class="pi pi-bell"></i> Notificaciones
                 <i class="pi pi-angle-right chev"></i>
             </button>
+
+            {{-- Cerrar sesión — anclado al fondo del sidebar --}}
+            <button type="button" class="st-nav-item st-logout" onclick="(window.openLogoutModal ? openLogoutModal() : document.getElementById('stLogoutFallback')?.submit())">
+                <i class="pi pi-sign-out"></i> Cerrar sesión
+            </button>
+            <form id="stLogoutFallback" method="POST" action="{{ route($stLogoutRoute) }}" class="hidden">@csrf</form>
         </aside>
 
         {{-- Main --}}

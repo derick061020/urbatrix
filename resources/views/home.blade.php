@@ -4801,9 +4801,24 @@
     window.toggleModalWishlist = function () {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) return;
       const unitId = currentOpenUnit;
-      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
       const btn = document.getElementById('modalAddToListBtn');
       const wasFav = btn ? btn.classList.contains('is-fav') : false;
+      // Al quitar de guardados, pedir confirmación (línea gráfica de la web)
+      if (wasFav && typeof window.confirmDialog === 'function') {
+        window.confirmDialog({
+          title: '¿Quitar de guardados?',
+          text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+          confirmLabel: 'Quitar',
+          icon: 'pi pi-heart-fill',
+          onConfirm: () => runModalWishlistToggle(unitId, wasFav),
+        });
+        return;
+      }
+      runModalWishlistToggle(unitId, wasFav);
+    };
+
+    function runModalWishlistToggle(unitId, wasFav) {
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
       // Optimistic flip
       setModalAddToListState(!wasFav);
       fetch(`/api/wishlist/toggle/${unitId}`, {
@@ -4832,8 +4847,23 @@
         const unitId = btn.dataset.unitId;
         if (!unitId) return;
 
-        // Optimistic UI flip
         const wasFav = btn.classList.contains('is-fav');
+        // Al quitar de guardados, pedir confirmación (línea gráfica de la web)
+        if (wasFav && typeof window.confirmDialog === 'function') {
+          window.confirmDialog({
+            title: '¿Quitar de guardados?',
+            text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+            confirmLabel: 'Quitar',
+            icon: 'pi pi-heart-fill',
+            onConfirm: () => runWishlistToggle(btn, unitId, wasFav),
+          });
+          return;
+        }
+        runWishlistToggle(btn, unitId, wasFav);
+      });
+
+      function runWishlistToggle(btn, unitId, wasFav){
+        // Optimistic UI flip
         btn.classList.toggle('is-fav', !wasFav);
         const svg = btn.querySelector('svg');
         if (svg) svg.setAttribute('fill', !wasFav ? 'currentColor' : 'none');
@@ -4888,7 +4918,7 @@
               window.location.href = '/login';
             }
           });
-      });
+      }
     })();
 
     // ============================
@@ -5026,6 +5056,7 @@
   </script>
 
 @include('partials.logout-modal')
+@include('partials.confirm-dialog')
 @include('partials.profile-modal')
 </body>
 

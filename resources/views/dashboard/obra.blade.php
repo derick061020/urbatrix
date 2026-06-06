@@ -118,6 +118,9 @@
                                 <div class="flex items-center gap-3 mt-2">
                                     <span class="text-[12px] font-bold" style="color:#1fc16b">{{ $r->overall_progress }}%</span>
                                     <span class="text-[11px] text-ink-400">avance global</span>
+                                    <button type="button" onclick="openReportModal({{ $r->id }})" class="ml-auto inline-flex items-center gap-1.5 text-[12px] font-semibold text-brand hover:underline">
+                                        <i class="pi pi-eye text-[11px]"></i> Ver reporte
+                                    </button>
                                 </div>
                             </div>
                             <div class="text-[11px] text-ink-400 whitespace-nowrap">{{ optional($r->published_at)->format('Y-m-d') }}</div>
@@ -131,4 +134,6 @@
 
     </div>
 </div>
+
+@include('_partials.construction_report_modal', ['reports' => $reports])
 @endsection

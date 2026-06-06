@@ -104,6 +104,7 @@
                                 <div class="text-[11px] text-ink-500 mt-0.5">{{ $r->description }}</div>
                                 <div class="flex items-center gap-3 mt-2">
                                     <span class="text-[11px] text-ink-400">{{ $r->overall_progress }}% · {{ $r->photos ? count($r->photos).' fotos' : 'sin fotos' }}</span>
+                                    <button type="button" onclick="openReportModal({{ $r->id }})" class="inline-flex items-center gap-1 text-[11px] text-brand font-semibold hover:underline"><i class="pi pi-eye text-[10px]"></i> Ver reporte</button>
                                     <form method="POST" action="{{ route('admin.crm.avance-obra.notify', $r) }}">
                                         @csrf
                                         <button class="text-[11px] text-brand font-semibold hover:underline">Notificar avance mensual</button>
@@ -210,4 +211,6 @@
         </div>
     </form>
 </dialog>
+
+@include('_partials.construction_report_modal', ['reports' => $reports])
 @endsection

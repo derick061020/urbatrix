@@ -797,6 +797,21 @@
         const unitId = btn.dataset.unitId;
         if (!unitId) return;
         const card = btn.closest('[data-unit-card]');
+        // Confirmación antes de quitar (línea gráfica de la web)
+        if (typeof window.confirmDialog === 'function') {
+            window.confirmDialog({
+                title: '¿Quitar de guardados?',
+                text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+                confirmLabel: 'Quitar',
+                icon: 'pi pi-heart-fill',
+                onConfirm: () => doUnsave(unitId, card, btn),
+            });
+        } else {
+            doUnsave(unitId, card, btn);
+        }
+    });
+
+    function doUnsave(unitId, card, btn) {
         const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
         btn.disabled = true;
         fetch(`/api/wishlist/toggle/${unitId}`, {
@@ -816,7 +831,7 @@
             }
           })
           .catch(() => { btn.disabled = false; });
-    });
+    }
 
     // Reserved card countdown (HH:MM:SS)
     (function initReservedCountdowns(){
