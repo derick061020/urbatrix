@@ -4,6 +4,28 @@
 @section('page_breadcrumb', 'Gestión · Expedientes de clientes')
 @php $activeRoute = 'crm.expedientes'; @endphp
 
+@push('styles')
+<style>
+    .dot-tip { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 3px; cursor: default; outline: none; }
+    .dot-tip__label {
+        position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(4px);
+        background: #222530; color: #fff; font-size: 11px; font-weight: 500; line-height: 1.2;
+        padding: 5px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none;
+        opacity: 0; visibility: hidden; transition: opacity .12s, transform .12s; z-index: 30;
+        box-shadow: 0 4px 12px -2px rgba(0,0,0,.25);
+    }
+    .dot-tip__label::after {
+        content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+        border: 4px solid transparent; border-top-color: #222530;
+    }
+    .dot-tip:hover .dot-tip__label, .dot-tip:focus .dot-tip__label {
+        opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+    }
+    .dot-tip__done { color: #4ade80; font-weight: 700; margin-left: 2px; }
+    .dot-tip__pending { color: #99a0ae; font-weight: 500; margin-left: 2px; }
+</style>
+@endpush
+
 @section('content')
 @php
     $advisors = \App\Models\Agent::pluck('name', 'id');
@@ -86,9 +108,13 @@
                                 <div class="text-[11px] text-ink-500">Makai Residences</div>
                             </td>
                             <td>
+                                @php $phaseNames = [1 => 'Reserva', 2 => 'KYC', 3 => 'Presupuesto', 4 => 'Plan de pagos / Documentos', 5 => 'Contrato firmado']; @endphp
                                 <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                                     @for ($s = 1; $s <= 5; $s++)
-                                        <span class="dot" style="background: {{ $s <= $step ? '#5c7c68' : '#eaecf0' }}"></span>
+                                        <span class="dot-tip" tabindex="0">
+                                            <span class="dot" style="background: {{ $s <= $step ? '#5c7c68' : '#eaecf0' }}"></span>
+                                            <span class="dot-tip__label">{{ $phaseNames[$s] }} @if($s <= $step)<span class="dot-tip__done">✓</span>@else<span class="dot-tip__pending">pendiente</span>@endif</span>
+                                        </span>
                                     @endfor
                                     <span class="text-[11px] text-ink-500 ml-2">{{ $stepName }}</span>
                                 </div>

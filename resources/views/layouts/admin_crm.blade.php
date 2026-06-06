@@ -133,6 +133,13 @@
       .crm-toggle.on { background:#1fc16b; }
       .crm-toggle.on::after { left:18px; }
 
+      /* Form checkbox toggle (units form) — pure CSS, :checked driven */
+      .ub-toggle { display:flex; align-items:flex-start; gap:12px; cursor:pointer; user-select:none; }
+      .ub-toggle__track { position:relative; width:36px; height:20px; border-radius:999px; background:#eaecf0; flex-shrink:0; margin-top:2px; transition:background .15s; }
+      .ub-toggle__knob { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.15); transition:left .15s; }
+      .ub-toggle__input:checked ~ .ub-toggle__track { background:#1fc16b; }
+      .ub-toggle__input:checked ~ .ub-toggle__track .ub-toggle__knob { left:18px; }
+
       /* Top icon button (notifications, settings, etc.) */
       .topbar-icon-btn {
           width: 38px; height: 38px;
@@ -287,7 +294,7 @@
                     : [];
                 $brokerUnitIdStrings = array_map('strval', $brokerUnitIds);
 
-                $expedientesQuery = \App\Models\Reservation::query();
+                $expedientesQuery = \App\Models\Reservation::whereDate('created_at', today());
                 if ($isBroker) $expedientesQuery->whereIn('unit_id', $brokerUnitIdStrings);
                 $expedientesCount = $expedientesQuery->count();
 

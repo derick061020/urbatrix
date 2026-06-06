@@ -126,44 +126,63 @@
         <i class="pi pi-chart-line text-ink-500"></i>
         <div class="text-[13px] font-bold text-ink-700">Contenido segmentado · Investment / Living</div>
     </div>
-    <div class="p-5 space-y-4">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">Texto "For Investment"</label>
-                <textarea name="for_investment_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
-                          placeholder="Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
+    <div class="p-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            {{-- ============ FOR INVESTMENT ============ --}}
+            <div class="space-y-4 pb-6 lg:pb-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-ink-200">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-info-soft text-info flex items-center justify-center"><i class="pi pi-chart-line text-[13px]"></i></span>
+                    <h3 class="text-[13px] font-bold text-ink-900">For Investment</h3>
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Texto "For Investment"</label>
+                    <textarea name="for_investment_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
+                              placeholder="Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Valor proyectado ($)</label>
+                        <input type="number" step="0.01" min="0" name="projected_value" value="{{ old('projected_value', $u->projected_value ?? '') }}" class="crm-input pl-3 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Año proyección</label>
+                        <input type="text" maxlength="10" name="projected_value_year" value="{{ old('projected_value_year', $u->projected_value_year ?? '') }}" class="crm-input pl-3 mt-1" placeholder="2027">
+                    </div>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">ROI (%)</label>
+                        <input type="number" step="0.01" min="0" max="999" name="roi_percent" value="{{ old('roi_percent', $u->roi_percent ?? '') }}" class="crm-input pl-3 mt-1" placeholder="10.3">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Comentario comparativo</label>
+                    <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="Miami Beach reference: $900/sqft · Makai $450/sqft — 50% menos">
+                </div>
             </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">Texto "For Living"</label>
-                <textarea name="for_living_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
-                          placeholder="Mensaje orientado a residentes. Ej: barrio, escuelas, lifestyle, terraza...">{{ old('for_living_text', $u->for_living_text ?? '') }}</textarea>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">Valor proyectado ($)</label>
-                <input type="number" step="0.01" min="0" name="projected_value" value="{{ old('projected_value', $u->projected_value ?? '') }}" class="crm-input pl-3 mt-1">
-            </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">Año proyección</label>
-                <input type="text" maxlength="10" name="projected_value_year" value="{{ old('projected_value_year', $u->projected_value_year ?? '') }}" class="crm-input pl-3 mt-1" placeholder="2027">
-            </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">ROI (%)</label>
-                <input type="number" step="0.01" min="0" max="999" name="roi_percent" value="{{ old('roi_percent', $u->roi_percent ?? '') }}" class="crm-input pl-3 mt-1" placeholder="10.3">
-            </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">Walk score (0-100)</label>
-                <input type="number" min="0" max="100" name="walk_score" value="{{ old('walk_score', $u->walk_score ?? '') }}" class="crm-input pl-3 mt-1">
-            </div>
-            <div class="sm:col-span-2 lg:col-span-4">
-                <label class="text-[12px] font-semibold text-ink-700">Comentario comparativo</label>
-                <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="Miami Beach reference: $900/sqft · Makai $450/sqft — 50% menos">
-            </div>
-            <div class="sm:col-span-2 lg:col-span-2">
-                <label class="text-[12px] font-semibold text-ink-700">Amenities (For Living)</label>
-                <div class="mt-2">
+            {{-- ============ FOR LIVING ============ --}}
+            <div class="space-y-4 pt-6 lg:pt-0 lg:pl-8">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-brand-soft text-brand flex items-center justify-center"><i class="pi pi-home text-[13px]"></i></span>
+                    <h3 class="text-[13px] font-bold text-ink-900">For Living</h3>
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Texto "For Living"</label>
+                    <textarea name="for_living_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
+                              placeholder="Mensaje orientado a residentes. Ej: barrio, escuelas, lifestyle, terraza...">{{ old('for_living_text', $u->for_living_text ?? '') }}</textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Walk score (0-100)</label>
+                        <input type="number" min="0" max="100" name="walk_score" value="{{ old('walk_score', $u->walk_score ?? '') }}" class="crm-input pl-3 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">Cercanía a escuelas</label>
+                        <input type="text" maxlength="255" name="school_proximity" value="{{ old('school_proximity', $u->school_proximity ?? '') }}" class="crm-input pl-3 mt-1" placeholder="International School – 1.2 km">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">Amenities</label>
+                    <div class="mt-2">
                     @php
                         $amenitiesOptions = [
                             'pool' => ['label' => 'Pool', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>'],
@@ -184,7 +203,7 @@
                             $selectedAmenities = json_decode($selectedAmenities, true) ?? [];
                         }
                     @endphp
-                    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
                         @foreach($amenitiesOptions as $key => $amenity)
                             <label class="relative cursor-pointer">
                                 <input type="checkbox" name="amenities[]" value="{{ $key }}" {{ in_array($key, $selectedAmenities) ? 'checked' : '' }} class="peer sr-only">
@@ -200,9 +219,6 @@
                     <input type="hidden" name="amenities_text" value="{{ old('amenities_text', $u->amenities_text ?? '') }}">
                 </div>
             </div>
-            <div class="sm:col-span-2 lg:col-span-2">
-                <label class="text-[12px] font-semibold text-ink-700">Cercanía a escuelas</label>
-                <input type="text" maxlength="255" name="school_proximity" value="{{ old('school_proximity', $u->school_proximity ?? '') }}" class="crm-input pl-3 mt-1" placeholder="International School – 1.2 km">
             </div>
         </div>
     </div>

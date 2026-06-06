@@ -140,7 +140,11 @@ class Unit extends Model
      */
     public static function releaseExpiredHolds(): int
     {
+        // Only auto-release holds created by the reservation system (those carry a
+        // reserved_by_reservation_id). Units a human marked RESERVED/SOLD from the admin
+        // keep their status — otherwise they silently flip back to AVAILABLE on home load.
         $expired = static::whereNotNull('reserved_until')
+            ->whereNotNull('reserved_by_reservation_id')
             ->where('reserved_until', '<', now())
             ->whereIn('status', ['RESERVED', 'reserved'])
             ->get();

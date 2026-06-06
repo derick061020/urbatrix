@@ -11,6 +11,7 @@
     <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -97,7 +98,27 @@
           background:#5c7c68; color:#fff;
           display:flex; align-items:center; justify-content:center;
           margin: 0 auto 18px;
+          position: relative;
       }
+
+      /* ===== Celebration animations (success view) ===== */
+      #success-view:not(.hidden) .check-circle { animation: pop-in .55s cubic-bezier(.18,.89,.32,1.28) both; }
+      #success-view:not(.hidden) .check-circle i { animation: check-draw .4s ease-out .25s both; }
+      #success-view:not(.hidden) h2 { animation: rise-in .5s ease-out .15s both; }
+      #success-view:not(.hidden) h3 { animation: rise-in .5s ease-out .28s both; }
+      #success-view:not(.hidden) p  { animation: rise-in .5s ease-out .4s both; }
+      #success-view:not(.hidden) .flex { animation: rise-in .5s ease-out .52s both; }
+
+      .check-circle::after {
+          content:""; position:absolute; inset:-6px; border-radius:999px;
+          border:3px solid #5c7c68; opacity:0;
+      }
+      #success-view:not(.hidden) .check-circle::after { animation: ring-pulse .9s ease-out .35s 2; }
+
+      @keyframes pop-in   { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+      @keyframes check-draw { 0% { transform: scale(0) rotate(-25deg); opacity:0; } 100% { transform: scale(1) rotate(0); opacity:1; } }
+      @keyframes rise-in  { 0% { transform: translateY(14px); opacity:0; } 100% { transform: translateY(0); opacity:1; } }
+      @keyframes ring-pulse { 0% { transform: scale(.85); opacity:.65; } 100% { transform: scale(1.5); opacity:0; } }
 
       @media (max-width: 640px) {
           #step-indicator { display:none !important; }
@@ -338,6 +359,26 @@
 
     [cardNumber, cardExpiry, cardCvc].forEach(el => el.on('change', (e) => { if (e.error) showError(e.error.message); else clearError(); }));
 
+    function celebrate() {
+        if (typeof confetti !== 'function') return;
+        const brand = ['#5c7c68', '#4a6354', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
+
+        // Big opening burst
+        confetti({ particleCount: 160, spread: 90, origin: { y: 0.55 }, colors: brand, scalar: 1.1, zIndex: 9999 });
+
+        // Side cannons
+        setTimeout(() => confetti({ particleCount: 90, angle: 60,  spread: 70, origin: { x: 0, y: 0.65 }, colors: brand, zIndex: 9999 }), 180);
+        setTimeout(() => confetti({ particleCount: 90, angle: 120, spread: 70, origin: { x: 1, y: 0.65 }, colors: brand, zIndex: 9999 }), 180);
+
+        // Gentle falling rain for ~2.2s
+        const end = Date.now() + 2200;
+        (function frame() {
+            confetti({ particleCount: 3, startVelocity: 0, ticks: 200, gravity: 0.6,
+                       origin: { x: Math.random(), y: -0.05 }, colors: brand, scalar: 0.9, zIndex: 9999 });
+            if (Date.now() < end) requestAnimationFrame(frame);
+        })();
+    }
+
     window.payNow = async function () {
         clearError();
         const name = document.getElementById('card_name').value.trim();
@@ -389,6 +430,7 @@
             document.getElementById('checkout-view').classList.add('hidden');
             document.getElementById('success-view').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            celebrate();
         } catch (e) {
             console.error(e);
             showError('Error de red. Intenta de nuevo.');

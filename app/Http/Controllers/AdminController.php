@@ -213,6 +213,14 @@ class AdminController extends Controller
 
         $unit->update($validated);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok'      => true,
+                'message' => 'Unit updated successfully!',
+                'saved_at' => now()->format('H:i:s'),
+            ]);
+        }
+
         return redirect()->route('admin.units.edit', $unit->id)
             ->with('success', 'Unit updated successfully!');
     }

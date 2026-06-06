@@ -222,41 +222,6 @@
             </div>
         </div>
 
-        {{-- Deal history --}}
-        <div class="crm-card">
-            <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
-                <i class="pi pi-briefcase text-ink-500"></i>
-                <div class="text-[13px] font-bold text-ink-700">Historial de negociaciones</div>
-                <span class="ml-auto text-[11px] text-ink-500">{{ $unit->dealHistories->count() }} eventos</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full crm-table">
-                    <thead class="bg-white">
-                        <tr><th>Fecha</th><th>Acción</th><th>Autor</th><th>Rol</th></tr>
-                    </thead>
-                    <tbody>
-                        @forelse($unit->dealHistories as $row)
-                            <tr>
-                                <td class="text-[12px] text-ink-700">{{ $row->datetime?->format('Y-m-d H:i') ?? '—' }}</td>
-                                <td><span class="crm-pill bg-info-soft text-info">{{ $row->action }}</span></td>
-                                <td class="text-[12px] text-ink-700">{{ $row->author ?? '—' }}</td>
-                                <td>
-                                    @php $rolePill = match(strtoupper($row->author_role ?? '')) {
-                                        'SUPERADMIN' => ['SUPERADMIN','err'],
-                                        'ADMIN'      => ['ADMIN','warn'],
-                                        default      => [$row->author_role ?? '—','ink-500'],
-                                    }; @endphp
-                                    <span class="crm-pill bg-{{ $rolePill[1] }}-soft text-{{ $rolePill[1] }}">{{ $rolePill[0] }}</span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin negociaciones.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         {{-- Payment history --}}
         <div class="crm-card">
             <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
@@ -302,9 +267,18 @@
     </div>
 
     <div class="flex items-center justify-end gap-2 pt-2">
-        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">Cancelar</a>
-        <button type="submit" form="unit-edit-form" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> Guardar cambios</button>
+        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">Volver a unidades</a>
     </div>
+</div>
+
+{{-- ===================== FLOATING AUTOSAVE BAR ===================== --}}
+<div id="unit-save-bar" class="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-white border border-ink-200 shadow-panel rounded-full pl-4 pr-2 py-2">
+    <span id="unit-save-status" class="flex items-center gap-2 text-[12px] font-semibold text-ink-500 whitespace-nowrap">
+        <i class="pi pi-check-circle text-ok"></i> <span data-save-text>Guardado</span>
+    </span>
+    <button type="button" id="unit-discard-btn" class="crm-btn crm-btn-ghost text-err text-[12px] py-1.5 px-3 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+        <i class="pi pi-undo text-[11px]"></i> Descartar cambios
+    </button>
 </div>
 
 @push('scripts')
@@ -443,6 +417,128 @@
         uploadStatus.textContent = message;
         setTimeout(() => uploadStatus.classList.add('hidden'), 5000);
     }
+})();
+
+/* ===================== AUTOSAVE + DISCARD ===================== */
+(function () {
+    const form = document.getElementById('unit-edit-form');
+    const bar  = document.getElementById('unit-save-bar');
+    if (!form || !bar) return;
+
+    const statusWrap   = document.getElementById('unit-save-status');
+    const statusText   = statusWrap.querySelector('[data-save-text]');
+    const statusIcon   = statusWrap.querySelector('i');
+    const discardBtn   = document.getElementById('unit-discard-btn');
+    const csrf         = document.querySelector('meta[name=csrf-token]')?.content;
+    const DEBOUNCE_MS  = 1200;
+
+    const controls = () => form.querySelectorAll('input, select, textarea');
+
+    function snapshot() {
+        const map = new Map();
+        controls().forEach(el => {
+            if (!el.name) return;
+            map.set(el, (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value);
+        });
+        return map;
+    }
+    function restore(map) {
+        map.forEach((val, el) => {
+            if (el.type === 'checkbox' || el.type === 'radio') el.checked = val;
+            else el.value = val;
+        });
+    }
+    function differs(map) {
+        for (const [el, val] of map) {
+            const cur = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+            if (cur !== val) return true;
+        }
+        return false;
+    }
+
+    // initial = state at page load (target for "discard"); saved = last persisted state.
+    const initial = snapshot();
+    let savedState = snapshot();
+    let timer = null;
+    let saving = false;
+
+    function setStatus(icon, text, color) {
+        statusIcon.className = 'pi ' + icon + ' ' + color;
+        statusText.textContent = text;
+        statusWrap.className = 'flex items-center gap-2 text-[12px] font-semibold whitespace-nowrap ' + color;
+    }
+    function refreshDiscard() {
+        discardBtn.disabled = saving || !differs(initial);
+    }
+
+    function doSave() {
+        if (saving) return;
+        if (!differs(savedState)) { setStatus('pi-check-circle', 'Guardado', 'text-ok'); refreshDiscard(); return; }
+        saving = true;
+        setStatus('pi-spin pi-spinner', 'Guardando…', 'text-ink-500');
+        refreshDiscard();
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+            body: new FormData(form),
+        })
+        .then(r => {
+            if (r.status === 422) return r.json().then(d => { throw { validation: d }; });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json().catch(() => ({}));
+        })
+        .then(data => {
+            savedState = snapshot();
+            const at = (data && data.saved_at) ? ' ' + data.saved_at : '';
+            setStatus('pi-check-circle', 'Guardado' + at, 'text-ok');
+        })
+        .catch(err => {
+            if (err && err.validation) {
+                const first = Object.values(err.validation.errors || {})[0];
+                setStatus('pi-exclamation-triangle', first ? first[0] : 'Error de validación', 'text-err');
+            } else {
+                console.error('Autosave failed', err);
+                setStatus('pi-exclamation-triangle', 'Error al guardar', 'text-err');
+            }
+        })
+        .finally(() => { saving = false; refreshDiscard(); });
+    }
+
+    function scheduleSave() {
+        setStatus('pi-pencil', 'Cambios sin guardar…', 'text-warn');
+        refreshDiscard();
+        clearTimeout(timer);
+        timer = setTimeout(doSave, DEBOUNCE_MS);
+    }
+
+    form.addEventListener('input', scheduleSave);
+    form.addEventListener('change', scheduleSave);
+
+    // Submitting manually shouldn't double-fire; let autosave own it.
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearTimeout(timer);
+        doSave();
+    });
+
+    discardBtn.addEventListener('click', function () {
+        clearTimeout(timer);
+        restore(initial);
+        if (differs(savedState)) {
+            doSave(); // persist the revert so the DB matches the page-load state
+        } else {
+            setStatus('pi-check-circle', 'Guardado', 'text-ok');
+            refreshDiscard();
+        }
+    });
+
+    // Warn if leaving with an in-flight/pending change
+    window.addEventListener('beforeunload', function (e) {
+        if (saving || differs(savedState)) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    refreshDiscard();
 })();
 </script>
 @endpush
