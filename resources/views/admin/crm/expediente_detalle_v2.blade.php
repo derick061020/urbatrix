@@ -142,6 +142,24 @@
                     </div>
                 @endif
 
+                {{-- ===== Acuerdos firmados: firma, IP, hora y dispositivo ===== --}}
+                @php
+                    $firmados = $reservation->documents
+                        ->whereIn('document_type', ['payment_plan', 'purchase_promise', 'contract'])
+                        ->filter(fn($d) => in_array($d->status, ['signed', 'approved']))
+                        ->sortByDesc('signed_at');
+                @endphp
+                @if($firmados->isNotEmpty())
+                    <div class="mb-4 space-y-3">
+                        <div class="text-[12px] font-bold text-ink-600 uppercase tracking-wide flex items-center gap-2">
+                            <i class="pi pi-shield text-ink-400"></i> Acuerdos firmados
+                        </div>
+                        @foreach($firmados as $fd)
+                            @include('admin.crm._partials.firma_detalle', ['document' => $fd])
+                        @endforeach
+                    </div>
+                @endif
+
                 @php
                     $statusLabel = ['pending' => ['Pendiente','warn'],'generated' => ['Generado','info'],'signed' => ['Firmado','ok'],'approved' => ['Aprobado','ok'],'rejected' => ['Rechazado','err']];
                 @endphp

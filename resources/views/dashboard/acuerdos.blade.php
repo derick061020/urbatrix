@@ -169,6 +169,38 @@
     .acm-bk-cell .meta { font-size:10px; color:#717784; margin-top:2px; }
     .acm-bk-cell.total { background:#fff8ec; border-color:#f6dca5; }
     .acm-bk-cell.total .val { color:#b67a06; font-size:17px; }
+
+    /* ---- Document preview: fit-to-width, never horizontal scroll ---- */
+    .acm-preview-wrap {
+        position:relative;
+        width:100%;
+        max-width:820px;
+        margin:0 auto;
+        height:72vh;
+        border-radius:12px;
+        border:1px solid #e3e6eb;
+        background:#fff;
+        overflow:hidden;           /* clip the over-wide reserved iframe box */
+        box-shadow:0 8px 28px -16px rgba(10,13,20,.25);
+    }
+    #acm-preview {
+        display:block;
+        border:0;
+        transform-origin: top left;
+        background:#fff;
+    }
+    /* Signature summary card shown on the "Resumen" step */
+    .acm-resumen-sig {
+        display:flex; align-items:center; gap:12px;
+        border:1px solid #e3e6eb; border-radius:12px; background:#fff;
+        padding:12px 14px;
+    }
+    .acm-resumen-sig .sig-thumb {
+        width:120px; height:56px; flex:none;
+        border:1px solid #eaecf0; border-radius:8px; background:#fafbfc;
+        display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .acm-resumen-sig .sig-thumb img { max-width:100%; max-height:100%; object-fit:contain; }
 </style>
 @endpush
 
@@ -200,22 +232,48 @@
                         $createdAt = (is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale('es')->isoFormat('D MMM YYYY') : '';
                         $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
                         $docId = is_object($doc) ? $doc->id : $doc['id'];
+
+                        /* Estado "en espera de cambios": el cliente pidió una revisión y aún
+                           no llegó la nueva versión del asesor. */
+                        if ($docType === 'budget' || $docType === 'payment_plan') {
+                            $docObs = $reservation?->budget_observations ?? [];
+                        } else {
+                            $docObs = data_get(is_object($doc) ? ($doc->metadata ?? []) : ($doc['metadata'] ?? []), 'observations', []);
+                        }
+                        $lastDocObs = ! empty($docObs) ? end($docObs) : null;
+                        $awaitingChanges = $lastDocObs
+                            && (($lastDocObs['from'] ?? '') === 'client')
+                            && (($lastDocObs['kind'] ?? null) !== 'accept');
                     @endphp
                     <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 transition-colors">
-                        <span class="w-1 h-12 rounded-full bg-warn shrink-0"></span>
+                        <span class="w-1 h-12 rounded-full {{ $awaitingChanges ? 'bg-info' : 'bg-warn' }} shrink-0"></span>
                         <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600 shrink-0"><i class="pi {{ $typeIcon }}"></i></div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[14px] font-bold text-ink-950 truncate">{{ $docTitle }}</div>
+                            <div class="text-[14px] font-bold text-ink-950 truncate flex items-center gap-2 flex-wrap">
+                                {{ $docTitle }}
+                                @if($awaitingChanges)
+                                    <span class="acm-status-pill bg-info-soft text-info shrink-0"><i class="pi pi-clock text-[10px]"></i> {{ __('En espera de cambios') }}</span>
+                                @endif
+                            </div>
                             <div class="text-[12px] text-ink-500 mt-0.5 flex items-center gap-2 flex-wrap">
                                 <span class="inline-flex items-center gap-1"><span class="dot bg-{{ $typeColor }}"></span> {{ $typeLabel }}</span>
                                 @if($advisorName)<span>{{ $advisorName }}</span>@endif
                                 @if($advisorName && $createdAt)<span>·</span>@endif
                                 <span>{{ $createdAt }}</span>
                             </div>
+                            @if($awaitingChanges)
+                                <div class="text-[11px] text-info mt-1 flex items-center gap-1">
+                                    <i class="pi pi-info-circle text-[10px]"></i> {{ __('Esperando que tu asesor envíe la nueva versión con los cambios solicitados.') }}
+                                </div>
+                            @endif
                         </div>
-                        <button type="button" class="cli-btn bg-warn text-white border-warn hover:bg-warn-dark px-3 py-2 text-[12px] font-semibold rounded-lg inline-flex items-center gap-2 shrink-0"
+                        <button type="button" class="cli-btn {{ $awaitingChanges ? 'cli-btn-ghost' : 'bg-warn text-white border-warn hover:bg-warn-dark' }} px-3 py-2 text-[12px] font-semibold rounded-lg inline-flex items-center gap-2 shrink-0"
                                 data-open-acuerdo="{{ $docId }}">
-                            <i class="pi pi-eye text-[11px]"></i> {{ __('Revisar') }}
+                            @if($awaitingChanges)
+                                <i class="pi pi-eye text-[11px]"></i> {{ __('Ver') }}
+                            @else
+                                <i class="pi pi-pencil text-[11px]"></i> {{ __('Firmar') }}
+                            @endif
                         </button>
                     </div>
                 @endforeach
@@ -338,7 +396,20 @@
 
             <div class="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_420px] overflow-hidden">
                 {{-- Preview --}}
-                <div class="bg-ink-100/60 p-4 sm:p-6 overflow-auto">
+                <div class="bg-ink-100/60 p-4 sm:p-6 overflow-y-auto overflow-x-hidden">
+                    {{-- Resumen: cómo quedará la firma (solo en el paso Resumen) --}}
+                    <div id="acm-resumen-banner" class="max-w-[820px] mx-auto mb-3" style="display:none;">
+                        <div class="acm-resumen-sig">
+                            <div class="sig-thumb"><img id="acm-resumen-sig-img" src="" alt="{{ __('Tu firma') }}"></div>
+                            <div class="min-w-0">
+                                <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Vista previa con tu firma') }}</div>
+                                <div class="text-[13px] font-bold text-ink-950 truncate" id="acm-resumen-name">—</div>
+                                <div class="text-[11px] text-ink-500" id="acm-resumen-date">—</div>
+                            </div>
+                            <span class="acm-status-pill bg-ok-soft text-ok-dark ml-auto shrink-0"><i class="pi pi-check-circle text-[10px]"></i> {{ __('Lista para firmar') }}</span>
+                        </div>
+                    </div>
+
                     {{-- Budget breakdown card (only for budget docs) --}}
                     <div id="acm-budget-card" class="cli-card bg-white p-4 max-w-[760px] mx-auto mb-4" style="display:none;">
                         <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-3">{{ __('Resumen del plan propuesto') }}</div>
@@ -370,7 +441,9 @@
                         <i class="pi pi-file text-[48px] text-ink-300"></i>
                         <div class="mt-3 text-[13px]">{{ __('El documento aún no está disponible para previsualizar. Tu asesor lo enviará en breve.') }}</div>
                     </div>
-                    <iframe id="acm-preview" class="hidden w-full h-[68vh] bg-white rounded-xl border border-ink-200 mx-auto" style="max-width:760px;"></iframe>
+                    <div id="acm-preview-wrap" class="acm-preview-wrap hidden">
+                        <iframe id="acm-preview" scrolling="yes"></iframe>
+                    </div>
                 </div>
 
                 {{-- Right rail --}}
@@ -387,9 +460,9 @@
                         <div class="mt-4 flex items-center gap-1">
                             <span class="acm-step-pill is-active" data-step="1"><span class="num">1</span> {{ __('Revisar') }}</span>
                             <span class="flex-1 h-px bg-ink-200 mx-1"></span>
-                            <span class="acm-step-pill" data-step="2"><span class="num">2</span> <span data-step-label-2>{{ __('Aceptar') }}</span></span>
+                            <span class="acm-step-pill" data-step="2"><span class="num">2</span> {{ __('Firmar') }}</span>
                             <span class="flex-1 h-px bg-ink-200 mx-1"></span>
-                            <span class="acm-step-pill" data-step="3"><span class="num">3</span> {{ __('Firmar') }}</span>
+                            <span class="acm-step-pill" data-step="3"><span class="num">3</span> {{ __('Resumen') }}</span>
                         </div>
                     </div>
 
@@ -433,11 +506,6 @@
                             <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Mensaje al asesor') }}</label>
                             <textarea id="acm-obs-text" rows="6" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] text-ink-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none" placeholder="{{ __('Ej. El precio de la unidad es distinto al pactado, podrías revisarlo y enviar la versión corregida.') }}"></textarea>
                             <div class="text-[10px] text-ink-400 mt-1 text-right"><span id="acm-obs-count">0</span>/2000</div>
-
-                            <button type="button" id="acm-obs-send" onclick="submitAcuerdoObservation()" class="cli-btn cli-btn-primary w-full mt-3 inline-flex items-center justify-center gap-2 py-2.5">
-                                <i class="pi pi-send text-[11px]"></i> {{ __('Enviar observación') }}
-                            </button>
-                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Cancelar') }}</button>
                         </div>
 
                         {{-- ============ SIGN PANEL ============ --}}
@@ -466,17 +534,61 @@
                                 <span>{{ __('Leí y acepto los términos del documento. Entiendo que esta firma electrónica es legalmente vinculante.') }}</span>
                             </label>
 
+                            <button type="button" id="acm-sig-continue" onclick="acmGoResumen()" class="cli-btn cli-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 py-2.5">
+                                <i class="pi pi-eye text-[11px]"></i> {{ __('Ver resumen con mi firma') }}
+                            </button>
+                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Volver') }}</button>
+                        </div>
+
+                        {{-- ============ RESUMEN PANEL ============ --}}
+                        <div class="acm-panel" data-acm-panel="resumen">
+                            <div class="text-[12px] text-ink-700 mb-3">
+                                {{ __('Así quedará el documento con tu firma. Revisá la vista previa de la izquierda y confirmá para firmar de forma definitiva.') }}
+                            </div>
+
+                            <div class="rounded-xl border border-ink-200 bg-ink-50 p-3 space-y-2">
+                                <div class="flex items-center justify-between text-[12px]">
+                                    <span class="text-ink-500">{{ __('Documento') }}</span>
+                                    <span class="font-semibold text-ink-900 text-right" id="acm-resumen-doc">—</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[12px]">
+                                    <span class="text-ink-500">{{ __('Firmante') }}</span>
+                                    <span class="font-semibold text-ink-900 text-right" id="acm-resumen-signer">—</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[12px]">
+                                    <span class="text-ink-500">{{ __('Fecha y hora') }}</span>
+                                    <span class="font-semibold text-ink-900 text-right" id="acm-resumen-when">—</span>
+                                </div>
+                                <div class="pt-2 border-t border-ink-200">
+                                    <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400 mb-1">{{ __('Tu firma') }}</div>
+                                    <div class="rounded-lg border border-ink-200 bg-white h-[64px] flex items-center justify-center overflow-hidden p-1">
+                                        <img id="acm-resumen-panel-img" src="" alt="{{ __('Firma') }}" class="max-h-full max-w-full object-contain">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-[11px] text-ink-500 mt-3 flex items-start gap-2">
+                                <i class="pi pi-shield text-[12px] mt-0.5"></i>
+                                <span>{{ __('Al confirmar, tu firma electrónica queda registrada con fecha, hora y dirección IP como evidencia legal.') }}</span>
+                            </div>
+
                             <button type="button" id="acm-sig-confirm" onclick="submitSignAcuerdo()" class="cli-btn cli-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 py-2.5">
                                 <i class="pi pi-check text-[11px]"></i> {{ __('Firmar y confirmar') }}
                             </button>
-                            <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Volver') }}</button>
+                            <button type="button" onclick="acmGoTab('sign')" class="cli-btn cli-btn-ghost w-full mt-2 py-2.5">{{ __('Volver a editar mi firma') }}</button>
                         </div>
                     </div>
 
                     {{-- Footer actions (only visible on Revisar tab) --}}
                     <div id="acm-footer" class="px-5 py-3 border-t border-ink-100 grid grid-cols-2 gap-2 bg-white">
-                        <button type="button" id="acm-btn-observe" onclick="acmGoTab('observe')" class="cli-btn border border-ink-200 text-ink-700 bg-white hover:bg-ink-50 py-2.5 inline-flex items-center justify-center gap-2"><i class="pi pi-comment text-[12px]"></i> {{ __('Pedir cambios') }}</button>
+                        <button type="button" id="acm-btn-observe" onclick="acmGoTab('observe')" class="cli-btn border border-ink-200 text-ink-700 bg-white hover:bg-ink-50 py-2.5 inline-flex items-center justify-center gap-2"><i class="pi pi-comment text-[12px]"></i> {{ __('Solicitar cambios') }}</button>
                         <button type="button" id="acm-btn-primary" class="cli-btn cli-btn-primary py-2.5 inline-flex items-center justify-center gap-2"></button>
+                    </div>
+
+                    {{-- Footer actions for the Observación tab (pinned, 50% / 50%) --}}
+                    <div id="acm-footer-observe" class="px-5 py-3 border-t border-ink-100 grid grid-cols-2 gap-2 bg-white" style="display:none;">
+                        <button type="button" onclick="acmGoTab('review')" class="cli-btn cli-btn-ghost py-2.5 inline-flex items-center justify-center gap-2">{{ __('Cancelar') }}</button>
+                        <button type="button" id="acm-obs-send" onclick="submitAcuerdoObservation()" class="cli-btn cli-btn-primary py-2.5 inline-flex items-center justify-center gap-2"><i class="pi pi-send text-[11px]"></i> {{ __('Enviar') }}</button>
                     </div>
                 </aside>
             </div>
@@ -633,8 +745,17 @@ function acmGoTab(tabName) {
     document.querySelectorAll('.acm-tab').forEach(t => t.classList.toggle('active', t.dataset.acmTab === tabName));
     document.querySelectorAll('.acm-panel').forEach(p => p.classList.toggle('active', p.dataset.acmPanel === tabName));
     document.getElementById('acm-footer').style.display = tabName === 'review' ? '' : 'none';
+    document.getElementById('acm-footer-observe').style.display = tabName === 'observe' ? '' : 'none';
 
-    // Steps state
+    // The "con firma" preview only lives on the Resumen step.
+    if (tabName === 'resumen') {
+        acmBuildResumen();
+    } else {
+        document.getElementById('acm-resumen-banner').style.display = 'none';
+        acmRemoveSigPreview();
+    }
+
+    // Steps state — 1 Revisar · 2 Firmar · 3 Resumen
     const steps = document.querySelectorAll('.acm-step-pill');
     const doc = acmCurrentDoc;
     steps.forEach(s => s.classList.remove('is-active','is-done'));
@@ -642,19 +763,89 @@ function acmGoTab(tabName) {
 
     if (doc.signed) {
         steps.forEach(s => s.classList.add('is-done'));
+    } else if (tabName === 'resumen') {
+        steps[0].classList.add('is-done');
+        steps[1].classList.add('is-done');
+        steps[2].classList.add('is-active');
     } else if (tabName === 'sign') {
         steps[0].classList.add('is-done');
-        steps[1].classList.add('is-done');
-        steps[2].classList.add('is-active');
-    } else if (doc.accepted) {
-        steps[0].classList.add('is-done');
-        steps[1].classList.add('is-done');
-        steps[2].classList.add('is-active');
+        steps[1].classList.add('is-active');
     } else {
         steps[0].classList.add('is-active');
     }
 
     if (tabName === 'sign') setTimeout(acmInitCanvas, 50);
+    setTimeout(acmFitPreview, 30);
+}
+
+/* ---------- Resumen step: preview the document WITH the signature ---------- */
+const ACM_DOC_W = 794;  // A4 width @96dpi (210mm) — matches the printable templates
+function acmFitPreview() {
+    const wrap = document.getElementById('acm-preview-wrap');
+    const ifr  = document.getElementById('acm-preview');
+    if (!wrap || !ifr || wrap.classList.contains('hidden')) return;
+    const avail = wrap.clientWidth;
+    if (!avail) return;
+    const scale = Math.min(1, avail / ACM_DOC_W);
+    ifr.style.width     = ACM_DOC_W + 'px';
+    ifr.style.height    = Math.round(wrap.clientHeight / scale) + 'px';
+    ifr.style.transform = 'scale(' + scale + ')';
+}
+
+function acmRemoveSigPreview() {
+    try {
+        const doc = document.getElementById('acm-preview')?.contentDocument;
+        doc?.querySelectorAll('[data-sig-preview]')?.forEach(n => n.remove());
+    } catch (e) { /* cross-origin / not ready */ }
+}
+
+function acmInjectSigPreview(sigData) {
+    try {
+        const doc = document.getElementById('acm-preview')?.contentDocument;
+        if (!doc) return;
+        acmRemoveSigPreview();
+        const box = doc.querySelector('.sig-box');
+        if (box && !box.querySelector('img[data-signature]')) {
+            const img = doc.createElement('img');
+            img.setAttribute('data-sig-preview', '1');
+            img.src = sigData;
+            img.style.cssText = 'max-height:46px;max-width:200px;object-fit:contain;display:block;margin:2px auto 0;';
+            box.innerHTML = '';
+            box.appendChild(img);
+            try { box.scrollIntoView({ behavior:'smooth', block:'center' }); } catch (e) {}
+        }
+    } catch (e) { /* fallback: the banner card already shows the signature */ }
+}
+
+function acmBuildResumen() {
+    const canvas = document.getElementById('acm-sig-canvas');
+    const sigData = canvas.toDataURL('image/png');
+    const name = document.getElementById('acm-sig-name').value.trim();
+    const whenStr = new Date().toLocaleString('es-AR', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) + ' hs';
+
+    // Banner over the live preview
+    document.getElementById('acm-resumen-sig-img').src = sigData;
+    document.getElementById('acm-resumen-name').textContent = name || '—';
+    document.getElementById('acm-resumen-date').textContent = whenStr;
+    document.getElementById('acm-resumen-banner').style.display = '';
+
+    // Summary panel on the right rail
+    document.getElementById('acm-resumen-doc').textContent    = acmCurrentDoc?.title || '—';
+    document.getElementById('acm-resumen-signer').textContent = name || '—';
+    document.getElementById('acm-resumen-when').textContent   = whenStr;
+    document.getElementById('acm-resumen-panel-img').src      = sigData;
+
+    // Inject the drawn signature into the document preview itself
+    acmInjectSigPreview(sigData);
+}
+
+function acmGoResumen() {
+    const name = document.getElementById('acm-sig-name').value.trim();
+    const accept = document.getElementById('acm-sig-accept').checked;
+    if (name.length < 3) { acmToast('Escribí tu nombre completo.', 'err'); return; }
+    if (!acmHasStroke)   { acmToast('Falta tu firma manuscrita.', 'err'); return; }
+    if (!accept)         { acmToast('Aceptá los términos para continuar.', 'err'); return; }
+    acmGoTab('resumen');
 }
 
 function openAcuerdoModal(id) {
@@ -680,10 +871,6 @@ function openAcuerdoModal(id) {
         doc.awaiting_admin ? 'bg-info-soft text-info' :
         'bg-warn-soft text-warn-dark'
     );
-
-    // Step 2 label per type
-    const step2 = document.querySelector('[data-step-label-2]');
-    if (step2) step2.textContent = (doc.doc_type === 'budget' || doc.doc_type === 'purchase_promise' || doc.doc_type === 'contract') ? 'Aceptar' : 'Aceptar';
 
     // Download button
     const dl = document.getElementById('acm-download');
@@ -715,13 +902,17 @@ function openAcuerdoModal(id) {
 
     // Preview iframe — auto-generates via /documents/{id}/preview if needed
     const iframe = document.getElementById('acm-preview');
+    const wrap   = document.getElementById('acm-preview-wrap');
     const fb     = document.getElementById('acm-preview-fallback');
+    document.getElementById('acm-resumen-banner').style.display = 'none';
     if (doc.preview_url) {
+        iframe.onload = () => acmFitPreview();
         iframe.src = doc.preview_url;
-        iframe.classList.remove('hidden');
+        wrap.classList.remove('hidden');
         fb.classList.add('hidden');
+        setTimeout(acmFitPreview, 80);
     } else {
-        iframe.src = ''; iframe.classList.add('hidden');
+        iframe.src = ''; wrap.classList.add('hidden');
         fb.classList.remove('hidden');
         // For budget, the breakdown card is the "preview"
         if (bk) fb.classList.add('hidden');
@@ -991,7 +1182,7 @@ document.addEventListener('click', e => {
     }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAcuerdoModal(); });
-window.addEventListener('resize', () => { if (document.getElementById('acuerdoModal').style.display !== 'none') acmInitCanvas(); });
+window.addEventListener('resize', () => { if (document.getElementById('acuerdoModal').style.display !== 'none') { acmInitCanvas(); acmFitPreview(); } });
 </script>
 @endpush
 @endsection

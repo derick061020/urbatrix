@@ -342,6 +342,19 @@ class DocumentController extends Controller
         try {
             $notes = $request->input('notes');
 
+            // Enrich the client-supplied signature payload with server-side evidence
+            // (IP, user agent and an authoritative timestamp) so the admin can audit
+            // exactly when, from where and with which device the document was signed.
+            $decoded = json_decode((string) $notes, true);
+            if (is_array($decoded)) {
+                $decoded['ip'] = $request->ip();
+                $decoded['signed_server_at'] = now()->toIso8601String();
+                if (empty($decoded['user_agent'])) {
+                    $decoded['user_agent'] = $request->userAgent();
+                }
+                $notes = json_encode($decoded);
+            }
+
             // Embed the signature image into the actual file (append a signature page
             // to the docx). If this fails we still mark the doc as signed — the JSON
             // payload with the signature stays in `notes` as legal evidence.
