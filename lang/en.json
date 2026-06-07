@@ -1,4 +1,5 @@
 {
+    "home.title" : "Makai Residences",
     "Español": "Spanish",
     "English": "English",
     "Idioma": "Language",
@@ -299,5 +300,17 @@
     "minutos": "minutes",
     "horas": "hours",
     "días": "days",
-    ":sold OF :total UNITS SOLD": ":sold OF :total UNITS SOLD"
+    ":sold OF :total UNITS SOLD": ":sold OF :total UNITS SOLD",
+    "online_users" : "users online right now",
+    "guardados" : "Saved",
+    "Lista de guardados" : "Wishlist",
+    "Contactar agente" : "Contact agent",
+    "Soporte" :  "Tech support",
+    "Progreso de la construcción" : "Construction progress",
+    "Sitio web" : "Main website",
+    "Presentación comercial" : "Brochure",
+    "Plantas" : "Floor plants",
+    "Especificaciones" : "Specifications",
+    "Términos y condiciones" : "Terms & Conditions"
+    
 }

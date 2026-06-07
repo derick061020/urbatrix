@@ -1,4 +1,5 @@
 {
+    "home.title" : "Makai Residencias",
     "Español": "Español",
     "English": "English",
     "Idioma": "Idioma",
@@ -46,7 +47,7 @@
     "Completado": "Completado",
     "En proceso": "En proceso",
 
-    "Dashboard": "Dashboard",
+    "Dashboard": "Escritorio",
     "Inicio": "Inicio",
     "Mi propiedad": "Mi propiedad",
     "Documentos": "Documentos",
@@ -299,5 +300,16 @@
     "minutos": "minutos",
     "horas": "horas",
     "días": "días",
-    ":sold OF :total UNITS SOLD": ":sold DE :total UNIDADES VENDIDAS"
+    ":sold OF :total UNITS SOLD": ":sold DE :total UNIDADES VENDIDAS",
+    "online_users" : "usuarios activos",
+    "guardados" : "Guardados",
+    "Lista de guardados" : "Lista de guardados",
+    "Contactar agente" : "Contactar agente",
+    "Soporte": "Soporte",
+    "Progreso de la construccion" : "Progreso de la construccion",
+    "Sitio web": "Sitio web",
+    "Presentación comercial" : "Presentación comercial",
+    "Plantas": "Plantas",
+    "Especificaciones" : "Especificaciones",
+    "Términos y condiciones" : "Términos y condiciones"
 }

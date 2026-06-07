@@ -1083,7 +1083,7 @@
           <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
-            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> Users Online Right Now</span>
+            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> {{ __('online_users') }}</span>
           </div>
         </div>
         <style>
@@ -1110,14 +1110,14 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
-            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;">Guardados</span>
+            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;">{{ __('guardados') }}</span>
           </span>
           @else
           <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
-            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;" data-saved-count>Guardados ({{ count($wishlistIds ?? []) }})</span>
+            <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;" data-saved-count>{{ __('guardados') }} ({{ count($wishlistIds ?? []) }})</span>
           </a>
           @endif
 
@@ -1185,7 +1185,7 @@
                       </svg>
                     </div>
                     <div style="display:flex;flex-direction:column;justify-content:center;font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:#525866;letter-spacing:-0.072px;white-space:nowrap;flex-shrink:0;">
-                      <span style="line-height:20px;">Español</span>
+                      <span style="line-height:20px;">{{ __('Español') }}</span>
                     </div>
                   </button>
                   <button onclick="setLanguage('en')" id="lang-en" style="display:flex;gap:8px;align-items:center;justify-content:center;padding:6px;border-radius:8px;flex:1;min-width:0;position:relative;z-index:1;background:transparent;border:none;cursor:pointer;opacity:0.52;">
@@ -1202,7 +1202,7 @@
                       </svg>
                     </div>
                     <div style="display:flex;flex-direction:column;justify-content:center;font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:#717784;letter-spacing:-0.072px;white-space:nowrap;flex-shrink:0;">
-                      <span style="line-height:20px;">English</span>
+                      <span style="line-height:20px;">{{ __('English') }}</span>
                     </div>
                   </button>
                 </div>
@@ -1219,7 +1219,7 @@
                       <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
                   </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Dashboard</div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Dashboard') }}</div>
                 </div>
               </a>
 
@@ -1230,7 +1230,7 @@
                     <circle cx="12" cy="7" r="4"></circle>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">My Profile</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Mi perfil') }}</div>
               </div>
 
               @if($isAdminUser)
@@ -1241,7 +1241,7 @@
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                   </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Lista de guardados') }}</div>
                 </div>
               </div>
               @else
@@ -1252,7 +1252,7 @@
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                   </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Wishlist</div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Lista de guardados') }}</div>
                 </div>
               </a>
               @endif
@@ -1268,7 +1268,7 @@
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Contact Agent</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Contactar agente') }}</div>
               </div>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
@@ -1279,7 +1279,7 @@
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Tech Support</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Soporte') }}</div>
               </div>
 
               <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.crm.avance-obra') : route('dashboard.progress') }}" style="text-decoration:none;display:block;width:100%">
@@ -1290,7 +1290,7 @@
                       <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                   </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Construction Progress</div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Progreso de la construcción') }}</div>
                 </div>
               </a>
 
@@ -1307,7 +1307,7 @@
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Main Website</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Sitio web') }}</div>
               </div>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
@@ -1318,7 +1318,7 @@
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">FAQs</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('FAQs') }}</div>
               </div>
 
               <!-- Divider -->
@@ -1335,7 +1335,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Brochure</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Presentación comercial') }}</div>
               </div>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
@@ -1347,7 +1347,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Floor Plans</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Plantas') }}</div>
               </div>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
@@ -1359,7 +1359,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">ROIs</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('ROIs') }}</div>
               </div>
 
               <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
@@ -1371,7 +1371,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                   </svg>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Specifications</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Especificaciones') }}</div>
               </div>
 
               <!-- Divider -->
@@ -1390,13 +1390,13 @@
                       <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
                   </div>
-                  <div style="flex:1;text-align: start;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">Sign out</div>
+                  <div style="flex:1;text-align: start;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Cerrar sesión') }}</div>
                 </button>
               </form>
 
               <!-- Footer -->
               <div style="background:white;display:flex;align-items:center;overflow:hidden;padding:8px;width:100%;flex-shrink:0;">
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;line-height:16px;">v.1.0.1 · Terms & Conditions</div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;line-height:16px;">v.1.0.1 · {{ __('Términos y condiciones') }}</div>
               </div>
 
               <!-- Inner shadow effect -->
