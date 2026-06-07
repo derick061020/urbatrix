@@ -298,5 +298,6 @@
     "Hace": "Hace",
     "minutos": "minutos",
     "horas": "horas",
-    "días": "días"
+    "días": "días",
+    ":sold OF :total UNITS SOLD": ":sold DE :total UNIDADES VENDIDAS"
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Makai Residences</title>
+  <title>{{ __('home.title') }}</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -1054,7 +1054,7 @@
         </a>
       </div>
       <div style="display:flex;flex-direction:row;width:33.33%;justify-content:center;align-items:center;">
-        <span style="text-transform:uppercase;text-align:center;font-weight:700;font-size:1.25rem;letter-spacing:0.08em;color:rgb(99,124,105);">{{ $soldCount ?? 0 }} OF {{ $totalUnits ?? 0 }} UNITS SOLD</span>
+        <span style="text-transform:uppercase;text-align:center;font-weight:700;font-size:1.25rem;letter-spacing:0.08em;color:rgb(99,124,105);">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
       </div>
       <div style="display:flex;flex-direction:row;width:33.33%;justify-content:flex-end;align-items:center;gap:0.75rem;padding-right:1rem;">
         <span style="text-transform:uppercase;font-weight:700;letter-spacing:0.08em;font-size:0.875rem;cursor:pointer;color:rgb(99,124,105);">MENU</span>

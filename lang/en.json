@@ -298,5 +298,6 @@
     "Hace": "About",
     "minutos": "minutes",
     "horas": "hours",
-    "días": "days"
+    "días": "days",
+    ":sold OF :total UNITS SOLD": ":sold OF :total UNITS SOLD"
 }
