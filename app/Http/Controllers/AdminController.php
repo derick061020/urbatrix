@@ -19,6 +19,7 @@ use App\Models\CrmTemplate;
 use App\Models\CrmAutomation;
 use App\Models\CrmChannelSetting;
 use App\Models\ExportAuthorization;
+use App\Support\UnitOptions;
 use App\Helpers\PaymentPlanHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +58,47 @@ class AdminController extends Controller
     {
         Unit::releaseExpiredHolds();
         $units = Unit::orderBy('created_at', 'desc')->get();
-        return view('admin.units.units', compact('units'));
+        $unitOptions = UnitOptions::all();
+        $amenityIconKeys = array_keys(UnitOptions::amenityIcons());
+        return view('admin.units.units', compact('units', 'unitOptions', 'amenityIconKeys'));
+    }
+
+    /**
+     * Guarda las listas globales editables de unidades (tipos, plantas, vistas,
+     * direcciones y amenidades). Alimenta el formulario de unidades y los
+     * filtros de la home a través de App\Support\UnitOptions.
+     */
+    public function updateUnitOptions(Request $request)
+    {
+        foreach (UnitOptions::CATEGORIES as $category) {
+            $rows = $request->input($category, []);
+            if (!is_array($rows)) {
+                continue;
+            }
+
+            $clean = [];
+            foreach ($rows as $row) {
+                $label = trim((string) ($row['label'] ?? ''));
+                if ($label === '') {
+                    continue;
+                }
+                $value = trim((string) ($row['value'] ?? ''));
+                if ($value === '') {
+                    // Genera un slug estable a partir de la etiqueta.
+                    $value = \Illuminate\Support\Str::slug($label, '_') ?: \Illuminate\Support\Str::random(6);
+                }
+
+                $entry = ['value' => $value, 'label' => $label];
+                if ($category === 'amenities') {
+                    $entry['icon'] = trim((string) ($row['icon'] ?? 'check')) ?: 'check';
+                }
+                $clean[] = $entry;
+            }
+
+            UnitOptions::put($category, $clean);
+        }
+
+        return redirect()->route('admin.units')->with('success', 'Configuración de opciones guardada.');
     }
 
     public function editUnit(Unit $unit)

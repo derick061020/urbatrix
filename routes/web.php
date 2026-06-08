@@ -197,6 +197,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/notifications/read', [NotificationController::class, 'read'])->name('admin.notifications.read');
 
     Route::get('/units', [AdminController::class, 'units'])->name('admin.units');
+    Route::post('/units/options', [AdminController::class, 'updateUnitOptions'])->name('admin.units.options');
     Route::get('/units/create', [AdminController::class, 'createUnit'])->name('admin.units.create');
     Route::post('/units', [AdminController::class, 'storeUnit'])->name('admin.units.store');
     Route::get('/units/{unit}', [AdminController::class, 'editUnit'])->name('admin.units.edit');

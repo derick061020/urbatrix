@@ -3,22 +3,16 @@
     Required vars: $unit (Unit or null), $agents (Collection of Agent)
 --}}
 @php
+    use App\Support\UnitOptions;
     $u = $unit ?? null;
-    $typeOptions = [
-        '1_bed' => '1 Bed',
-        '1_bed_family' => '1 Bed & Family Room',
-        '1_bed_studio' => '1 Bed & Studio Lock-off',
-        '2_bed' => '2 Bed',
-        '3_bed' => '3 Bed',
-        'penthouse_1_bed' => 'Penthouse 1 Bed',
-        'penthouse_2_bed' => 'Penthouse 2 Bed',
-    ];
-    $currentType = old('type', $u->type ?? '2_bed');
+    $typeOptions    = UnitOptions::map('types');
+    $currentType    = old('type', $u->type ?? array_key_first($typeOptions) ?? '');
     if ($currentType && !array_key_exists($currentType, $typeOptions)) {
         $typeOptions = [$currentType => $currentType] + $typeOptions;
     }
-    $floorOptions = ['ground' => 'Planta baja', '1st' => '1°', '2nd' => '2°', '3rd' => '3°', '4th' => '4°', '5th' => '5°', '6th' => '6°'];
-    $outlookOptions = ['golf_course' => 'Vista al campo de golf', 'lake' => 'Vista al lago', 'ocean_lake' => 'Vista al mar y al lago', 'ocean' => 'Vista al mar', 'mountain' => 'Vista a la montaña'];
+    $floorOptions   = UnitOptions::map('floors');
+    $outlookOptions = UnitOptions::map('outlooks');
+    $addressOptions = UnitOptions::addresses();
     $statusOptions = [
         'AVAILABLE' => 'Disponible',
         'PENDING'   => 'Pendiente',
@@ -73,7 +67,12 @@
         </div>
         <div class="sm:col-span-2">
             <label class="text-[12px] font-semibold text-ink-700">Dirección</label>
-            <input type="text" name="address" value="{{ old('address', $u->address ?? '') }}" placeholder="Ej. 1A Launch Boulevard" class="crm-input pl-3 mt-1">
+            <input type="text" name="address" list="unit-address-options" value="{{ old('address', $u->address ?? '') }}" placeholder="Ej. 1A Launch Boulevard" class="crm-input pl-3 mt-1">
+            <datalist id="unit-address-options">
+                @foreach($addressOptions as $addr)
+                    <option value="{{ $addr }}"></option>
+                @endforeach
+            </datalist>
         </div>
         <div class="flex flex-wrap items-center gap-6 pt-7">
             @include('admin.units._partials.toggle', ['name' => 'public',       'label' => 'Público',       'checked' => old('public', $u->public ?? false)])
@@ -184,34 +183,22 @@
                     <label class="text-[12px] font-semibold text-ink-700">Amenities</label>
                     <div class="mt-2">
                     @php
-                        $amenitiesOptions = [
-                            'pool' => ['label' => 'Pool', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>'],
-                            'gym' => ['label' => 'Gym', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6 20v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/></svg>'],
-                            'beach_club' => ['label' => 'Beach Club', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M12 2v20"/><path d="M4 12c0-4 3-7 8-7s8 3 8 7"/></svg>'],
-                            'restaurant' => ['label' => 'Restaurant', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>'],
-                            'spa' => ['label' => 'Spa', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>'],
-                            'tennis' => ['label' => 'Tennis Court', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2v20"/><path d="M4.93 4.93l14.14 14.14"/><path d="M19.07 4.93L4.93 19.07"/></svg>'],
-                            'golf' => ['label' => 'Golf Course', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 13v8"/><path d="M9 6l3-4 3 4"/></svg>'],
-                            'security' => ['label' => '24/7 Security', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'],
-                            'parking' => ['label' => 'Parking', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15V9"/><path d="M17 15V9"/></svg>'],
-                            'concierge' => ['label' => 'Concierge', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'],
-                            'playground' => ['label' => 'Playground', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'],
-                            'bbq' => ['label' => 'BBQ Area', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M6 12v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/><path d="M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>'],
-                        ];
+                        $amenitiesOptions = UnitOptions::get('amenities');
                         $selectedAmenities = old('amenities', $u->amenities ?? []);
                         if (is_string($selectedAmenities)) {
                             $selectedAmenities = json_decode($selectedAmenities, true) ?? [];
                         }
                     @endphp
                     <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                        @foreach($amenitiesOptions as $key => $amenity)
+                        @foreach($amenitiesOptions as $amenity)
+                            @php $key = $amenity['value'] ?? ''; @endphp
                             <label class="relative cursor-pointer">
                                 <input type="checkbox" name="amenities[]" value="{{ $key }}" {{ in_array($key, $selectedAmenities) ? 'checked' : '' }} class="peer sr-only">
                                 <div class="flex flex-col items-center gap-1 p-3 rounded-lg border-2 border-ink-200 bg-white peer-checked:border-brand peer-checked:bg-brand-soft hover:border-brand/50 transition-all">
                                     <div class="text-ink-400 peer-checked:text-brand transition-colors">
-                                        {!! $amenity['icon'] !!}
+                                        {!! UnitOptions::amenityIcon($amenity['icon'] ?? null) !!}
                                     </div>
-                                    <span class="text-[10px] font-medium text-ink-600 peer-checked:text-brand-dark text-center leading-tight">{{ $amenity['label'] }}</span>
+                                    <span class="text-[10px] font-medium text-ink-600 peer-checked:text-brand-dark text-center leading-tight">{{ $amenity['label'] ?? $key }}</span>
                                 </div>
                             </label>
                         @endforeach

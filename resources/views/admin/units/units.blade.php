@@ -26,6 +26,7 @@
         <div class="text-[14px] font-semibold text-ink-700">{{ $units->total() }} unidades totales</div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-exportar-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
+            <button type="button" onclick="document.getElementById('modal-config-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-cog"></i> Configuraciones</button>
             <a href="{{ route('admin.units.create') }}" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nueva unidad</a>
         </div>
     </div>
@@ -128,6 +129,53 @@
 
 @include('admin.crm._partials.modal_exportar', ['name' => 'Unidades', 'id' => 'modal-exportar-unidades'])
 
+{{-- ===================== MODAL: CONFIGURACIÓN DE OPCIONES ===================== --}}
+@php
+    $cfgSections = [
+        'types'     => ['label' => 'Tipos de unidad', 'icon' => 'pi-th-large',  'hint' => 'Aparecen en el selector "Tipo" del formulario.'],
+        'floors'    => ['label' => 'Plantas / Pisos',  'icon' => 'pi-building',  'hint' => 'Selector "Planta" del formulario y filtro de la home.'],
+        'outlooks'  => ['label' => 'Vistas',           'icon' => 'pi-eye',       'hint' => 'Selector "Vista" del formulario y filtro de la home.'],
+        'addresses' => ['label' => 'Direcciones',      'icon' => 'pi-map-marker','hint' => 'Sugerencias para el campo "Dirección".'],
+        'amenities' => ['label' => 'Amenidades',       'icon' => 'pi-star',      'hint' => 'Tarjetas de amenidades del formulario y front.'],
+    ];
+    $amenityIcons = \App\Support\UnitOptions::amenityIcons();
+@endphp
+<dialog id="modal-config-unidades" class="rounded-2xl p-0 w-full max-w-3xl backdrop:bg-black/40">
+    <form method="POST" action="{{ route('admin.units.options') }}" class="flex flex-col max-h-[88vh]">
+        @csrf
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-cog text-brand"></i>
+                <h2 class="text-[15px] font-bold text-ink-900">Configuración de opciones</h2>
+            </div>
+            <button type="button" onclick="document.getElementById('modal-config-unidades').close()" class="text-ink-400 hover:text-ink-700"><i class="pi pi-times"></i></button>
+        </div>
+
+        <div class="px-6 pt-3 border-b border-ink-100 flex items-center gap-1 overflow-x-auto">
+            @foreach($cfgSections as $cat => $meta)
+                <button type="button" data-cfg-tab="{{ $cat }}" class="cfg-tab px-3 py-2 text-[12px] font-semibold whitespace-nowrap border-b-2 {{ $loop->first ? 'border-brand text-brand' : 'border-transparent text-ink-500' }}">
+                    <i class="pi {{ $meta['icon'] }} text-[11px]"></i> {{ $meta['label'] }}
+                </button>
+            @endforeach
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1">
+            @foreach($cfgSections as $cat => $meta)
+                <section data-cfg-section="{{ $cat }}" class="{{ $loop->first ? '' : 'hidden' }}">
+                    <p class="text-[12px] text-ink-500 mb-3">{{ $meta['hint'] }}</p>
+                    <div data-cfg-rows="{{ $cat }}" class="space-y-2"></div>
+                    <button type="button" data-cfg-add="{{ $cat }}" class="crm-btn crm-btn-ghost mt-3 text-[12px]"><i class="pi pi-plus"></i> Agregar</button>
+                </section>
+            @endforeach
+        </div>
+
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
+            <button type="button" onclick="document.getElementById('modal-config-unidades').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+        </div>
+    </form>
+</dialog>
+
 @push('scripts')
 <script>
 (function () {
@@ -165,6 +213,98 @@
             alert('No se pudo cambiar la visibilidad. Intentá de nuevo.');
         })
         .finally(() => { btn.disabled = false; });
+    });
+})();
+</script>
+
+{{-- Editor de opciones globales (tipos, plantas, vistas, direcciones, amenidades) --}}
+<script>
+(function () {
+    const data  = @json($unitOptions);
+    const icons = @json($amenityIcons);
+    const iconKeys = Object.keys(icons);
+    const counters = {};
+
+    const esc = s => String(s ?? '').replace(/"/g, '&quot;');
+
+    function iconOptions(selected) {
+        return iconKeys.map(k => `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`).join('');
+    }
+
+    function iconPreview(key) {
+        return icons[key] || icons['check'] || '';
+    }
+
+    function makeRow(cat, row) {
+        row = row || {};
+        const i = (counters[cat] = (counters[cat] ?? -1) + 1);
+        const base = `${cat}[${i}]`;
+        const wrap = document.createElement('div');
+        wrap.className = 'flex items-center gap-2';
+
+        if (cat === 'addresses') {
+            wrap.innerHTML = `
+                <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Dirección" class="crm-input pl-3 flex-1">
+                <input type="hidden" name="${base}[value]" value="${esc(row.value)}">
+                <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
+        } else if (cat === 'amenities') {
+            const sel = row.icon || 'check';
+            wrap.innerHTML = `
+                <span class="cfg-icon-prev w-8 h-8 flex items-center justify-center text-ink-500 shrink-0">${iconPreview(sel)}</span>
+                <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Etiqueta" class="crm-input pl-3 flex-1">
+                <input type="text" name="${base}[value]" value="${esc(row.value)}" placeholder="valor (opcional)" class="crm-input pl-3 w-32">
+                <select name="${base}[icon]" class="crm-input pl-3 w-28 cfg-icon-sel">${iconOptions(sel)}</select>
+                <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
+        } else {
+            wrap.innerHTML = `
+                <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Etiqueta" class="crm-input pl-3 flex-1">
+                <input type="text" name="${base}[value]" value="${esc(row.value)}" placeholder="valor (opcional)" class="crm-input pl-3 w-40">
+                <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
+        }
+        return wrap;
+    }
+
+    // Render inicial
+    Object.keys(data).forEach(cat => {
+        const host = document.querySelector(`[data-cfg-rows="${cat}"]`);
+        if (!host) return;
+        (data[cat] || []).forEach(row => host.appendChild(makeRow(cat, row)));
+    });
+
+    // Delegación de eventos dentro del modal
+    const modal = document.getElementById('modal-config-unidades');
+    modal.addEventListener('click', function (e) {
+        const add = e.target.closest('[data-cfg-add]');
+        if (add) {
+            const cat = add.dataset.cfgAdd;
+            document.querySelector(`[data-cfg-rows="${cat}"]`).appendChild(makeRow(cat));
+            return;
+        }
+        const del = e.target.closest('.cfg-del');
+        if (del) { del.closest('.flex').remove(); return; }
+
+        const tab = e.target.closest('[data-cfg-tab]');
+        if (tab) {
+            const cat = tab.dataset.cfgTab;
+            modal.querySelectorAll('[data-cfg-tab]').forEach(t => {
+                const on = t.dataset.cfgTab === cat;
+                t.classList.toggle('border-brand', on);
+                t.classList.toggle('text-brand', on);
+                t.classList.toggle('border-transparent', !on);
+                t.classList.toggle('text-ink-500', !on);
+            });
+            modal.querySelectorAll('[data-cfg-section]').forEach(s => {
+                s.classList.toggle('hidden', s.dataset.cfgSection !== cat);
+            });
+        }
+    });
+
+    // Actualiza el preview del ícono al cambiar el select
+    modal.addEventListener('change', function (e) {
+        const sel = e.target.closest('.cfg-icon-sel');
+        if (!sel) return;
+        const prev = sel.closest('.flex').querySelector('.cfg-icon-prev');
+        if (prev) prev.innerHTML = iconPreview(sel.value);
     });
 })();
 </script>

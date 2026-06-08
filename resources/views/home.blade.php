@@ -14,17 +14,131 @@
 
 <body data-view="grid">
 
+  <!-- ░░░ MAKAI LOADING SCREEN ░░░ -->
+  <div id="makaiLoader" aria-hidden="true">
+    <div class="ml-inner">
+      <div class="ml-rings">
+        <span class="ml-ring"></span>
+        <span class="ml-ring"></span>
+        <span class="ml-ring"></span>
+        <span class="ml-core"></span>
+      </div>
+      <img src="/images/makai-logo.png" alt="Makai" class="ml-logo">
+      <div class="ml-bar"><span></span></div>
+    </div>
+  </div>
+  <style>
+    #makaiLoader{
+      position:fixed; inset:0; z-index:99999;
+      display:flex; align-items:center; justify-content:center;
+      background:radial-gradient(120% 120% at 50% 30%, #fbfcfa 0%, #f1f4ee 55%, #e8ede5 100%);
+      transition:opacity .6s ease, visibility .6s ease;
+    }
+    #makaiLoader.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+    .ml-inner{
+      display:flex; flex-direction:column; align-items:center; gap:30px;
+      animation:ml-fade-in .7s ease both;
+    }
+    /* Anillos topográficos / ondas que se expanden ("Makai" = hacia el mar) */
+    .ml-rings{ position:relative; width:120px; height:120px; }
+    .ml-ring{
+      position:absolute; inset:0; margin:auto;
+      width:36px; height:36px; border-radius:50%;
+      border:1.5px solid #5c7c68;
+      transform:scale(.3); opacity:0;
+      animation:ml-ripple 2.4s cubic-bezier(.22,.61,.36,1) infinite;
+    }
+    .ml-ring:nth-child(2){ animation-delay:.6s; }
+    .ml-ring:nth-child(3){ animation-delay:1.2s; }
+    .ml-core{
+      position:absolute; inset:0; margin:auto;
+      width:14px; height:14px; border-radius:50%;
+      background:#5c7c68;
+      animation:ml-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes ml-ripple{
+      0%   { transform:scale(.3);  opacity:0; }
+      15%  { opacity:.55; }
+      100% { transform:scale(3.2); opacity:0; }
+    }
+    @keyframes ml-pulse{
+      0%,100%{ transform:scale(1);   opacity:1; }
+      50%    { transform:scale(.7);  opacity:.65; }
+    }
+    .ml-logo{
+      height:34px; width:auto; max-width:200px; object-fit:contain;
+      opacity:.92;
+      animation:ml-breathe 3s ease-in-out infinite;
+    }
+    @keyframes ml-breathe{
+      0%,100%{ opacity:.92; }
+      50%    { opacity:.6; }
+    }
+    .ml-bar{
+      width:160px; height:3px; border-radius:99px;
+      background:rgba(92,124,104,.15); overflow:hidden;
+    }
+    .ml-bar span{
+      display:block; height:100%; width:40%; border-radius:99px;
+      background:linear-gradient(90deg, transparent, #5c7c68, transparent);
+      animation:ml-slide 1.3s ease-in-out infinite;
+    }
+    @keyframes ml-slide{
+      0%  { transform:translateX(-120%); }
+      100%{ transform:translateX(330%); }
+    }
+    @keyframes ml-fade-in{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none;} }
+    /* Con "reducir movimiento" mantenemos solo latidos de opacidad (sin desplazamientos). */
+    @media (prefers-reduced-motion:reduce){
+      .ml-ring{ animation:none; }
+      .ml-ring:first-child{ opacity:.35; transform:scale(2.2); }
+      .ml-bar span{ animation:ml-breathe 1.3s ease-in-out infinite; transform:none; width:100%; }
+    }
+  </style>
+  <script>
+    (function(){
+      var loader = document.getElementById('makaiLoader');
+      if(!loader) return;
+      var start = Date.now();
+      var MIN_SHOW = 1500; // ms mínimos visibles para que la animación se aprecie aunque cargue rápido
+      var hidden = false;
+      function replayHero(){
+        // La animación de entrada del hero ya corrió oculta bajo el loader;
+        // la reiniciamos justo al levantar el telón para que sí se vea.
+        var hero = document.getElementById('hero');
+        if(!hero || !hero.dataset.active) return;
+        var active = hero.dataset.active;
+        hero.removeAttribute('data-active');
+        void hero.offsetWidth; // fuerza reflow para reiniciar la animación
+        hero.dataset.active = active;
+      }
+      function hide(){
+        if(hidden) return; hidden = true;
+        replayHero();
+        loader.classList.add('is-hidden');
+        setTimeout(function(){ if(loader && loader.parentNode){ loader.parentNode.removeChild(loader); } }, 700);
+      }
+      function requestHide(){
+        var remaining = MIN_SHOW - (Date.now() - start);
+        setTimeout(hide, remaining > 0 ? remaining : 0);
+      }
+      // Oculta cuando toda la página (incluidas imágenes) terminó de cargar,
+      // respetando el tiempo mínimo de exhibición.
+      if(document.readyState === 'complete'){ requestHide(); }
+      else { window.addEventListener('load', requestHide); }
+      // Fallback: nunca dejar la pantalla bloqueada más de 8s.
+      setTimeout(hide, 8000);
+    })();
+  </script>
+  <!-- ░░░ /MAKAI LOADING SCREEN ░░░ -->
+
   @php
-    // Etiquetas de "Vista" (outlook). Las claves COINCIDEN con los valores que
-    // guarda el formulario de unidad del admin (form_fields.blade.php), de modo
-    // que el filtro de la home matchee y se muestre una etiqueta legible.
-    $outlookLabels = [
-        'golf_course' => 'Vista al campo de golf',
-        'lake'        => 'Vista al lago',
-        'ocean_lake'  => 'Vista al mar y al lago',
-        'ocean'       => 'Vista al mar',
-        'mountain'    => 'Vista a la montaña',
-    ];
+    // Listas globales editables desde el admin (Unidades → Configuraciones).
+    // Las claves COINCIDEN con los valores que guarda el formulario de unidad,
+    // de modo que los filtros de la home matcheen y muestren una etiqueta legible.
+    $outlookLabels = \App\Support\UnitOptions::map('outlooks');
+    $floorLabels   = \App\Support\UnitOptions::map('floors');
+    $typeLabels    = \App\Support\UnitOptions::map('types');
   @endphp
 
   <!-- MORE INFO MODAL — Figma 220:20041 (modal-tipologia) -->
@@ -1533,12 +1647,11 @@
             </button>
             <div id="floorDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:120px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Ground" onchange="applyFloorFilter()"> {{ __('Ground')}}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1st" onchange="applyFloorFilter()"> {{ __('1st')}}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2nd" onchange="applyFloorFilter()"> {{ __('2nd')}}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3rd" onchange="applyFloorFilter()"> {{ __('3rd')}}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="4th" onchange="applyFloorFilter()"> {{ __('4th')}}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyFloorFilter()"> {{ __('Penthouse')}}</label>
+                @forelse($floorLabels as $floorKey => $floorText)
+                  <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="{{ $floorKey }}" onchange="applyFloorFilter()"> {{ $floorText }}</label>
+                @empty
+                  <div style="font-size:12px;color:#a3a3a3;padding:4px 0;">{{ __('Sin opciones') }}</div>
+                @endforelse
               </div>
             </div>
           </div>
@@ -1550,11 +1663,11 @@
             </button>
             <div id="typeDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:140px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1 Bed" onchange="applyTypeFilter()"> 1 {{ __('Cuarto') }}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2 Bed" onchange="applyTypeFilter()"> 2 {{ __('Cuarto') }}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3 Bed" onchange="applyTypeFilter()"> 3 {{ __('Cuarto') }}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Studio" onchange="applyTypeFilter()">{{ __('Estudio') }}</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyTypeFilter()">{{ __('Penthouse') }}</label>
+                @forelse($typeLabels as $typeKey => $typeText)
+                  <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="{{ $typeKey }}" onchange="applyTypeFilter()"> {{ $typeText }}</label>
+                @empty
+                  <div style="font-size:12px;color:#a3a3a3;padding:4px 0;">{{ __('Sin opciones') }}</div>
+                @endforelse
               </div>
             </div>
           </div>
@@ -1667,8 +1780,8 @@
         <div class="{{ $cardCls }}"
              data-filter-unit="{{ $unitId }}"
              data-filter-search="{{ $searchBlob }}"
-             data-filter-floor="{{ $floorNorm }}"
-             data-filter-type="{{ $unitTypeLbl }}"
+             data-filter-floor="{{ $unit->floor ?? '' }}"
+             data-filter-type="{{ $unit->type ?? '' }}"
              data-filter-bedrooms="{{ $beds }}"
              data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
              data-filter-outlook="{{ $unit->outlook ?? '' }}"
@@ -1951,8 +2064,8 @@
                   data-tab="{{ $tabKey }}"
                   data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}"
                   data-filter-unit="{{ $unitId }}"
-                  data-filter-floor="{{ $rowFloorNorm }}"
-                  data-filter-type="{{ $rowTypeLbl }}"
+                  data-filter-floor="{{ $unit->floor ?? '' }}"
+                  data-filter-type="{{ $unit->type ?? '' }}"
                   data-filter-bedrooms="{{ $rowBeds }}"
                   data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
                   data-filter-outlook="{{ $unit->outlook ?? '' }}"
@@ -4086,17 +4199,10 @@
         if (f.minPrice != null && price < f.minPrice) return false;
         if (f.maxPrice != null && price > f.maxPrice) return false;
 
-        if (f.types && f.types.length) {
-          const ok = f.types.some(t => {
-            if (t === 'Studio')    return beds === 0;
-            if (t === '1 Bed')     return beds === 1;
-            if (t === '2 Bed')     return beds === 2;
-            if (t === '3 Bed')     return beds === 3;
-            if (t === 'Penthouse') return type === 'Penthouse';
-            return false;
-          });
-          if (!ok) return false;
-        }
+        // Los tipos provienen de la configuración global (Unidades →
+        // Configuraciones); el valor del checkbox coincide con data-filter-type
+        // (el campo `type` guardado en la unidad), por lo que basta match exacto.
+        if (f.types && f.types.length && !f.types.includes(type)) return false;
         if (f.directions && f.directions.length && !f.directions.includes(dir)) return false;
         if (f.outlooks   && f.outlooks.length   && !f.outlooks.includes(outlook)) return false;
         if (f.floors     && f.floors.length     && !f.floors.includes(floor))    return false;
