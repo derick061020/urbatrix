@@ -50,7 +50,7 @@
     <form id="unit-delete-form" method="POST" action="{{ route('admin.units.delete', $unit->id) }}" class="hidden">@csrf @method('DELETE')</form>
 
     {{-- ===================== VIEW HISTORY ===================== --}}
-    <div class="crm-card">
+    <div id="historial-vistas" class="crm-card scroll-mt-24">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-eye text-ink-500"></i>
             <div class="text-[13px] font-bold text-ink-700">Historial de vistas</div>

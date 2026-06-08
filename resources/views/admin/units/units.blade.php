@@ -10,6 +10,18 @@
     $countAvailable = \App\Models\Unit::whereIn('status', ['AVAILABLE','available'])->count();
     $countReserved  = \App\Models\Unit::whereIn('status', ['RESERVED','reserved'])->count();
     $countSold      = \App\Models\Unit::whereIn('status', ['SOLD','sold'])->count();
+
+    // Estadísticas de vistas por unidad (mismas métricas que el formulario), en una
+    // sola consulta agrupada para las unidades de la página actual.
+    $viewStatsByUnit = \App\Models\UnitView::query()
+        ->selectRaw('unit_id, COUNT(*) as total')
+        ->selectRaw('SUM(CASE WHEN viewed_at >= ? THEN 1 ELSE 0 END) as today', [today()])
+        ->selectRaw('SUM(CASE WHEN viewed_at >= ? THEN 1 ELSE 0 END) as week', [now()->subDays(7)])
+        ->selectRaw('SUM(CASE WHEN viewed_at >= ? THEN 1 ELSE 0 END) as month', [now()->subDays(30)])
+        ->whereIn('unit_id', $units->pluck('id'))
+        ->groupBy('unit_id')
+        ->get()
+        ->keyBy('unit_id');
 @endphp
 
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
@@ -74,6 +86,7 @@
                         <th>Sqft Int.</th>
                         <th>Sqft Terraza</th>
                         <th>Precio</th>
+                        <th>Vistas</th>
                         <th>Estado</th>
                         <th>Cliente</th>
                         <th>Público</th>
@@ -99,6 +112,27 @@
                             <td class="text-[12px] text-ink-700">{{ $u->internal_area ?? '—' }}</td>
                             <td class="text-[12px] text-ink-700">{{ $u->expense_1 ?? '—' }}</td>
                             <td class="text-[13px] font-bold text-ok-dark">${{ number_format($u->price ?? 0, 0) }}</td>
+                            @php
+                                $vs      = $viewStatsByUnit[$u->id] ?? null;
+                                $vToday  = (int) ($vs->today ?? 0);
+                                $vWeek   = (int) ($vs->week  ?? 0);
+                                $vMonth  = (int) ($vs->month ?? 0);
+                                $vTotal  = (int) ($vs->total ?? 0);
+                            @endphp
+                            <td>
+                                <a href="{{ route('admin.units.edit', $u->id) }}#historial-vistas"
+                                   class="inline-flex flex-col group"
+                                   title="Hoy: {{ $vToday }} · 7d: {{ $vWeek }} · 30d: {{ $vMonth }} · Total: {{ $vTotal }}">
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="pi pi-eye text-ink-400 text-[11px] group-hover:text-brand"></i>
+                                        <span class="text-[13px] font-bold text-ink-900">{{ number_format($vTotal) }}</span>
+                                        @if($vToday > 0)
+                                            <span class="crm-pill bg-ok-soft text-ok-dark text-[10px]">+{{ $vToday }} hoy</span>
+                                        @endif
+                                    </span>
+                                    <span class="text-[10px] text-ink-400 mt-0.5">7d {{ $vWeek }} · 30d {{ $vMonth }}</span>
+                                </a>
+                            </td>
                             <td>
                                 <span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span>
                                 @if($u->reserved_until && $u->reserved_until->isFuture())
@@ -118,7 +152,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="12" class="text-center text-[12px] text-ink-500 py-8">No hay unidades creadas.</td></tr>
+                        <tr><td colspan="13" class="text-center text-[12px] text-ink-500 py-8">No hay unidades creadas.</td></tr>
                     @endforelse
                 </tbody>
             </table>

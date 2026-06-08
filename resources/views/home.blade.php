@@ -389,12 +389,6 @@
           <div class="mt-gallery">
             <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="Unit" class="mt-gallery-img">
 
-            <!-- Dimensions toggle -->
-            <div class="mt-dim-toggle">
-              <button type="button" class="active">{{ __('NO DIMENSIONS') }}</button>
-              <button type="button">{{ __('WITH DIMENSIONS') }}</button>
-            </div>
-
             <!-- Arrows -->
             <button class="mt-arrow mt-arrow-left" type="button" onclick="prevModalImg()" aria-label="{{ __('Previous') }}">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -2779,13 +2773,6 @@
           this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
           this.classList.add('active');
           applyBuyerMode(this.dataset.buyer || 'investment');
-        });
-      });
-      // No / With dimensions toggle
-      document.querySelectorAll('.mt-dim-toggle button').forEach(function (b) {
-        b.addEventListener('click', function () {
-          this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-          this.classList.add('active');
         });
       });
       // Plan floor chips → filter markers + update floor label

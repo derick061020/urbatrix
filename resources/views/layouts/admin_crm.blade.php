@@ -280,11 +280,11 @@
         {{-- Nav --}}
         @php $isBroker = Auth::user()->role === 'broker'; @endphp
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
-            <a href="{{ route('admin.estadisticas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'estadisticas' ? 'active' : '' }}">
-                <i class="pi pi-chart-bar"></i> {{ __('Estadísticas') }}
-            </a>
             <a href="{{ route('admin.crm.dashboard') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.dashboard' ? 'active' : '' }}">
                 <i class="pi pi-th-large"></i> {{ __('Dashboard') }}
+            </a>
+            <a href="{{ route('admin.estadisticas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'estadisticas' ? 'active' : '' }}">
+                <i class="pi pi-chart-bar"></i> {{ __('Estadísticas') }}
             </a>
 
             <div class="crm-nav-section">{{ __('Gestión') }}</div>
