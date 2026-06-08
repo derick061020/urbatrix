@@ -69,11 +69,43 @@
     $pendingAmount = $totalPlanAmount - $paidAmount;
     $paidCount = $payments->where('status', 'paid')->count();
     $pendingCount = $payments->where('status', 'pending')->count();
-    $overdueCount = $payments->where('status', 'overdue')->count() + 
+    $overdueCount = $payments->where('status', 'overdue')->count() +
                    $payments->where('status', 'pending')->filter(function($p) {
                        return $p->due_date < now();
                    })->count();
-    
+
+    // ── Reserva (seña) como hito propio del timeline ──
+    // La seña pagada (registrada con type 'initial' y label "Reserva (seña)…") se
+    // mostraba absorbida dentro de "Pago Inicial". La separamos en su propia fila.
+    $senaPayment = $payments->first(function($p) {
+        return $p->status === 'paid' && \Illuminate\Support\Str::startsWith($p->label ?? '', 'Reserva (seña)');
+    });
+    if (! $senaPayment && $reservation->paid_at) {
+        $senaPayment = $payments->first(function($p) use ($reservation) {
+            return $p->status === 'paid'
+                && $p->payment_type === 'initial'
+                && (float) $p->amount === (float) ($reservation->reservation_fee ?? 0);
+        });
+    }
+    // Evitar que la seña marque "Pago Inicial" como pagado
+    if ($senaPayment) {
+        $existingPayments = $existingPayments->reject(fn($p) => $p->id === $senaPayment->id);
+    }
+    // Anteponer el hito "Reserva (seña)" al plan
+    array_unshift($paymentPlan, [
+        'type'               => 'reservation',
+        'is_reservation'     => true,
+        'payment'            => $senaPayment,
+        'label'              => 'Reserva (seña)',
+        'amount'             => (float) ($senaPayment->amount ?? $reservation->reservation_fee ?? 0),
+        'percentage'         => $totalPlanAmount > 0
+            ? round(((float) ($senaPayment->amount ?? $reservation->reservation_fee ?? 0) / $totalPlanAmount) * 100, 2)
+            : 0,
+        'description'        => 'Pago de seña para asegurar la unidad',
+        'installment_number' => null,
+        'due_date'           => optional($senaPayment->paid_at ?? $reservation->created_at)->format('Y-m-d'),
+        'order'              => 0,
+    ]);
 @endphp
 
 @section('content')
@@ -230,7 +262,9 @@
                 @foreach($paymentPlan as $index => $paymentItem)
                     @php
                         $paymentKey = $paymentItem['type'] . '_' . ($paymentItem['installment_number'] ?? '0');
-                        $existingPayment = $existingPayments->get($paymentKey);
+                        $existingPayment = ($paymentItem['is_reservation'] ?? false)
+                            ? ($paymentItem['payment'] ?? null)
+                            : $existingPayments->get($paymentKey);
                         $isPaid = $existingPayment && $existingPayment->status === 'paid';
                         $isPending = $existingPayment && $existingPayment->status === 'pending';
                         $isOverdue = $existingPayment && ($existingPayment->status === 'overdue' || ($existingPayment->status === 'pending' && $existingPayment->due_date < now()));

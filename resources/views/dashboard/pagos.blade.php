@@ -33,8 +33,8 @@
             <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
             <div class="text-[12px] text-ink-500">Makai Residences · Cap Cana, Punta Cana</div>
         </div>
-        <button onclick="openWireTransferModal()" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
-            <i class="pi pi-building-columns text-[12px]"></i> {{ __('Datos para transferencia') }}
+        <button onclick="downloadBankData()" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
+            <i class="pi pi-download text-[12px]"></i> {{ __('Descargar datos bancarios') }}
         </button>
     </div>
 
@@ -113,19 +113,25 @@
             </thead>
             <tbody class="divide-y divide-ink-100">
                 @php
-                    $rows = $pagados->concat($enRevision)->concat($vencidos)->concat($upcoming);
+                    // Show paid + in-review + overdue first, then ALL pending cuotas.
+                    // The pending ones beyond the 5th are rendered hidden and revealed by "Ver todos".
+                    $rows = $pagados->concat($enRevision)->concat($vencidos)->concat($pendientes);
+                    $pendingSeen = 0;
                 @endphp
                 @forelse($rows as $i => $p)
                     @php
-                        $isPaid     = $p->status === 'paid';
-                        $inReview   = ! $isPaid && $p->approval_status === 'pending';
-                        $isOverdue  = ! $inReview && $p->status === 'overdue';
-                        $isNext     = ! $inReview && $nextPay && $p->id === $nextPay->id;
-                        $rowBg      = $isNext ? 'bg-warn-soft/40' : '';
-                        $bullet     = $isPaid ? 'bg-ok' : ($inReview ? 'bg-info' : ($isOverdue ? 'bg-err' : ($isNext ? 'bg-warn' : 'bg-ink-200')));
-                        $balance    = $isPaid ? 0 : $p->amount;
+                        $isPaid       = $p->status === 'paid';
+                        $inReview     = ! $isPaid && $p->approval_status === 'pending';
+                        $isOverdue    = ! $inReview && $p->status === 'overdue';
+                        $isNext       = ! $inReview && $nextPay && $p->id === $nextPay->id;
+                        $isPendingRow = ! $isPaid && ! $inReview && ! $isOverdue;
+                        $isExtra      = false;
+                        if ($isPendingRow) { $pendingSeen++; $isExtra = $pendingSeen > 5; }
+                        $rowBg        = $isNext ? 'bg-warn-soft/40' : '';
+                        $bullet       = $isPaid ? 'bg-ok' : ($inReview ? 'bg-info' : ($isOverdue ? 'bg-err' : ($isNext ? 'bg-warn' : 'bg-ink-200')));
+                        $balance      = $isPaid ? 0 : $p->amount;
                     @endphp
-                    <tr class="{{ $rowBg }}">
+                    <tr class="{{ $rowBg }} {{ $isExtra ? 'pay-extra-row hidden' : '' }}">
                         <td class="px-5 py-3.5">
                             <div class="flex items-center gap-3">
                                 <span class="dot {{ $bullet }} shrink-0"></span>
@@ -162,7 +168,7 @@
                         </td>
                         <td class="px-3 py-3.5 text-right">
                             @if($isNext)
-                                <button type="button" onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3">{{ __('Pagar') }}</button>
+                                <button type="button" onclick="document.getElementById('modal-pagar').showModal()" class="cli-btn bg-warn text-white border-warn hover:bg-warn-dark text-[11px] py-1 px-3">{{ __('Pagar') }}</button>
                             @endif
                         </td>
                     </tr>
@@ -173,8 +179,8 @@
         </table>
         @if($more > 0)
             <div class="px-5 py-3 text-center text-[12px] text-ink-500 bg-ink-50/60 border-t border-ink-100">
-                + {{ $more }} {{ __('cuotas pendientes restantes') }} · {{ __('Total') }}: ${{ number_format($totalMore, 0) }}
-                <button class="text-brand font-semibold hover:underline ml-2">{{ __('Ver todos') }} <i class="pi pi-angle-down text-[10px]"></i></button>
+                <span id="pay-more-info">+ {{ $more }} {{ __('cuotas pendientes restantes') }} · {{ __('Total') }}: ${{ number_format($totalMore, 0) }}</span>
+                <button type="button" id="pay-toggle-all" onclick="togglePayAll(this)" class="text-brand font-semibold hover:underline ml-2">{{ __('Ver todos') }} <i class="pi pi-angle-down text-[10px]"></i></button>
             </div>
         @endif
     </div>
@@ -275,32 +281,11 @@
         @include('_partials.bank_panel')
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="openWireTransferModal()" class="cli-btn cli-btn-ghost text-brand"><i class="pi pi-building-columns"></i> {{ __('Ver datos de transferencia') }}</button>
+            <button type="button" onclick="downloadBankData()" class="cli-btn cli-btn-ghost text-brand"><i class="pi pi-download"></i> {{ __('Descargar datos bancarios') }}</button>
             <button type="button" onclick="this.closest('dialog').close()" class="cli-btn cli-btn-ghost">{{ __('Cancelar') }}</button>
             <button type="submit" id="submitPaymentBtn" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> {{ __('Enviar para aprobación') }}</button>
         </div>
     </form>
-</dialog>
-
-{{-- Wire Transfer Modal --}}
-<dialog id="modal-wire-transfer" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto max-w-4xl">
-    <div class="bg-white rounded-2xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-building-columns"></i></div>
-            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Datos para transferencia en USD') }}</div>
-            <button type="button" onclick="document.getElementById('modal-wire-transfer').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
-        </div>
-        <div id="wire-transfer-content" style="width:794px;max-width:90vw;background:#f0efec">
-            <div class="text-center py-8">
-                <i class="pi pi-spin pi-spinner text-ink-400 text-[24px]"></i>
-                <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando datos...') }}</div>
-            </div>
-        </div>
-        <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="downloadWireTransferPDF()" class="cli-btn cli-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
-            <button type="button" onclick="document.getElementById('modal-wire-transfer').close()" class="cli-btn cli-btn-ghost">{{ __('Cerrar') }}</button>
-        </div>
-    </div>
 </dialog>
 
 {{-- Receipt Modal --}}
@@ -317,8 +302,33 @@
                 <div class="text-[13px] text-ink-500 mt-2">{{ __('Cargando comprobante...') }}</div>
             </div>
         </div>
+
+        {{-- Firma obligatoria: el cliente debe firmar antes de poder descargar el comprobante --}}
+        <div id="receipt-sign-panel" class="px-6 py-4 border-t border-ink-100 bg-white" style="width:794px;max-width:90vw">
+            <div class="flex items-center gap-2 text-[13px] font-bold text-ink-900"><i class="pi pi-pencil text-brand"></i> {{ __('Firma el comprobante para descargarlo') }}</div>
+            <div class="text-[11px] text-ink-500 mt-1 mb-3">{{ __('Tu firma se incorpora al comprobante como constancia de recepción.') }}</div>
+            <div class="grid sm:grid-cols-2 gap-4 items-start">
+                <div>
+                    <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Nombre completo') }}</label>
+                    <input type="text" id="receipt-sig-name" class="cli-input pl-3 mt-1" placeholder="{{ __('Tal como aparece en tu documento') }}">
+                </div>
+                <div>
+                    <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Firma') }}</label>
+                    <div class="relative mt-1">
+                        <canvas id="receipt-sig-canvas" class="w-full bg-white border border-dashed border-ink-300 rounded-lg" style="height:96px;display:block;touch-action:none;cursor:crosshair"></canvas>
+                        <div id="receipt-sig-empty" class="absolute inset-0 flex items-center justify-center text-[11px] text-ink-400 italic pointer-events-none">{{ __('Firma aquí con el mouse o el dedo') }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+                <button type="button" onclick="receiptClearSig()" class="text-[11px] text-ink-500 hover:text-ink-900 font-semibold inline-flex items-center gap-1"><i class="pi pi-refresh text-[10px]"></i> {{ __('Limpiar') }}</button>
+                <button type="button" onclick="receiptSign()" class="cli-btn cli-btn-primary text-[12px] py-1.5 px-4"><i class="pi pi-check text-[10px]"></i> {{ __('Firmar comprobante') }}</button>
+            </div>
+        </div>
+
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="printReceipt()" class="cli-btn cli-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+            <span id="receipt-sign-hint" class="text-[11px] text-ink-500 mr-auto inline-flex items-center gap-1"><i class="pi pi-info-circle text-[10px]"></i> {{ __('Firma el comprobante para habilitar la descarga.') }}</span>
+            <button type="button" id="receipt-download-btn" onclick="printReceipt()" disabled class="cli-btn cli-btn-primary opacity-50 cursor-not-allowed"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
             <button type="button" onclick="document.getElementById('modal-receipt').close()" class="cli-btn cli-btn-ghost">{{ __('Cerrar') }}</button>
         </div>
     </div>
@@ -343,45 +353,151 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Open wire transfer modal — render the print sheet inside an iframe so its own
-// CSS (defined in the document <head>) is preserved and the design shows correctly.
-function openWireTransferModal() {
-    const modal = document.getElementById('modal-wire-transfer');
-    const content = document.getElementById('wire-transfer-content');
-
-    modal.showModal();
-    content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="{{ __('Datos para transferencia en USD') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
+// Descargar datos bancarios — sin modal: cargamos la hoja de transferencia en un
+// iframe oculto y disparamos la impresión / guardar como PDF directamente.
+function downloadBankData() {
+    let frame = document.getElementById('bank-data-frame');
+    if (frame) frame.remove();
+    frame = document.createElement('iframe');
+    frame.id = 'bank-data-frame';
+    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    frame.src = wireTransferUrl;
+    frame.onload = function() {
+        try {
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        } catch (e) {
+            window.open(wireTransferUrl, '_blank');
+        }
+    };
+    document.body.appendChild(frame);
 }
 
+// "Ver todos" — muestra/oculta las cuotas pendientes extra del calendario.
+function togglePayAll(btn) {
+    const rows = document.querySelectorAll('.pay-extra-row');
+    if (!rows.length) return;
+    const willShow = rows[0].classList.contains('hidden');
+    rows.forEach(r => r.classList.toggle('hidden', !willShow));
+    btn.innerHTML = willShow
+        ? `{{ __('Ver menos') }} <i class="pi pi-angle-up text-[10px]"></i>`
+        : `{{ __('Ver todos') }} <i class="pi pi-angle-down text-[10px]"></i>`;
+    const info = document.getElementById('pay-more-info');
+    if (info) info.style.display = willShow ? 'none' : '';
+}
+
+// ---- Comprobante: firma obligatoria antes de descargar ----
+let receiptSigCtx = null, receiptSigDrawing = false, receiptSigHasStroke = false, receiptSigned = false;
+
 // Open receipt modal — render the payment receipt inside an iframe so its own
-// styles are preserved, mirroring the wire transfer modal pattern.
+// styles are preserved. The download stays locked until the client signs.
 function openReceiptModal(url) {
     const modal = document.getElementById('modal-receipt');
     const content = document.getElementById('receipt-content');
 
+    // Reset firma state on each open
+    receiptSigned = false;
+    receiptSigHasStroke = false;
+    const dlBtn = document.getElementById('receipt-download-btn');
+    dlBtn.disabled = true;
+    dlBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    const panel = document.getElementById('receipt-sign-panel');
+    panel.classList.remove('opacity-50', 'pointer-events-none');
+    document.getElementById('receipt-sig-name').value = '';
+    document.getElementById('receipt-sign-hint').style.display = '';
+
     modal.showModal();
     content.innerHTML = `<iframe id="receipt-iframe" src="${url}" title="{{ __('Comprobante de pago') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
+    setTimeout(() => { receiptInitCanvas(); receiptClearSig(); }, 60);
 }
 
-// Download/print the receipt — print the already-loaded iframe.
+function receiptInitCanvas() {
+    const canvas = document.getElementById('receipt-sig-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  || 320;
+    canvas.height = rect.height || 96;
+    receiptSigCtx = canvas.getContext('2d');
+    receiptSigCtx.strokeStyle = '#171717';
+    receiptSigCtx.lineWidth = 2;
+    receiptSigCtx.lineCap = 'round';
+    receiptSigCtx.lineJoin = 'round';
+
+    const pos = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        return { x: t.clientX - r.left, y: t.clientY - r.top };
+    };
+    const start = (e) => { e.preventDefault(); receiptSigDrawing = true; const p = pos(e); receiptSigCtx.beginPath(); receiptSigCtx.moveTo(p.x, p.y); };
+    const move  = (e) => {
+        if (!receiptSigDrawing) return;
+        e.preventDefault();
+        const p = pos(e);
+        receiptSigCtx.lineTo(p.x, p.y);
+        receiptSigCtx.stroke();
+        if (!receiptSigHasStroke) { receiptSigHasStroke = true; document.getElementById('receipt-sig-empty').style.display = 'none'; }
+    };
+    const end = () => { receiptSigDrawing = false; };
+    canvas.onmousedown = start;
+    canvas.onmousemove = move;
+    window.addEventListener('mouseup', end);
+    canvas.ontouchstart = start;
+    canvas.ontouchmove = move;
+    canvas.ontouchend = end;
+}
+
+function receiptClearSig() {
+    const canvas = document.getElementById('receipt-sig-canvas');
+    if (receiptSigCtx && canvas) receiptSigCtx.clearRect(0, 0, canvas.width, canvas.height);
+    receiptSigHasStroke = false;
+    const empty = document.getElementById('receipt-sig-empty');
+    if (empty) empty.style.display = '';
+}
+
+function receiptSign() {
+    const name = document.getElementById('receipt-sig-name').value.trim();
+    if (name.length < 3) { alert("{{ __('Escribí tu nombre completo.') }}"); return; }
+    if (!receiptSigHasStroke) { alert("{{ __('Falta tu firma manuscrita.') }}"); return; }
+
+    const canvas = document.getElementById('receipt-sig-canvas');
+    const sigData = canvas.toDataURL('image/png');
+
+    // Incrustar la firma en el recuadro del cliente ("Recibido por") del comprobante
+    try {
+        const frame = document.getElementById('receipt-iframe');
+        const doc = frame && frame.contentDocument;
+        if (doc) {
+            const boxes = doc.querySelectorAll('.sig-box');
+            const box = boxes[boxes.length - 1]; // último = cliente
+            if (box) {
+                box.style.position = 'relative';
+                const img = doc.createElement('img');
+                img.src = sigData;
+                img.style.cssText = 'max-height:44px;max-width:200px;object-fit:contain;position:absolute;left:0;bottom:2px';
+                box.innerHTML = '';
+                box.appendChild(img);
+            }
+        }
+    } catch (e) { /* same-origin esperado; si falla, igual habilitamos la descarga */ }
+
+    receiptSigned = true;
+    const dlBtn = document.getElementById('receipt-download-btn');
+    dlBtn.disabled = false;
+    dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    document.getElementById('receipt-sign-panel').classList.add('opacity-50', 'pointer-events-none');
+    const hint = document.getElementById('receipt-sign-hint');
+    hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+}
+
+// Download/print the receipt — only after signing.
 function printReceipt() {
+    if (!receiptSigned) { alert("{{ __('Firmá el comprobante antes de descargarlo.') }}"); return; }
     const frame = document.getElementById('receipt-iframe');
     if (frame && frame.contentWindow) {
         frame.contentWindow.focus();
         frame.contentWindow.print();
     } else if (frame) {
         window.open(frame.src, '_blank');
-    }
-}
-
-// Download wire transfer PDF — print the already-loaded iframe.
-function downloadWireTransferPDF() {
-    const frame = document.getElementById('wire-iframe');
-    if (frame && frame.contentWindow) {
-        frame.contentWindow.focus();
-        frame.contentWindow.print();
-    } else {
-        window.open(wireTransferUrl, '_blank');
     }
 }
 
