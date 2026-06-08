@@ -328,6 +328,21 @@
 const paymentSubmitUrl = "{{ route('dashboard.payments.submit', $reservation) }}";
 const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
 
+// Auto-abrir el modal de pago cuando se llega con ?pay=1 (ej. desde el calendario)
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('pay') === '1') {
+        const modal = document.getElementById('modal-pagar');
+        if (modal && typeof modal.showModal === 'function') {
+            modal.showModal();
+        }
+        // Limpiar el parámetro de la URL para que no reabra al recargar
+        params.delete('pay');
+        const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState({}, '', clean);
+    }
+});
+
 // Open wire transfer modal — render the print sheet inside an iframe so its own
 // CSS (defined in the document <head>) is preserved and the design shows correctly.
 function openWireTransferModal() {

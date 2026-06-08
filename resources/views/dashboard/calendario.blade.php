@@ -122,12 +122,9 @@
                     };
                 @endphp
                 <div class="cli-card overflow-hidden top-card" data-type="{{ $e->type }}">
-                    <div class="px-4 pt-3 pb-2 flex items-start gap-2">
-                        <div class="flex-1 min-w-0">
-                            <div class="text-[13px] font-bold text-ink-950 truncate">{{ $e->title }}</div>
-                            <div class="text-[11px] text-ink-500">{{ $e->start->format('H:i') }} - {{ $e->end->format('H:i') }}</div>
-                        </div>
-                        <button class="text-ink-400 hover:text-ink-700"><i class="pi pi-angle-down text-[12px]"></i></button>
+                    <div class="px-4 pt-3 pb-2">
+                        <div class="text-[13px] font-bold text-ink-950 truncate">{{ $e->title }}</div>
+                        <div class="text-[11px] text-ink-500">{{ $e->start->format('H:i') }} - {{ $e->end->format('H:i') }}</div>
                     </div>
                     <div class="px-4 py-2 flex items-center justify-between text-[11px]" style="background:{{ $bg }}40;">
                         <span class="flex items-center gap-1.5" style="color:{{ $statusColor }};">
@@ -136,7 +133,7 @@
                         @if($e->start->isToday() && $e->type === 'video')
                             <a class="font-semibold text-ok-dark hover:underline">Unirse a la reunión</a>
                         @elseif($e->type === 'payment')
-                            <a href="{{ route('dashboard.payments') }}" class="font-semibold text-warn-dark hover:underline">Ver pago</a>
+                            <a href="{{ route('dashboard.payments') }}?pay=1" class="font-semibold text-warn-dark hover:underline">Pagar</a>
                         @else
                             <span class="text-ink-500">{{ $e->meta ?? '' }}</span>
                         @endif
@@ -200,13 +197,16 @@
                             $heightRem = max(2.5, ($hEnd - $hStart) * 6);
                             [$bg, $fg] = $typeColors[$e->type] ?? ['#f2f5f8', '#525866'];
                         @endphp
-                        <div class="absolute left-1 right-1 rounded-lg px-2 py-1.5 text-[11px] overflow-hidden shadow-xs cursor-pointer hover:shadow-card transition-shadow cal-event"
+                        @php $isPayEvent = $e->type === 'payment'; @endphp
+                        <{{ $isPayEvent ? 'a' : 'div' }}
+                             @if($isPayEvent) href="{{ route('dashboard.payments') }}?pay=1" @endif
+                             class="absolute left-1 right-1 rounded-lg px-2 py-1.5 text-[11px] overflow-hidden shadow-xs cursor-pointer hover:shadow-card transition-shadow cal-event {{ $isPayEvent ? 'block no-underline' : '' }}"
                              style="top:{{ $topRem }}rem; height:{{ $heightRem }}rem; background:{{ $bg }}; color:{{ $fg }};"
-                             title="{{ $e->title }}"
+                             title="{{ $isPayEvent ? $e->title.' · Click para pagar' : $e->title }}"
                              data-type="{{ $e->type }}">
                             <div class="font-semibold truncate">{{ $e->title }}</div>
-                            <div class="text-[10px] opacity-80">{{ $e->start->format('H:i') }} - {{ $e->end->format('H:i') }}</div>
-                        </div>
+                            <div class="text-[10px] opacity-80">{{ $e->start->format('H:i') }} - {{ $e->end->format('H:i') }}@if($isPayEvent) · Pagar @endif</div>
+                        </{{ $isPayEvent ? 'a' : 'div' }}>
                     @endforeach
                 </div>
             @endforeach
