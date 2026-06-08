@@ -8,10 +8,38 @@
 @php
     $events = $events ?? collect();
 
-    $start = request()->date('start') ? \Carbon\Carbon::parse(request('start'))->startOfWeek() : \Carbon\Carbon::now()->startOfWeek();
-    $end   = $start->copy()->addDays(4); // Mon-Fri shown (5 cols)
-    $days  = [];
-    for ($i = 0; $i < 5; $i++) {
+    // ── View / range mode ──────────────────────────────────────────
+    // week  → full week, Mon–Sun (7 días)
+    // work  → semana laboral, Lun–Vie (5 días)
+    // next7 → próximos 7 días desde hoy
+    // last7 → últimos 7 días hasta hoy
+    $range = in_array(request('range'), ['week', 'work', 'next7', 'last7']) ? request('range') : 'week';
+
+    $today = \Carbon\Carbon::today();
+
+    switch ($range) {
+        case 'work':
+            $start    = request('start') ? \Carbon\Carbon::parse(request('start'))->startOfWeek() : \Carbon\Carbon::now()->startOfWeek();
+            $dayCount = 5;
+            break;
+        case 'next7':
+            $start    = request('start') ? \Carbon\Carbon::parse(request('start'))->startOfDay() : $today->copy();
+            $dayCount = 7;
+            break;
+        case 'last7':
+            $start    = request('start') ? \Carbon\Carbon::parse(request('start'))->startOfDay() : $today->copy()->subDays(6);
+            $dayCount = 7;
+            break;
+        case 'week':
+        default:
+            $start    = request('start') ? \Carbon\Carbon::parse(request('start'))->startOfWeek() : \Carbon\Carbon::now()->startOfWeek();
+            $dayCount = 7;
+            break;
+    }
+
+    $end  = $start->copy()->addDays($dayCount - 1);
+    $days = [];
+    for ($i = 0; $i < $dayCount; $i++) {
         $days[] = $start->copy()->addDays($i);
     }
     $hours = range(9, 14); // 9 AM to 2 PM
@@ -31,9 +59,8 @@
         'video'   => ['#e3f7ec', '#1daf61'],
     ];
 
-    $today = \Carbon\Carbon::today();
-    $prevWeek = $start->copy()->subWeek()->toDateString();
-    $nextWeek = $start->copy()->addWeek()->toDateString();
+    $prevWeek = $start->copy()->subDays($dayCount)->toDateString();
+    $nextWeek = $start->copy()->addDays($dayCount)->toDateString();
 
     $topCards = $events->take(4); // upcoming featured
 @endphp
@@ -42,18 +69,25 @@
 
     {{-- Toolbar --}}
     <div class="flex items-center gap-3 flex-wrap">
+        {{-- Date range as a title (not a button) --}}
+        <div class="flex items-baseline gap-2 mr-1">
+            <h2 class="text-[18px] font-bold text-ink-950 leading-none" id="date-range-label">
+                @if($start->isSameMonth($end))
+                    {{ $start->locale('es')->isoFormat('D') }} – {{ $end->locale('es')->isoFormat('D MMMM YYYY') }}
+                @else
+                    {{ $start->locale('es')->isoFormat('D MMM') }} – {{ $end->locale('es')->isoFormat('D MMM YYYY') }}
+                @endif
+            </h2>
+        </div>
+
         <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-today">Hoy</button>
         <div class="relative">
             <select class="cli-input pl-3 pr-9 text-[12px] !h-9 w-auto" id="select-range">
-                <option value="week">Vista semanal</option>
-                <option value="last7">Últimos 7 días</option>
-                <option value="next7">Próximos 7 días</option>
-                <option value="month">Este mes</option>
+                <option value="week"  @selected($range === 'week')>Semana completa</option>
+                <option value="work"  @selected($range === 'work')>Semana laboral</option>
+                <option value="last7" @selected($range === 'last7')>Últimos 7 días</option>
+                <option value="next7" @selected($range === 'next7')>Próximos 7 días</option>
             </select>
-        </div>
-        <div class="cli-btn cli-btn-ghost text-[12px] inline-flex items-center gap-2">
-            <i class="pi pi-calendar text-[11px]"></i>
-            <span id="date-range-label">{{ $start->locale('es')->isoFormat('D MMM') }} - {{ $end->locale('es')->isoFormat('D MMM YYYY') }}</span>
         </div>
 
         <div class="ml-auto flex items-center gap-3">
@@ -115,18 +149,28 @@
     {{-- Week grid --}}
     <div class="cli-card overflow-hidden">
         <div class="px-3 py-2 flex items-center gap-2 border-b border-ink-100 bg-white">
-            <a href="?start={{ $prevWeek }}" class="w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[12px]"></i></a>
-            <a href="?start={{ $nextWeek }}" class="w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[12px]"></i></a>
+            <a href="?range={{ $range }}&start={{ $prevWeek }}" aria-label="Anterior" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[12px]"></i></a>
+            <a href="?range={{ $range }}&start={{ $nextWeek }}" aria-label="Siguiente" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[12px]"></i></a>
 
-            <div class="grid grid-cols-5 flex-1 ml-2 text-[11px] text-ink-500 uppercase font-semibold tracking-wider">
+            {{-- Spacer matching the time column --}}
+            <div class="shrink-0" style="width:60px;"></div>
+
+            <div class="grid flex-1 text-[11px] text-ink-500 uppercase font-semibold tracking-wider" style="grid-template-columns: repeat({{ $dayCount }}, minmax(0,1fr));">
                 @foreach($days as $d)
-                    <div class="text-center px-2 py-1 {{ $d->isToday() ? 'text-ok-dark' : '' }}">{{ $d->locale('es')->isoFormat('DD ddd') }}</div>
+                    <div class="text-center px-1 py-1 {{ $d->isToday() ? 'text-ok-dark' : '' }}">
+                        <div class="flex items-center justify-center gap-1.5">
+                            @if($d->isToday())
+                                <span class="dot" style="background:#1fc16b"></span>
+                            @endif
+                            <span>{{ $d->locale('es')->isoFormat('ddd DD') }}</span>
+                        </div>
+                    </div>
                 @endforeach
             </div>
         </div>
 
         {{-- Hour grid --}}
-        <div class="grid grid-cols-[60px_repeat(5,1fr)] divide-x divide-ink-100">
+        <div class="grid divide-x divide-ink-100" style="grid-template-columns: 60px repeat({{ $dayCount }}, minmax(0,1fr));">
             {{-- Time column --}}
             <div class="bg-ink-50/40">
                 @foreach($hours as $h)
@@ -259,7 +303,7 @@
         searchInput.addEventListener('input', applyFilters);
     }
 
-    // ── "Hoy" button ──
+    // ── "Hoy" button (keeps current range, resets to current period) ──
     if (btnToday) {
         btnToday.addEventListener('click', function() {
             var params = new URLSearchParams(window.location.search);
@@ -268,30 +312,12 @@
         });
     }
 
-    // ── Range selector ──
+    // ── Range selector — the server resolves the period from ?range ──
     if (selectRange) {
         selectRange.addEventListener('change', function() {
-            var val = this.value;
             var params = new URLSearchParams(window.location.search);
-            var today = new Date();
-            var start = null;
-            if (val === 'last7') {
-                start = new Date(today);
-                start.setDate(today.getDate() - 7);
-                start = start.toISOString().split('T')[0];
-            } else if (val === 'next7') {
-                start = today.toISOString().split('T')[0];
-            } else if (val === 'month') {
-                start = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-01';
-            } else {
-                // 'week' — current week (Monday)
-                var day = today.getDay();
-                var diff = day === 0 ? 6 : day - 1;
-                var monday = new Date(today);
-                monday.setDate(today.getDate() - diff);
-                start = monday.toISOString().split('T')[0];
-            }
-            params.set('start', start);
+            params.set('range', this.value);
+            params.delete('start'); // switch to the current period for the chosen view
             window.location.search = params.toString();
         });
     }
