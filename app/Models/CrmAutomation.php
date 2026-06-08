@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CrmAutomation extends Model
 {
@@ -52,6 +54,44 @@ class CrmAutomation extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(CrmTemplate::class, 'template_id');
+    }
+
+    /** Fases de la cadena, en orden de ejecución. */
+    public function steps(): HasMany
+    {
+        return $this->hasMany(CrmAutomationStep::class, 'automation_id')->orderBy('position');
+    }
+
+    /**
+     * Pasos a ejecutar. Si la automatización aún no tiene pasos definidos
+     * (datos heredados), sintetiza uno a partir de los campos planos para que
+     * el flujo siga funcionando sin migración previa.
+     */
+    public function resolvedSteps(): Collection
+    {
+        $steps = $this->relationLoaded('steps') ? $this->steps : $this->steps()->with('template')->get();
+
+        if ($steps->isNotEmpty()) {
+            return $steps;
+        }
+
+        $legacy = new CrmAutomationStep([
+            'automation_id' => $this->id,
+            'position'      => 1,
+            'template_id'   => $this->template_id,
+            'delay_minutes' => $this->delay_minutes ?? 0,
+            'channels'      => $this->channels,
+        ]);
+        $legacy->setRelation('template', $this->template);
+
+        return new Collection([$legacy]);
+    }
+
+    public function stepsCount(): int
+    {
+        return $this->relationLoaded('steps')
+            ? max(1, $this->steps->count())
+            : max(1, $this->steps()->count());
     }
 
     public function triggerLabel(): string

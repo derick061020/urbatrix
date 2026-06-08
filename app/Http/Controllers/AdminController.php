@@ -17,6 +17,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\CrmTemplate;
 use App\Models\CrmAutomation;
+use App\Models\CrmAutomationStep;
 use App\Models\CrmChannelSetting;
 use App\Models\ExportAuthorization;
 use App\Support\UnitOptions;
@@ -1538,7 +1539,7 @@ class AdminController extends Controller
         $templates = $templatesQuery->get();
         $templatesAll = CrmTemplate::all();
 
-        $automations = CrmAutomation::with('template')->orderBy('name')->get();
+        $automations = CrmAutomation::with('template', 'steps.template')->orderBy('name')->get();
 
         $channels = CrmChannelSetting::all()->keyBy('channel');
 
@@ -1651,36 +1652,75 @@ class AdminController extends Controller
     /* ───── CRM: Automations CRUD ───── */
     public function storeAutomation(Request $request)
     {
-        $validated = $request->validate([
-            'name'           => 'required|string|max:160',
-            'description'    => 'nullable|string|max:1000',
-            'trigger_event'  => 'required|string|max:80',
-            'template_id'    => 'nullable|exists:crm_templates,id',
-            'delay_minutes'  => 'required|integer|min:0|max:43200',
-            'channels'       => 'required|array|min:1',
-            'channels.*'     => 'in:email,whatsapp,sms,push',
-            'is_active'      => 'nullable|boolean',
-        ]);
-        $validated['is_active'] = (bool)($validated['is_active'] ?? true);
-        CrmAutomation::create($validated);
+        $validated = $this->validateAutomation($request, true);
+
+        $automation = null;
+        DB::transaction(function () use ($validated, &$automation) {
+            $automation = CrmAutomation::create($this->automationAttributes($validated));
+            $this->syncAutomationSteps($automation, $validated['steps']);
+        });
+
         return back()->with('success', 'Automatización creada.');
     }
 
     public function updateAutomation(Request $request, CrmAutomation $automation)
     {
-        $validated = $request->validate([
-            'name'           => 'required|string|max:160',
-            'description'    => 'nullable|string|max:1000',
-            'trigger_event'  => 'required|string|max:80',
-            'template_id'    => 'nullable|exists:crm_templates,id',
-            'delay_minutes'  => 'required|integer|min:0|max:43200',
-            'channels'       => 'required|array|min:1',
-            'channels.*'     => 'in:email,whatsapp,sms,push',
-            'is_active'      => 'nullable|boolean',
-        ]);
-        $validated['is_active'] = (bool)($validated['is_active'] ?? false);
-        $automation->update($validated);
+        $validated = $this->validateAutomation($request, false);
+
+        DB::transaction(function () use ($validated, $automation) {
+            $automation->update($this->automationAttributes($validated));
+            $this->syncAutomationSteps($automation, $validated['steps']);
+        });
+
         return back()->with('success', 'Automatización actualizada.');
+    }
+
+    /** Valida nombre/disparador + la cadena de pasos del flujo. */
+    private function validateAutomation(Request $request, bool $creating): array
+    {
+        return $request->validate([
+            'name'                  => 'required|string|max:160',
+            'description'           => 'nullable|string|max:1000',
+            'trigger_event'         => 'required|string|max:80',
+            'is_active'             => 'nullable|boolean',
+            'steps'                 => 'required|array|min:1',
+            'steps.*.template_id'   => 'nullable|exists:crm_templates,id',
+            'steps.*.delay_minutes' => 'required|integer|min:0|max:43200',
+            'steps.*.channels'      => 'required|array|min:1',
+            'steps.*.channels.*'    => 'in:email,whatsapp,sms,push',
+        ]);
+    }
+
+    /** Atributos planos del flujo; reflejan el primer paso para listados y compatibilidad. */
+    private function automationAttributes(array $validated): array
+    {
+        $first = $validated['steps'][0] ?? [];
+
+        return [
+            'name'          => $validated['name'],
+            'description'   => $validated['description'] ?? null,
+            'trigger_event' => $validated['trigger_event'],
+            'is_active'     => (bool) ($validated['is_active'] ?? false),
+            'template_id'   => $first['template_id'] ?? null,
+            'delay_minutes' => (int) ($first['delay_minutes'] ?? 0),
+            'channels'      => $first['channels'] ?? ['email'],
+        ];
+    }
+
+    /** Recrea los pasos de la cadena respetando el orden enviado. */
+    private function syncAutomationSteps(CrmAutomation $automation, array $steps): void
+    {
+        $automation->steps()->delete();
+
+        $position = 1;
+        foreach (array_values($steps) as $step) {
+            $automation->steps()->create([
+                'position'      => $position++,
+                'template_id'   => $step['template_id'] ?? null,
+                'delay_minutes' => (int) ($step['delay_minutes'] ?? 0),
+                'channels'      => array_values($step['channels'] ?? ['email']),
+            ]);
+        }
     }
 
     public function toggleAutomation(CrmAutomation $automation)
@@ -1697,22 +1737,44 @@ class AdminController extends Controller
 
     public function runAutomation(CrmAutomation $automation)
     {
-        $template = $automation->template;
-        if (! $template) {
-            return back()->with('error', 'La automatización no tiene plantilla asignada.');
+        $steps = $automation->load('steps.template')->resolvedSteps()
+            ->filter(fn ($s) => $s->template);
+
+        if ($steps->isEmpty()) {
+            return back()->with('error', 'El flujo no tiene ninguna fase con plantilla asignada.');
         }
 
-        // Ejecución manual: envía una muestra de la plantilla al correo del admin
-        // (no dispara envíos masivos a clientes reales).
+        // Ejecución manual: envía una muestra de cada fase de la cadena al correo
+        // del admin (no dispara envíos masivos a clientes reales). Respeta los
+        // retrasos acumulados para reproducir la secuencia real.
         $to = Auth::user()->email;
-        $rendered = \App\Support\CrmTemplateRenderer::render(
-            $template,
-            \App\Support\CrmTemplateRenderer::SAMPLE
-        );
+        $cumulativeDelay = 0;
+        $position = 0;
 
         try {
-            \Illuminate\Support\Facades\Mail::to($to)
-                ->send(new \App\Mail\CrmTemplateMail('[FLUJO] ' . $rendered['subject'], $rendered['html']));
+            foreach ($steps as $step) {
+                $position++;
+                $cumulativeDelay += (int) ($step->delay_minutes ?? 0);
+                $template = $step->template;
+
+                $rendered = \App\Support\CrmTemplateRenderer::render(
+                    $template,
+                    \App\Support\CrmTemplateRenderer::SAMPLE
+                );
+                $subject = "[FLUJO · Paso {$position}/{$steps->count()}] " . $rendered['subject'];
+                $mail = new \App\Mail\CrmTemplateMail($subject, $rendered['html']);
+
+                if ($cumulativeDelay > 0) {
+                    \Illuminate\Support\Facades\Mail::to($to)->later(now()->addMinutes($cumulativeDelay), $mail);
+                } else {
+                    \Illuminate\Support\Facades\Mail::to($to)->send($mail);
+                }
+
+                $template->forceFill([
+                    'last_used_at' => now(),
+                    'usage_count'  => ($template->usage_count ?? 0) + 1,
+                ])->save();
+            }
         } catch (\Throwable $e) {
             return back()->with('error', 'No se pudo ejecutar el flujo: ' . $e->getMessage());
         }
@@ -1721,17 +1783,23 @@ class AdminController extends Controller
             'last_run_at' => now(),
             'run_count'   => ($automation->run_count ?? 0) + 1,
         ])->save();
-        $template->forceFill([
-            'last_used_at' => now(),
-            'usage_count'  => ($template->usage_count ?? 0) + 1,
-        ])->save();
 
-        return back()->with('success', 'Flujo ejecutado: muestra enviada a ' . $to . '.');
+        return back()->with('success', "Flujo ejecutado: {$steps->count()} fase(s) enviada(s) a {$to}.");
     }
 
     public function getAutomation(CrmAutomation $automation)
     {
-        return response()->json($automation->load('template'));
+        $automation->load('template', 'steps.template');
+
+        $data = $automation->toArray();
+        $data['steps'] = $automation->resolvedSteps()->map(fn ($s) => [
+            'position'      => $s->position,
+            'template_id'   => $s->template_id,
+            'delay_minutes' => (int) ($s->delay_minutes ?? 0),
+            'channels'      => $s->channels ?: ['email'],
+        ])->values();
+
+        return response()->json($data);
     }
 
     /* ───── CRM: Channel settings ───── */
@@ -1763,7 +1831,15 @@ class AdminController extends Controller
             'units as available_count' => fn($q) => $q->where('status', 'AVAILABLE'),
         ])->findOrFail($id);
         $units = $proyecto->units()->orderBy('custom_id')->orderBy('id')->get();
-        return view('admin.crm.proyecto_detalle', compact('proyecto', 'units'));
+
+        // Avance de obra real: último reporte publicado del proyecto. De aquí
+        // salen las fases, el % global y la entrega estimada (no se inventan).
+        $latestReport = \App\Models\ConstructionReport::where('project_id', $proyecto->id)
+            ->orderByDesc('published_at')
+            ->orderByDesc('created_at')
+            ->first();
+
+        return view('admin.crm.proyecto_detalle', compact('proyecto', 'units', 'latestReport'));
     }
     public function crmExpedienteDetalle($id)
     {

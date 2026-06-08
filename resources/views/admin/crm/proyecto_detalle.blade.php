@@ -24,14 +24,18 @@
     $pctSold      = $totalUnits > 0 ? ($sold / $totalUnits) * 100 : 0;
     $pctReserved  = $totalUnits > 0 ? ($reserved / $totalUnits) * 100 : 0;
     $pctAvailable = max(0, 100 - $pctSold - $pctReserved);
-    $pctObra      = (int) ($proyecto->progress ?? 0);
+    // Avance de obra real: % global del último reporte; si no hay, el del proyecto.
+    $pctObra      = (int) (optional($latestReport)->overall_progress ?? $proyecto->progress ?? 0);
 
     // Investment estimates (project-level; fall back to project averages if unit-level missing)
     $avgRoi = (float) $proyecto->units()->avg('roi_percent') ?: 15.0;
     $avgRentNet = $vendidoUSD > 0 ? round(($vendidoSoloUSD * ($avgRoi / 100)) / 12) : 0;
     $launchDiscount = (float) ($proyecto->launch_discount ?? 20000);
-    $estDeliveryYear = $proyecto->estimated_delivery ?? 'Q4 2026';
-    $entregaFmt = is_string($estDeliveryYear) ? $estDeliveryYear : \Carbon\Carbon::parse($estDeliveryYear)->format('M Y');
+    // Entrega estimada: la del último reporte de obra si existe; si no, la del proyecto.
+    $estDeliveryYear = optional($latestReport)->estimated_delivery ?: ($proyecto->estimated_delivery ?? null);
+    $entregaFmt = $estDeliveryYear
+        ? (is_string($estDeliveryYear) ? $estDeliveryYear : \Carbon\Carbon::parse($estDeliveryYear)->format('M Y'))
+        : 'Sin fecha';
     $payback = $avgRoi > 0 ? round(100 / $avgRoi, 1) : null;
 
     // Inventory by typology (used twice in layout)
@@ -55,15 +59,16 @@
         ];
     });
 
-    // Construction phases (use project fields if you have, else generic)
-    $phases = [
-        ['Progreso de ventas', 'completed', 'Jun '.now()->subYear()->format('Y')],
-        ['Estructura',         $pctObra >= 50 ? 'completed' : ($pctObra >= 25 ? 'active' : 'pending'), 'Dic '.now()->subYear()->format('Y')],
-        ['Mampostería',        $pctObra >= 35 ? 'active' : 'pending', 'En curso'],
-        ['Instalaciones',      $pctObra >= 45 ? 'active' : 'pending', 'En curso'],
-        ['Acabados',           $pctObra >= 70 ? 'active' : 'pending', 'Q3 '.now()->addYear()->format('Y')],
-        ['Entrega',            'pending', $entregaFmt],
-    ];
+    // Avance de obra real: fases publicadas en el último reporte de obra.
+    // Cada fase trae name, status (done/active/pending), date y pct. Se mapea
+    // el status del reporte al usado por esta vista (completed/active/pending).
+    $statusToView = ['done' => 'completed', 'active' => 'active', 'pending' => 'pending'];
+    $phases = collect(optional($latestReport)->phases ?? [])->map(fn ($ph) => [
+        $ph['name'] ?? '—',
+        $statusToView[$ph['status'] ?? 'pending'] ?? 'pending',
+        $ph['date'] ?? '—',
+        (int) ($ph['pct'] ?? 0),
+    ])->all();
 
     $reservasActivas = \App\Models\Reservation::whereHas('unit', fn($q) => $q->where('project_id', $proyecto->id))->count();
 @endphp
@@ -88,7 +93,8 @@
                     <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?? 'Cap Cana · Punta Cana' }}</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-[11px] opacity-80">Actualizado: <span class="font-semibold">{{ now()->locale('es')->isoFormat('D MMM YYYY') }}</span></div>
+                    @php $updatedAt = optional($latestReport)->published_at ?? $proyecto->updated_at; @endphp
+                    <div class="text-[11px] opacity-80">Actualizado: <span class="font-semibold">{{ optional($updatedAt)->locale('es')->isoFormat('D MMM YYYY') ?? '—' }}</span></div>
                     <span class="crm-pill bg-ok-soft text-ok-dark mt-2 inline-flex"><span class="dot bg-ok"></span> FASE ACTIVA</span>
                 </div>
             </div>
@@ -161,12 +167,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {{-- Construction timeline --}}
         <div class="crm-card p-5">
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Avance de obra</div>
+            <div class="flex items-center justify-between">
+                <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Avance de obra</div>
+                @if($latestReport)
+                    <span class="text-[10px] text-ink-400">{{ $latestReport->period }}</span>
+                @endif
+            </div>
             <ul class="mt-3 space-y-2">
-                @foreach($phases as $p)
+                @forelse($phases as $p)
                     @php
                         $isDone   = $p[1] === 'completed';
                         $isActive = $p[1] === 'active';
+                        $phasePct = $p[3] ?? 0;
                         $iconCls  = $isDone ? 'pi pi-check text-ok' : ($isActive ? 'pi pi-circle-fill text-warn' : 'pi pi-circle text-ink-300');
                         $textCls  = $isDone ? 'text-ink-900 line-through opacity-60' : ($isActive ? 'text-ink-900 font-semibold' : 'text-ink-500');
                         $barCls   = $isDone ? 'bg-ok' : ($isActive ? 'bg-warn' : 'bg-ink-200');
@@ -175,15 +187,20 @@
                         <i class="{{ $iconCls }} text-[11px] shrink-0"></i>
                         <span class="text-[13px] {{ $textCls }} flex-1">{{ $p[0] }}</span>
                         @if($isActive)
-                            <div class="w-20 h-1.5 rounded-full bg-ink-100 overflow-hidden"><span class="block h-full {{ $barCls }}" style="width:60%;"></span></div>
+                            <div class="w-20 h-1.5 rounded-full bg-ink-100 overflow-hidden"><span class="block h-full {{ $barCls }}" style="width:{{ $phasePct }}%;"></span></div>
                         @endif
                         <span class="text-[11px] text-ink-500 w-20 text-right">{{ $p[2] }}</span>
                     </li>
-                @endforeach
+                @empty
+                    <li class="text-[12px] text-ink-400 py-3 text-center">
+                        Aún no hay reportes de obra publicados.
+                        <a href="{{ route('admin.crm.avance-obra') }}" class="text-brand font-semibold hover:underline">Publicar avance →</a>
+                    </li>
+                @endforelse
             </ul>
             <div class="mt-4 pt-3 border-t border-ink-100 flex items-center justify-between">
                 <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">Avance general<br><span class="text-[11px] text-ink-500 normal-case font-medium">Entrega estimada {{ $entregaFmt }}</span></div>
-                <div class="font-display text-[24px] font-bold text-ok-dark">{{ $pctObra ?: 52 }}%</div>
+                <div class="font-display text-[24px] font-bold text-ok-dark">{{ $pctObra }}%</div>
             </div>
         </div>
 

@@ -43,6 +43,18 @@
     .pa-empty { padding:60px 20px; text-align:center; color:#717784; }
     .pa-empty .pi { font-size:36px; color:#cacfd8; margin-bottom:10px; }
     .pa-preview-block { background:#f9fafb; border:1px solid #eaecf0; border-radius:10px; padding:14px 16px; font-size:13px; color:#2b303b; white-space:pre-wrap; word-break:break-word; line-height:1.55; max-height:50vh; overflow-y:auto; }
+    /* Cadena de fases */
+    .pa-step { position:relative; border:1px solid #eaecf0; border-radius:10px; padding:14px 14px 14px 18px; background:#fcfcfd; }
+    .pa-step::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:3px; background:#5c7c68; }
+    .pa-step-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+    .pa-step-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#4a6354; text-transform:uppercase; letter-spacing:.04em; }
+    .pa-step-badge .num { width:20px; height:20px; border-radius:999px; background:#5c7c68; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
+    .pa-step-delay { display:flex; align-items:center; gap:8px; font-size:12px; color:#717784; margin-bottom:10px; }
+    .pa-step-delay input { width:90px; }
+    .pa-step-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+    .pa-step-remove { color:#fb3748; background:none; border:none; cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:4px; }
+    .pa-step-remove:hover { text-decoration:underline; }
+    .pa-step .pa-conn { font-size:11px; color:#9aa1ad; }
 </style>
 @endpush
 
@@ -174,9 +186,12 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $auto->name }}</div>
+                            @php $stepCount = $auto->stepsCount(); @endphp
                             <div class="text-[11px] text-ink-500">
                                 <span class="font-semibold text-brand">{{ $auto->triggerLabel() }}</span>
-                                @if($auto->template)
+                                @if($stepCount > 1)
+                                    · <span class="font-semibold text-ink-700">{{ $stepCount }} fases en cadena</span>
+                                @elseif($auto->template)
                                     · usa <span class="font-semibold text-ink-700">{{ $auto->template->name }}</span>
                                 @endif
                                 · {{ $auto->channelsLabel() ?: '—' }}
@@ -185,6 +200,19 @@
                                     · {{ $auto->run_count }} {{ $auto->run_count === 1 ? 'ejecución' : 'ejecuciones' }}
                                 @endif
                             </div>
+                            @if($stepCount > 1)
+                                <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                                    @foreach($auto->resolvedSteps() as $i => $step)
+                                        @if($i > 0)<i class="pi pi-arrow-right text-[9px] text-ink-300"></i>@endif
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-medium text-ink-600 bg-ink-50 border border-ink-100 rounded-full px-2 py-0.5">
+                                            @if($i > 0 && $step->delay_minutes > 0)
+                                                <span class="text-ink-400">+{{ $step->delayLabel() }}</span>
+                                            @endif
+                                            {{ $step->template?->name ?? 'Sin plantilla' }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                         <form method="POST" action="{{ route('admin.crm.automatizaciones.toggle', $auto) }}" class="inline-flex items-center" onclick="event.stopPropagation();">
                             @csrf
@@ -378,35 +406,24 @@
                     </select>
                 </div>
                 <div class="pa-field">
-                    <label>Plantilla a enviar</label>
-                    <select class="pa-select" name="template_id" id="pa-auto-template">
-                        <option value="">— Sin plantilla —</option>
-                        @foreach($templatesAll as $t)
-                            <option value="{{ $t->id }}">{{ $t->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="pa-field">
-                    <label>Retraso (minutos)</label>
-                    <input type="number" min="0" max="43200" class="pa-input" name="delay_minutes" id="pa-auto-delay" value="0">
-                </div>
-                <div class="pa-field">
                     <label>Estado</label>
                     <label class="pa-chip">
                         <input type="checkbox" name="is_active" id="pa-auto-active" value="1" checked>
                         <i class="pi pi-power-off"></i> Activo
                     </label>
                 </div>
+
+                {{-- ====== Cadena de fases ====== --}}
                 <div class="pa-field md:col-span-2">
-                    <label>Canales de envío *</label>
-                    <div class="flex flex-wrap gap-2" id="pa-auto-channels">
-                        @foreach($channelDefs as $key => $def)
-                            <label class="pa-chip">
-                                <input type="checkbox" name="channels[]" value="{{ $key }}">
-                                <i class="pi pi-{{ $def['icon'] }}"></i> {{ $def['label'] }}
-                            </label>
-                        @endforeach
-                    </div>
+                    <label>Cadena de fases *</label>
+                    <p class="text-[11px] text-ink-500 -mt-1 mb-2">
+                        El disparador inicia la cadena. Cada fase envía una plantilla; el retraso se cuenta
+                        respecto de la fase anterior (la primera, desde el disparo).
+                    </p>
+                    <div id="pa-steps-list" class="space-y-3"></div>
+                    <button type="button" class="crm-btn crm-btn-ghost text-[12px] mt-3" onclick="paAddStep()">
+                        <i class="pi pi-plus"></i> Añadir fase
+                    </button>
                 </div>
             </div>
             <footer>
@@ -684,8 +701,110 @@
         }
     };
 
-    // ---------- Automation editor ----------
+    // ---------- Automation editor (cadena de fases) ----------
     const autoForm = document.getElementById('pa-auto-form');
+    const stepsList = document.getElementById('pa-steps-list');
+    const CHANNEL_DEFS = @json($channelDefs);
+    const TEMPLATE_OPTS = @json($templatesAll->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->values());
+    let stepSeq = 0;
+
+    function channelChipsHtml(idx, selected) {
+        return Object.entries(CHANNEL_DEFS).map(([key, def]) => {
+            const active = selected.includes(key) ? ' active' : '';
+            const checked = selected.includes(key) ? ' checked' : '';
+            return `<label class="pa-chip${active}">
+                <input type="checkbox" name="steps[${idx}][channels][]" value="${key}"${checked}>
+                <i class="pi pi-${def.icon}"></i> ${def.label}
+            </label>`;
+        }).join('');
+    }
+
+    function templateOptionsHtml(selectedId) {
+        let html = '<option value="">— Sin plantilla —</option>';
+        TEMPLATE_OPTS.forEach(t => {
+            const sel = String(t.id) === String(selectedId) ? ' selected' : '';
+            html += `<option value="${t.id}"${sel}>${t.name.replace(/</g,'&lt;')}</option>`;
+        });
+        return html;
+    }
+
+    // Crea una fase. data = { template_id, delay_minutes, channels[] }
+    window.paAddStep = (data = {}) => {
+        const idx = stepSeq++;
+        const channels = Array.isArray(data.channels) && data.channels.length ? data.channels : ['email'];
+        const delay = data.delay_minutes ?? 0;
+
+        const card = document.createElement('div');
+        card.className = 'pa-step';
+        card.dataset.stepIdx = idx;
+        card.innerHTML = `
+            <div class="pa-step-head">
+                <span class="pa-step-badge"><span class="num"></span> <span class="pa-step-name">Fase</span></span>
+                <button type="button" class="pa-step-remove" title="Eliminar fase"><i class="pi pi-trash"></i> Quitar</button>
+            </div>
+            <div class="pa-step-delay">
+                <i class="pi pi-clock"></i>
+                <span class="pa-delay-prefix">Esperar</span>
+                <input type="number" min="0" max="43200" class="pa-input" name="steps[${idx}][delay_minutes]" value="${delay}">
+                <span>minutos <span class="pa-conn pa-delay-suffix"></span></span>
+            </div>
+            <div class="pa-step-grid">
+                <div class="pa-field">
+                    <label>Plantilla a enviar</label>
+                    <select class="pa-select" name="steps[${idx}][template_id]">${templateOptionsHtml(data.template_id)}</select>
+                </div>
+                <div class="pa-field">
+                    <label>Canales de envío *</label>
+                    <div class="flex flex-wrap gap-2">${channelChipsHtml(idx, channels)}</div>
+                </div>
+            </div>`;
+
+        card.querySelector('.pa-step-remove').addEventListener('click', () => {
+            card.remove();
+            renumberSteps();
+        });
+        // Wire chip toggles dentro de la fase
+        card.querySelectorAll('.pa-chip').forEach(chip => {
+            const cb = chip.querySelector('input[type=checkbox]');
+            const sync = () => chip.classList.toggle('active', cb.checked);
+            cb.addEventListener('change', sync);
+            chip.addEventListener('click', e => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'I') return;
+                e.preventDefault();
+                cb.checked = !cb.checked;
+                sync();
+            });
+        });
+
+        stepsList.appendChild(card);
+        renumberSteps();
+    };
+
+    function renumberSteps() {
+        const cards = [...stepsList.querySelectorAll('.pa-step')];
+        cards.forEach((card, i) => {
+            card.querySelector('.num').textContent = i + 1;
+            card.querySelector('.pa-step-name').textContent = i === 0 ? 'Fase inicial' : `Fase ${i + 1}`;
+            const prefix = card.querySelector('.pa-delay-prefix');
+            const suffix = card.querySelector('.pa-delay-suffix');
+            if (i === 0) {
+                prefix.textContent = 'Esperar';
+                suffix.textContent = 'tras el disparo del evento';
+            } else {
+                prefix.textContent = 'Esperar';
+                suffix.textContent = 'tras la fase anterior';
+            }
+            // No permitir eliminar si solo queda una fase
+            card.querySelector('.pa-step-remove').style.display = cards.length <= 1 ? 'none' : '';
+        });
+    }
+
+    function setSteps(steps) {
+        stepsList.innerHTML = '';
+        stepSeq = 0;
+        const list = Array.isArray(steps) && steps.length ? steps : [{ delay_minutes: 0, channels: ['email'] }];
+        list.forEach(s => paAddStep(s));
+    }
 
     function resetAutoForm() {
         autoForm.reset();
@@ -693,8 +812,8 @@
         autoForm.action = '{{ route('admin.crm.automatizaciones.store') }}';
         document.getElementById('pa-auto-title').textContent = 'Nueva automatización';
         document.getElementById('pa-auto-active').checked = true;
-        autoForm.querySelectorAll('input[name="channels[]"]').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change')); });
         document.getElementById('pa-auto-active').dispatchEvent(new Event('change'));
+        setSteps([{ delay_minutes: 0, channels: ['email'] }]);
     }
 
     window.paOpenNewAutomation = () => {
@@ -714,15 +833,9 @@
             document.getElementById('pa-auto-name').value = a.name || '';
             document.getElementById('pa-auto-description').value = a.description || '';
             document.getElementById('pa-auto-trigger').value = a.trigger_event || '';
-            document.getElementById('pa-auto-template').value = a.template_id || '';
-            document.getElementById('pa-auto-delay').value = a.delay_minutes || 0;
             document.getElementById('pa-auto-active').checked = !!a.is_active;
             document.getElementById('pa-auto-active').dispatchEvent(new Event('change'));
-            const ch = Array.isArray(a.channels) ? a.channels : [];
-            autoForm.querySelectorAll('input[name="channels[]"]').forEach(cb => {
-                cb.checked = ch.includes(cb.value);
-                cb.dispatchEvent(new Event('change'));
-            });
+            setSteps(a.steps);
             paOpenModal('pa-modal-automation');
         } catch (e) {
             alert(e.message);

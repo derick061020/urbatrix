@@ -34,7 +34,7 @@ class CrmDispatcher
      */
     public function fire(string $event, array $models = []): int
     {
-        $automations = CrmAutomation::with('template')
+        $automations = CrmAutomation::with(['template', 'steps.template'])
             ->where('trigger_event', $event)
             ->where('is_active', true)
             ->get();
@@ -48,33 +48,49 @@ class CrmDispatcher
         $sent = 0;
 
         foreach ($automations as $automation) {
-            $template = $automation->template;
-            if (! $template) {
-                continue;
-            }
-
-            $recipients = $this->recipientsFor($template, $models, $vars);
-            $channels = $automation->channels ?: $template->channels ?: ['email'];
-
+            // Cadena de fases: cada paso espera "delay_minutes" respecto del paso
+            // anterior, así que acumulamos el retraso desde el disparo del evento.
+            $cumulativeDelay = 0;
             $delivered = false;
-            foreach ($channels as $channel) {
-                if ($channel === 'email') {
-                    if (! $emailEnabled) {
-                        continue;
-                    }
-                    foreach ($recipients as $to) {
-                        if ($this->sendEmail($template, $vars, $to, $automation->delay_minutes)) {
-                            $sent++;
-                            $delivered = true;
+
+            foreach ($automation->resolvedSteps() as $step) {
+                $cumulativeDelay += (int) ($step->delay_minutes ?? 0);
+
+                $template = $step->template;
+                if (! $template) {
+                    continue;
+                }
+
+                $recipients = $this->recipientsFor($template, $models, $vars);
+                $channels = $step->channels ?: $template->channels ?: ['email'];
+
+                foreach ($channels as $channel) {
+                    if ($channel === 'email') {
+                        if (! $emailEnabled) {
+                            continue;
                         }
+                        foreach ($recipients as $to) {
+                            if ($this->sendEmail($template, $vars, $to, $cumulativeDelay)) {
+                                $sent++;
+                                $delivered = true;
+                            }
+                        }
+                    } else {
+                        // WhatsApp / SMS / Push: sin proveedor configurado → se registra.
+                        Log::info("[CRM] Canal '{$channel}' no implementado; paso de '{$automation->name}' omitido para ese canal.", [
+                            'event'      => $event,
+                            'template'   => $template->name,
+                            'recipients' => $recipients,
+                            'delay_min'  => $cumulativeDelay,
+                        ]);
                     }
-                } else {
-                    // WhatsApp / SMS / Push: sin proveedor configurado → se registra.
-                    Log::info("[CRM] Canal '{$channel}' no implementado; automatización '{$automation->name}' omitida para ese canal.", [
-                        'event'       => $event,
-                        'template'    => $template->name,
-                        'recipients'  => $recipients,
-                    ]);
+                }
+
+                if ($delivered) {
+                    $template->forceFill([
+                        'last_used_at' => now(),
+                        'usage_count'  => ($template->usage_count ?? 0) + 1,
+                    ])->save();
                 }
             }
 
@@ -82,10 +98,6 @@ class CrmDispatcher
                 $automation->forceFill([
                     'last_run_at' => now(),
                     'run_count'   => ($automation->run_count ?? 0) + 1,
-                ])->save();
-                $template->forceFill([
-                    'last_used_at' => now(),
-                    'usage_count'  => ($template->usage_count ?? 0) + 1,
                 ])->save();
             }
         }
