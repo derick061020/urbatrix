@@ -118,6 +118,6 @@
     </div>
 </div>
 
-@include('admin.crm._partials.modal_nueva_reserva', ['units' => $units])
+@include('admin.crm._partials.modal_nueva_reserva', ['units' => $units, 'clients' => $clients])
 @include('admin.crm._partials.modal_exportar', ['name' => 'Contratos', 'id' => 'modal-exportar-contratos'])
 @endsection

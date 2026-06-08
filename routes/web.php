@@ -39,6 +39,10 @@ Route::post('/forgot-password/send',    [AuthController::class, 'forgotPasswordS
 Route::post('/forgot-password/verify',  [AuthController::class, 'forgotPasswordVerify'])->name('password.verify');
 Route::post('/forgot-password/reset',   [AuthController::class, 'forgotPasswordReset'])->name('password.update');
 
+// Invitación de cuenta (cliente registrado por el equipo desde "Nueva reserva")
+Route::get('/invitation/{token}',  [AuthController::class, 'showInvitation'])->name('invitation.show');
+Route::post('/invitation/{token}', [AuthController::class, 'acceptInvitation'])->name('invitation.accept');
+
 // Google OAuth routes
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');

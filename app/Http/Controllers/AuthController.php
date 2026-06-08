@@ -331,6 +331,99 @@ class AuthController extends Controller
         ]);
     }
 
+    /* =================================================================
+     * Invitación de cuenta — un cliente registrado por el equipo desde
+     * "Nueva reserva" recibe un enlace para crear su contraseña y activar
+     * su cuenta. El token se guarda (hasheado) en password_reset_tokens.
+     * ================================================================= */
+
+    /** Días de validez del enlace de invitación. */
+    public const INVITATION_DAYS = 7;
+
+    /**
+     * Crea (o renueva) un token de invitación para un email y devuelve la URL
+     * de activación lista para enviar por correo. Centraliza la lógica para que
+     * el flujo de "Nueva reserva" la reutilice.
+     */
+    public static function makeInvitationUrl(string $email): string
+    {
+        $raw = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $email],
+            ['token' => Hash::make($raw), 'created_at' => now()]
+        );
+
+        return route('invitation.show', ['token' => $raw]) . '?email=' . urlencode($email);
+    }
+
+    /** Pantalla de activación: valida el token y muestra el formulario de contraseña. */
+    public function showInvitation(Request $request, string $token)
+    {
+        $email = (string) $request->query('email', '');
+        $user  = User::where('email', $email)->first();
+        $valid = $user && $this->invitationTokenIsValid($email, $token);
+
+        return view('auth.invitation', [
+            'valid' => $valid,
+            'token' => $token,
+            'email' => $email,
+            'name'  => $valid ? ($user->first_name ?: $user->name) : '',
+        ]);
+    }
+
+    /** Activa la cuenta: fija la contraseña, consume el token e inicia sesión. */
+    public function acceptInvitation(Request $request, string $token)
+    {
+        $email = (string) $request->query('email', $request->input('email', ''));
+
+        if (! $this->invitationTokenIsValid($email, $token)) {
+            return response()->json(['message' => 'El enlace ha caducado o no es válido.'], 422);
+        }
+
+        $data = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $email)->first();
+        if (! $user) {
+            return response()->json(['message' => 'Usuario no encontrado.'], 422);
+        }
+
+        $update = ['password' => bcrypt($data['password'])];
+        if (Schema::hasColumn('users', 'verification_status')) {
+            $update['verification_status'] = 'approved';
+        }
+        $user->update($update);
+
+        DB::table('password_reset_tokens')->where('email', $email)->delete();
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
+
+        return response()->json([
+            'ok'       => true,
+            'redirect' => $user->postAuthRedirectPath(),
+        ]);
+    }
+
+    /** Comprueba que el token de invitación coincide y no ha expirado. */
+    private function invitationTokenIsValid(string $email, string $token): bool
+    {
+        if ($email === '' || $token === '') return false;
+
+        $row = DB::table('password_reset_tokens')->where('email', $email)->first();
+        if (! $row) return false;
+
+        // Carbon 3 devuelve diferencias con signo; comparamos contra el umbral.
+        if (\Illuminate\Support\Carbon::parse($row->created_at)->lt(now()->subDays(self::INVITATION_DAYS))) {
+            return false;
+        }
+
+        return Hash::check($token, $row->token);
+    }
+
     /**
      * Envía el código de verificación por correo. Nunca interrumpe el flujo:
      * si el correo falla, se registra y el proceso continúa.

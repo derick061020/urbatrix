@@ -859,7 +859,10 @@ class AdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('admin.crm.expedientes', compact('reservations', 'search'));
+        $units   = Unit::orderBy('custom_id')->get();
+        $clients = User::where('role', 'user')->orderBy('name')->get();
+
+        return view('admin.crm.expedientes', compact('reservations', 'search', 'units', 'clients'));
     }
 
     public function crmDocumentos(Request $request)
@@ -895,7 +898,10 @@ class AdminController extends Controller
         }
         $reservations = $query->orderBy('created_at', 'desc')->take(50)->get();
 
-        return view('admin.crm.contratos', compact('reservations'));
+        $units   = Unit::orderBy('custom_id')->get();
+        $clients = User::where('role', 'user')->orderBy('name')->get();
+
+        return view('admin.crm.contratos', compact('reservations', 'units', 'clients'));
     }
 
     public function crmProyectos()
@@ -1563,25 +1569,29 @@ class AdminController extends Controller
     public function createReservationQuick(Request $request)
     {
         $data = $request->validate([
-            'cliente_nombre' => 'required|string|max:255',
-            'cliente_email'  => 'required|email|max:255',
+            'client_mode'    => 'required|in:new,existing',
+            'user_id'        => 'required_if:client_mode,existing|nullable|exists:users,id',
+            'cliente_nombre' => 'required_if:client_mode,new|nullable|string|max:255',
+            'cliente_email'  => 'required_if:client_mode,new|nullable|email|max:255',
             'unit_id'        => 'required|exists:units,id',
             'fecha'          => 'required|date',
             'monto'          => 'required|numeric|min:0',
         ]);
 
-        $parts = preg_split('/\s+/', trim($data['cliente_nombre']), 2);
-        $first = $parts[0] ?? '';
-        $last  = $parts[1] ?? '';
-
         $unit = Unit::find($data['unit_id']);
 
+        // Resuelve (o crea) la cuenta del cliente y obtiene sus datos.
+        // En modo "new" se crea el usuario y se le envía un correo de invitación
+        // para que active su cuenta y cree su contraseña.
+        [$client, $invited] = $this->resolveReservationClient($data, $unit);
+
         $reservationData = [
-            'first_name'       => $first,
-            'last_name'        => $last,
-            'email'            => $data['cliente_email'],
-            'phone'            => '',
-            'country'          => '',
+            'first_name'       => $client['first_name'],
+            'last_name'        => $client['last_name'],
+            'email'            => $client['email'],
+            'phone'            => $client['phone'] ?? '',
+            'country'          => $client['country'] ?? '',
+            'user_id'          => $client['user_id'],
             'unit_id'          => $data['unit_id'],
             'reservation_code' => strtoupper(\Illuminate\Support\Str::random(8)),
             'status'           => 'pending',
@@ -1615,7 +1625,93 @@ class AdminController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Reserva creada correctamente.');
+        $msg = $invited
+            ? 'Reserva creada. Se envió una invitación a ' . $client['email'] . ' para que active su cuenta.'
+            : 'Reserva creada correctamente.';
+
+        return back()->with('success', $msg);
+    }
+
+    /**
+     * Resuelve el cliente de una reserva creada desde "Nueva reserva".
+     *
+     * - Modo "existing": vincula a un usuario ya existente (por user_id).
+     * - Modo "new": si el email ya pertenece a un usuario lo vincula; si no,
+     *   crea la cuenta (sin contraseña) y le envía un correo de invitación para
+     *   que la active. Reutiliza el diseño de correos de marca.
+     *
+     * @return array{0: array, 1: bool}  [datos del cliente, ¿se envió invitación?]
+     */
+    private function resolveReservationClient(array $data, ?Unit $unit): array
+    {
+        if ($data['client_mode'] === 'existing') {
+            $user = User::findOrFail($data['user_id']);
+            return [[
+                'user_id'    => $user->id,
+                'email'      => $user->email,
+                'first_name' => $user->first_name ?: (\Illuminate\Support\Str::before($user->name ?? '', ' ') ?: $user->name),
+                'last_name'  => $user->last_name ?: \Illuminate\Support\Str::after($user->name ?? '', ' '),
+                'phone'      => $user->phone,
+                'country'    => $user->country,
+            ], false];
+        }
+
+        // Modo "new": parte del nombre completo.
+        $parts = preg_split('/\s+/', trim($data['cliente_nombre']), 2);
+        $first = $parts[0] ?? '';
+        $last  = $parts[1] ?? '';
+
+        $existing = User::where('email', $data['cliente_email'])->first();
+        if ($existing) {
+            // El correo ya tiene cuenta: vincúlala sin reinvitar.
+            return [[
+                'user_id'    => $existing->id,
+                'email'      => $existing->email,
+                'first_name' => $existing->first_name ?: $first,
+                'last_name'  => $existing->last_name ?: $last,
+                'phone'      => $existing->phone,
+                'country'    => $existing->country,
+            ], false];
+        }
+
+        // Crea la cuenta nueva (sin contraseña hasta que active la invitación).
+        $userAttrs = [
+            'name'  => trim($data['cliente_nombre']),
+            'email' => $data['cliente_email'],
+            'role'  => 'user',
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'first_name'))          $userAttrs['first_name']          = $first;
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_name'))           $userAttrs['last_name']           = $last;
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) $userAttrs['verification_status'] = 'approved';
+
+        $user = User::create($userAttrs);
+
+        // Genera el enlace de activación y envía la invitación. No interrumpe
+        // el alta de la reserva si el correo falla.
+        $invited = false;
+        try {
+            $url = \App\Http\Controllers\AuthController::makeInvitationUrl($user->email);
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                new \App\Mail\InvitationMail(
+                    name: $first ?: $user->name,
+                    actionUrl: $url,
+                    unitName: $unit?->name ?? $unit?->custom_id ?? '',
+                    days: \App\Http\Controllers\AuthController::INVITATION_DAYS,
+                )
+            );
+            $invited = true;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo enviar la invitación de cuenta a ' . $user->email . ': ' . $e->getMessage());
+        }
+
+        return [[
+            'user_id'    => $user->id,
+            'email'      => $user->email,
+            'first_name' => $first,
+            'last_name'  => $last,
+            'phone'      => '',
+            'country'    => '',
+        ], $invited];
     }
 
     public function uploadDocumentQuick(Request $request)
