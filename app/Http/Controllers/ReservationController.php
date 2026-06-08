@@ -311,9 +311,15 @@ class ReservationController extends Controller
             }
 
             // Pagada la seña: bienvenida al cliente (E-01) + aviso interno al equipo (E-09).
-            \App\Services\CrmDispatcher::event('reservation_confirmed', [
-                'reservation' => $reservation->fresh('unit'),
-            ]);
+            // Un fallo de notificación NO debe romper la verificación: el pago ya está
+            // confirmado y la reserva marcada como pagada arriba.
+            try {
+                \App\Services\CrmDispatcher::event('reservation_confirmed', [
+                    'reservation' => $reservation->fresh('unit'),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Could not dispatch reservation_confirmed: '.$e->getMessage());
+            }
 
             session(['reservation' => $reservation]);
 
