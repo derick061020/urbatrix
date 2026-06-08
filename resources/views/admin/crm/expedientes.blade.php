@@ -7,19 +7,19 @@
 @push('styles')
 <style>
     .dot-tip { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 3px; cursor: default; outline: none; }
-    .dot-tip__label {
-        position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(4px);
+    /* Floating tooltip is appended to <body> so it never gets clipped by the
+       table's / cell's overflow-x-auto (which also clips overflow-y). */
+    #dot-tip-float {
+        position: fixed; z-index: 1000; transform: translate(-50%, -100%);
         background: #222530; color: #fff; font-size: 11px; font-weight: 500; line-height: 1.2;
         padding: 5px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none;
-        opacity: 0; visibility: hidden; transition: opacity .12s, transform .12s; z-index: 30;
+        opacity: 0; visibility: hidden; transition: opacity .12s;
         box-shadow: 0 4px 12px -2px rgba(0,0,0,.25);
     }
-    .dot-tip__label::after {
+    #dot-tip-float.show { opacity: 1; visibility: visible; }
+    #dot-tip-float::after {
         content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
         border: 4px solid transparent; border-top-color: #222530;
-    }
-    .dot-tip:hover .dot-tip__label, .dot-tip:focus .dot-tip__label {
-        opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
     }
     .dot-tip__done { color: #4ade80; font-weight: 700; margin-left: 2px; }
     .dot-tip__pending { color: #99a0ae; font-weight: 500; margin-left: 2px; }
@@ -111,9 +111,8 @@
                                 @php $phaseNames = [1 => 'Reserva', 2 => 'KYC', 3 => 'Presupuesto', 4 => 'Plan de pagos / Documentos', 5 => 'Contrato firmado']; @endphp
                                 <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                                     @for ($s = 1; $s <= 5; $s++)
-                                        <span class="dot-tip" tabindex="0">
+                                        <span class="dot-tip" tabindex="0" data-tip-label="{{ $phaseNames[$s] }}" data-tip-state="{{ $s <= $step ? 'done' : 'pending' }}">
                                             <span class="dot" style="background: {{ $s <= $step ? '#5c7c68' : '#eaecf0' }}"></span>
-                                            <span class="dot-tip__label">{{ $phaseNames[$s] }} @if($s <= $step)<span class="dot-tip__done">✓</span>@else<span class="dot-tip__pending">pendiente</span>@endif</span>
                                         </span>
                                     @endfor
                                     <span class="text-[11px] text-ink-500 ml-2">{{ $stepName }}</span>
@@ -146,3 +145,35 @@
 @include('admin.crm._partials.modal_nueva_reserva', ['units' => $units, 'clients' => $clients])
 @include('admin.crm._partials.modal_exportar', ['name' => 'Expedientes', 'id' => 'modal-exportar-expedientes'])
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var tip = document.createElement('div');
+    tip.id = 'dot-tip-float';
+    document.body.appendChild(tip);
+
+    function show(el) {
+        var label = el.dataset.tipLabel || '';
+        var badge = el.dataset.tipState === 'done'
+            ? '<span class="dot-tip__done">✓</span>'
+            : '<span class="dot-tip__pending">pendiente</span>';
+        tip.innerHTML = label + ' ' + badge;
+        var r = el.getBoundingClientRect();
+        tip.style.left = (r.left + r.width / 2) + 'px';
+        tip.style.top  = (r.top - 6) + 'px';
+        tip.classList.add('show');
+    }
+    function hide() { tip.classList.remove('show'); }
+
+    document.querySelectorAll('.dot-tip').forEach(function (el) {
+        el.addEventListener('mouseenter', function () { show(el); });
+        el.addEventListener('mouseleave', hide);
+        el.addEventListener('focus', function () { show(el); });
+        el.addEventListener('blur', hide);
+    });
+    // Hide while scrolling so the fixed tooltip doesn't float over stale spots.
+    window.addEventListener('scroll', hide, true);
+})();
+</script>
+@endpush
