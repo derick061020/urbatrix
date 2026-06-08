@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Dashboard — CRM Duna Makai')
-@section('page_title', 'Dashboard')
-@section('page_breadcrumb', 'Vista global · todos los proyectos')
+@section('title', __('Dashboard — CRM Duna Makai'))
+@section('page_title', __('Dashboard'))
+@section('page_breadcrumb', __('Vista global · todos los proyectos'))
 @php $activeRoute = 'crm.dashboard'; @endphp
 
 @push('styles')
@@ -35,10 +35,10 @@
     <div class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-err-soft border border-err/20 text-[12px] text-ink-700">
         <i class="pi pi-exclamation-triangle text-err text-[14px]"></i>
         <span class="leading-tight">
-            <span class="font-bold text-ink-950">{{ $aprobCola + $docsPendientes + $tareasVencidas }} alertas activas</span> &mdash;
-            {{ $aprobCola }} verificaciones pendientes · {{ $tareasVencidas }} tareas vencidas · {{ $docsPendientes }} documentos sin gestionar. Requieren atención inmediata.
+            <span class="font-bold text-ink-950">{{ $aprobCola + $docsPendientes + $tareasVencidas }} {{ __('alertas activas') }}</span> &mdash;
+            {{ __(':aprob verificaciones pendientes · :tareas tareas vencidas · :docs documentos sin gestionar. Requieren atención inmediata.', ['aprob' => $aprobCola, 'tareas' => $tareasVencidas, 'docs' => $docsPendientes]) }}
         </span>
-        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-err font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">Ver todas <i class="pi pi-arrow-right text-[10px]"></i></a>
+        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-err font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">{{ __('Ver todas') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
         <button type="button" class="text-ink-400 hover:text-ink-700 shrink-0" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[11px]"></i></button>
     </div>
 
@@ -46,11 +46,12 @@
     <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-warn-soft border border-warn/20 text-[13px] text-ink-700">
         <i class="pi pi-user-check text-warn text-[16px]"></i>
         <span class="leading-tight">
-            <span class="font-bold text-ink-950">{{ $perfilesPendientes }} {{ $perfilesPendientes === 1 ? 'perfil pendiente' : 'perfiles pendientes' }} de verificación</span> &mdash;
-            Hay {{ $perfilesPendientes }} {{ $perfilesPendientes === 1 ? 'usuario que aún no ha completado' : 'usuarios que aún no han completado' }} su proceso de verificación de identidad (KYC).
-            Revisa los documentos y aprueba o rechaza sus perfiles para que puedan continuar.
+            <span class="font-bold text-ink-950">{{ $perfilesPendientes }} {{ $perfilesPendientes === 1 ? __('perfil pendiente de verificación') : __('perfiles pendientes de verificación') }}</span> &mdash;
+            {{ $perfilesPendientes === 1
+                ? __('Hay :n usuario que aún no ha completado su proceso de verificación de identidad (KYC). Revisa los documentos y aprueba o rechaza su perfil para que pueda continuar.', ['n' => $perfilesPendientes])
+                : __('Hay :n usuarios que aún no han completado su proceso de verificación de identidad (KYC). Revisa los documentos y aprueba o rechaza sus perfiles para que puedan continuar.', ['n' => $perfilesPendientes]) }}
         </span>
-        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-warn font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">Ir a verificaciones <i class="pi pi-arrow-right text-[10px]"></i></a>
+        <a href="{{ route('admin.crm.aprobaciones') }}" class="ml-auto text-warn font-semibold hover:underline flex items-center gap-1 whitespace-nowrap">{{ __('Ir a verificaciones') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
         <button type="button" class="text-ink-400 hover:text-ink-700 shrink-0" onclick="this.parentElement.style.display='none'"><i class="pi pi-times text-[11px]"></i></button>
     </div>
     @endif
@@ -59,10 +60,10 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         @php
             $kpis = [
-                ['n' => $expedientesActivos,'label' => 'Expedientes activos',  'sub' => $expedientesIncompletos.' INCOMPLETOS · 3 SIN ASESOR', 'dot' => '#1fc16b', 'href' => route('admin.crm.expedientes')],
-                ['n' => $docsPendientes,    'label' => 'Documentos pendientes','sub' => '3 SIN REVISAR · 2 POR FIRMAR',                       'dot' => '#fa7319', 'href' => route('admin.crm.documentos')],
-                ['n' => $aprobCola,         'label' => 'Aprobaciones en cola', 'sub' => '3 KYC · 2 CONTRATOS · 2 BROKERS',                    'dot' => '#fb3748', 'href' => route('admin.crm.aprobaciones')],
-                ['n' => $tareasVencidas,    'label' => 'Tareas vencidas',      'sub' => '4 ESCALADAS HOY · SIN RESOLVER',                     'dot' => '#335cff', 'href' => route('admin.crm.tareas')],
+                ['n' => $expedientesActivos,'label' => __('Expedientes activos'),  'sub' => __(':n INCOMPLETOS · 3 SIN ASESOR', ['n' => $expedientesIncompletos]), 'dot' => '#1fc16b', 'href' => route('admin.crm.expedientes')],
+                ['n' => $docsPendientes,    'label' => __('Documentos pendientes'),'sub' => __('3 SIN REVISAR · 2 POR FIRMAR'),                                'dot' => '#fa7319', 'href' => route('admin.crm.documentos')],
+                ['n' => $aprobCola,         'label' => __('Aprobaciones en cola'), 'sub' => __('3 KYC · 2 CONTRATOS · 2 BROKERS'),                             'dot' => '#fb3748', 'href' => route('admin.crm.aprobaciones')],
+                ['n' => $tareasVencidas,    'label' => __('Tareas vencidas'),      'sub' => __('4 ESCALADAS HOY · SIN RESOLVER'),                              'dot' => '#335cff', 'href' => route('admin.crm.tareas')],
             ];
         @endphp
         @foreach($kpis as $k)
@@ -82,17 +83,17 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="crm-card lg:col-span-2 overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="font-display text-[14px] font-semibold text-ink-950">Proyectos activos</h3>
-                <a href="{{ route('admin.crm.proyectos') }}" class="text-[11px] text-brand font-semibold hover:underline">Ver todos &rarr;</a>
+                <h3 class="font-display text-[14px] font-semibold text-ink-950">{{ __('Proyectos activos') }}</h3>
+                <a href="{{ route('admin.crm.proyectos') }}" class="text-[11px] text-brand font-semibold hover:underline">{{ __('Ver todos') }} &rarr;</a>
             </div>
             <table class="w-full">
                 <thead class="bg-ink-50/60">
                     <tr>
-                        <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Proyecto</th>
-                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Estado</th>
-                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Vendidas</th>
-                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Avance</th>
-                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">Valor total</th>
+                        <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Proyecto') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Estado') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Vendidas') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Avance') }}</th>
+                        <th class="text-left px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Valor total') }}</th>
                         <th class="px-3 py-2.5"></th>
                     </tr>
                 </thead>
@@ -109,13 +110,13 @@
                         <tr class="hover:bg-ink-50">
                             <td class="px-5 py-3.5">
                                 <div class="text-[13px] font-semibold text-ink-950">{{ $p->name }}</div>
-                                <div class="text-[11px] text-ink-500">{{ $totalUnits }} unidades</div>
+                                <div class="text-[11px] text-ink-500">{{ $totalUnits }} {{ __('unidades') }}</div>
                             </td>
                             <td class="px-3 py-3.5">
                                 @if($isActive)
-                                    <span class="crm-pill bg-ok-soft text-ok-dark"><i class="pi pi-check-circle text-[10px]"></i> Activo</span>
+                                    <span class="crm-pill bg-ok-soft text-ok-dark"><i class="pi pi-check-circle text-[10px]"></i> {{ __('Activo') }}</span>
                                 @else
-                                    <span class="crm-pill bg-ink-100 text-ink-500"><i class="pi pi-pause-circle text-[10px]"></i> Inactivo</span>
+                                    <span class="crm-pill bg-ink-100 text-ink-500"><i class="pi pi-pause-circle text-[10px]"></i> {{ __('Inactivo') }}</span>
                                 @endif
                             </td>
                             <td class="px-3 py-3.5 text-[13px] text-ink-700">{{ $isActive ? ($sold + $reserved) : '—' }}</td>
@@ -137,11 +138,11 @@
                                 @endif
                             </td>
                             <td class="px-3 py-3.5 text-right">
-                                <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="text-[12px] text-brand font-semibold hover:underline whitespace-nowrap">Ver &rarr;</a>
+                                <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="text-[12px] text-brand font-semibold hover:underline whitespace-nowrap">{{ __('Ver') }} &rarr;</a>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-5 py-6 text-center text-[12px] text-ink-500">Sin proyectos.</td></tr>
+                        <tr><td colspan="6" class="px-5 py-6 text-center text-[12px] text-ink-500">{{ __('Sin proyectos.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -150,8 +151,8 @@
         {{-- Expedientes recientes con color de estado en texto --}}
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="font-display text-[14px] font-semibold text-ink-950">Expedientes recientes</h3>
-                <a href="{{ route('admin.crm.expedientes') }}" class="text-[11px] text-brand font-semibold hover:underline">Ver todos &rarr;</a>
+                <h3 class="font-display text-[14px] font-semibold text-ink-950">{{ __('Expedientes recientes') }}</h3>
+                <a href="{{ route('admin.crm.expedientes') }}" class="text-[11px] text-brand font-semibold hover:underline">{{ __('Ver todos') }} &rarr;</a>
             </div>
             <div class="divide-y divide-ink-100">
                 @forelse(($expedientesRecientes ?? collect()) as $r)
@@ -160,10 +161,10 @@
                         $totalDocs    = $r->documents->count();
                         $approvedDocs = $r->documents->where('status', 'approved')->count();
                         $rejected     = $r->documents->where('status', 'rejected')->isNotEmpty();
-                        if ($rejected)                                        { $estado = 'Pago vencido'; $color = 'text-err'; }
-                        elseif ($approvedDocs === $totalDocs && $totalDocs)   { $estado = 'Al día';        $color = 'text-ok-dark'; }
-                        elseif ($totalDocs === 0)                             { $estado = 'KYC Pendiente'; $color = 'text-warn'; }
-                        else                                                  { $estado = 'En revisión';   $color = 'text-info'; }
+                        if ($rejected)                                        { $estado = __('Pago vencido'); $color = 'text-err'; }
+                        elseif ($approvedDocs === $totalDocs && $totalDocs)   { $estado = __('Al día');        $color = 'text-ok-dark'; }
+                        elseif ($totalDocs === 0)                             { $estado = __('KYC Pendiente'); $color = 'text-warn'; }
+                        else                                                  { $estado = __('En revisión');   $color = 'text-info'; }
                         $bgPalette = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#5c7c68','#d56a6a'];
                         $bg = $bgPalette[$r->id % count($bgPalette)];
                     @endphp
@@ -171,7 +172,7 @@
                         <div class="crm-avatar crm-avatar-sm" style="background:{{ $bg }}">{{ $init }}</div>
                         <div class="flex-1 min-w-0">
                             <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $r->first_name }} {{ $r->last_name }}</div>
-                            <div class="text-[11px] text-ink-500 truncate">{{ $r->unit->name ?? $r->unit->custom_id ?? 'Sin unidad' }} · Makai</div>
+                            <div class="text-[11px] text-ink-500 truncate">{{ $r->unit->name ?? $r->unit->custom_id ?? __('Sin unidad') }} · Makai</div>
                         </div>
                         <div class="text-right">
                             <div class="text-[12px] font-semibold {{ $color }}">{{ $estado }}</div>
@@ -179,7 +180,7 @@
                         </div>
                     </a>
                 @empty
-                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">Sin expedientes recientes.</div>
+                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">{{ __('Sin expedientes recientes.') }}</div>
                 @endforelse
             </div>
         </div>
@@ -190,10 +191,10 @@
         {{-- Verificaciones pendientes con botones --}}
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="font-display text-[14px] font-semibold text-ink-950">Verificaciones pendientes</h3>
+                <h3 class="font-display text-[14px] font-semibold text-ink-950">{{ __('Verificaciones pendientes') }}</h3>
                 <a href="{{ route('admin.crm.aprobaciones') }}" class="text-[11px] text-brand font-semibold hover:underline flex items-center gap-1">
                     <span class="crm-pill bg-err-soft text-err">{{ $aprobCola }}</span>
-                    <span>Ver todos &rarr;</span>
+                    <span>{{ __('Ver todos') }} &rarr;</span>
                 </a>
             </div>
             <div class="divide-y divide-ink-100">
@@ -205,26 +206,26 @@
                     @endphp
                     <div class="px-5 py-3">
                         <div class="flex items-center justify-between mb-1">
-                            <div class="text-[13px] font-semibold text-ink-950">{{ $a->requested_by ?? 'Solicitud' }}</div>
+                            <div class="text-[13px] font-semibold text-ink-950">{{ $a->requested_by ?? __('Solicitud') }}</div>
                             <span class="crm-pill bg-{{ $color }}-soft text-{{ $color }}">{{ $typeLabel }}</span>
                         </div>
-                        <div class="text-[12px] text-ink-500 mb-2.5">{{ $a->amount_or_condition ?? $a->notes ?? 'Sin descripción' }}</div>
+                        <div class="text-[12px] text-ink-500 mb-2.5">{{ $a->amount_or_condition ?? $a->notes ?? __('Sin descripción') }}</div>
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] text-ink-400">{{ $a->created_at?->diffForHumans() }} · Sistema</span>
+                            <span class="text-[10px] text-ink-400">{{ $a->created_at?->diffForHumans() }} · {{ __('Sistema') }}</span>
                             <div class="flex items-center gap-2">
                                 <form method="POST" action="{{ route('admin.crm.aprobaciones.decide', $a->id) }}" class="inline m-0">
                                     @csrf
-                                    <button type="submit" name="decision" value="aprobada" class="text-[11px] font-semibold text-ok-dark hover:bg-ok-soft px-2 py-1 rounded inline-flex items-center gap-1"><i class="pi pi-check text-[10px]"></i> Verificar</button>
+                                    <button type="submit" name="decision" value="aprobada" class="text-[11px] font-semibold text-ok-dark hover:bg-ok-soft px-2 py-1 rounded inline-flex items-center gap-1"><i class="pi pi-check text-[10px]"></i> {{ __('Verificar') }}</button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.crm.aprobaciones.decide', $a->id) }}" class="inline m-0">
                                     @csrf
-                                    <button type="submit" name="decision" value="rechazada" class="text-[11px] font-semibold text-err hover:bg-err-soft px-2 py-1 rounded inline-flex items-center gap-1"><i class="pi pi-times text-[10px]"></i> Rechazar</button>
+                                    <button type="submit" name="decision" value="rechazada" class="text-[11px] font-semibold text-err hover:bg-err-soft px-2 py-1 rounded inline-flex items-center gap-1"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">Sin aprobaciones urgentes.</div>
+                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">{{ __('Sin aprobaciones urgentes.') }}</div>
                 @endforelse
             </div>
         </div>
@@ -232,10 +233,10 @@
         {{-- Tareas del día con bullets de color --}}
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="font-display text-[14px] font-semibold text-ink-950">Tareas del día</h3>
+                <h3 class="font-display text-[14px] font-semibold text-ink-950">{{ __('Tareas del día') }}</h3>
                 <a href="{{ route('admin.crm.tareas') }}" class="text-[11px] text-brand font-semibold hover:underline flex items-center gap-1">
                     <span class="crm-pill bg-err-soft text-err">{{ $tareasVencidas }}</span>
-                    <span>Ver todos &rarr;</span>
+                    <span>{{ __('Ver todos') }} &rarr;</span>
                 </a>
             </div>
             <div class="divide-y divide-ink-100">
@@ -249,10 +250,10 @@
                         <input type="checkbox" class="w-4 h-4 accent-brand" {{ $isDone ? 'checked' : '' }} onclick="this.form.submit()">
                         <span class="dot {{ $prioDot }}"></span>
                         <div class="flex-1 text-[12px] {{ $isDone ? 'line-through text-ink-400' : 'text-ink-700' }}">{{ $t->title }}</div>
-                        <div class="text-[10px] text-ink-400 whitespace-nowrap">{{ $isDone ? 'Completado' : ($t->due_label ?? optional($t->due_date)->format('d/m')) }}</div>
+                        <div class="text-[10px] text-ink-400 whitespace-nowrap">{{ $isDone ? __('Completado') : ($t->due_label ?? optional($t->due_date)->format('d/m')) }}</div>
                     </form>
                 @empty
-                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">No hay tareas para hoy.</div>
+                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">{{ __('No hay tareas para hoy.') }}</div>
                 @endforelse
             </div>
         </div>
@@ -260,7 +261,7 @@
         {{-- Actividad reciente --}}
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="font-display text-[14px] font-semibold text-ink-950">Actividad reciente</h3>
+                <h3 class="font-display text-[14px] font-semibold text-ink-950">{{ __('Actividad reciente') }}</h3>
             </div>
             <div class="divide-y divide-ink-100">
                 @php
@@ -270,8 +271,8 @@
                     @php
                         $statusMap = ['approved' => 'bg-ok','generated' => 'bg-info','signed' => 'bg-ok','pending' => 'bg-warn','rejected' => 'bg-err'];
                         $dot = $statusMap[$a->status] ?? 'bg-ink-400';
-                        $who = $a->reservation ? ($a->reservation->first_name.' '.$a->reservation->last_name) : 'Sistema';
-                        $verb = $a->status === 'approved' ? 'aprobó' : ($a->status === 'rejected' ? 'rechazó' : 'subió');
+                        $who = $a->reservation ? ($a->reservation->first_name.' '.$a->reservation->last_name) : __('Sistema');
+                        $verb = $a->status === 'approved' ? __('aprobó') : ($a->status === 'rejected' ? __('rechazó') : __('subió'));
                     @endphp
                     <div class="px-5 py-2.5 flex items-start gap-3">
                         <span class="dot {{ $dot }} mt-1.5 shrink-0"></span>
@@ -281,7 +282,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">Sin actividad reciente.</div>
+                    <div class="px-5 py-6 text-center text-[12px] text-ink-500">{{ __('Sin actividad reciente.') }}</div>
                 @endforelse
             </div>
         </div>
