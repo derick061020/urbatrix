@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Reservation;
 use App\Support\PaymentReceiptData;
+use Illuminate\Http\Request;
 
 class PaymentDocumentController extends Controller
 {
@@ -21,6 +22,43 @@ class PaymentDocumentController extends Controller
         return view('print.payment-receipt', [
             'd'       => PaymentReceiptData::build($payment),
             'company' => config('company'),
+        ]);
+    }
+
+    /**
+     * Registra la firma manuscrita del comprador sobre el comprobante.
+     * Queda persistida en el pago para que no se pierda al recargar y para
+     * dejar constancia (con fecha y nombre) de la recepción del comprobante.
+     */
+    public function signReceipt(Request $request, Payment $payment)
+    {
+        $payment->load('reservation');
+        abort_unless($payment->reservation, 404);
+        $this->authorizeAccess($payment->reservation);
+
+        $data = $request->validate([
+            'signer_name'     => ['required', 'string', 'min:3', 'max:120'],
+            'signature_image' => ['required', 'string'],
+        ]);
+
+        // La firma llega como data URL PNG (base64). Validamos el formato básico.
+        if (! preg_match('/^data:image\/png;base64,/', $data['signature_image'])) {
+            return response()->json([
+                'success' => false,
+                'message' => __('La firma no tiene un formato válido.'),
+            ], 422);
+        }
+
+        $payment->forceFill([
+            'receipt_signature'   => $data['signature_image'],
+            'receipt_signer_name' => $data['signer_name'],
+            'receipt_signed_at'   => now(),
+        ])->save();
+
+        return response()->json([
+            'success'   => true,
+            'message'   => __('Comprobante firmado.'),
+            'signed_at' => $payment->receipt_signed_at->format('d/m/Y H:i'),
         ]);
     }
 

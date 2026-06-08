@@ -226,8 +226,12 @@ body {
         <div class="sig-role">Recibido por · Received by</div>
         <div class="sig-name">{{ $d['nombre_cliente'] }}</div>
         <div class="sig-entity">Cliente · {{ $d['documento_cliente'] }}</div>
-        <div class="sig-box"></div>
-        <div class="sig-hint">Firma / Signature</div>
+        <div class="sig-box" style="position:relative">
+          @if(!empty($d['firma_cliente']))
+            <img src="{{ $d['firma_cliente'] }}" alt="Firma" style="position:absolute;left:0;bottom:2px;max-height:44px;max-width:200px;object-fit:contain">
+          @endif
+        </div>
+        <div class="sig-hint">@if(!empty($d['firma_cliente_fecha'])) Firmado · {{ $d['firma_cliente_fecha'] }} @else Firma / Signature @endif</div>
       </div>
     </div>
 

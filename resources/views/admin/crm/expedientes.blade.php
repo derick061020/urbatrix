@@ -28,8 +28,8 @@
 
 @section('content')
 @php
-    $advisors = \App\Models\Agent::pluck('name', 'id');
-    $units    = \App\Models\Unit::orderBy('custom_id')->get(['id','custom_id','name','price']);
+    $currentTab = $tab ?? request('tab', 'todos');
+    $hasFilters = filled($search ?? null) || filled($unitId ?? null) || filled($dateFrom ?? null) || filled($dateTo ?? null);
 @endphp
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
@@ -49,20 +49,30 @@
     <div class="crm-card">
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-                @php $currentTab = request('tab', 'todos'); @endphp
                 @foreach (['todos' => 'Todos','kyc' => 'KYC Pendiente','firma' => 'Firma requerida','vencido' => 'Pago Vencido','al-dia' => 'Al día'] as $slug => $label)
-                    <a href="?tab={{ $slug }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ $label }}</a>
+                    <a href="{{ route('admin.crm.expedientes', array_merge(request()->except(['page', 'tab']), ['tab' => $slug])) }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
-                <form method="GET" class="relative w-full sm:w-64 m-0">
+            <form method="GET" action="{{ route('admin.crm.expedientes') }}" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto m-0">
+                <div class="relative w-full sm:w-64">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
                     <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Buscar expediente…" class="crm-input pr-3">
-                </form>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
-                <button class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
-            </div>
+                </div>
+                <select name="unit_id" class="crm-input pl-3 w-full sm:w-44">
+                    <option value="">Todas las unidades</option>
+                    @foreach($units as $u)
+                        <option value="{{ $u->id }}" @selected((string)($unitId ?? '') === (string)$u->id)>{{ $u->custom_id ?? $u->name }} {{ $u->name && $u->custom_id ? '· '.$u->name : '' }}</option>
+                    @endforeach
+                </select>
+                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Desde">
+                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                @if($hasFilters)
+                    <a href="{{ route('admin.crm.expedientes', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> Limpiar</a>
+                @endif
+                <button type="button" class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
+            </form>
         </div>
 
         <div class="overflow-x-auto">

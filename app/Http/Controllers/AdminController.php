@@ -674,24 +674,67 @@ class AdminController extends Controller
         ));
     }
 
-    public function transactionsReport()
+    public function transactionsReport(Request $request)
     {
-        $dealsQuery = Deal::with(['unit', 'agent']);
-        $totalQuery = Deal::where('status', 'COMPLETED');
-        $pendingQuery = Deal::where('status', 'PENDING');
+        $tab = $request->get('tab', 'todos');
+        $search = $request->get('search');
+        $unitId = $request->get('unit_id');
+        $method = $request->get('method');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
 
-        if (Auth::user()->role === 'broker') {
-            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->all();
-            $dealsQuery->whereIn('unit_id', $unitIds);
-            $totalQuery->whereIn('unit_id', $unitIds);
-            $pendingQuery->whereIn('unit_id', $unitIds);
-        }
+        $baseQuery = Payment::query()->with('reservation.unit');
+        $this->scopePaymentQueryForBroker($baseQuery);
+        $this->applyPaymentFilters($baseQuery, $request);
 
-        $deals = $dealsQuery->orderBy('deal_date', 'desc')->get();
-        $totalRevenue = $totalQuery->sum('deal_price');
-        $pendingRevenue = $pendingQuery->sum('deal_price');
+        $paymentsQuery = clone $baseQuery;
+        match ($tab) {
+            'confirmados' => $paymentsQuery->where('status', 'paid'),
+            'pendientes'  => $paymentsQuery->where('status', 'pending'),
+            'vencidos'    => $paymentsQuery->where('status', 'overdue'),
+            default       => null,
+        };
 
-        return view('admin.transactions-report', compact('deals', 'totalRevenue', 'pendingRevenue'));
+        $payments = $paymentsQuery
+            ->orderByRaw('COALESCE(paid_at, due_date, created_at) desc')
+            ->paginate(40)
+            ->withQueryString();
+
+        $totalCobrado = (clone $baseQuery)->where('status', 'paid')->sum('amount');
+        $pendienteCobro = (clone $baseQuery)->where('status', 'pending')->sum('amount');
+        $pagosVencidos = (clone $baseQuery)->where('status', 'overdue')->sum('amount');
+        $countPaid = (clone $baseQuery)->where('status', 'paid')->count();
+        $countPending = (clone $baseQuery)->where('status', 'pending')->count();
+        $countOverdue = (clone $baseQuery)->where('status', 'overdue')->count();
+
+        $units = $this->crmUnitsForUser();
+        $methodsQuery = Payment::query()
+            ->whereNotNull('payment_method')
+            ->distinct();
+        $this->scopePaymentQueryForBroker($methodsQuery);
+        $methods = $methodsQuery
+            ->orderBy('payment_method')
+            ->pluck('payment_method')
+            ->filter()
+            ->values();
+
+        return view('admin.transactions-report', compact(
+            'payments',
+            'totalCobrado',
+            'pendienteCobro',
+            'pagosVencidos',
+            'countPaid',
+            'countPending',
+            'countOverdue',
+            'tab',
+            'search',
+            'unitId',
+            'method',
+            'dateFrom',
+            'dateTo',
+            'units',
+            'methods'
+        ));
     }
 
     public function communication()
@@ -839,13 +882,14 @@ class AdminController extends Controller
 
     public function crmExpedientes(Request $request)
     {
+        $tab = $request->get('tab', 'todos');
         $search = $request->get('search');
+        $unitId = $request->get('unit_id');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
         $query = Reservation::with(['unit', 'documents', 'payments']);
 
-        if (Auth::user()->role === 'broker') {
-            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($id) => (string) $id)->all();
-            $query->whereIn('unit_id', $unitIds);
-        }
+        $this->scopeReservationQueryForBroker($query);
 
         $reservations = $query
             ->when($search, function ($q) use ($search) {
@@ -853,16 +897,50 @@ class AdminController extends Controller
                     $w->where('first_name', 'like', "%$search%")
                       ->orWhere('last_name', 'like', "%$search%")
                       ->orWhere('email', 'like', "%$search%")
-                      ->orWhere('reservation_code', 'like', "%$search%");
+                      ->orWhere('phone', 'like', "%$search%")
+                      ->orWhere('reservation_code', 'like', "%$search%")
+                      ->orWhereHas('unit', function ($u) use ($search) {
+                          $u->where('name', 'like', "%$search%")
+                            ->orWhere('custom_id', 'like', "%$search%");
+                      });
                 });
             })
+            ->when($unitId, fn ($q) => $q->where('unit_id', $unitId))
+            ->when($dateFrom, fn ($q) => $q->whereDate('created_at', '>=', $dateFrom))
+            ->when($dateTo, fn ($q) => $q->whereDate('created_at', '<=', $dateTo))
+            ->when($tab === 'kyc', function ($q) {
+                $q->whereHas('documents', function ($d) {
+                    $d->where('document_type', 'kyc')
+                      ->whereIn('status', ['pending', 'generated']);
+                });
+            })
+            ->when($tab === 'firma', function ($q) {
+                $q->whereHas('documents', function ($d) {
+                    $d->whereIn('document_type', ['payment_plan', 'purchase_promise', 'contract', 'promise'])
+                      ->whereIn('status', ['pending', 'generated']);
+                });
+            })
+            ->when($tab === 'vencido', fn ($q) => $q->whereHas('payments', fn ($p) => $p->where('status', 'overdue')))
+            ->when($tab === 'al-dia', fn ($q) => $q->whereDoesntHave('payments', fn ($p) => $p->where('status', 'overdue')))
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        $units   = Unit::orderBy('custom_id')->get();
+        $units   = $this->crmUnitsForUser();
         $clients = User::where('role', 'user')->orderBy('name')->get();
+        $advisors = Agent::orderBy('name')->pluck('name', 'id');
 
-        return view('admin.crm.expedientes', compact('reservations', 'search', 'units', 'clients'));
+        return view('admin.crm.expedientes', compact(
+            'reservations',
+            'tab',
+            'search',
+            'unitId',
+            'dateFrom',
+            'dateTo',
+            'units',
+            'clients',
+            'advisors'
+        ));
     }
 
     public function crmDocumentos(Request $request)
@@ -889,19 +967,141 @@ class AdminController extends Controller
         return view('admin.crm.documentos', compact('documents', 'tab', 'tabs'));
     }
 
-    public function crmContratos()
+    public function crmContratos(Request $request)
     {
-        $query = Reservation::with(['unit', 'documents']);
-        if (Auth::user()->role === 'broker') {
-            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($id) => (string) $id)->all();
-            $query->whereIn('unit_id', $unitIds);
-        }
-        $reservations = $query->orderBy('created_at', 'desc')->take(50)->get();
+        $tab = $request->get('tab', 'todos');
+        $search = $request->get('search');
+        $unitId = $request->get('unit_id');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $contractTypes = ['contract', 'promise', 'purchase_promise'];
 
-        $units   = Unit::orderBy('custom_id')->get();
+        $baseQuery = Reservation::query()->with(['unit', 'documents', 'payments']);
+        $this->scopeReservationQueryForBroker($baseQuery);
+
+        $kpiQuery = clone $baseQuery;
+
+        $query = clone $baseQuery;
+        $query
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($w) use ($search) {
+                    $w->where('first_name', 'like', "%$search%")
+                      ->orWhere('last_name', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%")
+                      ->orWhere('reservation_code', 'like', "%$search%")
+                      ->orWhereHas('unit', function ($u) use ($search) {
+                          $u->where('name', 'like', "%$search%")
+                            ->orWhere('custom_id', 'like', "%$search%");
+                      });
+                });
+            })
+            ->when($unitId, fn ($q) => $q->where('unit_id', $unitId))
+            ->when($dateFrom, fn ($q) => $q->whereDate('created_at', '>=', $dateFrom))
+            ->when($dateTo, fn ($q) => $q->whereDate('created_at', '<=', $dateTo))
+            ->when($tab === 'reservas', fn ($q) => $q->whereDoesntHave('documents', fn ($d) => $d->whereIn('document_type', $contractTypes)))
+            ->when($tab === 'contratos', fn ($q) => $q->whereHas('documents', fn ($d) => $d->whereIn('document_type', $contractTypes)))
+            ->when($tab === 'por-firmar', fn ($q) => $q->whereHas('documents', fn ($d) => $d->whereIn('document_type', $contractTypes)->whereIn('status', ['pending', 'generated'])))
+            ->when($tab === 'pago-vencido', fn ($q) => $q->whereHas('payments', fn ($p) => $p->where('status', 'overdue')));
+
+        $reservations = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(30)
+            ->withQueryString();
+
+        $reservasCount = (clone $kpiQuery)->count();
+        $countContratos = (clone $kpiQuery)->whereHas('documents', fn ($d) => $d->whereIn('document_type', $contractTypes))->count();
+        $porFirmar = (clone $kpiQuery)->whereHas('documents', fn ($d) => $d->whereIn('document_type', $contractTypes)->whereIn('status', ['pending', 'generated']))->count();
+        $pagoVencido = (clone $kpiQuery)->whereHas('payments', fn ($p) => $p->where('status', 'overdue'))->count();
+        $firmados = (clone $kpiQuery)->where(function ($q) use ($contractTypes) {
+            $q->whereIn('status', ['contract_signed', 'signed'])
+              ->orWhereHas('documents', fn ($d) => $d->whereIn('document_type', $contractTypes)->whereIn('status', ['signed', 'approved']));
+        })->count();
+
+        $units   = $this->crmUnitsForUser();
         $clients = User::where('role', 'user')->orderBy('name')->get();
 
-        return view('admin.crm.contratos', compact('reservations', 'units', 'clients'));
+        return view('admin.crm.contratos', compact(
+            'reservations',
+            'tab',
+            'search',
+            'unitId',
+            'dateFrom',
+            'dateTo',
+            'reservasCount',
+            'countContratos',
+            'porFirmar',
+            'pagoVencido',
+            'firmados',
+            'units',
+            'clients'
+        ));
+    }
+
+    private function scopeReservationQueryForBroker($query)
+    {
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->map(fn ($id) => (string) $id)->all();
+            $query->whereIn('unit_id', $unitIds);
+        }
+
+        return $query;
+    }
+
+    private function scopePaymentQueryForBroker($query)
+    {
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->all();
+            $query->whereHas('reservation', fn ($q) => $q->whereIn('unit_id', $unitIds));
+        }
+
+        return $query;
+    }
+
+    private function crmUnitsForUser()
+    {
+        $query = Unit::query()->orderBy('custom_id');
+
+        if (Auth::user()->role === 'broker') {
+            $unitIds = Auth::user()->assignedUnits()->pluck('units.id')->all();
+            $query->whereIn('id', $unitIds);
+        }
+
+        return $query->get();
+    }
+
+    private function applyPaymentFilters($query, Request $request)
+    {
+        $search = $request->get('search');
+
+        return $query
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($w) use ($search) {
+                    $w->where('label', 'like', "%$search%")
+                      ->orWhere('payment_type', 'like', "%$search%")
+                      ->orWhere('payment_method', 'like', "%$search%")
+                      ->orWhere('notes', 'like', "%$search%")
+                      ->orWhereHas('reservation', function ($r) use ($search) {
+                          $r->where('first_name', 'like', "%$search%")
+                            ->orWhere('last_name', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%")
+                            ->orWhere('reservation_code', 'like', "%$search%")
+                            ->orWhereHas('unit', function ($u) use ($search) {
+                                $u->where('name', 'like', "%$search%")
+                                  ->orWhere('custom_id', 'like', "%$search%");
+                            });
+                      });
+                });
+            })
+            ->when($request->get('unit_id'), function ($q, $unitId) {
+                $q->whereHas('reservation', fn ($r) => $r->where('unit_id', $unitId));
+            })
+            ->when($request->get('method'), fn ($q, $method) => $q->where('payment_method', $method))
+            ->when($request->get('date_from'), function ($q, $dateFrom) {
+                $q->whereDate(DB::raw('COALESCE(paid_at, due_date)'), '>=', $dateFrom);
+            })
+            ->when($request->get('date_to'), function ($q, $dateTo) {
+                $q->whereDate(DB::raw('COALESCE(paid_at, due_date)'), '<=', $dateTo);
+            });
     }
 
     public function crmProyectos()

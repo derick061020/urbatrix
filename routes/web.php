@@ -161,6 +161,7 @@ Route::middleware(['auth'])->group(function () {
     // Documentos imprimibles (comprobante de pago / datos de transferencia)
     // Acceso: admin o el comprador dueño de la reserva (validado en el controlador).
     Route::get('/payments/{payment}/receipt', [PaymentDocumentController::class, 'receipt'])->name('payments.receipt');
+    Route::post('/payments/{payment}/receipt/sign', [PaymentDocumentController::class, 'signReceipt'])->name('payments.receipt.sign');
     Route::get('/reservations/{reservation}/wire-instructions', [PaymentDocumentController::class, 'wireInstructions'])->name('reservations.wire');
 });
 

@@ -6,13 +6,8 @@
 
 @section('content')
 @php
-    $units = \App\Models\Unit::orderBy('custom_id')->get(['id','custom_id','name','price']);
-
-    $countContratos = \App\Models\Document::where('document_type', 'contract')->whereIn('status', ['signed','approved'])->count();
-    $porFirmar      = \App\Models\Document::whereIn('document_type', ['contract','promise'])->where('status', 'generated')->count();
-    $reservasCount  = $reservations->count();
-    $firmados       = $reservations->filter(fn($r) => $r->documents->where('status', 'signed')->isNotEmpty() || $r->documents->where('status', 'approved')->isNotEmpty())->count();
-    $pagoVencido    = \App\Models\Payment::where('status', 'overdue')->count();
+    $currentTab = $tab ?? request('tab', 'todos');
+    $hasFilters = filled($search ?? null) || filled($unitId ?? null) || filled($dateFrom ?? null) || filled($dateTo ?? null);
 @endphp
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
@@ -45,18 +40,30 @@
     <div class="crm-card">
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-                @foreach (['Todos','Reservas','Contratos','Por firmar','Pago vencido'] as $i => $tab)
-                    <button class="crm-tab {{ $i === 0 ? 'active' : '' }}">{{ $tab }}</button>
+                @foreach (['todos' => 'Todos','reservas' => 'Reservas','contratos' => 'Contratos','por-firmar' => 'Por firmar','pago-vencido' => 'Pago vencido'] as $slug => $label)
+                    <a href="{{ route('admin.crm.contratos', array_merge(request()->except(['page', 'tab']), ['tab' => $slug])) }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+            <form method="GET" action="{{ route('admin.crm.contratos') }}" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto m-0">
+                <input type="hidden" name="tab" value="{{ $currentTab }}">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="Buscar documento…" class="crm-input pr-3">
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Buscar documento…" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
-                <button class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
-            </div>
+                <select name="unit_id" class="crm-input pl-3 w-full sm:w-44">
+                    <option value="">Todas las unidades</option>
+                    @foreach($units as $u)
+                        <option value="{{ $u->id }}" @selected((string)($unitId ?? '') === (string)$u->id)>{{ $u->custom_id ?? $u->name }} {{ $u->name && $u->custom_id ? '· '.$u->name : '' }}</option>
+                    @endforeach
+                </select>
+                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Desde">
+                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                @if($hasFilters)
+                    <a href="{{ route('admin.crm.contratos', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> Limpiar</a>
+                @endif
+                <button type="button" class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
+            </form>
         </div>
 
         <div class="overflow-x-auto">
@@ -77,18 +84,21 @@
                 <tbody>
                     @forelse($reservations as $r)
                         @php
-                            $hasContract = $r->documents->whereIn('document_type', ['contract','promise'])->isNotEmpty();
-                            $signed      = $r->documents->whereIn('status', ['signed','approved'])->count() > 0;
+                            $contractDocs = $r->documents->whereIn('document_type', ['contract','promise','purchase_promise']);
+                            $hasContract = $contractDocs->isNotEmpty();
+                            $hasOverdue = $r->payments->where('status', 'overdue')->count() > 0;
+                            $signed = in_array($r->status, ['contract_signed', 'signed'])
+                                || $contractDocs->whereIn('status', ['signed','approved'])->count() > 0;
                             $tipo        = $hasContract ? 'CONTRATO' : 'RESERVA';
-                            if ($signed)              { $estado = ['Firmado','ok']; }
+                            if ($hasOverdue)          { $estado = ['Pago vencido','err']; }
+                            elseif ($signed)          { $estado = ['Firmado','ok']; }
                             elseif ($hasContract)     { $estado = ['Por firmar','warn']; }
-                            elseif ($r->payments->where('status', 'overdue')->count() > 0) { $estado = ['Pago vencido','err']; }
-                            else                      { $estado = ['Firmado','ok']; }
+                            else                      { $estado = ['Reserva','info']; }
                             $tipoColor = ['RESERVA' => 'bg-info-soft text-info', 'CONTRATO' => 'bg-warn-soft text-warn-dark'];
                             $total = (float)($r->unit?->price ?? 0);
                             $paid  = $r->payments->where('status', 'paid')->sum('amount');
-                            $firmaDoc = $r->documents->whereIn('status', ['signed','approved'])->sortByDesc('signed_at')->first();
-                            $fechaFirma = optional($firmaDoc?->signed_at ?? $r->created_at)->format('Y-m-d');
+                            $firmaDoc = $contractDocs->whereIn('status', ['signed','approved'])->sortByDesc('signed_at')->first();
+                            $fechaFirma = $firmaDoc ? optional($firmaDoc->signed_at ?? $firmaDoc->approved_at)->format('Y-m-d') : '—';
                         @endphp
                         <tr>
                             <td><input type="checkbox" class="w-4 h-4 accent-brand"></td>
@@ -115,6 +125,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="px-4 py-3 border-t border-ink-100">{{ $reservations->withQueryString()->links() }}</div>
     </div>
 </div>
 

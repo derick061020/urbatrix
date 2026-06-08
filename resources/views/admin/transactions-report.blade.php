@@ -6,25 +6,8 @@
 
 @section('content')
 @php
-    $brokerUnitIds = auth()->user()->role === 'broker'
-        ? auth()->user()->assignedUnits()->pluck('units.id')->all()
-        : null;
-
-    $scopeBroker = function ($query) use ($brokerUnitIds) {
-        if ($brokerUnitIds !== null) {
-            $query->whereHas('reservation', fn ($q) => $q->whereIn('unit_id', $brokerUnitIds));
-        }
-        return $query;
-    };
-
-    $payments = $scopeBroker(\App\Models\Payment::with('reservation.unit'))
-        ->orderBy('paid_at', 'desc')->orderBy('created_at', 'desc')->paginate(40);
-    $totalCobrado    = $scopeBroker(\App\Models\Payment::where('status', 'paid'))->sum('amount');
-    $pendienteCobro  = $scopeBroker(\App\Models\Payment::where('status', 'pending'))->sum('amount');
-    $pagosVencidos   = $scopeBroker(\App\Models\Payment::where('status', 'overdue'))->sum('amount');
-    $countPaid       = $scopeBroker(\App\Models\Payment::where('status', 'paid'))->count();
-    $countPending    = $scopeBroker(\App\Models\Payment::where('status', 'pending'))->count();
-    $countOverdue    = $scopeBroker(\App\Models\Payment::where('status', 'overdue'))->count();
+    $currentTab = $tab ?? request('tab', 'todos');
+    $hasFilters = filled($search ?? null) || filled($unitId ?? null) || filled($method ?? null) || filled($dateFrom ?? null) || filled($dateTo ?? null);
 @endphp
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
@@ -59,17 +42,35 @@
     <div class="crm-card">
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-                @foreach (['Todos','Confirmados','Pendientes','Vencidos'] as $i => $tab)
-                    <button class="crm-tab {{ $i === 0 ? 'active' : '' }}">{{ $tab }}</button>
+                @foreach (['todos' => 'Todos','confirmados' => 'Confirmados','pendientes' => 'Pendientes','vencidos' => 'Vencidos'] as $slug => $label)
+                    <a href="{{ route('admin.transactions-report', array_merge(request()->except(['page', 'tab']), ['tab' => $slug])) }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+            <form method="GET" action="{{ route('admin.transactions-report') }}" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto m-0">
+                <input type="hidden" name="tab" value="{{ $currentTab }}">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="Buscar pago…" class="crm-input pr-3">
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Buscar pago…" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
-            </div>
+                <select name="unit_id" class="crm-input pl-3 w-full sm:w-44">
+                    <option value="">Todas las unidades</option>
+                    @foreach($units as $u)
+                        <option value="{{ $u->id }}" @selected((string)($unitId ?? '') === (string)$u->id)>{{ $u->custom_id ?? $u->name }} {{ $u->name && $u->custom_id ? '· '.$u->name : '' }}</option>
+                    @endforeach
+                </select>
+                <select name="method" class="crm-input pl-3 w-full sm:w-40">
+                    <option value="">Todos los métodos</option>
+                    @foreach($methods as $paymentMethod)
+                        <option value="{{ $paymentMethod }}" @selected(($method ?? '') === $paymentMethod)>{{ strtoupper($paymentMethod) }}</option>
+                    @endforeach
+                </select>
+                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Desde">
+                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                @if($hasFilters)
+                    <a href="{{ route('admin.transactions-report', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> Limpiar</a>
+                @endif
+            </form>
         </div>
 
         <div class="overflow-x-auto">
@@ -106,7 +107,17 @@
                             <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                             <td class="text-[12px] text-ink-700">{{ optional($p->paid_at ?? $p->due_date)->format('Y-m-d') }}</td>
                             <td class="text-[12px] text-ink-500"><i class="pi pi-credit-card text-[10px]"></i> {{ $p->payment_method }}</td>
-                            <td class="text-right">
+                            <td class="text-right whitespace-nowrap">
+                                @if($p->receipt_path)
+                                    @php
+                                        $receiptPreviewPayload = [
+                                            'url' => asset('storage/'.$p->receipt_path),
+                                            'title' => 'Comprobante de pago',
+                                            'filename' => basename((string) $p->receipt_path),
+                                        ];
+                                    @endphp
+                                    <button type="button" onclick="openDocumentPreview(@js($receiptPreviewPayload))" class="text-[12px] text-brand font-semibold hover:underline mr-3" title="Ver comprobante"><i class="pi pi-eye text-[10px]"></i> Comprobante</button>
+                                @endif
                                 <a href="{{ route('admin.crm.expediente.detalle', $r?->id) }}?tab=pagos" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
                             </td>
                         </tr>
@@ -116,10 +127,11 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-4 py-3 border-t border-ink-100">{{ $payments->withQueryString()->links() }}</div>
+        <div class="px-4 py-3 border-t border-ink-100">{{ $payments->withQueryString()->links('admin.crm._partials.pagination') }}</div>
     </div>
 </div>
 
 @include('admin.crm._partials.modal_registrar_pago')
 @include('admin.crm._partials.modal_exportar', ['name' => 'Transacciones', 'id' => 'modal-exportar-transacciones'])
+@include('admin.crm._partials.document_preview_modal')
 @endsection

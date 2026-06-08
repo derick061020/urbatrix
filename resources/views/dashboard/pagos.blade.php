@@ -210,7 +210,7 @@
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
-                            <button type="button" onclick="openReceiptModal('{{ route('payments.receipt', $p) }}')" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</button>
+                            <button type="button" onclick="openReceiptModal('{{ route('payments.receipt', $p) }}', '{{ route('payments.receipt.sign', $p) }}', {{ $p->receipt_signed_at ? 'true' : 'false' }})" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</button>
                             @if($p->receipt_path)
                                 <span class="text-ink-300 mx-1">·</span>
                                 <a href="{{ asset('storage/'.$p->receipt_path) }}" target="_blank" class="text-ink-600 hover:underline">{{ __('Adjunto') }}</a>
@@ -288,6 +288,23 @@
     </form>
 </dialog>
 
+{{-- Estilos del lienzo de firma del comprobante (mismo look que "Acuerdos") --}}
+<style>
+    #receipt-sig-canvas {
+        width: 100%; height: 110px;
+        background:#fff; border:1px dashed #cacfd8; border-radius:10px;
+        cursor: crosshair; touch-action: none;
+        display:block;
+    }
+    .rcs-canvas-wrap { position:relative; }
+    .rcs-canvas-wrap.has-stroke .rcs-empty-canvas { display:none; }
+    .rcs-canvas-wrap.has-stroke #receipt-sig-canvas { border-style:solid; border-color:#5c7c68; }
+    .rcs-empty-canvas {
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        color:#a3a3a3; font-size:11px; pointer-events:none; font-style:italic;
+    }
+</style>
+
 {{-- Receipt Modal --}}
 <dialog id="modal-receipt" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <div class="bg-white rounded-2xl overflow-hidden">
@@ -303,27 +320,35 @@
             </div>
         </div>
 
-        {{-- Firma obligatoria: el cliente debe firmar antes de poder descargar el comprobante --}}
+        {{-- Firma obligatoria: el cliente debe firmar antes de poder descargar el comprobante.
+             Mismo diseño que el panel de firma de "Acuerdos". --}}
         <div id="receipt-sign-panel" class="px-6 py-4 border-t border-ink-100 bg-white" style="width:794px;max-width:90vw">
             <div class="flex items-center gap-2 text-[13px] font-bold text-ink-900"><i class="pi pi-pencil text-brand"></i> {{ __('Firma el comprobante para descargarlo') }}</div>
-            <div class="text-[11px] text-ink-500 mt-1 mb-3">{{ __('Tu firma se incorpora al comprobante como constancia de recepción.') }}</div>
-            <div class="grid sm:grid-cols-2 gap-4 items-start">
-                <div>
-                    <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Nombre completo') }}</label>
-                    <input type="text" id="receipt-sig-name" class="cli-input pl-3 mt-1" placeholder="{{ __('Tal como aparece en tu documento') }}">
-                </div>
-                <div>
-                    <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Firma') }}</label>
-                    <div class="relative mt-1">
-                        <canvas id="receipt-sig-canvas" class="w-full bg-white border border-dashed border-ink-300 rounded-lg" style="height:96px;display:block;touch-action:none;cursor:crosshair"></canvas>
-                        <div id="receipt-sig-empty" class="absolute inset-0 flex items-center justify-center text-[11px] text-ink-400 italic pointer-events-none">{{ __('Firma aquí con el mouse o el dedo') }}</div>
-                    </div>
-                </div>
+            <div class="text-[12px] text-ink-700 mt-2 mb-3">
+                {{ __('Tu firma equivale a una firma manuscrita y se incorpora al comprobante como constancia de recepción.') }}
             </div>
-            <div class="flex items-center justify-between mt-2">
+
+            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500">{{ __('Nombre completo') }}</label>
+            <input type="text" id="receipt-sig-name" class="w-full mt-1 rounded-xl border border-ink-200 px-3 py-2 text-[13px] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="{{ __('Tal como aparece en tu documento') }}">
+
+            <label class="text-[11px] uppercase font-bold tracking-wider text-ink-500 mt-3 block">{{ __('Firma') }}</label>
+            <div class="rcs-canvas-wrap mt-1" id="receipt-canvas-wrap">
+                <canvas id="receipt-sig-canvas"></canvas>
+                <div class="rcs-empty-canvas" id="receipt-sig-empty">{{ __('Firma aquí con el mouse o el dedo') }}</div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5">
                 <button type="button" onclick="receiptClearSig()" class="text-[11px] text-ink-500 hover:text-ink-900 font-semibold inline-flex items-center gap-1"><i class="pi pi-refresh text-[10px]"></i> {{ __('Limpiar') }}</button>
-                <button type="button" onclick="receiptSign()" class="cli-btn cli-btn-primary text-[12px] py-1.5 px-4"><i class="pi pi-check text-[10px]"></i> {{ __('Firmar comprobante') }}</button>
+                <span class="text-[10px] text-ink-400">{{ __('Trazo manuscrito · obligatorio') }}</span>
             </div>
+
+            <label class="mt-4 flex items-start gap-2 text-[12px] text-ink-700 cursor-pointer">
+                <input type="checkbox" id="receipt-sig-accept" class="mt-0.5 accent-brand">
+                <span>{{ __('Confirmo la recepción de este comprobante. Entiendo que esta firma electrónica es legalmente vinculante.') }}</span>
+            </label>
+
+            <button type="button" id="receipt-sig-confirm" onclick="receiptSign()" class="cli-btn cli-btn-primary w-full mt-4 inline-flex items-center justify-center gap-2 py-2.5">
+                <i class="pi pi-check text-[11px]"></i> {{ __('Firmar comprobante') }}
+            </button>
         </div>
 
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
@@ -388,27 +413,47 @@ function togglePayAll(btn) {
 
 // ---- Comprobante: firma obligatoria antes de descargar ----
 let receiptSigCtx = null, receiptSigDrawing = false, receiptSigHasStroke = false, receiptSigned = false;
+let receiptSignUrl = null;
+
+function getCsrfToken() { return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'; }
 
 // Open receipt modal — render the payment receipt inside an iframe so its own
 // styles are preserved. The download stays locked until the client signs.
-function openReceiptModal(url) {
+// `alreadySigned` viene del backend: si el pago ya tiene firma persistida, el
+// comprobante ya la muestra dentro del iframe y sólo habilitamos la descarga.
+function openReceiptModal(url, signUrl, alreadySigned) {
     const modal = document.getElementById('modal-receipt');
     const content = document.getElementById('receipt-content');
 
     // Reset firma state on each open
-    receiptSigned = false;
+    receiptSignUrl = signUrl || null;
+    receiptSigned = !!alreadySigned;
     receiptSigHasStroke = false;
     const dlBtn = document.getElementById('receipt-download-btn');
-    dlBtn.disabled = true;
-    dlBtn.classList.add('opacity-50', 'cursor-not-allowed');
     const panel = document.getElementById('receipt-sign-panel');
-    panel.classList.remove('opacity-50', 'pointer-events-none');
     document.getElementById('receipt-sig-name').value = '';
-    document.getElementById('receipt-sign-hint').style.display = '';
+    const accept = document.getElementById('receipt-sig-accept');
+    if (accept) accept.checked = false;
+    document.getElementById('receipt-canvas-wrap')?.classList.remove('has-stroke');
+
+    if (receiptSigned) {
+        // Ya firmado: ocultar el panel y habilitar la descarga directa.
+        panel.style.display = 'none';
+        dlBtn.disabled = false;
+        dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        const hint = document.getElementById('receipt-sign-hint');
+        hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+    } else {
+        panel.style.display = '';
+        panel.classList.remove('opacity-50', 'pointer-events-none');
+        dlBtn.disabled = true;
+        dlBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('receipt-sign-hint').style.display = '';
+    }
 
     modal.showModal();
     content.innerHTML = `<iframe id="receipt-iframe" src="${url}" title="{{ __('Comprobante de pago') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
-    setTimeout(() => { receiptInitCanvas(); receiptClearSig(); }, 60);
+    if (!receiptSigned) setTimeout(() => { receiptInitCanvas(); receiptClearSig(); }, 60);
 }
 
 function receiptInitCanvas() {
@@ -435,7 +480,7 @@ function receiptInitCanvas() {
         const p = pos(e);
         receiptSigCtx.lineTo(p.x, p.y);
         receiptSigCtx.stroke();
-        if (!receiptSigHasStroke) { receiptSigHasStroke = true; document.getElementById('receipt-sig-empty').style.display = 'none'; }
+        if (!receiptSigHasStroke) { receiptSigHasStroke = true; document.getElementById('receipt-canvas-wrap')?.classList.add('has-stroke'); }
     };
     const end = () => { receiptSigDrawing = false; };
     canvas.onmousedown = start;
@@ -450,43 +495,72 @@ function receiptClearSig() {
     const canvas = document.getElementById('receipt-sig-canvas');
     if (receiptSigCtx && canvas) receiptSigCtx.clearRect(0, 0, canvas.width, canvas.height);
     receiptSigHasStroke = false;
-    const empty = document.getElementById('receipt-sig-empty');
-    if (empty) empty.style.display = '';
+    document.getElementById('receipt-canvas-wrap')?.classList.remove('has-stroke');
+}
+
+// Incrusta la firma en el recuadro "Recibido por" del comprobante dentro del iframe.
+function receiptEmbedSignature(sigData) {
+    try {
+        const frame = document.getElementById('receipt-iframe');
+        const doc = frame && frame.contentDocument;
+        if (!doc) return;
+        const boxes = doc.querySelectorAll('.sig-box');
+        const box = boxes[boxes.length - 1]; // último = cliente
+        if (!box) return;
+        box.style.position = 'relative';
+        const img = doc.createElement('img');
+        img.src = sigData;
+        img.style.cssText = 'max-height:44px;max-width:200px;object-fit:contain;position:absolute;left:0;bottom:2px';
+        box.innerHTML = '';
+        box.appendChild(img);
+    } catch (e) { /* same-origin esperado; si falla, igual habilitamos la descarga */ }
 }
 
 function receiptSign() {
     const name = document.getElementById('receipt-sig-name').value.trim();
+    const accept = document.getElementById('receipt-sig-accept');
     if (name.length < 3) { alert("{{ __('Escribí tu nombre completo.') }}"); return; }
     if (!receiptSigHasStroke) { alert("{{ __('Falta tu firma manuscrita.') }}"); return; }
+    if (accept && !accept.checked) { alert("{{ __('Confirmá la recepción para continuar.') }}"); return; }
+    if (!receiptSignUrl) { alert("{{ __('No se pudo registrar la firma.') }}"); return; }
 
     const canvas = document.getElementById('receipt-sig-canvas');
     const sigData = canvas.toDataURL('image/png');
 
-    // Incrustar la firma en el recuadro del cliente ("Recibido por") del comprobante
-    try {
-        const frame = document.getElementById('receipt-iframe');
-        const doc = frame && frame.contentDocument;
-        if (doc) {
-            const boxes = doc.querySelectorAll('.sig-box');
-            const box = boxes[boxes.length - 1]; // último = cliente
-            if (box) {
-                box.style.position = 'relative';
-                const img = doc.createElement('img');
-                img.src = sigData;
-                img.style.cssText = 'max-height:44px;max-width:200px;object-fit:contain;position:absolute;left:0;bottom:2px';
-                box.innerHTML = '';
-                box.appendChild(img);
-            }
-        }
-    } catch (e) { /* same-origin esperado; si falla, igual habilitamos la descarga */ }
+    const btn = document.getElementById('receipt-sig-confirm');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="pi pi-spin pi-spinner text-[11px]"></i> {{ __('Firmando…') }}';
 
-    receiptSigned = true;
-    const dlBtn = document.getElementById('receipt-download-btn');
-    dlBtn.disabled = false;
-    dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-    document.getElementById('receipt-sign-panel').classList.add('opacity-50', 'pointer-events-none');
-    const hint = document.getElementById('receipt-sign-hint');
-    hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+    const fd = new FormData();
+    fd.append('signer_name', name);
+    fd.append('signature_image', sigData);
+    fd.append('_token', getCsrfToken());
+
+    fetch(receiptSignUrl, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: fd,
+        credentials: 'same-origin',
+    })
+    .then(r => r.json().catch(() => ({})))
+    .then(d => {
+        if (d.success !== false) {
+            // Firma persistida en el servidor: la incrustamos también en el iframe actual.
+            receiptEmbedSignature(sigData);
+            receiptSigned = true;
+            const dlBtn = document.getElementById('receipt-download-btn');
+            dlBtn.disabled = false;
+            dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('receipt-sign-panel').style.display = 'none';
+            const hint = document.getElementById('receipt-sign-hint');
+            hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+        } else {
+            alert(d.message || "{{ __('No se pudo registrar la firma.') }}");
+            btn.disabled = false; btn.innerHTML = original;
+        }
+    })
+    .catch(() => { alert("{{ __('Error de red al intentar firmar.') }}"); btn.disabled = false; btn.innerHTML = original; });
 }
 
 // Download/print the receipt — only after signing.

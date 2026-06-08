@@ -241,12 +241,24 @@
                 
                 $totalDocs = $signedDocs + $kycDocs;
                 
-                // Acuerdos: cuenta documentos pendientes del controlador (igual que el controlador)
+                // Acuerdos: cuenta solo los documentos que realmente se muestran como pendientes
+                // en la vista de Acuerdos.
                 $pendingAgreements = 0;
                 if ($reservation) {
-                    $docs = $reservation->documents;
-                    $docs = $docs->filter(fn($d) => $d->status !== 'signed');
-                    $pendingAgreements = $docs->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']))->count();
+                    $acuerdoTypes = ['budget', 'payment_plan', 'purchase_promise', 'contract'];
+                    $budgetSent = $reservation->isBudgetSent()
+                        || $reservation->budget_status === 'approved'
+                        || ! empty($reservation->budget_observations);
+                    $paymentPlanSigned = $reservation->documents
+                        ->firstWhere('document_type', 'payment_plan')?->status === 'signed';
+
+                    $pendingAgreements = $reservation->documents
+                        ->filter(fn($d) => in_array($d->document_type, $acuerdoTypes))
+                        ->reject(fn($d) => $d->status === 'signed')
+                        ->reject(fn($d) => $d->document_type === 'payment_plan' && ! $budgetSent)
+                        ->reject(fn($d) => $d->document_type === 'purchase_promise' && ! $paymentPlanSigned)
+                        ->filter(fn($d) => in_array($d->status, ['pending', 'generated', 'awaiting_signature', 'in_review']))
+                        ->count();
                 }
                 
                 $pendingPays = \App\Models\Payment::whereHas('reservation', fn($q) => $q->where('user_id', $uid))->where('status', 'pending')->count();

@@ -26,12 +26,16 @@ class Payment extends Model
         'approved_by',
         'approved_at',
         'rejection_reason',
+        'receipt_signature',
+        'receipt_signer_name',
+        'receipt_signed_at',
     ];
 
     protected $casts = [
         'due_date' => 'date',
         'paid_at' => 'datetime',
         'overdue_notified_at' => 'datetime',
+        'receipt_signed_at' => 'datetime',
         'amount' => 'decimal:2',
     ];
 

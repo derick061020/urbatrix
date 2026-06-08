@@ -162,17 +162,21 @@ class NotificationController extends Controller
             ]);
         }
 
-        // Pagos pendientes
-        $pendingPays = Payment::whereHas('reservation', fn ($q) => $q->where('user_id', $userId))
-            ->where('status', 'pending')->latest()->limit(8)->get();
-        foreach ($pendingPays as $p) {
+        // Próximo pago pendiente: solo el siguiente que le falta por pagar
+        // (el de fecha de vencimiento más cercana), no todo el plan de pagos.
+        $nextPay = Payment::whereHas('reservation', fn ($q) => $q->where('user_id', $userId))
+            ->where('status', 'pending')
+            ->orderByRaw('due_date IS NULL') // pagos con fecha primero
+            ->orderBy('due_date')
+            ->first();
+        if ($nextPay) {
             $items->push([
-                'id'         => 'pay-'.$p->id,
+                'id'         => 'pay-'.$nextPay->id,
                 'icon'       => 'pi-credit-card',
                 'color'      => 'amber',
-                'title'      => 'Pago pendiente',
-                'body'       => 'RD$ '.number_format((float) $p->amount, 2).' · '.($p->label ?: $p->payment_type),
-                'created_at' => $p->updated_at ?: $p->created_at,
+                'title'      => 'Próximo pago pendiente',
+                'body'       => 'RD$ '.number_format((float) $nextPay->amount, 2).' · '.($nextPay->label ?: $nextPay->payment_type),
+                'created_at' => $nextPay->updated_at ?: $nextPay->created_at,
                 'url'        => route('dashboard.payments'),
             ]);
         }

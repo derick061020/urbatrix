@@ -170,9 +170,16 @@ class CrmTemplateRenderer
     private static function fromReport(ConstructionReport $rep): array
     {
         $rep->loadMissing('project');
-        $delivery = $rep->estimated_delivery
-            ? Carbon::parse($rep->estimated_delivery)->locale('es')->isoFormat('MMMM YYYY')
-            : '—';
+        // estimated_delivery puede ser texto libre ("Q4 2026"), no necesariamente
+        // una fecha parseable: si Carbon no puede interpretarlo, usamos el valor tal cual.
+        $delivery = '—';
+        if ($rep->estimated_delivery) {
+            try {
+                $delivery = Carbon::parse($rep->estimated_delivery)->locale('es')->isoFormat('MMMM YYYY');
+            } catch (\Exception $e) {
+                $delivery = $rep->estimated_delivery;
+            }
+        }
 
         return [
             'proyecto'           => $rep->project->name ?? config('company.project'),

@@ -69,6 +69,11 @@ class PaymentReceiptData
 
             'link_comprobante'   => route('payments.receipt', $payment),
             'link_portal'        => route('dashboard.payments'),
+
+            // Firma manuscrita del comprador (constancia de recepción), si ya firmó.
+            'firma_cliente'      => $payment->receipt_signature,
+            'firma_cliente_nombre' => $payment->receipt_signer_name,
+            'firma_cliente_fecha'  => $payment->receipt_signed_at?->format('d/m/Y H:i'),
         ];
     }
 }
