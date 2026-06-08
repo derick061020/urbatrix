@@ -30,28 +30,28 @@
   <!-- MORE INFO MODAL — Figma 220:20041 (modal-tipologia) -->
   <div id="moreInfoModal" class="mt-overlay" style="display:none;">
     <div class="mt-backdrop" onclick="closeMoreInfo()"></div>
-    <div class="mt-shell" role="dialog" aria-modal="true" aria-label="Unit details">
+    <div class="mt-shell" role="dialog" aria-modal="true" aria-label="{{ __('Unit details') }}">
 
       <!-- HEADER -->
       <div class="mt-header">
         <div class="mt-header-left">
           <img src="/images/makai-logo.png" alt="Makai" class="mt-header-logo">
           <span class="mt-header-dot"></span>
-          <span class="mt-header-unit">Unit <span id="modalUnitNum">A-101</span></span>
+          <span class="mt-header-unit">{{ __('Unit') }} <span id="modalUnitNum">A-101</span></span>
           <span id="modalStatusBadge" class="mt-badge-available">
-            <span class="dot"></span><span id="modalStatusText">AVAILABLE</span>
+            <span class="dot"></span><span id="modalStatusText">{{ __('AVAILABLE') }}</span>
           </span>
         </div>
         <div class="mt-header-right">
           <div class="mt-pill mt-pill-soft">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>Last inquiry <b>2 hours ago</b> · Shortlisted by <b>7 others</b></span>
+            <span>{{ __('Last inquiry') }} <b>2 {{ __('hours ago') }}</b> · {{ __('Shortlisted by') }} <b>7 {{ __('others') }}</b></span>
           </div>
           <div class="mt-pill mt-pill-wa">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg>
-            <span>Contact Broker on WhatsApp</span>
+            <span>{{ __('Contact Broker on WhatsApp') }}</span>
           </div>
-          <button class="mt-close" onclick="closeMoreInfo()" aria-label="Close">
+          <button class="mt-close" onclick="closeMoreInfo()" aria-label="{{ __('Cerrar') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
@@ -63,13 +63,13 @@
         <aside class="mt-left">
           <div class="mt-peopleview">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
-            <span><b id="modalShortlistedCount">0</b> people shortlisted this unit</span>
+            <span><b id="modalShortlistedCount">0</b> {{ __('people shortlisted this unit') }}</span>
           </div>
 
           <div class="mt-left-inner">
 
             <!-- Discount chip -->
-            <span class="mt-discount-chip">Unlock $20,000 Discount</span>
+            <span class="mt-discount-chip">{{ __('Unlock :amount Discount', ['amount' => '$20,000']) }}</span>
 
             <!-- Price block -->
             <div class="mt-price-block">
@@ -87,13 +87,13 @@
                 <span class="sep"></span>
                 <span class="success">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z" transform="rotate(180 12 12)"/></svg>
-                  12% below Cap Cana avg.
+                  {{ __('12% below Cap Cana avg.') }}
                 </span>
               </div>
               <div class="mt-price-meta">
-                <span class="warning">Reserve from $5,000</span>
+                <span class="warning">{{ __('Reserve from $5,000') }}</span>
                 <span class="sep"></span>
-                <span class="muted">100% refundable</span>
+                <span class="muted">{{ __('100% refundable') }}</span>
               </div>
             </div>
 
@@ -105,33 +105,33 @@
               <div class="mt-stats-row">
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatBed">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg></div>
-                  <div class="label">BED</div>
+                  <div class="label">{{ __('BED') }}</div>
                 </div>
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatBath">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4a2 2 0 0 1 4 0"/><path d="M2 11h20"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><line x1="6" y1="22" x2="6" y2="20"/><line x1="18" y1="22" x2="18" y2="20"/></svg></div>
-                  <div class="label">BATH</div>
+                  <div class="label">{{ __('BATH') }}</div>
                 </div>
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatPark">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14"/><path d="M5 17V9l1.5-4h11L19 9v8"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
-                  <div class="label">PARK</div>
+                  <div class="label">{{ __('PARK') }}</div>
                 </div>
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatPool">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
-                  <div class="label">POOL</div>
+                  <div class="label">{{ __('POOL') }}</div>
                 </div>
               </div>
               <div class="mt-stats-row">
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatInt">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="2 2"/></svg></div>
-                  <div class="label">INT M²</div>
+                  <div class="label">{{ __('INT M²') }}</div>
                 </div>
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatExt">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 3 3 8 3"/><polyline points="16 3 21 3 21 8"/><polyline points="21 16 21 21 16 21"/><polyline points="8 21 3 21 3 16"/></svg></div>
-                  <div class="label">TERRACE M²</div>
+                  <div class="label">{{ __('TERRACE M²') }}</div>
                 </div>
                 <div class="mt-stat-box">
                   <div class="value"><span id="modalStatTotal">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg></div>
-                  <div class="label">TOTAL M²</div>
+                  <div class="label">{{ __('TOTAL M²') }}</div>
                 </div>
               </div>
             </div>
@@ -140,36 +140,36 @@
 
             <!-- For Investment / For Living toggle -->
             <div class="mt-buyer-toggle" role="tablist">
-              <button type="button" class="active" data-buyer="investment">For Investment</button>
-              <button type="button" data-buyer="living">For Living</button>
+              <button type="button" class="active" data-buyer="investment">{{ __('For Investment') }}</button>
+              <button type="button" data-buyer="living">{{ __('For Living') }}</button>
             </div>
 
             <!-- Financial table (For Investment) — pulled from DB; rows hidden when data is missing -->
             <div class="mt-fin-table mt-investment-only" id="mtFinTable">
               <div class="row">
                 <div class="cell" id="modalRowLevies" style="display:none;">
-                  <span class="k">HOA Levies</span>
-                  <span class="v"><b id="modalLevies">—</b><i>/mo</i></span>
+                  <span class="k">{{ __('HOA Levies') }}</span>
+                  <span class="v"><b id="modalLevies">—</b><i>{{ __('/mo') }}</i></span>
                 </div>
                 <div class="cell" id="modalRowRental" style="display:none;">
-                  <span class="k">Est. Rental Income</span>
-                  <span class="v success"><b id="modalRental">—</b><i>/mo</i></span>
+                  <span class="k">{{ __('Est. Rental Income') }}</span>
+                  <span class="v success"><b id="modalRental">—</b><i>{{ __('/mo') }}</i></span>
                 </div>
               </div>
               <div class="row">
                 <div class="cell" id="modalRowFees" style="display:none;">
-                  <span class="k">Monthly Fees</span>
-                  <span class="v"><b id="modalFees">—</b><i>/mo</i></span>
+                  <span class="k">{{ __('Monthly Fees') }}</span>
+                  <span class="v"><b id="modalFees">—</b><i>{{ __('/mo') }}</i></span>
                 </div>
                 <div class="cell" id="modalRowRates" style="display:none;">
-                  <span class="k">Rates</span>
-                  <span class="v"><b id="modalRates">—</b><i>/mo</i></span>
+                  <span class="k">{{ __('Rates') }}</span>
+                  <span class="v"><b id="modalRates">—</b><i>{{ __('/mo') }}</i></span>
                 </div>
               </div>
             </div>
 
             <!-- Amenities — For Living -->
-            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;margin-top:10px;">Amenities &amp; Lifestyle</p>
+            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;margin-top:10px;">{{ __('Amenities & Lifestyle') }}</p>
             <div class="mt-living-extras mt-living-only">
               <div class="mt-living-row" id="modalRowAmen" style="display:none;">
                 <span class="txt" id="modalAmenities">—</span>
@@ -182,7 +182,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
               </div>
               <div>
-                <p class="mt-projected-label">PROJECTED VALUE AT DELIVERY</p>
+                <p class="mt-projected-label">{{ __('PROJECTED VALUE AT DELIVERY') }}</p>
                 <div class="mt-projected-row">
                   <span class="now" id="modalProjectedNow">$0 today</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -207,15 +207,15 @@
             <div class="mt-divider"></div>
 
             <!-- Floor plan downloads -->
-            <p class="mt-section-label">Floor Plan Downloads</p>
+            <p class="mt-section-label">{{ __('Floor Plan Downloads') }}</p>
             <div class="mt-fancy-row">
               <button type="button" class="mt-fancy-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                With Measurements
+                {{ __('With Measurements') }}
               </button>
               <button type="button" class="mt-fancy-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Without Measurements
+                {{ __('Without Measurements') }}
               </button>
             </div>
 
@@ -228,11 +228,11 @@
                 </div>
                 <div>
                   <div class="mt-advisor-name">Carlos Méndez</div>
-                  <div class="mt-advisor-status">Available right now</div>
+                  <div class="mt-advisor-status">{{ __('Available right now') }}</div>
                 </div>
               </div>
               <button type="button" class="mt-advisor-chat">
-                Chat
+                {{ __('Chat') }}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
             </div>
@@ -240,10 +240,10 @@
 
           <!-- Sticky bottom -->
           <div class="mt-cta-row">
-            <button id="modalReserveBtn" type="button" class="mt-btn-secondary" onclick="openReservePage(currentOpenUnit)">Reserve Online</button>
+            <button id="modalReserveBtn" type="button" class="mt-btn-secondary" onclick="openReservePage(currentOpenUnit)">{{ __('Reserve Online') }}</button>
             <button type="button" class="mt-btn-primary" onclick="openAdvisorVideoCall(currentOpenUnit)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-              Book Video Call
+              {{ __('Book Video Call') }}
             </button>
           </div>
         </aside>
@@ -255,19 +255,19 @@
           <div class="mt-tabs">
             <button type="button" class="mt-tab" id="modalAddToListBtn" onclick="toggleModalWishlist()">
               <svg id="modalAddToListIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span id="modalAddToListLabel">ADD TO LIST</span>
+              <span id="modalAddToListLabel">{{ __('ADD TO LIST') }}</span>
             </button>
             <button type="button" class="mt-tab mt-tab-middle" onclick="openDisclaimer()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              DISCLAIMER
+              {{ __('DISCLAIMER') }}
             </button>
             <button type="button" class="mt-tab" onclick="openShareModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              SHARE
+              {{ __('SHARE') }}
             </button>
-            <button type="button" class="mt-tab mt-tab-download" onclick="downloadUnitSheet()" title="Descargar ficha PDF">
+            <button type="button" class="mt-tab mt-tab-download" onclick="downloadUnitSheet()" title="{{ __('Descargar ficha PDF') }}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              DOWNLOAD
+              {{ __('DOWNLOAD') }}
             </button>
           </div>
 
@@ -277,15 +277,15 @@
 
             <!-- Dimensions toggle -->
             <div class="mt-dim-toggle">
-              <button type="button" class="active">NO DIMENSIONS</button>
-              <button type="button">WITH DIMENSIONS</button>
+              <button type="button" class="active">{{ __('NO DIMENSIONS') }}</button>
+              <button type="button">{{ __('WITH DIMENSIONS') }}</button>
             </div>
 
             <!-- Arrows -->
-            <button class="mt-arrow mt-arrow-left" type="button" onclick="prevModalImg()" aria-label="Previous">
+            <button class="mt-arrow mt-arrow-left" type="button" onclick="prevModalImg()" aria-label="{{ __('Previous') }}">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <button class="mt-arrow mt-arrow-right" type="button" onclick="nextModalImg()" aria-label="Next">
+            <button class="mt-arrow mt-arrow-right" type="button" onclick="nextModalImg()" aria-label="{{ __('Next') }}">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
 
@@ -1446,9 +1446,9 @@
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
             </svg>
           </div>
-          <h2 class="fg-project-empty-title">Estamos trabajando en ello</h2>
-          <p class="fg-project-empty-text">Las unidades de <span data-empty-project-name>este proyecto</span> aún no están disponibles. Estamos preparando todo para que muy pronto puedas explorarlas aquí.</p>
-          <button type="button" class="fg-project-empty-cta" onclick="toggleProjects()">Ver otros proyectos</button>
+          <h2 class="fg-project-empty-title">{{ __('Estamos trabajando en ello') }}</h2>
+          <p class="fg-project-empty-text">{{ __('Las unidades de') }} <span data-empty-project-name>{{ __('este proyecto') }}</span> {{ __('aún no están disponibles. Estamos preparando todo para que muy pronto puedas explorarlas aquí.') }}</p>
+          <button type="button" class="fg-project-empty-cta" onclick="toggleProjects()">{{ __('Ver otros proyectos') }}</button>
         </div>
       </div>
 
@@ -1465,7 +1465,7 @@
                   <rect x="14" y="14" width="7" height="7"></rect>
                 </svg>
               </div>
-              <span>Grid</span>
+              <span>{{ __('Grid') }}</span>
             </button>
             <button type="button" data-view="list" role="tab" aria-selected="false">
               <div class="fg-icon-list">
@@ -1478,7 +1478,7 @@
                   <line x1="4" y1="18" x2="4" y2="18"></line>
                 </svg>
               </div>
-              <span>List</span>
+              <span>{{ __('List') }}</span>
             </button>
             <div class="fg-toggle-bg-active" aria-hidden="true"></div>
           </div>
@@ -1505,82 +1505,82 @@
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Unit No.">
+            <input type="text" placeholder="{{ __('Unit No.') }}">
           </label>
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('price')">
-              <span id="priceLabel">Price</span>
+              <span id="priceLabel">{{ __('Precio') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="priceDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:170px;padding:12px;">
               <div style="margin-bottom:8px;">
-                <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">Min Price</label>
+                <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">{{__('Min Price')}}</label>
                 <input type="number" id="minPrice" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
               <div style="margin-bottom:8px;">
-                <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">Max Price</label>
+                <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">{{__('Max Price')}}</label>
                 <input type="number" id="maxPrice" placeholder="1000000" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
-              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:var(--brand);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">Apply</button>
+              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:var(--brand);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
             </div>
           </div>
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('floor')">
-              <span id="floorLabel">Floor</span>
+              <span id="floorLabel">Piso</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="floorDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:120px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Ground" onchange="applyFloorFilter()"> Ground</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1st" onchange="applyFloorFilter()"> 1st</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2nd" onchange="applyFloorFilter()"> 2nd</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3rd" onchange="applyFloorFilter()"> 3rd</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="4th" onchange="applyFloorFilter()"> 4th</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyFloorFilter()"> Penthouse</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Ground" onchange="applyFloorFilter()"> {{ __('Ground')}}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1st" onchange="applyFloorFilter()"> {{ __('1st')}}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2nd" onchange="applyFloorFilter()"> {{ __('2nd')}}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3rd" onchange="applyFloorFilter()"> {{ __('3rd')}}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="4th" onchange="applyFloorFilter()"> {{ __('4th')}}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyFloorFilter()"> {{ __('Penthouse')}}</label>
               </div>
             </div>
           </div>
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('type')">
-              <span id="typeLabel">Unit Type</span>
+              <span id="typeLabel">{{ __('Tipo de unidad') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="typeDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:140px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1 Bed" onchange="applyTypeFilter()"> 1 Bed</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2 Bed" onchange="applyTypeFilter()"> 2 Bed</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3 Bed" onchange="applyTypeFilter()"> 3 Bed</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Studio" onchange="applyTypeFilter()"> Studio</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyTypeFilter()"> Penthouse</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="1 Bed" onchange="applyTypeFilter()"> 1 {{ __('Cuarto') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="2 Bed" onchange="applyTypeFilter()"> 2 {{ __('Cuarto') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="3 Bed" onchange="applyTypeFilter()"> 3 {{ __('Cuarto') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Studio" onchange="applyTypeFilter()">{{ __('Estudio') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="Penthouse" onchange="applyTypeFilter()">{{ __('Penthouse') }}</label>
               </div>
             </div>
           </div>
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('direction')">
-              <span id="directionLabel">Direction</span>
+              <span id="directionLabel">{{ __('Direction') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="directionDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:120px;padding:12px;">
               <div style="max-height:220px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="N" onchange="applyDirectionFilter()"> North</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="S" onchange="applyDirectionFilter()"> South</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="E" onchange="applyDirectionFilter()"> East</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="W" onchange="applyDirectionFilter()"> West</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="NE" onchange="applyDirectionFilter()"> NE</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="NW" onchange="applyDirectionFilter()"> NW</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="SE" onchange="applyDirectionFilter()"> SE</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="SW" onchange="applyDirectionFilter()"> SW</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="N" onchange="applyDirectionFilter()"> {{ __('North') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="S" onchange="applyDirectionFilter()"> {{ __('South') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="E" onchange="applyDirectionFilter()"> {{ __('East') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="W" onchange="applyDirectionFilter()"> {{ __('West') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="NE" onchange="applyDirectionFilter()"> {{ __('NE') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="NW" onchange="applyDirectionFilter()"> {{ __('NW') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="SE" onchange="applyDirectionFilter()"> {{ __('SE') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="checkbox" value="SW" onchange="applyDirectionFilter()"> {{ __('SW') }}</label>
               </div>
             </div>
           </div>
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('outlook')">
-              <span id="outlookLabel">Outlook</span>
+              <span id="outlookLabel">{{ __('Outlook') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="outlookDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:140px;padding:12px;">
@@ -1595,7 +1595,7 @@
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('sort')">
-              <span id="sortLabel">Sort</span>
+              <span id="sortLabel">{{ __('Sort') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="sortDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:160px;padding:12px;">
@@ -1624,7 +1624,7 @@
             <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          Mostrando {{ $units->count() }} de {{ $units->count() }} unidades
+          {{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $units->count()]) }}
         </button>
       </div>
       <!-- Cards Grid -->
@@ -1683,7 +1683,7 @@
               @if($unit->images->isNotEmpty())
                 <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" onerror="this.style.display='none'">
               @else
-                <div class="fg-card-img-noimage">No Image Available</div>
+                <div class="fg-card-img-noimage">{{ __('No Image Available') }}</div>
               @endif
 
               <!-- Top row: status badge (left) + ADD TO LIST (right) -->
@@ -1691,22 +1691,22 @@
                 @if($isReserved)
                   <span class="fg-status-badge reserved">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    RESERVED
+                    {{ __('RESERVED') }}
                   </span>
                 @elseif($isPending)
                   <span class="fg-status-badge pending">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    PENDING
+                    {{ __('PENDING') }}
                   </span>
                 @elseif(!$isReserved && !$isSold && $isHighDem)
                   <span class="fg-status-badge high-demand">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
-                    HIGH DEMAND
+                    {{ __('HIGH DEMAND') }}
                   </span>
                 @elseif(!$isReserved && !$isSold && $isSecond)
                   <span class="fg-status-badge second">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    2ND CHANCE
+                    {{ __('2ND CHANCE') }}
                   </span>
                 @else
                   <span></span>
@@ -1715,7 +1715,7 @@
                 @php $isFav = in_array($unit->id, $wishlistIds ?? []); @endphp
                 <button type="button"
                         class="fg-add-to-list {{ $isFav ? 'is-fav' : '' }}"
-                        aria-label="Add to list"
+                        aria-label="{{ __('Add to list') }}"
                         aria-pressed="{{ $isFav ? 'true' : 'false' }}"
                         data-wishlist-toggle data-unit-id="{{ $unit->id }}"
                         title="Shortlisted by {{ $unit->shortlisted_count ?? 0 }} other">
@@ -1725,18 +1725,18 @@
                     </svg>
                   </span>
                   <span class="text">
-                    <span class="label">{{ $isFav ? 'Saved' : 'Add to list' }}</span>
-                    <span class="meta">Shortlisted by <span data-unit-count="{{ $unit->id }}">{{ $unit->shortlisted_count ?? 0 }}</span> other</span>
+                    <span class="label">{{ $isFav ? __('Saved') : __('Add to list') }}</span>
+                    <span class="meta">{{ __('Shortlisted by') }} <span data-unit-count="{{ $unit->id }}">{{ $unit->shortlisted_count ?? 0 }}</span> {{ __('other') }}</span>
                   </span>
                 </button>
               </div>
 
               <!-- Gold "RESERVE FROM $5000" banner -->
-              <div class="fg-reserve-banner">Reserve from $5000</div>
+              <div class="fg-reserve-banner">{{ __('Reserve from $5000') }}</div>
 
               @if($isSold)
                 <!-- SOLD overlay (Figma 125:5048) -->
-                <div class="fg-sold-badge"><span>SOLD</span></div>
+                <div class="fg-sold-badge"><span>{{ __('SOLD') }}</span></div>
               @endif
             </div>
 
@@ -1752,7 +1752,7 @@
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
-                  {{ $unit->floor ? ucfirst($unit->floor) . ' Floor' : 'Ground Floor' }}
+                  {{ $unit->floor ? ucfirst($unit->floor) . ' ' . __('Floor') : __('Ground Floor') }}
                   @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
                   @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>
@@ -1764,7 +1764,7 @@
                   @endif
                 </div>
                 @if($hasDiscount)
-                  <button type="button" class="fg-discount" title="Limited time offer">Unlock ${{ number_format($unit->discount, 0, ',', ',') }} Discount</button>
+                  <button type="button" class="fg-discount" title="{{ __('Limited time offer') }}">{{ __('Unlock :amount Discount', ['amount' => '$'.number_format($unit->discount, 0, ',', ',')]) }}</button>
                 @endif
               </div>
 
@@ -1805,38 +1805,38 @@
               <div class="fg-card-actions">
                 @if($isSold)
                   <div class="fg-card-buttons">
-                    <button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">View Similar Units</button>
+                    <button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">{{ __('View Similar Units') }}</button>
                   </div>
                   <div class="fg-card-availability">
                     <span class="dot"></span>
-                    <span>This unit has been sold.</span>
+                    <span>{{ __('This unit has been sold.') }}</span>
                   </div>
                 @elseif($isReserved)
                   <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">More Info</button>
+                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
                     <button class="fg-btn-cta" type="button" onclick="notifyWhenAvailable('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                      Notificar si se libera
+                      {{ __('Notificar si se libera') }}
                     </button>
                   </div>
                   <div class="fg-card-availability">
                     <span class="dot"></span>
-                    <span>Currently on hold by another buyer.</span>
+                    <span>{{ __('Currently on hold by another buyer.') }}</span>
                   </div>
                 @else
                   <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">More Info</button>
+                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
                     <button class="fg-btn-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
                       </svg>
-                      Book Video Call
+                      {{ __('Book Video Call') }}
                     </button>
                   </div>
                   <div class="fg-card-availability advisor-live">
                     <span class="dot"></span>
-                    <span>An advisor is available right now.</span>
+                    <span>{{ __('An advisor is available right now.') }}</span>
                   </div>
                 @endif
               </div>
@@ -1847,13 +1847,13 @@
             <div class="fg-card-status-strip">
               <span class="fg-card-status-dot"></span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>{{ (int)($unit->views_today ?? 0) ?: $shortlistedCount }} people viewed this unit today</span>
+              <span>{{ __(':count people viewed this unit today', ['count' => (int)($unit->views_today ?? 0) ?: $shortlistedCount]) }}</span>
             </div>
           @elseif($isPending)
             <div class="fg-card-status-strip">
               <span class="fg-card-status-dot"></span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Pending review · Hold expires soon</span>
+              <span>{{ __('Pending review · Hold expires soon') }}</span>
             </div>
           @elseif($isSecond)
             <div class="fg-card-status-strip">
@@ -1861,7 +1861,7 @@
               @php
                 $releasedDays = $unit->released_at ? (int) \Carbon\Carbon::parse($unit->released_at)->diffInDays(now()) : null;
               @endphp
-              <span>This unit was released {{ $releasedDays !== null ? ($releasedDays === 0 ? 'today' : $releasedDays.' '.\Illuminate\Support\Str::plural('day', $releasedDays).' ago') : 'recently' }}</span>
+              <span>{{ __('This unit was released') }} {{ $releasedDays !== null ? ($releasedDays === 0 ? __('today') : $releasedDays.' '.__(\Illuminate\Support\Str::plural('day', $releasedDays)).' '.__('ago')) : __('recently') }}</span>
             </div>
           @elseif($isReserved)
             @php
@@ -1870,9 +1870,9 @@
             <div class="fg-card-status-strip is-reserved-strip" @if($reservedFuture) data-reserved-until="{{ \Carbon\Carbon::parse($unit->reserved_until)->toIso8601String() }}" @endif>
               <span class="fg-card-status-dot"></span>
               @if($reservedFuture)
-                <span>Reserved for <span class="fg-countdown" data-countdown>00:00:00</span> remaining</span>
+                <span>{{ __('Reserved for') }} <span class="fg-countdown" data-countdown>00:00:00</span> {{ __('remaining') }}</span>
               @else
-                <span>Reserved · Awaiting deposit</span>
+                <span>{{ __('Reserved · Awaiting deposit') }}</span>
               @endif
             </div>
           @endif
@@ -1889,36 +1889,36 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" placeholder="Search unit, floor, type…" oninput="filterListRows(this.value)">
+            <input type="text" placeholder="{{ __('Search unit, floor, type…') }}" oninput="filterListRows(this.value)">
           </label>
-          <div class="fg-list-tabs" role="tablist" aria-label="Status filter">
-            <button type="button" class="fg-list-tab active" data-tab="all" onclick="setListTab(this)">All <span class="badge">{{ $units->count() }}</span></button>
-            <button type="button" class="fg-list-tab" data-tab="available" onclick="setListTab(this)">Available <span class="badge">{{ $units->whereIn('status', ['available', null, ''])->count() ?: $units->where('status', '!=', 'sold')->count() }}</span></button>
-            <button type="button" class="fg-list-tab" data-tab="pending" onclick="setListTab(this)">Pending <span class="badge">{{ $units->where('status', 'PENDING')->count() }}</span></button>
-            <button type="button" class="fg-list-tab" data-tab="second" onclick="setListTab(this)">2nd Chance <span class="badge">{{ $units->filter(fn($u)=>!empty($u->is_second_chance))->count() }}</span></button>
-            <button type="button" class="fg-list-tab" data-tab="sold" onclick="setListTab(this)">Sold <span class="badge">{{ $units->where('status', 'SOLD')->count() }}</span></button>
+          <div class="fg-list-tabs" role="tablist" aria-label="{{ __('Status filter') }}">
+            <button type="button" class="fg-list-tab active" data-tab="all" onclick="setListTab(this)">{{ __('All') }} <span class="badge">{{ $units->count() }}</span></button>
+            <button type="button" class="fg-list-tab" data-tab="available" onclick="setListTab(this)">{{ __('Available') }} <span class="badge">{{ $units->whereIn('status', ['available', null, ''])->count() ?: $units->where('status', '!=', 'sold')->count() }}</span></button>
+            <button type="button" class="fg-list-tab" data-tab="pending" onclick="setListTab(this)">{{ __('Pending') }} <span class="badge">{{ $units->where('status', 'PENDING')->count() }}</span></button>
+            <button type="button" class="fg-list-tab" data-tab="second" onclick="setListTab(this)">{{ __('2nd Chance') }} <span class="badge">{{ $units->filter(fn($u)=>!empty($u->is_second_chance))->count() }}</span></button>
+            <button type="button" class="fg-list-tab" data-tab="sold" onclick="setListTab(this)">{{ __('Sold') }} <span class="badge">{{ $units->where('status', 'SOLD')->count() }}</span></button>
           </div>
           <button class="fg-pill-matches" type="button" style="margin-left:auto;" onclick="shareMatches()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
-            Mostrando {{ $units->count() }} de {{ $units->count() }} unidades
+            {{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $units->count()]) }}
           </button>
         </div>
         <table class="fg-list-table" id="fgListTable">
           <thead>
             <tr>
-              <th>Unit</th>
-              <th>Status</th>
-              <th>Floor</th>
-              <th>Type</th>
-              <th>Direction</th>
-              <th>Bed/Bath</th>
-              <th>Int sqft</th>
-              <th>Ext sqft</th>
-              <th>Price</th>
-              <th>ROI</th>
+              <th>{{ __('Unit') }}</th>
+              <th>{{ __('Status') }}</th>
+              <th>{{ __('Floor') }}</th>
+              <th>{{ __('Type') }}</th>
+              <th>{{ __('Direction') }}</th>
+              <th>{{ __('Bed/Bath') }}</th>
+              <th>{{ __('Int sqft') }}</th>
+              <th>{{ __('Ext sqft') }}</th>
+              <th>{{ __('Price') }}</th>
+              <th>{{ __('ROI') }}</th>
               <th></th>
             </tr>
           </thead>
@@ -1962,13 +1962,13 @@
                   data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
                 <td><b>{{ $unit->name }}</b></td>
                 <td>
-                    <span class="fg-list-status {{ $statusCls }}">{{ strtoupper($statusLabel) }}</span>
+                    <span class="fg-list-status {{ $statusCls }}">{{ strtoupper(__($statusLabel)) }}</span>
                     @if($statusCls === 'reserved' && !empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture())
-                        <div style="font-size:10px;color:#92400e;margin-top:2px;">Expira {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</div>
+                        <div style="font-size:10px;color:#92400e;margin-top:2px;">{{ __('Expira') }} {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</div>
                     @endif
                 </td>
-                <td>{{ $unit->floor ? ucfirst($unit->floor) : 'Ground' }}</td>
-                <td>{{ ($unit->bedrooms ?? 0) }} Bed{{ ($unit->bedrooms ?? 0) > 1 ? '' : '' }}</td>
+                <td>{{ $unit->floor ? ucfirst($unit->floor) : __('Ground') }}</td>
+                <td>{{ ($unit->bedrooms ?? 0) }} {{ __('Bed') }}</td>
                 <td>
                     {{ strtoupper($unit->direction ?? '—') }}
                     @if($unit->outlook)
@@ -1993,18 +1993,18 @@
                 </td>
                 <td>
                   <div class="fg-list-actions">
-                    <button class="fg-list-icon-btn" type="button" aria-label="Save">
+                    <button class="fg-list-icon-btn" type="button" aria-label="{{ __('Save') }}">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                       </svg>
                     </button>
-                    <button class="fg-list-info-btn" type="button" onclick="openMoreInfo('{{ $unitId }}')">INFO</button>
+                    <button class="fg-list-info-btn" type="button" onclick="openMoreInfo('{{ $unitId }}')">{{ __('INFO') }}</button>
                     @if($statusCls === 'sold')
-                      <button class="fg-list-cta" type="button" disabled>Sold</button>
+                      <button class="fg-list-cta" type="button" disabled>{{ __('Sold') }}</button>
                     @elseif($statusCls === 'reserved')
-                      <button class="fg-list-cta" type="button" disabled style="opacity:.5;cursor:not-allowed;">Reserved</button>
+                      <button class="fg-list-cta" type="button" disabled style="opacity:.5;cursor:not-allowed;">{{ __('Reserved') }}</button>
                     @else
-                      <button class="fg-list-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">Book Video Call</button>
+                      <button class="fg-list-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">{{ __('Book Video Call') }}</button>
                     @endif
                   </div>
                 </td>
@@ -2013,11 +2013,11 @@
           </tbody>
         </table>
         <div class="fg-list-pagination">
-          <span>Page 1 of 1</span>
+          <span>{{ __('Page :current of :total', ['current' => 1, 'total' => 1]) }}</span>
           <div class="fg-list-pages">
-            <button class="fg-list-page" type="button" aria-label="Previous">‹</button>
+            <button class="fg-list-page" type="button" aria-label="{{ __('Previous') }}">‹</button>
             <button class="fg-list-page active" type="button">1</button>
-            <button class="fg-list-page" type="button" aria-label="Next">›</button>
+            <button class="fg-list-page" type="button" aria-label="{{ __('Next') }}">›</button>
           </div>
         </div>
       </div>
@@ -2194,7 +2194,7 @@
         
         <!-- Copyright -->
         <div class="fg-footer-copyright" data-node-id="124:3626">
-          <p>©2026 Duna Development — Todos los derechos reservados</p>
+          <p>{{ __('©2026 Duna Development — Todos los derechos reservados') }}</p>
         </div>
         
         <!-- Social Icons -->
