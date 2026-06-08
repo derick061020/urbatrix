@@ -433,6 +433,7 @@
 
 @include('admin.crm._partials.settings-modal')
 @include('partials.logout-modal')
+@include('partials.confirm-dialog')
 
 @if (session('settings_success'))
 <script>

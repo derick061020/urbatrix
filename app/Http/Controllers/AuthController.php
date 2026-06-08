@@ -36,16 +36,28 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
-            return redirect($user->postAuthRedirectPath());
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (! $user || ! $user->password || ! Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'email' => 'Las credenciales no coinciden.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden.',
-        ])->onlyInput('email');
+        // Si el usuario tiene 2FA confirmada, NO lo autenticamos todavía:
+        // guardamos su id en sesión y lo mandamos al desafío del segundo factor.
+        if ($user->hasTwoFactorEnabled()) {
+            $request->session()->put('login.2fa', [
+                'id'       => $user->id,
+                'remember' => $request->boolean('remember'),
+            ]);
+            return redirect()->route('2fa.challenge');
+        }
+
+        Auth::login($user, (bool) $request->boolean('remember'));
+        $request->session()->regenerate();
+        $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
+        return redirect($user->postAuthRedirectPath());
     }
 
     public function logout(Request $request)

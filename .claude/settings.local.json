@@ -26,7 +26,8 @@
       "Bash(php -r ' *)",
       "Bash(composer require *)",
       "Bash(rg -rn \"route\\('dashboard\" resources/views/layouts/)",
-      "Bash(rg -rln \"dashboard.acuerdos\" resources/views/)"
+      "Bash(rg -rln \"dashboard.acuerdos\" resources/views/)",
+      "Bash(timeout 8 curl -sI https://repo.packagist.org)"
     ]
   }
 }

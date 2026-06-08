@@ -29,7 +29,51 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_seen' => 'datetime',
+            // 2FA: el secreto y los códigos se guardan cifrados en la BD.
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    /* ============================ 2FA / TOTP ============================ */
+
+    /** ¿El usuario tiene la autenticación de dos factores activa y confirmada? */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return ! is_null($this->two_factor_secret)
+            && ! is_null($this->two_factor_confirmed_at);
+    }
+
+    /** Devuelve los códigos de respaldo aún disponibles. */
+    public function recoveryCodes(): array
+    {
+        return $this->two_factor_recovery_codes ?? [];
+    }
+
+    /** Genera un nuevo lote de 8 códigos de respaldo (formato XXXX-XXXX). */
+    public static function generateRecoveryCodes(int $count = 8): array
+    {
+        return collect(range(1, $count))->map(function () {
+            return strtoupper(\Illuminate\Support\Str::random(4) . '-' . \Illuminate\Support\Str::random(4));
+        })->all();
+    }
+
+    /**
+     * Consume un código de respaldo (si coincide) eliminándolo del lote.
+     * Devuelve true si el código era válido.
+     */
+    public function consumeRecoveryCode(string $code): bool
+    {
+        $code  = strtoupper(trim($code));
+        $codes = $this->recoveryCodes();
+        $index = array_search($code, array_map('strtoupper', $codes), true);
+        if ($index === false) {
+            return false;
+        }
+        unset($codes[$index]);
+        $this->forceFill(['two_factor_recovery_codes' => array_values($codes)])->save();
+        return true;
     }
 
     public function getIsAdminAttribute(): bool

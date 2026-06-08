@@ -213,6 +213,34 @@
     .st-collapse { display: none; padding: 16px 0 4px; }
     .st-collapse.open { display: block; }
 
+    /* ===== 2FA ===== */
+    .st-2fa-badge {
+        display:inline-block; margin-left:6px; padding:1px 8px; border-radius:999px;
+        font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+        background:#f2f5f8; color:#99a0ae; vertical-align:middle;
+    }
+    .st-2fa-badge.on { background:#e3f7ec; color:#1daf61; }
+    .st-2fa-grid { display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+    .st-2fa-qr {
+        width:168px; height:168px; flex-shrink:0; border:1px solid #eaecf0; border-radius:12px;
+        background:#fff; display:flex; align-items:center; justify-content:center; padding:8px;
+    }
+    .st-2fa-qr img, .st-2fa-qr canvas { width:100%; height:100%; }
+    .st-2fa-steps { flex:1; min-width:240px; display:flex; flex-direction:column; gap:8px; }
+    .st-2fa-help { font-size:12.5px; color:#525866; line-height:1.5; margin:0; }
+    .st-2fa-secret {
+        display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:13px; letter-spacing:.12em;
+        background:#f5f7fa; border:1px solid #eaecf0; border-radius:8px; padding:6px 10px; color:#171717; word-break:break-all;
+    }
+    .st-2fa-codes {
+        display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px;
+    }
+    .st-2fa-codes span {
+        font-family:ui-monospace,Menlo,monospace; font-size:14px; letter-spacing:.08em; text-align:center;
+        background:#f5f7fa; border:1px solid #eaecf0; border-radius:8px; padding:8px 6px; color:#171717;
+    }
+    .st-2fa-codes span.used { text-decoration:line-through; opacity:.45; }
+
     @media (max-width: 860px) {
         .st-shell { grid-template-columns: 1fr; height: calc(100vh - 24px); max-height: calc(100vh - 24px); }
         .st-sidebar { display: flex; flex-direction: row; gap: 4px; overflow-x: auto; padding: 12px; }
@@ -475,23 +503,74 @@
                         </div>
                     </div>
 
+                    @php $st2faOn = $authUser?->hasTwoFactorEnabled() ?? false; @endphp
+
+                    {{-- =========== AUTENTICACIÓN 2FA =========== --}}
+                    <div class="st-row compact">
+                        <div>
+                            <div class="st-row-label">
+                                Autenticación 2FA
+                                <span id="st2faBadge" class="st-2fa-badge {{ $st2faOn ? 'on' : '' }}">{{ $st2faOn ? 'Activa' : 'Inactiva' }}</span>
+                            </div>
+                            <div class="st-row-desc">Agrega una capa extra de protección a tu cuenta.</div>
+                        </div>
+                        <div class="st-row-right">
+                            <button type="button" class="st-btn st-btn-ghost" id="st2faManageBtn" onclick="st2faTogglePanel()">Administrar Autenticación</button>
+                        </div>
+                    </div>
+
+                    <div class="st-collapse" id="st2faPanel">
+                        {{-- (A) Activar: QR + secreto + confirmación --}}
+                        <div id="st2faSetup" style="display:none;">
+                            <div class="st-2fa-grid">
+                                <div class="st-2fa-qr" id="st2faQr"></div>
+                                <div class="st-2fa-steps">
+                                    <p class="st-2fa-help">1. Escaneá el código QR con Google Authenticator, Authy, 1Password o similar.</p>
+                                    <p class="st-2fa-help">2. ¿No podés escanear? Cargá esta clave manualmente:</p>
+                                    <code class="st-2fa-secret" id="st2faSecret">—</code>
+                                    <p class="st-2fa-help">3. Ingresá el código de 6 dígitos que muestra la app:</p>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" id="st2faConfirmCode" inputmode="numeric" maxlength="6"
+                                               class="crm-input pl-3" style="max-width:160px; letter-spacing:.25em; text-align:center;" placeholder="000000">
+                                        <button type="button" class="st-btn st-btn-primary" onclick="st2faConfirm()">Confirmar y activar</button>
+                                        <button type="button" class="st-btn st-btn-ghost" onclick="st2faTogglePanel(false)">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- (B) Ya activa: desactivar --}}
+                        <div id="st2faActive" style="display:none;">
+                            <p class="st-2fa-help" style="margin-bottom:10px;">
+                                <i class="pi pi-check-circle" style="color:#1daf61;"></i>
+                                La 2FA está activa. Cada vez que inicies sesión te pediremos un código.
+                            </p>
+                            <div class="flex items-center gap-2">
+                                <input type="password" id="st2faDisablePwd" class="crm-input pl-3" style="max-width:220px;" placeholder="Tu contraseña actual">
+                                <button type="button" class="st-btn st-btn-ghost" style="color:#e93544;" onclick="st2faDisable()">Desactivar 2FA</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- =========== CÓDIGOS DE RESPALDO =========== --}}
                     <div class="st-row compact">
                         <div>
                             <div class="st-row-label">Códigos de Respaldo</div>
                             <div class="st-row-desc">Genera códigos de respaldo para tu dispositivo 2FA.</div>
                         </div>
                         <div class="st-row-right">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="stShowAlert('Códigos de respaldo: función disponible próximamente.', 'ok')">Generar Códigos</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faShowRecoveryCodes()">Generar Códigos</button>
                         </div>
                     </div>
 
-                    <div class="st-row compact">
-                        <div>
-                            <div class="st-row-label">Autenticación 2FA</div>
-                            <div class="st-row-desc">Agrega una capa extra de protección a tu cuenta.</div>
-                        </div>
-                        <div class="st-row-right">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="stShowAlert('2FA: función disponible próximamente.', 'ok')">Administrar Autenticación</button>
+                    <div class="st-collapse" id="st2faCodesPanel">
+                        <p class="st-2fa-help" style="margin-bottom:8px;">
+                            Guardá estos códigos en un lugar seguro. Cada uno sirve una sola vez para entrar si perdés tu dispositivo.
+                        </p>
+                        <div class="st-2fa-codes" id="st2faCodesList"></div>
+                        <div class="flex items-center gap-2 mt-3">
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faCopyCodes()"><i class="pi pi-copy"></i> Copiar</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faRegenerate()"><i class="pi pi-refresh"></i> Regenerar</button>
                         </div>
                     </div>
                 </div>
@@ -544,6 +623,7 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function(){
     let activePane = 'profile';
@@ -662,6 +742,141 @@
         const panel = document.getElementById('stPwdPanel');
         if (typeof force === 'boolean') panel.classList.toggle('open', force);
         else panel.classList.toggle('open');
+    };
+
+    /* ======================= 2FA ======================= */
+    let st2faEnabled = {{ ($authUser?->hasTwoFactorEnabled() ?? false) ? 'true' : 'false' }};
+    let st2faCurrentCodes = [];
+
+    const st2faCsrf = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+    async function st2faPost(url, body){
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': st2faCsrf(), 'Accept':'application/json' },
+            body: JSON.stringify(body || {}),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Ocurrió un error. Intentá de nuevo.');
+        return data;
+    }
+    async function st2faGet(url){
+        const res = await fetch(url, { headers: { 'X-CSRF-TOKEN': st2faCsrf(), 'Accept':'application/json' } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Ocurrió un error.');
+        return data;
+    }
+
+    function st2faSyncBadge(){
+        const badge = document.getElementById('st2faBadge');
+        if (badge){ badge.classList.toggle('on', st2faEnabled); badge.textContent = st2faEnabled ? 'Activa' : 'Inactiva'; }
+    }
+
+    // Mostrar/ocultar el panel de gestión 2FA (activar o desactivar según estado)
+    window.st2faTogglePanel = async function(force){
+        const panel = document.getElementById('st2faPanel');
+        const willOpen = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+        panel.classList.toggle('open', willOpen);
+        if (!willOpen) return;
+
+        document.getElementById('st2faSetup').style.display  = st2faEnabled ? 'none' : 'block';
+        document.getElementById('st2faActive').style.display = st2faEnabled ? 'block' : 'none';
+        if (st2faEnabled) return;
+
+        // Generar secreto + QR
+        try {
+            const data = await st2faPost('{{ route('2fa.enable') }}');
+            document.getElementById('st2faSecret').textContent = data.secret;
+            const qrBox = document.getElementById('st2faQr');
+            qrBox.innerHTML = '';
+            if (window.QRCode) {
+                new QRCode(qrBox, { text: data.otpauth_uri, width: 152, height: 152, correctLevel: QRCode.CorrectLevel.M });
+            } else {
+                qrBox.innerHTML = '<span style="font-size:11px;color:#99a0ae;text-align:center;">No se pudo cargar el QR. Usá la clave manual.</span>';
+            }
+        } catch (e) { stShowAlert(e.message, 'err'); }
+    };
+
+    window.st2faConfirm = async function(){
+        const code = document.getElementById('st2faConfirmCode').value.trim();
+        if (code.length < 6) { stShowAlert('Ingresá el código de 6 dígitos.', 'err'); return; }
+        try {
+            const data = await st2faPost('{{ route('2fa.confirm') }}', { code });
+            st2faEnabled = true;
+            st2faSyncBadge();
+            document.getElementById('st2faPanel').classList.remove('open');
+            stShowAlert('¡2FA activada! Guardá tus códigos de respaldo.', 'ok', 3000);
+            st2faRenderCodes(data.recovery_codes);
+        } catch (e) { stShowAlert(e.message, 'err'); }
+    };
+
+    // Confirmación con la línea gráfica de la web (partials/confirm-dialog).
+    // Fallback al confirm() nativo solo si el diálogo no estuviera disponible.
+    function st2faConfirm2(opts){
+        if (typeof window.confirmDialog === 'function') { window.confirmDialog(opts); return; }
+        if (confirm(opts.text || opts.title || '¿Continuar?')) (opts.onConfirm || function(){})();
+    }
+
+    window.st2faDisable = function(){
+        const password = document.getElementById('st2faDisablePwd').value;
+        if (!password) { stShowAlert('Ingresá tu contraseña para desactivar la 2FA.', 'err'); return; }
+        st2faConfirm2({
+            title: 'Desactivar autenticación 2FA',
+            text:  'Tu cuenta quedará protegida únicamente por la contraseña. Podés volver a activarla cuando quieras.',
+            confirmLabel: 'Desactivar',
+            icon: 'pi pi-shield',
+            onConfirm: async () => {
+                try {
+                    await st2faPost('{{ route('2fa.disable') }}', { password });
+                    st2faEnabled = false;
+                    st2faSyncBadge();
+                    document.getElementById('st2faPanel').classList.remove('open');
+                    document.getElementById('st2faCodesPanel').classList.remove('open');
+                    document.getElementById('st2faDisablePwd').value = '';
+                    stShowAlert('La 2FA fue desactivada.', 'ok', 2500);
+                } catch (e) { stShowAlert(e.message, 'err'); }
+            },
+        });
+    };
+
+    function st2faRenderCodes(codes){
+        st2faCurrentCodes = codes || [];
+        const list = document.getElementById('st2faCodesList');
+        list.innerHTML = '';
+        st2faCurrentCodes.forEach(c => { const s = document.createElement('span'); s.textContent = c; list.appendChild(s); });
+        document.getElementById('st2faCodesPanel').classList.add('open');
+    }
+
+    window.st2faShowRecoveryCodes = async function(){
+        if (!st2faEnabled) { stShowAlert('Activá la 2FA antes de generar códigos de respaldo.', 'err'); return; }
+        try {
+            const data = await st2faGet('{{ route('2fa.recovery') }}');
+            st2faRenderCodes(data.recovery_codes);
+        } catch (e) { stShowAlert(e.message, 'err'); }
+    };
+
+    window.st2faRegenerate = function(){
+        st2faConfirm2({
+            title: 'Regenerar códigos de respaldo',
+            text:  'Esto invalidará tus códigos anteriores: los que hayas guardado dejarán de funcionar.',
+            confirmLabel: 'Regenerar',
+            tone: 'brand',
+            icon: 'pi pi-refresh',
+            onConfirm: async () => {
+                try {
+                    const data = await st2faPost('{{ route('2fa.recovery.regen') }}');
+                    st2faRenderCodes(data.recovery_codes);
+                    stShowAlert('Códigos regenerados.', 'ok', 2200);
+                } catch (e) { stShowAlert(e.message, 'err'); }
+            },
+        });
+    };
+
+    window.st2faCopyCodes = function(){
+        if (!st2faCurrentCodes.length) return;
+        navigator.clipboard?.writeText(st2faCurrentCodes.join('\n'))
+            .then(() => stShowAlert('Códigos copiados al portapapeles.', 'ok', 1800))
+            .catch(() => stShowAlert('No se pudieron copiar.', 'err'));
     };
 
     // Sync name → first/last + form submit

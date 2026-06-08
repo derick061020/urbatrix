@@ -16,6 +16,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\PaymentDocumentController;
 use App\Http\Controllers\BrokerController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\Admin\MaterialController;
 
 // Auth routes
@@ -27,6 +28,10 @@ Route::post('/register/resend',   [AuthController::class, 'registerResend'])->na
 Route::post('/register/verify',   [AuthController::class, 'registerVerify'])->name('register.verify');
 Route::post('/register/complete', [AuthController::class, 'registerComplete'])->name('register.complete');
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
+
+// Desafío 2FA en el login (usuario aún sin autenticar — usa sesión login.2fa)
+Route::get('/2fa/challenge',  [TwoFactorController::class, 'challenge'])->name('2fa.challenge');
+Route::post('/2fa/challenge', [TwoFactorController::class, 'verifyChallenge'])->name('2fa.challenge.verify');
 
 // Forgot / reset password
 Route::get('/forgot-password',          [AuthController::class, 'showForgotPassword'])->name('password.request');
@@ -62,6 +67,13 @@ Route::get('/api/reservations/{code}', [ReservationController::class, 'getByCode
 // Checkout (Stripe) — the $5,000 reservation fee is paid here BEFORE the unit
 // is held. Requires an authenticated buyer with a pending reservation.
 Route::middleware(['auth'])->group(function () {
+    // Gestión de 2FA desde el modal de configuración (admin y usuario)
+    Route::post('/2fa/enable',          [TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::post('/2fa/confirm',         [TwoFactorController::class, 'confirm'])->name('2fa.confirm');
+    Route::post('/2fa/disable',         [TwoFactorController::class, 'disable'])->name('2fa.disable');
+    Route::get('/2fa/recovery-codes',   [TwoFactorController::class, 'recoveryCodes'])->name('2fa.recovery');
+    Route::post('/2fa/recovery-codes',  [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('2fa.recovery.regen');
+
     Route::get('/checkout', [ReservationController::class, 'showCheckout']);
     Route::post('/checkout/payment-intent', [ReservationController::class, 'createPaymentIntent']);
     Route::post('/checkout/confirm', [ReservationController::class, 'confirmPayment']);
