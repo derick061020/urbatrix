@@ -207,7 +207,7 @@
               <div class="mt-price-meta">
                 <span class="warning">{{ __('Reserve from $5,000') }}</span>
                 <span class="sep"></span>
-                <span class="muted">{{ __('100% refundable') }}</span>
+                <span class="muted">{{ __('Not refundable') }}</span>
               </div>
             </div>
 
@@ -1788,9 +1788,9 @@
             <!-- Image area -->
             <div class="fg-card-img">
               @if($unit->images->isNotEmpty())
-                <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" onerror="this.style.display='none'">
+                <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" onerror="this.style.display='none'" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
               @else
-                <div class="fg-card-img-noimage">{{ __('No Image Available') }}</div>
+                <div class="fg-card-img-noimage" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('No Image Available') }}</div>
               @endif
 
               <!-- Top row: status badge (left) + ADD TO LIST (right) -->
@@ -1839,7 +1839,7 @@
               </div>
 
               <!-- Gold "RESERVE FROM $5000" banner -->
-              <div class="fg-reserve-banner">{{ __('Reserve from $5000') }}</div>
+              <div class="fg-reserve-banner" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('Reserve from $5000') }}</div>
 
               @if($isSold)
                 <!-- SOLD overlay (Figma 125:5048) -->
@@ -1864,7 +1864,7 @@
                   @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>
                 <div class="fg-card-divider"></div>
-                <div class="fg-card-price">
+                <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
                     <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/sqft</span>
