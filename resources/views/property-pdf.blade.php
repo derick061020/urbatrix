@@ -66,6 +66,21 @@ body {
   margin: 0 auto;
 }
 
+/* Each .sheet is exactly one A4 page. Fixed height + hidden overflow guarantees
+   the browser paginates into exactly two pages with no stray page breaks. */
+.sheet {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+}
+.sheet:last-of-type {
+  page-break-after: auto;
+  break-after: auto;
+}
+
 .hdr { background: #0b1c0a; padding: 14px 36px; display: flex; align-items: center; justify-content: space-between; }
 .hdr-logo { display: flex; align-items: center; gap: 14px; }
 .hdr-isotipo { width: 36px; height: 36px; flex-shrink: 0; }
@@ -196,7 +211,7 @@ body {
 .dk { color: #6B7280; }
 .dv { color: #111827; font-weight: 500; }
 
-.footer { position: fixed; bottom: 0; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
+.footer { position: absolute; bottom: 0; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
 .footer-brand { font-size: 9px; font-weight: 700; color: #374151; letter-spacing: .06em; }
 .footer-contact { font-size: 9px; color: #6B7280; text-align: center; line-height: 1.55; }
 .footer-disc { font-size: 7.5px; color: #9CA3AF; text-align: right; max-width: 190px; line-height: 1.45; }
@@ -231,10 +246,13 @@ body {
 .qr-label { font-size: 13px; font-weight: 700; color: #111827; }
 .qr-sub { font-size: 10px; color: #9CA3AF; }
 
-@media print { body { width: 210mm; } .footer { position: fixed; bottom: 0; } @page { margin: 0; } }
+@media print { body { width: 210mm; } .sheet { margin: 0; } @page { margin: 0; } }
 </style>
 </head>
 <body>
+
+<!-- ============ PAGE 1 ============ -->
+<div class="sheet">
 
 <!-- HEADER -->
 <div class="hdr">
@@ -431,8 +449,16 @@ body {
   </div>
 </div>
 
-<!-- PAGE 2 -->
-<div class="page-break"></div>
+<div class="footer">
+  <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
+  <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
+</div>
+
+</div><!-- /sheet page 1 -->
+
+<!-- ============ PAGE 2 ============ -->
+<div class="sheet">
 
 <div class="p2-hdr">
   <div>
@@ -572,6 +598,8 @@ body {
   <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
+
+</div><!-- /sheet page 2 -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
