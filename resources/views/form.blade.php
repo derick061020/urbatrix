@@ -86,15 +86,24 @@
         background-size: 24px 24px;
       }
 
-      /* Payment plan card */
+      /* Payment plan card — mirrors the role-card selector from registro */
       .pay-card {
-          border:1px solid #ebebeb; border-radius:14px; padding:18px;
-          background:#fff; cursor:pointer;
+          display:flex; align-items:center; gap:14px;
+          border:1px solid #ebebeb; border-radius:14px; padding:16px;
+          background:#fff; cursor:pointer; position:relative;
           transition: border-color .15s, background-color .15s;
       }
       .pay-card:hover { background:#f8f8f8; }
       .pay-card.selected { border-color:#5c7c68; background:#fff; box-shadow:0 0 0 1px #5c7c68; }
       .pay-card.is-invalid { border-color:#fb3748; background:#fff7f7; box-shadow:0 0 0 1px #fb3748; }
+      .pay-card .radio-dot {
+          width:18px; height:18px; border-radius:999px;
+          border:1.5px solid #cacfd8;
+          margin-left:auto; flex-shrink:0;
+          display:flex; align-items:center; justify-content:center;
+      }
+      .pay-card.selected .radio-dot { border-color:#5c7c68; }
+      .pay-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#5c7c68; }
 
       /* Drop zone */
       .file-drop {
@@ -614,63 +623,36 @@
 
                 <div class="space-y-3">
                     {{-- Option A --}}
-                    <label class="pay-card flex items-start gap-4" data-pay="A">
-                        <input type="checkbox" name="payment_a" value="A" class="w-5 h-5 mt-1 accent-brand" onchange="onPaySelect(this)">
+                    <label class="pay-card" data-pay="A">
+                        <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-bold text-ink-950">Plan A — 30/40/30</div>
-                            <div class="text-[12px] text-ink-500 mt-1">30% al firmar · 40% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">Plan A — 30/40/30</div>
+                            <div class="text-[12px] text-ink-500">30% al firmar · 40% durante construcción · 30% a la entrega</div>
                         </div>
+                        <input type="radio" name="payment_method" value="A" class="sr-only" onchange="onPaySelect(this)">
+                        <span class="radio-dot"></span>
                     </label>
 
                     {{-- Option B --}}
-                    <label class="pay-card flex items-start gap-4" data-pay="B">
-                        <input type="checkbox" name="payment_b" value="B" class="w-5 h-5 mt-1 accent-brand" onchange="onPaySelect(this)">
+                    <label class="pay-card" data-pay="B">
+                        <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-bold text-ink-950">Plan B — 40/30/30</div>
-                            <div class="text-[12px] text-ink-500 mt-1">40% al firmar · 30% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">Plan B — 40/30/30</div>
+                            <div class="text-[12px] text-ink-500">40% al firmar · 30% durante construcción · 30% a la entrega</div>
                         </div>
+                        <input type="radio" name="payment_method" value="B" class="sr-only" onchange="onPaySelect(this)">
+                        <span class="radio-dot"></span>
                     </label>
 
                     {{-- Option C --}}
-                    <label class="pay-card flex items-start gap-4" data-pay="C">
-                        <input type="checkbox" name="payment_c" value="C" class="w-5 h-5 mt-1 accent-brand" onchange="onPaySelect(this)">
+                    <label class="pay-card" data-pay="C">
+                        <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-bold text-ink-950">Plan C — 50/20/30</div>
-                            <div class="text-[12px] text-ink-500 mt-1">50% al firmar · 20% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">Plan C — 50/20/30</div>
+                            <div class="text-[12px] text-ink-500">50% al firmar · 20% durante construcción · 30% a la entrega</div>
                         </div>
-                    </label>
-
-                    {{-- Personalizado --}}
-                    <label class="pay-card flex items-start gap-4" data-pay="CUSTOM">
-                        <input type="checkbox" name="payment_custom" value="PERSONALIZADO" id="payment_custom_checkbox" class="w-5 h-5 mt-1 accent-brand" onchange="onPaySelect(this); toggleCustomPayment();">
-                        <div class="flex-1">
-                            <div class="text-[14px] font-bold text-ink-950">Plan personalizado</div>
-                            <div class="text-[12px] text-ink-500 mt-1">Configura los porcentajes que mejor se ajusten</div>
-
-                            <div id="custom_payment_options" class="grid grid-cols-3 gap-3 mt-4" style="display:none;">
-                                <div>
-                                    <label class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">Inicial</label>
-                                    <div class="relative mt-1">
-                                        <input type="text" name="custom_payment_1" placeholder="0" class="auth-input pr-7" inputmode="numeric">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-[12px]">%</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">Construcción</label>
-                                    <div class="relative mt-1">
-                                        <input type="text" name="custom_payment_2" placeholder="0" class="auth-input pr-7" inputmode="numeric">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-[12px]">%</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">Entrega</label>
-                                    <div class="relative mt-1">
-                                        <input type="text" name="custom_payment_3" placeholder="0" class="auth-input pr-7" inputmode="numeric">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-[12px]">%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <input type="radio" name="payment_method" value="C" class="sr-only" onchange="onPaySelect(this)">
+                        <span class="radio-dot"></span>
                     </label>
                 </div>
 
@@ -1008,22 +990,12 @@
     };
 
     /* ---------- Payment plan selection (single-select) ---------- */
-    window.onPaySelect = (cb) => {
-        if (cb.checked) {
-            document.querySelectorAll('.pay-card input[type=checkbox]').forEach(other => {
-                if (other !== cb) { other.checked = false; }
-            });
-        }
+    window.onPaySelect = () => {
         document.querySelectorAll('.pay-card').forEach(card => {
-            const i = card.querySelector('input[type=checkbox]');
+            const i = card.querySelector('input[type=radio]');
             card.classList.remove('is-invalid');
-            card.classList.toggle('selected', i.checked);
+            card.classList.toggle('selected', !!i?.checked);
         });
-    };
-
-    window.toggleCustomPayment = () => {
-        const cb = document.getElementById('payment_custom_checkbox');
-        document.getElementById('custom_payment_options').style.display = cb.checked ? 'grid' : 'none';
     };
 
     /* ---------- Submit ---------- */
@@ -1033,33 +1005,13 @@
         if (!validateStep(currentStep)) return;
 
         // Get selected payment method
-        let paymentMethod = '';
-        if (document.querySelector('input[name="payment_a"]:checked')) paymentMethod = 'A';
-        else if (document.querySelector('input[name="payment_b"]:checked')) paymentMethod = 'B';
-        else if (document.querySelector('input[name="payment_c"]:checked')) paymentMethod = 'C';
-        else if (document.querySelector('input[name="payment_custom"]:checked')) paymentMethod = 'PERSONALIZADO';
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || '';
 
         if (!paymentMethod) {
             errBox.textContent = 'Selecciona un plan de pago para continuar.';
             errBox.classList.remove('hidden');
             document.querySelectorAll('.pay-card').forEach(card => card.classList.add('is-invalid'));
             return;
-        }
-
-        if (paymentMethod === 'PERSONALIZADO') {
-            const customFields = [
-                document.querySelector('input[name=custom_payment_1]'),
-                document.querySelector('input[name=custom_payment_2]'),
-                document.querySelector('input[name=custom_payment_3]'),
-            ];
-            const missingCustomFields = customFields.filter(field => field && !String(field.value || '').trim());
-            if (missingCustomFields.length) {
-                missingCustomFields.forEach(markInvalid);
-                errBox.textContent = 'Completa los porcentajes del plan personalizado para continuar.';
-                errBox.classList.remove('hidden');
-                scrollToFirstInvalid(getStep(6));
-                return;
-            }
         }
         errBox.classList.add('hidden');
 
@@ -1083,16 +1035,6 @@
         // Titulares secundarios (co-buyers)
         const coBuyers = (typeof collectCoBuyers === 'function') ? collectCoBuyers() : [];
         fd.append('co_buyers', JSON.stringify(coBuyers));
-
-        // Custom payment percentages
-        if (paymentMethod === 'PERSONALIZADO') {
-            const c1 = document.querySelector('input[name=custom_payment_1]');
-            const c2 = document.querySelector('input[name=custom_payment_2]');
-            const c3 = document.querySelector('input[name=custom_payment_3]');
-            if (c1?.value) fd.append('custom_payment_1', c1.value);
-            if (c2?.value) fd.append('custom_payment_2', c2.value);
-            if (c3?.value) fd.append('custom_payment_3', c3.value);
-        }
 
         // ID document upload (frente + reverso)
         const idFile = document.getElementById('idDocument');
