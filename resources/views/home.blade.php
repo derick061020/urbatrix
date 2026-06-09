@@ -1811,7 +1811,7 @@
 
                 @php $isFav = in_array($unit->id, $wishlistIds ?? []); @endphp
                 <button type="button"
-                        class="fg-add-to-list {{ $isFav ? 'is-fav' : '' }}"
+                        class="fg-add-to-list {{ $isFav ? 'is-fav' : '' }} {{ app()->getLocale() === 'es' ? 'icon-only' : '' }}"
                         aria-label="{{ __('Add to list') }}"
                         aria-pressed="{{ $isFav ? 'true' : 'false' }}"
                         data-wishlist-toggle data-unit-id="{{ $unit->id }}"

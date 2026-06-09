@@ -1216,6 +1216,27 @@
     .fg-add-to-list.is-fav .text {
       display: none;
     }
+
+    /* Spanish: always show only a circle with the heart icon (no text) */
+    .fg-add-to-list.icon-only .text {
+      display: none;
+    }
+    .fg-add-to-list.icon-only {
+      padding: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+    }
+    .fg-add-to-list.icon-only .heart {
+      width: 14px;
+      height: 14px;
+    }
+    .fg-add-to-list.icon-only .heart svg {
+      width: 14px;
+      height: 14px;
+    }
     .fg-add-to-list.is-fav {
       padding: 0;
       width: 28px;
