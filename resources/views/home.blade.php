@@ -280,21 +280,7 @@
               </div>
             </div>
 
-            <!-- Projected value highlight (investment) -->
-            <div class="mt-projected mt-investment-only" id="modalProjected" style="display:none;">
-              <div class="mt-projected-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-              </div>
-              <div>
-                <p class="mt-projected-label">{{ __('PROJECTED VALUE AT DELIVERY') }}</p>
-                <div class="mt-projected-row">
-                  <span class="now" id="modalProjectedNow">$0 today</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  <span class="future" id="modalProjectedFuture">—</span>
-                  <span class="hint" id="modalProjectedHint">—</span>
-                </div>
-              </div>
-            </div>
+            
 
             <!-- Investment commentary -->
             <div class="mt-compare mt-investment-only" id="modalCompare" style="display:none;">
