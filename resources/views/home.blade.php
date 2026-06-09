@@ -4755,6 +4755,19 @@
     // ============================
     // GRID / LIST / PLAN TOGGLE
     // ============================
+    // Posiciona la barra activa midiendo el botón seleccionado (grid/list).
+    // Independiente del idioma: funciona con "Grid"/"Cuadrícula" o cualquier texto.
+    function positionToggleBg() {
+      const toggle = document.querySelector('.fg-toggle');
+      if (!toggle) return;
+      const bg = toggle.querySelector('.fg-toggle-bg-active');
+      const active = toggle.querySelector('button[data-view].active');
+      if (!bg || !active) return;
+      bg.style.left  = active.offsetLeft + 'px';
+      bg.style.width = active.offsetWidth + 'px';
+    }
+    window.addEventListener('resize', positionToggleBg);
+
     function setViewMode(view) {
       const allButtons = document.querySelectorAll('.fg-toggle button[data-view], .fg-location-btn[data-view]');
       allButtons.forEach(b => {
@@ -4767,6 +4780,8 @@
         toggle.classList.toggle('list-active', view === 'list');
         toggle.classList.toggle('plan-active', view === 'plan');
       }
+      // Recoloca la barra activa según el botón ahora seleccionado (grid/list).
+      if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
       // Reflect view in URL so the share link preserves grid/list/plan choice.
@@ -4782,6 +4797,12 @@
         setViewMode(this.dataset.view);
       });
     });
+
+    // Posición inicial de la barra activa (tras render y carga de fuentes,
+    // para que la medida del botón sea exacta con cualquier idioma).
+    positionToggleBg();
+    window.addEventListener('load', positionToggleBg);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionToggleBg);
 
     // List view tabs — delegate to the unified filter so status tab + filters compose.
     function setListTab(btn) {
