@@ -1876,7 +1876,7 @@
               </div>
 
               <!-- Stats row (6 boxes) -->
-              <div class="fg-stats">
+              <div class="fg-stats" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
                 <div class="fg-stat" title="Bedrooms">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg>
                   <span class="v">{{ $unit->bedrooms ?? 0 }}</span>
