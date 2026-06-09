@@ -66,12 +66,18 @@ body {
   margin: 0 auto;
 }
 
-/* Content flows as one continuous page; the printed page is sized dynamically
-   (see script at the bottom) to exactly fit all content — no clipping, no blank page. */
+/* Two fixed A4 pages. Each .sheet is exactly one printed page; its inner content
+   is auto-scaled by the script at the bottom so it always fits without clipping. */
 .sheet {
   position: relative;
   width: 210mm;
+  height: 296mm;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
 }
+.sheet:last-of-type { page-break-after: auto; break-after: auto; }
+.sheet-inner { transform-origin: top left; }
 
 .hdr { background: #0b1c0a; padding: 14px 36px; display: flex; align-items: center; justify-content: space-between; }
 .hdr-logo { display: flex; align-items: center; gap: 14px; }
@@ -203,8 +209,7 @@ body {
 .dk { color: #6B7280; }
 .dv { color: #111827; font-weight: 500; }
 
-.footer { position: relative; margin-top: 10px; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
-.flow-divider { height: 1px; background: #E5E7EB; margin: 28px 36px; }
+.footer { position: absolute; bottom: 0; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
 .footer-brand { font-size: 9px; font-weight: 700; color: #374151; letter-spacing: .06em; }
 .footer-contact { font-size: 9px; color: #6B7280; text-align: center; line-height: 1.55; }
 .footer-disc { font-size: 7.5px; color: #9CA3AF; text-align: right; max-width: 190px; line-height: 1.45; }
@@ -246,6 +251,7 @@ body {
 
 <!-- ============ PAGE 1 ============ -->
 <div class="sheet">
+<div class="sheet-inner">
 
 <!-- HEADER -->
 <div class="hdr">
@@ -442,12 +448,17 @@ body {
   </div>
 </div>
 
-<div class="flow-divider"></div>
-
+</div><!-- /sheet-inner page 1 -->
+<div class="footer">
+  <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
+  <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
+</div>
 </div><!-- /sheet page 1 -->
 
 <!-- ============ PAGE 2 ============ -->
 <div class="sheet">
+<div class="sheet-inner">
 
 <div class="p2-hdr">
   <div>
@@ -455,7 +466,7 @@ body {
     <div class="p2-hdr-title">Detalles del Proyecto</div>
   </div>
   <div class="p2-hdr-right">
-    <div class="p2-hdr-unit">{{ $unitNum }}</div>
+    <div class="p2-hdr-unit">{{ $unitNum }} · Página 2 / 2</div>
     <div class="p2-hdr-ref">{{ $ref }}</div>
   </div>
 </div>
@@ -582,6 +593,7 @@ body {
   </div>
 </div>
 
+</div><!-- /sheet-inner page 2 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
   <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
@@ -597,22 +609,27 @@ var PROJ_URL = '{{ url('/') }}';
 new QRCode(document.getElementById('qr-whatsapp'), { text: WA_URL, width: 130, height: 130, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 new QRCode(document.getElementById('qr-project'), { text: PROJ_URL, width: 130, height: 130, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 
-// Size the printed page to exactly fit all content (one continuous page),
-// then open the print dialog so the user can "Save as PDF".
-// This avoids clipped content, awkward page breaks and trailing blank pages.
-function fitPageAndPrint() {
-  var px = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  // 96px = 1in = 25.4mm. Add a tiny buffer to avoid rounding overflow onto a 2nd page.
-  var mm = Math.ceil(px * 25.4 / 96) + 2;
-  var style = document.createElement('style');
-  style.innerHTML = '@page { size: 210mm ' + mm + 'mm; margin: 0; }';
-  document.head.appendChild(style);
+// Each .sheet is one fixed A4 page. Scale its inner content down (only if needed)
+// so it always fits within the page without clipping or spilling onto extra pages.
+function fitSheetsAndPrint() {
+  document.querySelectorAll('.sheet').forEach(function (sheet) {
+    var inner = sheet.querySelector('.sheet-inner');
+    if (!inner) return;
+    var footer = sheet.querySelector('.footer');
+    var avail  = sheet.clientHeight - (footer ? footer.offsetHeight : 0);
+    var needed = inner.scrollHeight;
+    if (needed > avail) {
+      var s = avail / needed;
+      inner.style.transform = 'scale(' + s + ')';
+      inner.style.width = (100 / s) + '%';
+    }
+  });
   window.print();
 }
 
 window.addEventListener('load', function () {
   // Wait for QR codes + web fonts to finish rendering before measuring height.
-  setTimeout(fitPageAndPrint, 600);
+  setTimeout(fitSheetsAndPrint, 600);
 });
 </script>
 </body>
