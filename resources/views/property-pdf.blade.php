@@ -204,7 +204,7 @@ body {
 .dv { color: #111827; font-weight: 500; }
 
 .footer { position: relative; margin-top: 10px; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
-.footer-static { margin-bottom: 28px; }
+.flow-divider { height: 1px; background: #E5E7EB; margin: 28px 36px; }
 .footer-brand { font-size: 9px; font-weight: 700; color: #374151; letter-spacing: .06em; }
 .footer-contact { font-size: 9px; color: #6B7280; text-align: center; line-height: 1.55; }
 .footer-disc { font-size: 7.5px; color: #9CA3AF; text-align: right; max-width: 190px; line-height: 1.45; }
@@ -442,11 +442,7 @@ body {
   </div>
 </div>
 
-<div class="footer footer-static">
-  <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
-  <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
-</div>
+<div class="flow-divider"></div>
 
 </div><!-- /sheet page 1 -->
 
@@ -459,7 +455,7 @@ body {
     <div class="p2-hdr-title">Detalles del Proyecto</div>
   </div>
   <div class="p2-hdr-right">
-    <div class="p2-hdr-unit">{{ $unitNum }} · Página 2 / 2</div>
+    <div class="p2-hdr-unit">{{ $unitNum }}</div>
     <div class="p2-hdr-ref">{{ $ref }}</div>
   </div>
 </div>
