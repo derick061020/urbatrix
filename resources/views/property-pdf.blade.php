@@ -66,19 +66,11 @@ body {
   margin: 0 auto;
 }
 
-/* Each .sheet is exactly one A4 page. Fixed height + hidden overflow guarantees
-   the browser paginates into exactly two pages with no stray page breaks. */
+/* Content flows as one continuous page; the printed page is sized dynamically
+   (see script at the bottom) to exactly fit all content — no clipping, no blank page. */
 .sheet {
   position: relative;
   width: 210mm;
-  height: 297mm;
-  overflow: hidden;
-  page-break-after: always;
-  break-after: page;
-}
-.sheet:last-of-type {
-  page-break-after: auto;
-  break-after: auto;
 }
 
 .hdr { background: #0b1c0a; padding: 14px 36px; display: flex; align-items: center; justify-content: space-between; }
@@ -117,7 +109,7 @@ body {
 .validity svg { flex-shrink: 0; width: 13px; height: 13px; }
 
 .section { padding: 18px 36px 0; }
-.section-last { padding-bottom: 80px; }
+.section-last { padding-bottom: 28px; }
 .sec-title { font-size: 8px; font-weight: 600; color: #9CA3AF; letter-spacing: .12em; text-transform: uppercase; padding-bottom: 7px; border-bottom: 1px solid #F3F4F6; margin-bottom: 12px; }
 
 .specs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #F3F4F6; border: 1px solid #F3F4F6; border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
@@ -211,7 +203,7 @@ body {
 .dk { color: #6B7280; }
 .dv { color: #111827; font-weight: 500; }
 
-.footer { position: absolute; bottom: 0; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
+.footer { position: relative; margin-top: 10px; left: 0; right: 0; background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 10px 36px; display: flex; align-items: center; justify-content: space-between; }
 .footer-brand { font-size: 9px; font-weight: 700; color: #374151; letter-spacing: .06em; }
 .footer-contact { font-size: 9px; color: #6B7280; text-align: center; line-height: 1.55; }
 .footer-disc { font-size: 7.5px; color: #9CA3AF; text-align: right; max-width: 190px; line-height: 1.45; }
@@ -449,12 +441,6 @@ body {
   </div>
 </div>
 
-<div class="footer">
-  <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
-  <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
-</div>
-
 </div><!-- /sheet page 1 -->
 
 <!-- ============ PAGE 2 ============ -->
@@ -608,9 +594,22 @@ var PROJ_URL = '{{ url('/') }}';
 new QRCode(document.getElementById('qr-whatsapp'), { text: WA_URL, width: 130, height: 130, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 new QRCode(document.getElementById('qr-project'), { text: PROJ_URL, width: 130, height: 130, colorDark: '#111827', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 
-// Auto-open the browser print dialog so the user can "Save as PDF"
+// Size the printed page to exactly fit all content (one continuous page),
+// then open the print dialog so the user can "Save as PDF".
+// This avoids clipped content, awkward page breaks and trailing blank pages.
+function fitPageAndPrint() {
+  var px = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  // 96px = 1in = 25.4mm. Add a tiny buffer to avoid rounding overflow onto a 2nd page.
+  var mm = Math.ceil(px * 25.4 / 96) + 2;
+  var style = document.createElement('style');
+  style.innerHTML = '@page { size: 210mm ' + mm + 'mm; margin: 0; }';
+  document.head.appendChild(style);
+  window.print();
+}
+
 window.addEventListener('load', function () {
-  setTimeout(function () { window.print(); }, 500);
+  // Wait for QR codes + web fonts to finish rendering before measuring height.
+  setTimeout(fitPageAndPrint, 600);
 });
 </script>
 </body>
