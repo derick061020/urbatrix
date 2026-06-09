@@ -197,7 +197,7 @@
                 </div>
               </div>
               <div class="mt-price-meta">
-                <span class="muted">$450/sqft</span>
+                <span class="muted">$450m²</span>
                 <span class="sep"></span>
                 <span class="success">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z" transform="rotate(180 12 12)"/></svg>
@@ -1867,7 +1867,7 @@
                 <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/sqft</span>
+                    <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m²</span>
                   @endif
                 </div>
                 @if($hasDiscount)
@@ -2088,7 +2088,7 @@
                 <td>
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/SQFT</span>
+                    <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}m²</span>
                   @endif
                 </td>
                 <td>
@@ -3548,7 +3548,7 @@
         const usd = parseFloat(el.dataset.usdSqft || el.dataset.usd_sqft);
         if (!isNaN(usd)) {
           const converted = Math.round(usd * rate);
-          el.textContent = symbol + number_format(converted, 0) + '/sqft';
+          el.textContent = symbol + number_format(converted, 0) + 'm²';
         }
       });
 
@@ -3584,7 +3584,7 @@
         const usd = parseFloat(modalSqft.dataset.usdSqft);
         if (!isNaN(usd)) {
           const converted = Math.round(usd * rate);
-          modalSqft.textContent = symbol + number_format(converted, 0) + '/sqft';
+          modalSqft.textContent = symbol + number_format(converted, 0) + 'm²';
         }
       }
     }
@@ -4345,7 +4345,7 @@
 
       // Details section
       const pricePerSqft = unit.internal_area && unit.internal_area > 0
-        ? `<span style="display:block;font-size:0.62rem;color:rgb(98,84,65);opacity:0.75;line-height:1.2;">$${number_format(Math.round(unit.price / unit.internal_area), 0)}/sqft <span style="color:rgb(34,197,94);font-weight:600;">· -12% mercado</span></span>`
+        ? `<span style="display:block;font-size:0.62rem;color:rgb(98,84,65);opacity:0.75;line-height:1.2;">$${number_format(Math.round(unit.price / unit.internal_area), 0)}m² <span style="color:rgb(34,197,94);font-weight:600;">· -12% mercado</span></span>`
         : '';
       const detailsSection = document.createElement('div');
       detailsSection.style.cssText = 'position:relative;padding:1.25rem 1.5rem 0.5rem 1.5rem;';

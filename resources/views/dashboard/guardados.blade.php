@@ -666,7 +666,7 @@
                                 <div class="fg-card-price">
                                     <span class="price">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
                                     @if($unit->internal_area && $unit->internal_area > 0)
-                                        <span class="sqft">${{ number_format($unit->price / $unit->internal_area, 0) }}/sqft</span>
+                                        <span class="sqft">${{ number_format($unit->price / $unit->internal_area, 0) }}m²</span>
                                     @endif
                                 </div>
                                 @if($hasDiscount)
