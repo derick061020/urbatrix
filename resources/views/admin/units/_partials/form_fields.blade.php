@@ -138,7 +138,7 @@
                     <textarea name="for_investment_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
                               placeholder="Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-[12px] font-semibold text-ink-700">Valor proyectado ($)</label>
                         <input type="number" step="0.01" min="0" name="projected_value" value="{{ old('projected_value', $u->projected_value ?? '') }}" class="crm-input pl-3 mt-1">
@@ -146,10 +146,6 @@
                     <div>
                         <label class="text-[12px] font-semibold text-ink-700">Año proyección</label>
                         <input type="text" maxlength="10" name="projected_value_year" value="{{ old('projected_value_year', $u->projected_value_year ?? '') }}" class="crm-input pl-3 mt-1" placeholder="2027">
-                    </div>
-                    <div>
-                        <label class="text-[12px] font-semibold text-ink-700">ROI (%)</label>
-                        <input type="number" step="0.01" min="0" max="999" name="roi_percent" value="{{ old('roi_percent', $u->roi_percent ?? '') }}" class="crm-input pl-3 mt-1" placeholder="10.3">
                     </div>
                 </div>
                 <div>
@@ -336,6 +332,7 @@
         </div>
         <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center gap-6 pt-2">
             @include('admin.units._partials.toggle', ['name' => 'aircon',            'label' => 'Aire acondicionado',   'checked' => old('aircon', $u->aircon ?? false)])
+            @include('admin.units._partials.toggle', ['name' => 'fully_furnished',   'label' => __('Fully furnished'),   'checked' => old('fully_furnished', $u->fully_furnished ?? false)])
             @include('admin.units._partials.toggle', ['name' => 'guaranteed_rental', 'label' => 'Alquiler garantizado', 'checked' => old('guaranteed_rental', $u->guaranteed_rental ?? false)])
             @include('admin.units._partials.toggle', ['name' => 'override_action',   'label' => 'Override acción',      'checked' => old('override_action', $u->override_action ?? false)])
         </div>

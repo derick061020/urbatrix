@@ -1460,6 +1460,18 @@
       color: #1fc16b; line-height: 24px;
       white-space: nowrap;
     }
+    .fg-card-title-row .furnished {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600; font-size: 11px;
+      color: #8a6d3b;
+      background: #faf3e6;
+      border: 1px solid #ecd9b0;
+      border-radius: 999px;
+      padding: 2px 10px;
+      line-height: 18px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     .fg-card-subtitle {
       font-family: 'Poppins', sans-serif;
       font-weight: 500; font-size: 12px;
@@ -1690,7 +1702,8 @@
       white-space: nowrap;
     }
     .fg-card.is-sold .fg-card-price .price { text-decoration: line-through; }
-    .fg-card.is-sold .fg-card-title-row .roi { opacity: 0; pointer-events: none; }
+    .fg-card.is-sold .fg-card-title-row .roi,
+    .fg-card.is-sold .fg-card-title-row .furnished { opacity: 0; pointer-events: none; }
     /* SOLD bottom — single full-width slate button + red note */
     .fg-card.is-sold .fg-card-buttons {
       width: 100%;

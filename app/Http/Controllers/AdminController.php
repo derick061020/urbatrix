@@ -151,7 +151,7 @@ class AdminController extends Controller
             'public', 'pre_arranged', 'plot', 'guaranteed_rental', 'override_action',
             'aircon', 'bypass_launch_date', 'display_on_home_page', 'show_enquire_button',
             'set_discount_globally', 'hide_original_price', 'show_price_alternative',
-            'is_high_demand', 'is_second_chance',
+            'is_high_demand', 'is_second_chance', 'fully_furnished',
         ];
 
         foreach ($booleanFields as $field) {
@@ -241,6 +241,7 @@ class AdminController extends Controller
             'projected_value'       => 'nullable|numeric|min:0',
             'projected_value_year'  => 'nullable|string|max:10',
             'roi_percent'           => 'nullable|numeric|min:0|max:999',
+            'fully_furnished'       => 'boolean',
             'comparison_text'       => 'nullable|string|max:500',
             'amenities'             => 'nullable|array',
             'amenities.*'           => 'string|in:pool,gym,beach_club,restaurant,spa,tennis,golf,security,parking,concierge,playground,bbq',

@@ -261,16 +261,6 @@
             <!-- Financial table (For Investment) — pulled from DB; rows hidden when data is missing -->
             <div class="mt-fin-table mt-investment-only" id="mtFinTable">
               <div class="row">
-                <div class="cell" id="modalRowLevies" style="display:none;">
-                  <span class="k">{{ __('HOA Levies') }}</span>
-                  <span class="v"><b id="modalLevies">—</b><i>{{ __('/mo') }}</i></span>
-                </div>
-                <div class="cell" id="modalRowRental" style="display:none;">
-                  <span class="k">{{ __('Est. Rental Income') }}</span>
-                  <span class="v success"><b id="modalRental">—</b><i>{{ __('/mo') }}</i></span>
-                </div>
-              </div>
-              <div class="row">
                 <div class="cell" id="modalRowFees" style="display:none;">
                   <span class="k">{{ __('Monthly Fees') }}</span>
                   <span class="v"><b id="modalFees">—</b><i>{{ __('/mo') }}</i></span>
@@ -1854,8 +1844,8 @@
               <div class="fg-card-head">
                 <div class="fg-card-title-row">
                   <span class="name">{{ $unit->name }}</span>
-                  @if(!empty($unit->roi_percent) && (float) $unit->roi_percent > 0)
-                    <span class="roi">{{ rtrim(rtrim(number_format((float) $unit->roi_percent, 1, '.', ''), '0'), '.') }}% ROI</span>
+                  @if(!empty($unit->fully_furnished))
+                    <span class="furnished">{{ __('Fully furnished') }}</span>
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
@@ -2025,7 +2015,6 @@
               <th>{{ __('Int sqft') }}</th>
               <th>{{ __('Ext sqft') }}</th>
               <th>{{ __('Price') }}</th>
-              <th>{{ __('ROI') }}</th>
               <th></th>
             </tr>
           </thead>
@@ -2089,13 +2078,6 @@
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)
                     <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m²</span>
-                  @endif
-                </td>
-                <td>
-                  @if(!empty($unit->roi_percent) && (float) $unit->roi_percent > 0)
-                    <span class="roi">{{ rtrim(rtrim(number_format((float) $unit->roi_percent, 1, '.', ''), '0'), '.') }}%</span>
-                  @else
-                    <span class="roi" style="color:#a3a3a3;">—</span>
                   @endif
                 </td>
                 <td>
