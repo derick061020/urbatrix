@@ -42,7 +42,7 @@
   $advisorWA     = '18097109044';
   $advisorInitials = collect(explode(' ', $advisorName))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('');
 
-  $mainImage = optional($unit->images->first())->image_path;
+  $mainImage = optional($unit->images->first())->path;
   if ($mainImage && !preg_match('/^https?:\/\//', $mainImage)) {
     $mainImage = asset($mainImage);
   }
