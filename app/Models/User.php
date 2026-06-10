@@ -10,7 +10,63 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'first_name', 'last_name', 'email', 'password', 'role', 'last_seen', 'google_id', 'apple_id', 'avatar', 'phone', 'country', 'verification_status', 'kyc_id_document', 'kyc_id_document_back'])]
+#[Fillable([
+    'name',
+    'first_name',
+    'last_name',
+    'email',
+    'password',
+    'role',
+    'last_seen',
+    'google_id',
+    'apple_id',
+    'avatar',
+    'phone',
+    'country',
+    'verification_status',
+    'kyc_id_document',
+    'kyc_id_document_back',
+
+    'crm_id',
+    'position',
+    'company',
+    'contact_type',
+    'responsible',
+    'broker',
+    'agency',
+    'project',
+
+    'birthdate',
+    'document_type',
+    'document_number',
+    'document_issue_date',
+    'document_issue_place',
+    'nationality',
+    'age',
+    'marital_status',
+    'gender',
+    'birth_place',
+
+    'profession',
+    'occupation',
+    'depends_on_third',
+
+    'address',
+    'city',
+    'province',
+    'sector',
+    'country_residence',
+    'country_address',
+    'building',
+    'apartment',
+    'postal_code',
+
+    'spouse_name',
+    'spouse_nationality',
+    'spouse_document',
+
+    'crm_raw',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -33,6 +89,7 @@ class User extends Authenticatable
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
+            'crm_raw' => 'array',
         ];
     }
 
