@@ -105,17 +105,72 @@ class ImportClientsFromCsv extends Command
                         $name = $email !== null ? strtok($email, '@') : 'Sin nombre';
                     }
 
-                    User::create([
-                        'name'                => mb_substr($name, 0, 255),
-                        'first_name'          => $firstName !== '' ? mb_substr($firstName, 0, 255) : null,
-                        'last_name'           => $lastName !== '' ? mb_substr($lastName, 0, 255) : null,
-                        'email'               => $email,
-                        'phone'               => $phone,
-                        'role'                => $role,
-                        'password'            => null,
-                        'verification_status' => 'approved',
-                    ]);
-                    $created++;
+                    $user = null;
+
+                    if ($email) {
+                        $user = User::where('email', $email)->first();
+                    }
+
+                    if (! $user && $phone) {
+                        $user = User::where('phone', $phone)->first();
+                    }
+
+                    $data = [
+                        'crm_id'               => $this->fix($row[0] ?? ''),
+                        'name'                 => mb_substr($name, 0, 255),
+                        'first_name'           => $firstName !== '' ? mb_substr($firstName, 0, 255) : null,
+                        'last_name'            => $lastName !== '' ? mb_substr($lastName, 0, 255) : null,
+                        'email'                => $email,
+                        'phone'                => $phone,
+
+                        'position'             => $this->fix($row[7] ?? ''),
+                        'company'              => $this->fix($row[8] ?? ''),
+                        'contact_type'         => $this->fix($row[9] ?? ''),
+                        'responsible'          => $this->fix($row[10] ?? ''),
+
+                        'broker'               => $this->fix($row[63] ?? ''),
+                        'agency'               => $this->fix($row[64] ?? ''),
+                        'document_number'      => $this->fix($row[65] ?? ''),
+                        'project'              => $this->fix($row[66] ?? ''),
+                        'nationality'          => $this->fix($row[67] ?? ''),
+                        'age'                  => $this->fix($row[68] ?? ''),
+                        'city'                 => $this->fix($row[69] ?? ''),
+                        'document_type'        => $this->fix($row[70] ?? ''),
+                        'document_issue_date'  => $this->fix($row[71] ?? ''),
+                        'document_issue_place' => $this->fix($row[72] ?? ''),
+                        'marital_status'       => $this->fix($row[73] ?? ''),
+                        'gender'               => $this->fix($row[74] ?? ''),
+                        'birth_place'          => $this->fix($row[75] ?? ''),
+                        'country_residence'    => $this->fix($row[76] ?? ''),
+                        'address'              => $this->fix($row[77] ?? ''),
+                        'province'             => $this->fix($row[78] ?? ''),
+                        'sector'               => $this->fix($row[79] ?? ''),
+                        'country_address'      => $this->fix($row[80] ?? ''),
+                        'building'             => $this->fix($row[81] ?? ''),
+                        'apartment'            => $this->fix($row[82] ?? ''),
+                        'postal_code'          => $this->fix($row[83] ?? ''),
+                        'profession'           => $this->fix($row[84] ?? ''),
+                        'occupation'           => $this->fix($row[85] ?? ''),
+                        'depends_on_third'     => $this->fix($row[86] ?? ''),
+
+                        'spouse_name'          => $this->fix($row[91] ?? ''),
+                        'spouse_nationality'   => $this->fix($row[92] ?? ''),
+                        'spouse_document'      => $this->fix($row[93] ?? ''),
+
+                        'crm_raw'              => $row,
+                    ];
+
+                    if ($user) {
+                        $user->update($data);
+                        $existing++;
+                    } else {
+                        $data['role'] = $role;
+                        $data['password'] = null;
+                        $data['verification_status'] = 'approved';
+
+                        User::create($data);
+                        $created++;
+                    }
                 }
                 fclose($handle);
             }
