@@ -735,15 +735,30 @@
       });
     });
 
-    // Replaces the old prompt-based sharePropertyPdf — opens the PDF in a new tab
-    // for the currently opened unit, no prompt required. Hooked to both the
-    // DOWNLOAD tab and the green CTA inside the share modal.
+    // Loads the property sheet into a hidden, off-screen iframe instead of
+    // navigating to a new tab. The iframe page scales itself and auto-triggers
+    // its own print dialog, so the user stays on the home page the whole time.
+    // Hooked to both the DOWNLOAD tab and the green CTA inside the share modal.
     window.downloadUnitSheet = function () {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
         alert('Primero abrí los detalles de una unidad.');
         return;
       }
-      window.open('/property-pdf/' + encodeURIComponent(currentOpenUnit), '_blank', 'noopener');
+      const url = '/property-pdf/' + encodeURIComponent(currentOpenUnit);
+      // Reuse a single hidden iframe; drop any previous one first.
+      const prev = document.getElementById('pdfPrintFrame');
+      if (prev) prev.remove();
+      const frame = document.createElement('iframe');
+      frame.id = 'pdfPrintFrame';
+      frame.setAttribute('aria-hidden', 'true');
+      frame.style.position = 'fixed';
+      frame.style.left = '-10000px';
+      frame.style.top = '0';
+      frame.style.width = '230mm';
+      frame.style.height = '320mm';
+      frame.style.border = '0';
+      frame.src = url;
+      document.body.appendChild(frame);
     };
 
     // Auto-open a unit if URL has ?unit=<id> (so share links work)
