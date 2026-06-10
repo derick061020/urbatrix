@@ -66,6 +66,7 @@ class ImportClientsFromCsv extends Command
                 $this->line("→ {$file}");
                 $handle = fopen($file, 'r');
                 $first = true;
+                $headerRow = [];
 
                 while (($row = fgetcsv($handle)) !== false) {
                     // Saltar la fila de cabecera.
@@ -73,6 +74,7 @@ class ImportClientsFromCsv extends Command
                         $first = false;
                         $header = $this->fix($row[0] ?? '') . ' ' . $this->fix($row[3] ?? '');
                         if (stripos($header, 'ID') !== false || stripos($header, 'Nombre') !== false) {
+                            $headerRow = $row;
                             continue;
                         }
                     }
@@ -157,7 +159,7 @@ class ImportClientsFromCsv extends Command
                         'spouse_nationality'   => $this->fix($row[92] ?? ''),
                         'spouse_document'      => $this->fix($row[93] ?? ''),
 
-                        'crm_raw'              => $row,
+                        'crm_raw'              => !empty($headerRow) ? array_combine($headerRow, $row) : $row,
                     ];
 
                     if ($user) {
