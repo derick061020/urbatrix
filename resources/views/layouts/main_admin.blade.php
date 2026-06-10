@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Sidebar Navigation</title>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
+        <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
         <link
             crossorigin=""
             href="https://fonts.gstatic.com"

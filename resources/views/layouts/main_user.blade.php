@@ -5,6 +5,7 @@
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <title>Sidebar Navigation</title>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
+        <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
         <link
             crossorigin=""
             href="https://fonts.gstatic.com"
