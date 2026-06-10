@@ -183,6 +183,7 @@ Route::post('/api/update-last-seen', [ActiveUserController::class, 'updateLastSe
 Route::get('/api/units/{unitId}', [HomeController::class, 'getUnitDetails']);
 Route::post('/api/units/{unitId}/view', [HomeController::class, 'recordView']);
 Route::post('/api/units/filter', [HomeController::class, 'filterUnits']);
+Route::get('/api/units/load-more', [HomeController::class, 'loadMoreUnits']);
 Route::post('/api/wishlist/toggle/{unitId}', [HomeController::class, 'toggleWishlist'])->middleware('auth')->name('wishlist.toggle');
 Route::get('/property-pdf/{unitId}', [HomeController::class, 'propertyPdf'])->name('property.pdf');
 

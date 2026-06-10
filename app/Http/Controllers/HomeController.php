@@ -19,6 +19,9 @@ class HomeController extends Controller
         Unit::releaseExpiredHolds();
 
         // Only units explicitly toggled public are shown on home
+        $initialCount = 12;
+        $totalUnits = Unit::where('public', true)->count();
+
         $units = Unit::with(['images' => function($query) {
                 $query->orderBy('sort_order');
             }])
@@ -27,6 +30,7 @@ class HomeController extends Controller
             ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 0 ELSE 1 END")
             ->orderBy('custom_id')
             ->orderBy('id')
+            ->take($initialCount)
             ->get();
 
         // Calculate real units sold count (only sold status)
@@ -154,6 +158,38 @@ class HomeController extends Controller
         return response()->json([
             'views_today' => (int) $unit->fresh()->views_today,
             'views_total' => (int) $unit->fresh()->views_total,
+        ]);
+    }
+
+    /**
+     * Load more units for infinite scroll
+     */
+    public function loadMoreUnits(Request $request)
+    {
+        Unit::releaseExpiredHolds();
+
+        $offset = (int) $request->get('offset', 0);
+        $limit  = (int) $request->get('limit', 12);
+
+        $units = Unit::with(['images' => function($query) {
+                $query->orderBy('sort_order');
+            }])
+            ->where('public', true)
+            ->orderByRaw('display_on_home_page DESC')
+            ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 0 ELSE 1 END")
+            ->orderBy('custom_id')
+            ->orderBy('id')
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $total = Unit::where('public', true)->count();
+
+        return response()->json([
+            'units'     => $units,
+            'offset'    => $offset + $units->count(),
+            'total'     => $total,
+            'has_more'  => ($offset + $units->count()) < $total,
         ]);
     }
 

@@ -1720,12 +1720,12 @@
           </button>
         </div>
 
-        <button class="fg-pill-matches" type="button" onclick="shareMatches()">
+        <button class="fg-pill-matches" type="button" onclick="shareMatches()" data-total-units="{{ $totalUnits }}">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          {{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $units->count()]) }}
+          <span class="fg-pill-text">{{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $totalUnits]) }}</span>
         </button>
       </div>
       <!-- Cards Grid -->
@@ -4867,6 +4867,364 @@
         if (typeof openMoreInfo === 'function') openMoreInfo(refUnit);
       }
     };
+  </script>
+
+  <style>
+    /* ============================================================
+       Infinite scroll — skeleton shimmer + sentinel
+       ============================================================ */
+    @keyframes fgShimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .fg-skeleton {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f0f2f0;
+      position: relative;
+    }
+    .fg-skeleton::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.5) 50%, transparent 100%);
+      background-size: 800px 100%;
+      animation: fgShimmer 1.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .fg-skeleton-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 16px 16px 0 0;
+    }
+    .fg-skeleton-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fg-skeleton-line {
+      height: 14px;
+      border-radius: 8px;
+      background: #e5e7e5;
+    }
+    .fg-skeleton-line.w50 { width: 50%; }
+    .fg-skeleton-line.w60 { width: 60%; }
+    .fg-skeleton-line.w70 { width: 70%; }
+    .fg-skeleton-line.w80 { width: 80%; }
+    .fg-skeleton-stats {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .fg-skeleton-stat {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      background: #e5e7e5;
+    }
+
+    .fg-sentinel {
+      width: 100%;
+      height: 1px;
+      pointer-events: none;
+    }
+
+    /* Entrance animation for cards loaded via infinite scroll */
+    @keyframes fgCardSlideUp {
+      0%   { opacity: 0; transform: translateY(24px) scale(.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .fg-units-grid > .fg-card.is-new {
+      animation: fgCardSlideUp .45s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    /* Loading spinner at the bottom */
+    .fg-loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px 0 32px;
+      color: #8a9a90;
+      font-size: 13px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 500;
+    }
+    .fg-loading-spinner .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #8a9a90;
+      animation: fgDotBounce .9s ease-in-out infinite;
+    }
+    .fg-loading-spinner .dot:nth-child(2) { animation-delay: .15s; }
+    .fg-loading-spinner .dot:nth-child(3) { animation-delay: .3s; }
+    @keyframes fgDotBounce {
+      0%, 80%, 100% { transform: scale(.6); opacity: .4; }
+      40%           { transform: scale(1);   opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fg-skeleton::after { animation: none; }
+      .fg-units-grid > .fg-card.is-new { animation: none !important; }
+    }
+  </style>
+
+  <!-- Infinite scroll sentinel — IntersectionObserver watches this -->
+  <div class="fg-sentinel" id="fgScrollSentinel" aria-hidden="true"></div>
+
+  <script>
+    // ============================================================
+    // INFINITE SCROLL — load more units when sentinel enters viewport
+    // ============================================================
+    (function initInfiniteScroll() {
+      const GRID        = document.querySelector('.fg-units-grid');
+      const SENTINEL    = document.getElementById('fgScrollSentinel');
+      const TOTAL       = parseInt(document.querySelector('[data-total-units]')?.dataset.totalUnits || '0', 10);
+      let offset        = {{ $units->count() }};
+      let isLoading     = false;
+      let hasMore       = offset < TOTAL;
+
+      if (!GRID || !SENTINEL || !hasMore) return;
+
+      // Create a container for skeleton cards
+      const SKELETON_WRAPPER = document.createElement('div');
+      SKELETON_WRAPPER.id    = 'fgSkeletonWrapper';
+      SKELETON_WRAPPER.style.display = 'none';
+
+      function renderSkeletons(count = 6) {
+        SKELETON_WRAPPER.innerHTML = '';
+        SKELETON_WRAPPER.style.display = 'grid';
+        SKELETON_WRAPPER.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        SKELETON_WRAPPER.style.gap = '16px';
+        SKELETON_WRAPPER.style.marginTop = '8px';
+
+        for (let i = 0; i < count; i++) {
+          const sk = document.createElement('div');
+          sk.className = 'fg-skeleton fg-card';
+          sk.innerHTML = `
+            <div class="fg-skeleton-img"></div>
+            <div class="fg-skeleton-body">
+              <div class="fg-skeleton-line w60"></div>
+              <div class="fg-skeleton-line w80"></div>
+              <div class="fg-skeleton-line w50"></div>
+              <div class="fg-skeleton-stats">
+                <div class="fg-skeleton-stat"></div>
+                <div class="fg-skeleton-stat"></div>
+                <div class="fg-skeleton-stat"></div>
+                <div class="fg-skeleton-stat"></div>
+                <div class="fg-skeleton-stat"></div>
+                <div class="fg-skeleton-stat"></div>
+              </div>
+              <div class="fg-skeleton-line w70" style="margin-top:4px;"></div>
+            </div>
+          `;
+          SKELETON_WRAPPER.appendChild(sk);
+        }
+        GRID.after(SKELETON_WRAPPER);
+      }
+
+      function removeSkeletons() {
+        SKELETON_WRAPPER.style.display = 'none';
+        SKELETON_WRAPPER.innerHTML = '';
+      }
+
+      // Show a "Cargando más unidades..." bar after skeletons
+      function showLoadingBar() {
+        const existing = document.getElementById('fgLoadingBar');
+        if (existing) return;
+        const bar = document.createElement('div');
+        bar.id = 'fgLoadingBar';
+        bar.className = 'fg-loading-spinner';
+        bar.innerHTML = `
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span style="margin-left:6px;">{{ __('Cargando más unidades…') }}</span>
+        `;
+        SENTINEL.before(bar);
+      }
+
+      function hideLoadingBar() {
+        const bar = document.getElementById('fgLoadingBar');
+        if (bar) bar.remove();
+      }
+
+      function removeSentinel() {
+        SENTINEL.style.display = 'none';
+      }
+
+      function loadMore() {
+        if (isLoading || !hasMore) return;
+        isLoading = true;
+
+        renderSkeletons(6);
+        showLoadingBar();
+
+        const params = new URLSearchParams({ offset, limit: 12 });
+        fetch(`/api/units/load-more?${params.toString()}`, {
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin',
+        })
+        .then(r => r.ok ? r.json() : Promise.reject(r))
+        .then(data => {
+          removeSkeletons();
+          hideLoadingBar();
+
+          if (!data.units || !data.units.length) {
+            hasMore = false;
+            removeSentinel();
+            return;
+          }
+
+          // Append each new card with a staggered entrance
+          data.units.forEach((unit, idx) => {
+            const card = createInfiniteCard(unit);
+            card.style.setProperty('--card-index', idx);
+            card.style.animationDelay = `${idx * 60}ms`;
+            card.classList.add('is-new');
+            GRID.appendChild(card);
+          });
+
+          offset = data.offset;
+          hasMore = data.has_more;
+          if (!hasMore) removeSentinel();
+        })
+        .catch(() => {
+          removeSkeletons();
+          hideLoadingBar();
+        })
+        .finally(() => {
+          isLoading = false;
+        });
+      }
+
+      // Create a card element from API data (mirrors the Blade template structure)
+      function createInfiniteCard(unit) {
+        const unitId   = unit.custom_id || unit.id;
+        const st       = (unit.status || '').toLowerCase();
+        const isSold   = st === 'sold';
+        const isRes    = st === 'reserved';
+        const isPen    = st === 'pending';
+        const isHigh   = !!(unit.is_high_demand || unit.demand_level === 'high');
+        const isSec    = !!(unit.is_second_chance);
+        const hasDisc  = !!(unit.discount && unit.discount > 0);
+        const beds     = parseInt(unit.bedrooms || 0, 10);
+        const typeLbl  = (unit.type && unit.type.toLowerCase() === 'penthouse') ? 'Penthouse' : (beds === 0 ? 'Studio' : beds + ' Bed');
+        const floor    = (unit.floor || '').trim() || 'Ground';
+        const priceFmt = unit.price ? '$' + number_format(unit.price, 0, ' ', ' ') : '—';
+        const sqft     = (unit.internal_area && unit.internal_area > 0)
+          ? '$' + number_format(Math.round(unit.price / unit.internal_area), 0) + '/m'
+          : '';
+        const isFav    = false; // Will be synced by the wishlist system if logged in
+        const outlookTxt = unit.outlook ? (window.outlookLabels?.[unit.outlook] || unit.outlook) : '';
+
+        let cls = 'fg-card';
+        if (isSold)      cls += ' is-sold';
+        if (isRes)       cls += ' is-reserved';
+        if (isPen)       cls += ' is-pending';
+        if (isSec)       cls += ' is-second-chance';
+        if (isHigh && !isRes && !isPen && !isSec) cls += ' is-high-demand';
+
+        const imgHtml = unit.images && unit.images.length
+          ? `<img src="${unit.images[0].path}" alt="${unitId}" onerror="this.style.display='none'" onclick="openMoreInfo('${unitId}')" style="cursor:pointer">`
+          : `<div class="fg-card-img-noimage" onclick="openMoreInfo('${unitId}')" style="cursor:pointer">No Image Available</div>`;
+
+        let statusBadge = '';
+        if (isRes)       statusBadge = `<span class="fg-status-badge reserved"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> RESERVED</span>`;
+        else if (isPen)  statusBadge = `<span class="fg-status-badge pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> PENDING</span>`;
+        else if (isHigh) statusBadge = `<span class="fg-status-badge high-demand"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg> HIGH DEMAND</span>`;
+        else if (isSec)  statusBadge = `<span class="fg-status-badge second"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 2ND CHANCE</span>`;
+        else             statusBadge = '<span></span>';
+
+        const searchBlob = (unitId + ' ' + (unit.name||'') + ' ' + floor + ' ' + (unit.direction||'') + ' ' + (unit.outlook||'') + ' ' + (unit.type||'') + ' ' + beds + ' bed').toLowerCase();
+
+        const card = document.createElement('div');
+        card.className = cls;
+        card.dataset.filterUnit      = unitId;
+        card.dataset.filterSearch    = searchBlob;
+        card.dataset.filterFloor     = unit.floor || '';
+        card.dataset.filterType      = unit.type || '';
+        card.dataset.filterBedrooms  = String(beds);
+        card.dataset.filterDirection = (unit.direction || '').toUpperCase();
+        card.dataset.filterOutlook   = unit.outlook || '';
+        card.dataset.filterPrice     = String(unit.price || 0);
+        card.dataset.filterArea      = String(unit.internal_area || 0);
+        card.dataset.filterStatus    = st;
+        card.dataset.filterSecond    = isSec ? '1' : '0';
+
+        const furnishedBadge = unit.fully_furnished ? '<span class="furnished">Fully furnished</span>' : '';
+
+        card.innerHTML = `
+          <div class="fg-card-inner">
+            <div class="fg-card-img">
+              ${imgHtml}
+              <div class="fg-chip-row">
+                ${statusBadge}
+                <button type="button" class="fg-add-to-list icon-only" aria-label="Add to list" aria-pressed="false" data-wishlist-toggle data-unit-id="${unit.id}" title="Shortlisted by ${unit.shortlisted_count || 0} other">
+                  <span class="heart"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+                  <span class="text"><span class="label">Add to list</span><span class="meta">Shortlisted by <span data-unit-count="${unit.id}">${unit.shortlisted_count || 0}</span> other</span></span>
+                </button>
+              </div>
+              <div class="fg-reserve-banner" onclick="openMoreInfo('${unitId}')" style="cursor:pointer">Reserve from $5000</div>
+              ${isSold ? '<div class="fg-sold-badge"><span>SOLD</span></div>' : ''}
+            </div>
+            <div class="fg-card-body">
+              <div class="fg-card-head">
+                <div class="fg-card-title-row">
+                  <span class="name">${unit.name || unitId}</span>
+                  ${furnishedBadge}
+                </div>
+                <div class="fg-card-subtitle">${unit.floor ? unit.floor.charAt(0).toUpperCase() + unit.floor.slice(1) + ' Floor' : 'Ground Floor'} ${unit.direction ? '· ' + unit.direction.toUpperCase() : ''} ${outlookTxt ? '· ' + outlookTxt : ''}</div>
+                <div class="fg-card-divider"></div>
+                <div class="fg-card-price" onclick="openMoreInfo('${unitId}')" style="cursor:pointer">
+                  <span class="price" data-usd="${unit.price || 0}">${priceFmt}</span>
+                  ${sqft ? '<span class="sqft" data-usd-sqft="' + Math.round(unit.price / unit.internal_area) + '">' + sqft + '</span>' : ''}
+                </div>
+                ${hasDisc ? '<button type="button" class="fg-discount" title="Limited time offer">Unlock $' + number_format(unit.discount, 0, ',', ',') + ' Discount</button>' : ''}
+              </div>
+              <div class="fg-stats" onclick="openMoreInfo('${unitId}')" style="cursor:pointer">
+                <div class="fg-stat" title="Bedrooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg><span class="v">${unit.bedrooms || 0}</span></div>
+                <span class="fg-stat-divider"></span>
+                <div class="fg-stat" title="Bathrooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4a2 2 0 0 1 4 0"/><path d="M2 11h20"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><line x1="6" y1="22" x2="6" y2="20"/><line x1="18" y1="22" x2="18" y2="20"/></svg><span class="v">${unit.bathrooms || 0}</span></div>
+                <span class="fg-stat-divider"></span>
+                <div class="fg-stat" title="Parking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14"/><path d="M5 17V9l1.5-4h11L19 9v8"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg><span class="v">${unit.parking_bays || 0}</span></div>
+                <span class="fg-stat-divider"></span>
+                <div class="fg-stat" title="Internal area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="2 2"/></svg><span class="v">${number_format(unit.internal_area || 0)}m<sup>2</sup></span></div>
+                <span class="fg-stat-divider"></span>
+                <div class="fg-stat" title="External area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 3 3 8 3"/><polyline points="16 3 21 3 21 8"/><polyline points="21 16 21 21 16 21"/><polyline points="8 21 3 21 3 16"/></svg><span class="v">${number_format(unit.external_area || 0)}m<sup>2</sup></span></div>
+                <span class="fg-stat-divider"></span>
+                <div class="fg-stat" title="Total area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg><span class="v">${number_format(unit.total_area || 0)}m<sup>2</sup></span></div>
+              </div>
+              <div class="fg-card-actions">
+                ${isSold ? `<div class="fg-card-buttons"><button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">View Similar Units</button></div><div class="fg-card-availability"><span class="dot"></span><span>This unit has been sold.</span></div>`
+                : isRes ? `<div class="fg-card-buttons"><button class="fg-btn-info" onclick="openMoreInfo('${unitId}')">More Info</button><button class="fg-btn-cta" type="button" onclick="notifyWhenAvailable('${unitId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notificar si se libera</button></div><div class="fg-card-availability"><span class="dot"></span><span>Currently on hold by another buyer.</span></div>`
+                : `<div class="fg-card-buttons"><button class="fg-btn-info" onclick="openMoreInfo('${unitId}')">More Info</button><button class="fg-btn-cta" type="button" onclick="openAdvisorVideoCall('${unitId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7" fill="currentColor"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Book Video Call</button></div><div class="fg-card-availability advisor-live"><span class="dot"></span><span>An advisor is available right now.</span></div>`}
+              </div>
+            </div>
+          </div>
+          ${isHigh && !isRes && !isPen && !isSec ? `<div class="fg-card-status-strip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>${unit.views_today || unit.shortlisted_count || 0} people viewed this unit today</span></div>`
+          : isPen ? `<div class="fg-card-status-strip"><span class="fg-card-status-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Pending review · Hold expires soon</span></div>`
+          : isSec ? `<div class="fg-card-status-strip"><span class="fg-card-status-dot"></span><span>This unit was released recently</span></div>`
+          : ''}
+        `;
+
+        // Apply current filters to the new card
+        if (typeof matches === 'function' && !matches(card)) {
+          card.style.display = 'none';
+        }
+
+        return card;
+      }
+
+      // IntersectionObserver
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      }, { rootMargin: '200px' });
+
+      observer.observe(SENTINEL);
+    })();
   </script>
 
 @include('partials.logout-modal')
