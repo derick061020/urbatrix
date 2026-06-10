@@ -1040,7 +1040,59 @@
       animation: fgPillPulse .35s ease;
     }
 
+    /* ===========================================================
+       Lazy progressive reveal (grid cards + list rows)
+       — initial batch renders, the rest fade in on scroll.
+       =========================================================== */
+    @keyframes fgLazyIn {
+      0%   { opacity: 0; transform: translateY(18px) scale(.97); }
+      100% { opacity: 1; transform: none; }
+    }
+    .fg-units-grid > .fg-card.is-lazy-in {
+      animation: fgLazyIn .55s cubic-bezier(.16,1,.3,1) both;
+      animation-delay: calc(var(--lazy-i, 0) * 55ms);
+      will-change: opacity, transform;
+    }
+    @keyframes fgLazyRowIn {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: none; }
+    }
+    #fgListTable tbody tr[data-filter-unit].is-lazy-in {
+      animation: fgLazyRowIn .42s cubic-bezier(.16,1,.3,1) both;
+      animation-delay: calc(var(--lazy-i, 0) * 35ms);
+    }
+    /* "Loading more units" sentinel + indicator (observed for infinite scroll) */
+    .fg-lazy-more {
+      display: none;
+      align-items: center; justify-content: center; gap: 12px;
+      width: 100%;
+      padding: 26px 0 34px;
+      color: #5c7c68;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 13px; font-weight: 600; letter-spacing: .2px;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    .fg-lazy-more.is-active { display: flex; opacity: 1; }
+    #listLazyMore { padding: 18px 0 28px; }
+    .fg-lazy-dots { display: inline-flex; gap: 6px; }
+    .fg-lazy-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #5c7c68;
+      animation: fgLazyDot 1s ease-in-out infinite;
+    }
+    .fg-lazy-dots span:nth-child(2) { animation-delay: .15s; }
+    .fg-lazy-dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes fgLazyDot {
+      0%, 100% { transform: scale(.55); opacity: .35; }
+      40%      { transform: scale(1);   opacity: 1;   }
+    }
+    .fg-lazy-label { opacity: .85; }
+
     @media (prefers-reduced-motion: reduce) {
+      .fg-units-grid > .fg-card.is-lazy-in,
+      #fgListTable tbody tr[data-filter-unit].is-lazy-in,
+      .fg-lazy-dots span,
       .fg-units-grid > .fg-card,
       .fg-plan-marker.is-popping,
       .fg-plan-canvas.is-switching,
@@ -1981,6 +2033,11 @@
 
         @endforeach
       </div>
+      <!-- Infinite-scroll sentinel for the grid (revealed batch by batch). -->
+      <div class="fg-lazy-more" id="gridLazyMore" aria-hidden="true">
+        <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
+        <span class="fg-lazy-label">{{ __('Cargando más unidades…') }}</span>
+      </div>
 
       <!-- LIST VIEW -->
       <div class="fg-list-wrap" id="fgListWrap">
@@ -2104,6 +2161,11 @@
             @endforeach
           </tbody>
         </table>
+        <!-- Infinite-scroll sentinel for the list (revealed batch by batch). -->
+        <div class="fg-lazy-more" id="listLazyMore" aria-hidden="true">
+          <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
+          <span class="fg-lazy-label">{{ __('Cargando más unidades…') }}</span>
+        </div>
         <div class="fg-list-pagination">
           <span>{{ __('Page :current of :total', ['current' => 1, 'total' => 1]) }}</span>
           <div class="fg-list-pages">
@@ -4181,12 +4243,16 @@
         return true;
       }
 
+      // Mark eligibility (the lazy-reveal layer decides what's actually shown).
+      // Non-matching elements are hidden right away; matching ones are revealed
+      // in batches by applyLazyReveal() further below.
       const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
       let visibleGrid = 0;
       cards.forEach(c => {
         const ok = matches(c);
-        animateToggle(c, ok);
-        if (ok) visibleGrid++;
+        c._eligible = ok;
+        if (!ok) animateToggle(c, false);
+        else visibleGrid++;
       });
 
       const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
@@ -4196,8 +4262,9 @@
         const ok = matches(r);
         const tabOk = (activeTab === 'all') || (r.dataset.tab === activeTab);
         const show = ok && tabOk;
-        animateToggle(r, show, { kind: 'row' });
-        if (show) visibleList++;
+        r._eligible = show;
+        if (!show) animateToggle(r, false, { kind: 'row' });
+        else visibleList++;
       });
 
       // Sort cards in place when a sort is selected
@@ -4221,9 +4288,86 @@
         }
       }
 
+      // A fresh filter/sort/search resets the reveal window back to the first
+      // batch; scroll then re-extends it. (The observer passes keepReveal.)
+      if (!options.keepReveal) {
+        gridReveal = LAZY_BATCH_GRID;
+        listReveal = LAZY_BATCH_LIST;
+      }
+      applyLazyReveal('grid');
+      applyLazyReveal('list');
+
       updateMatchCount(visibleGrid);
       updateListMatchCount(visibleList);
       if (!options.skipUrl) syncFiltersToUrl();
+    }
+
+    // ── Lazy progressive reveal ──────────────────────────────────────────
+    // Only the first N eligible cards/rows are shown; the rest stay hidden
+    // until the user scrolls the sentinel into view (IntersectionObserver).
+    const LAZY_BATCH_GRID = 9;   // grid: initial render + per-scroll batch
+    const LAZY_BATCH_LIST = 15;  // list: initial render + per-scroll batch
+    let gridReveal = LAZY_BATCH_GRID;
+    let listReveal = LAZY_BATCH_LIST;
+
+    function applyLazyReveal(which) {
+      const isGrid = which === 'grid';
+      const els = isGrid
+        ? Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'))
+        : Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
+      const limit = isGrid ? gridReveal : listReveal;
+      let shown = 0, fresh = 0, hasMore = false;
+      els.forEach(el => {
+        if (!el._eligible) return;            // non-matching → already hidden
+        if (shown < limit) {
+          const wasHidden = el.style.display === 'none'
+            || el.classList.contains('is-lazy-hidden');
+          el.classList.remove('is-fading-out', 'is-lazy-hidden');
+          el.style.display = '';
+          if (wasHidden) {
+            el.classList.remove('is-lazy-in');
+            void el.offsetWidth;             // restart the keyframe
+            el.style.setProperty('--lazy-i', fresh++);
+            el.classList.add('is-lazy-in');
+            const node = el;
+            setTimeout(() => node.classList.remove('is-lazy-in'), 1000);
+          }
+          shown++;
+        } else {
+          el.style.display = 'none';
+          el.classList.add('is-lazy-hidden');
+          hasMore = true;
+        }
+      });
+      const loader = document.getElementById(isGrid ? 'gridLazyMore' : 'listLazyMore');
+      if (loader) loader.classList.toggle('is-active', hasMore);
+    }
+
+    // Reveal the next batch when its sentinel scrolls near the viewport.
+    function initLazyReveal() {
+      const grid = document.getElementById('gridLazyMore');
+      const list = document.getElementById('listLazyMore');
+      if (!('IntersectionObserver' in window) || (!grid && !list)) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          if (!entry.target.classList.contains('is-active')) return;
+          if (entry.target.id === 'gridLazyMore') {
+            gridReveal += LAZY_BATCH_GRID;
+            applyLazyReveal('grid');
+          } else {
+            listReveal += LAZY_BATCH_LIST;
+            applyLazyReveal('list');
+          }
+        });
+      }, { rootMargin: '0px 0px 160px 0px' });
+      if (grid) obs.observe(grid);
+      if (list) obs.observe(list);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLazyReveal);
+    } else {
+      initLazyReveal();
     }
 
     // Sync current filter state to URL query string (no reload).
@@ -4840,10 +4984,10 @@
         const isAvail  = !['sold','reserved','pending'].includes(cStatus);
         const notSelf  = cUnit !== refUnit;
         const show = sameBeds && isAvail && notSelf;
-        c.style.display = show ? '' : 'none';
+        c._eligible = show;
+        if (!show) c.style.display = 'none';
         if (show) visible++;
       });
-      updateMatchCount(visible);
       // Also apply on the list view in case the user toggles.
       const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
       let listVisible = 0;
@@ -4852,9 +4996,16 @@
         const rStatus = (r.dataset.filterStatus || '').toLowerCase();
         const rUnit   = (r.dataset.filterUnit || '');
         const show = (rBeds === beds) && !['sold','reserved','pending'].includes(rStatus) && rUnit !== refUnit;
-        r.style.display = show ? '' : 'none';
+        r._eligible = show;
+        if (!show) r.style.display = 'none';
         if (show) listVisible++;
       });
+      // Restart the reveal window and animate the matching subset in.
+      gridReveal = LAZY_BATCH_GRID;
+      listReveal = LAZY_BATCH_LIST;
+      applyLazyReveal('grid');
+      applyLazyReveal('list');
+      updateMatchCount(visible);
       updateListMatchCount(listVisible);
 
       // Smooth scroll to the grid so the user sees the result.
