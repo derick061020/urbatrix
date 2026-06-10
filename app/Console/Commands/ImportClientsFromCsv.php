@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\DB;
  *
  * El CSV trae ~95 columnas; sólo usamos nombre, apellido, e-mail y teléfono.
  * El e-mail y el teléfono se detectan por contenido (no por índice fijo) para
- * tolerar variaciones del export. Se deduplica por e-mail: si ya existe un
- * usuario con ese correo NO se modifica (no pisamos admins/brokers/clientes
- * reales). Las filas sin e-mail válido se omiten (el login es por e-mail).
+ * tolerar variaciones del export. Deduplicación: por e-mail cuando existe (si ya
+ * hay un usuario con ese correo NO se modifica, para no pisar admins/brokers/
+ * clientes reales); las filas sin e-mail también se guardan, deduplicando por
+ * teléfono. Las filas sin e-mail NI teléfono se crean igual (no se deduplican).
  *
  * Uso:
  *   php artisan clients:import                         # database/data/clientes*.csv
@@ -52,11 +53,11 @@ class ImportClientsFromCsv extends Command
 
         $created = 0;
         $existing = 0;
-        $skippedNoEmail = 0;
         $rows = 0;
-        $seen = [];
+        $seenEmail = [];
+        $seenPhone = [];
 
-        DB::transaction(function () use ($files, $role, &$created, &$existing, &$skippedNoEmail, &$rows, &$seen) {
+        DB::transaction(function () use ($files, $role, &$created, &$existing, &$rows, &$seenEmail, &$seenPhone) {
             foreach ($files as $file) {
                 if (! is_readable($file)) {
                     $this->error("No se puede leer: {$file}");
@@ -78,25 +79,30 @@ class ImportClientsFromCsv extends Command
 
                     $rows++;
                     $email = $this->extractEmail($row);
-                    if ($email === null) {
-                        $skippedNoEmail++;
-                        continue;
-                    }
-                    if (isset($seen[$email])) {
-                        continue; // duplicado dentro del propio CSV
-                    }
-                    $seen[$email] = true;
+                    $phone = $this->extractPhone($row);
 
-                    if (User::where('email', $email)->exists()) {
-                        $existing++;
-                        continue; // no tocamos usuarios ya existentes
+                    if ($email !== null) {
+                        // Dedupe por e-mail (dentro del CSV y contra la BD).
+                        if (isset($seenEmail[$email]) || User::where('email', $email)->exists()) {
+                            $existing++;
+                            continue;
+                        }
+                        $seenEmail[$email] = true;
+                    } elseif ($phone !== null) {
+                        // Sin e-mail: deduplicamos por teléfono.
+                        if (isset($seenPhone[$phone]) || User::where('phone', $phone)->exists()) {
+                            $existing++;
+                            continue;
+                        }
+                        $seenPhone[$phone] = true;
                     }
+                    // Sin e-mail ni teléfono: se crea igual (no se puede deduplicar).
 
                     $firstName = $this->fix($row[3] ?? '');
                     $lastName  = trim($this->fix($row[4] ?? '') . ' ' . $this->fix($row[5] ?? ''));
                     $name      = trim("{$firstName} {$lastName}");
                     if ($name === '') {
-                        $name = strtok($email, '@');
+                        $name = $email !== null ? strtok($email, '@') : 'Sin nombre';
                     }
 
                     User::create([
@@ -104,7 +110,7 @@ class ImportClientsFromCsv extends Command
                         'first_name'          => $firstName !== '' ? mb_substr($firstName, 0, 255) : null,
                         'last_name'           => $lastName !== '' ? mb_substr($lastName, 0, 255) : null,
                         'email'               => $email,
-                        'phone'               => $this->extractPhone($row),
+                        'phone'               => $phone,
                         'role'                => $role,
                         'password'            => null,
                         'verification_status' => 'approved',
@@ -116,7 +122,7 @@ class ImportClientsFromCsv extends Command
         });
 
         $this->newLine();
-        $this->info("Listo. Creados: {$created} · Ya existían: {$existing} · Sin e-mail (omitidos): {$skippedNoEmail}");
+        $this->info("Listo. Creados: {$created} · Duplicados/ya existían: {$existing}");
         $this->line("Filas de datos procesadas: {$rows}");
 
         return self::SUCCESS;
