@@ -515,10 +515,19 @@ class DashboardController extends Controller
             }
         }
 
+        $events = $events->sortBy('start')->values();
+
+        // Reunión recién agendada desde la home (?meeting=ID): la resaltamos
+        $highlightMeeting = null;
+        if ($request->filled('meeting')) {
+            $highlightMeeting = $events->firstWhere('id', 'm-'.$request->query('meeting'));
+        }
+
         return view('dashboard.calendario', [
-            'events'      => $events->sortBy('start')->values(),
-            'reservation' => $reservation,
-            'activeRoute' => 'calendario',
+            'events'           => $events,
+            'reservation'      => $reservation,
+            'activeRoute'      => 'calendario',
+            'highlightMeeting' => $highlightMeeting,
         ]);
     }
 

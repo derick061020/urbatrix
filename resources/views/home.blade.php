@@ -1198,7 +1198,8 @@
           <a id="advisorMeetLink" href="#" target="_blank" rel="noopener">Abrir en Google Meet</a>
           <button type="button" onclick="copyAdvisorMeetLink()">Copiar</button>
         </div>
-        <button type="button" class="vc-btn vc-btn-primary" style="width:100%;" onclick="closeAdvisorVideoCall()">Listo</button>
+        <button type="button" class="vc-btn vc-btn-primary" style="width:100%;" onclick="goToCalendarMeet()">Ver en mi calendario</button>
+        <button type="button" class="vc-btn vc-btn-ghost" style="width:100%;margin-top:8px;" onclick="closeAdvisorVideoCall()">Cerrar</button>
       </div>
     </div>
   </div>
@@ -3515,6 +3516,13 @@
         });
       } catch (e) { /* silencioso */ }
     }
+    function goToCalendarMeet() {
+      let url = '/dashboard/calendario';
+      if (window._lastMeetingId) {
+        url += '?meeting=' + encodeURIComponent(window._lastMeetingId);
+      }
+      window.location.href = url;
+    }
     function copyAdvisorMeetLink() {
       const link = document.getElementById('advisorMeetLink').href;
       if (!link) return;
@@ -3592,6 +3600,8 @@
         }
 
         const link = data?.meeting?.meet_link;
+        // Guardamos el id de la reunión recién creada para resaltarla en el calendario
+        window._lastMeetingId = data?.meeting?.id || null;
         const meetLinkEl = document.getElementById('advisorMeetLink');
         if (link) {
           meetLinkEl.href = link;

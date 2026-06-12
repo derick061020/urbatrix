@@ -108,6 +108,34 @@
         </div>
     </div>
 
+    {{-- Reunión recién agendada desde la home --}}
+    @if(!empty($highlightMeeting))
+        <div class="cli-card overflow-hidden border border-ok/30" id="new-meeting-banner" style="background:#e3f7ec40;">
+            <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-ok/15 text-ok-dark flex items-center justify-center shrink-0">
+                    <i class="pi pi-video text-[18px]"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[13px] font-bold text-ink-950">¡Videollamada agendada!</div>
+                    <div class="text-[12px] text-ink-500">
+                        {{ $highlightMeeting->start->locale('es')->isoFormat('ddd D [de] MMMM, HH:mm') }} hs · Este es tu link de Google Meet
+                    </div>
+                    @if($highlightMeeting->meet_link)
+                        <div class="text-[11px] text-ok-dark truncate mt-0.5">{{ $highlightMeeting->meet_link }}</div>
+                    @endif
+                </div>
+                @if($highlightMeeting->meet_link)
+                    <a href="{{ $highlightMeeting->meet_link }}" target="_blank" rel="noopener"
+                       class="cli-btn cli-btn-primary text-[12px] shrink-0 whitespace-nowrap">
+                        <i class="pi pi-external-link text-[11px]"></i> Abrir Google Meet
+                    </a>
+                @else
+                    <span class="text-[12px] text-ink-500 shrink-0">El link llegará a tu email</span>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Top cards (upcoming) --}}
     @if($topCards->count())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="top-cards-grid">
