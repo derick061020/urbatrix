@@ -1074,6 +1074,11 @@
       transition: opacity .3s ease;
     }
     .fg-lazy-more.is-active { display: flex; opacity: 1; }
+    /* The grid sentinel is a sibling of (not inside) .fg-units-grid, so the
+       view switch that off-screens the grid doesn't hide it. Keep it grid-only
+       or its "Cargando más unidades…" leaks to the top of the list/plan views. */
+    body[data-view="list"] #gridLazyMore,
+    body[data-view="plan"] #gridLazyMore { display: none !important; }
     #listLazyMore { padding: 18px 0 28px; }
     .fg-lazy-dots { display: inline-flex; gap: 6px; }
     .fg-lazy-dots span {
