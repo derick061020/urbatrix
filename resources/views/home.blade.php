@@ -367,7 +367,12 @@
 
           <!-- Image -->
           <div class="mt-gallery">
-            <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="Unit" class="mt-gallery-img">
+            <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="Unit" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
+
+            <!-- Zoom hint -->
+            <button class="mt-zoom-hint" type="button" onclick="openImgZoom()" aria-label="{{ __('Zoom') }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
 
             <!-- Arrows -->
             <button class="mt-arrow mt-arrow-left" type="button" onclick="prevModalImg()" aria-label="{{ __('Previous') }}">
@@ -399,6 +404,231 @@
       </div><!-- /.mt-body -->
     </div><!-- /.mt-shell -->
   </div><!-- /#moreInfoModal -->
+
+  <!-- IMAGE ZOOM LIGHTBOX -->
+  <div id="imgZoomOverlay" class="iz-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Zoom') }}" onclick="if(event.target===this)closeImgZoom()">
+    <button class="iz-close" type="button" onclick="closeImgZoom()" aria-label="{{ __('Close') }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="iz-arrow iz-arrow-left" type="button" onclick="prevModalImg()" aria-label="{{ __('Previous') }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="iz-arrow iz-arrow-right" type="button" onclick="nextModalImg()" aria-label="{{ __('Next') }}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="iz-stage" id="izStage">
+      <img id="izImg" src="" alt="Unit" draggable="false">
+    </div>
+    <div class="iz-toolbar">
+      <button type="button" onclick="izZoom(-1)" aria-label="{{ __('Zoom out') }}">&minus;</button>
+      <span id="izLevel">100%</span>
+      <button type="button" onclick="izZoom(1)" aria-label="{{ __('Zoom in') }}">+</button>
+      <button type="button" onclick="izReset()" aria-label="{{ __('Reset') }}">&#x21bb;</button>
+    </div>
+  </div>
+  <style>
+    .iz-overlay{
+      position:fixed; inset:0; z-index:1500;
+      background:rgba(8,10,14,.92);
+      display:none; align-items:center; justify-content:center;
+      animation: izFade .18s ease-out; overscroll-behavior:contain;
+    }
+    .iz-overlay.open{ display:flex; }
+    @keyframes izFade{ from{opacity:0} to{opacity:1} }
+    .iz-stage{
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; touch-action:none; cursor:zoom-in;
+    }
+    .iz-stage.zoomed{ cursor:grab; }
+    .iz-stage.grabbing{ cursor:grabbing; }
+    #izImg{
+      max-width:92vw; max-height:88vh;
+      object-fit:contain; user-select:none; -webkit-user-drag:none;
+      transform-origin:center center;
+      transition:transform .12s ease-out; will-change:transform;
+    }
+    .iz-stage.grabbing #izImg{ transition:none; }
+    .iz-close{
+      position:absolute; top:18px; right:18px; z-index:2;
+      width:42px; height:42px; border-radius:999px;
+      background:rgba(255,255,255,.12); color:#fff; border:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:background .15s ease;
+    }
+    .iz-close:hover{ background:rgba(255,255,255,.25); }
+    .iz-arrow{
+      position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+      width:46px; height:46px; border-radius:999px;
+      background:rgba(255,255,255,.12); color:#fff; border:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:background .15s ease;
+    }
+    .iz-arrow:hover{ background:rgba(255,255,255,.25); }
+    .iz-arrow-left{ left:18px; }
+    .iz-arrow-right{ right:18px; }
+    .iz-toolbar{
+      position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:2;
+      display:flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,.12); border-radius:999px; padding:5px 8px;
+      backdrop-filter:blur(4px);
+    }
+    .iz-toolbar button{
+      width:34px; height:34px; border-radius:999px; border:none;
+      background:rgba(255,255,255,.0); color:#fff; font-size:18px; line-height:1;
+      cursor:pointer; transition:background .15s ease;
+    }
+    .iz-toolbar button:hover{ background:rgba(255,255,255,.18); }
+    .iz-toolbar span{ color:#fff; font-size:12px; font-weight:600; min-width:46px; text-align:center; }
+    .mt-zoom-hint{
+      position:absolute; bottom:16px; left:16px; z-index:2;
+      width:34px; height:34px; border-radius:999px;
+      background:rgba(255,255,255,.92); border:1px solid #eaecf0;
+      box-shadow:0 1px 2px rgba(10,13,20,.06); color:#5c5c5c;
+      display:inline-flex; align-items:center; justify-content:center;
+      cursor:zoom-in; transition:all .15s ease;
+    }
+    .mt-zoom-hint:hover{ background:#fff; color:#171717; }
+    .mt-gallery-img{ cursor:zoom-in; }
+    @media (max-width:600px){
+      .iz-arrow{ width:40px; height:40px; }
+      .iz-arrow-left{ left:8px; } .iz-arrow-right{ right:8px; }
+    }
+  </style>
+  <script>
+    (function(){
+      let izScale = 1, izTx = 0, izTy = 0;
+      let dragging = false, sx = 0, sy = 0, stx = 0, sty = 0;
+      // pinch state
+      let pinchDist = 0, pinchScale = 1;
+      const MIN = 1, MAX = 5;
+
+      function stage(){ return document.getElementById('izStage'); }
+      function imgEl(){ return document.getElementById('izImg'); }
+
+      function apply(){
+        const img = imgEl();
+        if(!img) return;
+        izScale = Math.min(MAX, Math.max(MIN, izScale));
+        if(izScale === 1){ izTx = 0; izTy = 0; }
+        img.style.transform = `translate(${izTx}px, ${izTy}px) scale(${izScale})`;
+        const lvl = document.getElementById('izLevel');
+        if(lvl) lvl.textContent = Math.round(izScale * 100) + '%';
+        stage().classList.toggle('zoomed', izScale > 1);
+      }
+
+      window.openImgZoom = function(){
+        const src = document.getElementById('modalMainImg')?.src;
+        if(!src) return;
+        imgEl().src = src;
+        izScale = 1; izTx = 0; izTy = 0; apply();
+        document.getElementById('imgZoomOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      };
+      window.closeImgZoom = function(){
+        document.getElementById('imgZoomOverlay').classList.remove('open');
+        // keep the unit modal scroll-lock if it's still open
+        if(document.getElementById('moreInfoModal')?.style.display !== 'flex'){
+          document.body.style.overflow = '';
+        }
+      };
+      window.izZoom = function(dir){
+        izScale += dir * 0.5;
+        apply();
+      };
+      window.izReset = function(){ izScale = 1; izTx = 0; izTy = 0; apply(); };
+
+      document.addEventListener('DOMContentLoaded', function(){
+        const st = stage(), img = imgEl();
+        if(!st || !img) return;
+
+        // Keep the lightbox image synced when arrows/thumbs change the unit image.
+        // Wrapped here (not at parse time) so updateModalImage is already defined.
+        const _upd = window.updateModalImage;
+        window.updateModalImage = function(){
+          if(typeof _upd === 'function') _upd.apply(this, arguments);
+          const ov = document.getElementById('imgZoomOverlay');
+          if(ov && ov.classList.contains('open')){
+            imgEl().src = document.getElementById('modalMainImg').src;
+            izReset();
+          }
+        };
+
+        // Wheel zoom
+        st.addEventListener('wheel', function(e){
+          e.preventDefault();
+          izScale += (e.deltaY < 0 ? 0.3 : -0.3);
+          apply();
+        }, { passive:false });
+
+        // Double click toggles zoom
+        st.addEventListener('dblclick', function(){
+          izScale = izScale > 1 ? 1 : 2.5; apply();
+        });
+
+        // Single click on the stage (not the image when zoomed) toggles too
+        img.addEventListener('click', function(e){
+          if(izScale === 1){ izScale = 2.5; apply(); }
+        });
+
+        // Mouse drag to pan
+        st.addEventListener('mousedown', function(e){
+          if(izScale <= 1) return;
+          dragging = true; sx = e.clientX; sy = e.clientY; stx = izTx; sty = izTy;
+          st.classList.add('grabbing'); e.preventDefault();
+        });
+        window.addEventListener('mousemove', function(e){
+          if(!dragging) return;
+          izTx = stx + (e.clientX - sx);
+          izTy = sty + (e.clientY - sy);
+          apply();
+        });
+        window.addEventListener('mouseup', function(){
+          dragging = false; st.classList.remove('grabbing');
+        });
+
+        // Touch: pinch zoom + drag pan
+        st.addEventListener('touchstart', function(e){
+          if(e.touches.length === 2){
+            pinchDist = touchDist(e.touches); pinchScale = izScale;
+          } else if(e.touches.length === 1 && izScale > 1){
+            dragging = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+            stx = izTx; sty = izTy;
+          }
+        }, { passive:false });
+        st.addEventListener('touchmove', function(e){
+          if(e.touches.length === 2){
+            e.preventDefault();
+            const d = touchDist(e.touches);
+            if(pinchDist > 0){ izScale = pinchScale * (d / pinchDist); apply(); }
+          } else if(dragging && e.touches.length === 1){
+            e.preventDefault();
+            izTx = stx + (e.touches[0].clientX - sx);
+            izTy = sty + (e.touches[0].clientY - sy);
+            apply();
+          }
+        }, { passive:false });
+        st.addEventListener('touchend', function(e){
+          if(e.touches.length === 0){ dragging = false; pinchDist = 0; }
+        });
+
+        function touchDist(t){
+          const dx = t[0].clientX - t[1].clientX;
+          const dy = t[0].clientY - t[1].clientY;
+          return Math.hypot(dx, dy);
+        }
+      });
+
+      // ESC closes the lightbox first
+      document.addEventListener('keydown', function(e){
+        const ov = document.getElementById('imgZoomOverlay');
+        if(!ov || !ov.classList.contains('open')) return;
+        if(e.key === 'Escape'){ e.stopPropagation(); closeImgZoom(); }
+        else if(e.key === 'ArrowLeft'){ prevModalImg(); }
+        else if(e.key === 'ArrowRight'){ nextModalImg(); }
+      });
+    })();
+  </script>
 
 
   <!-- SHARE PROPERTY MODAL (YouTube-style) -->
