@@ -33,7 +33,8 @@
                   data-filter-price="{{ (float) $unit->price }}"
                   data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
                   data-filter-status="{{ $st }}"
-                  data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
+                  data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}"
+                  data-hot="{{ !empty($unit->is_high_demand) ? '1' : '0' }}">
                 <td><b>{{ $unit->name }}</b></td>
                 <td>
                     <span class="fg-list-status {{ $statusCls }}">{{ strtoupper(__($statusLabel)) }}</span>

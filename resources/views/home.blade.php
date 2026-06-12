@@ -1809,6 +1809,7 @@
           <div class="fg-list-tabs" role="tablist" aria-label="{{ __('Status filter') }}">
             <button type="button" class="fg-list-tab active" data-tab="all" onclick="setListTab(this)">{{ __('All') }} <span class="badge">{{ $units->count() }}</span></button>
             <button type="button" class="fg-list-tab" data-tab="available" onclick="setListTab(this)">{{ __('Available') }} <span class="badge">{{ $units->whereIn('status', ['available', null, ''])->count() ?: $units->where('status', '!=', 'sold')->count() }}</span></button>
+            <button type="button" class="fg-list-tab" data-tab="hot" onclick="setListTab(this)">{{ __('Hot') }} <span class="badge">{{ $units->filter(fn($u)=>!empty($u->is_high_demand))->count() }}</span></button>
             <button type="button" class="fg-list-tab" data-tab="pending" onclick="setListTab(this)">{{ __('Pending') }} <span class="badge">{{ $units->where('status', 'PENDING')->count() }}</span></button>
             <button type="button" class="fg-list-tab" data-tab="second" onclick="setListTab(this)">{{ __('2nd Chance') }} <span class="badge">{{ $units->filter(fn($u)=>!empty($u->is_second_chance))->count() }}</span></button>
             <button type="button" class="fg-list-tab" data-tab="sold" onclick="setListTab(this)">{{ __('Sold') }} <span class="badge">{{ $units->where('status', 'SOLD')->count() }}</span></button>
@@ -3951,7 +3952,8 @@
       const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
       rows.forEach(r => {
         const ok = matches(r);
-        const tabOk = (activeTab === 'all') || (r.dataset.tab === activeTab);
+        const tabOk = (activeTab === 'all')
+          || (activeTab === 'hot' ? r.dataset.hot === '1' : r.dataset.tab === activeTab);
         const show = ok && tabOk;
         animateToggle(r, show, { kind: 'row' });
         if (show) visibleList++;
