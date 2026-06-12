@@ -180,6 +180,7 @@ Route::get('/api/active-users', [ActiveUserController::class, 'getActiveUsersCou
 Route::post('/api/update-last-seen', [ActiveUserController::class, 'updateLastSeen']);
 
 // Home page API routes
+Route::get('/api/home-units', [HomeController::class, 'homeUnits'])->middleware('auth')->name('home.units');
 Route::get('/api/units/{unitId}', [HomeController::class, 'getUnitDetails']);
 Route::post('/api/units/{unitId}/view', [HomeController::class, 'recordView']);
 Route::post('/api/units/filter', [HomeController::class, 'filterUnits']);

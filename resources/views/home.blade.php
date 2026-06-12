@@ -1782,255 +1782,8 @@
       </div>
       <!-- Cards Grid -->
       <div class="fg-units-grid" style="padding-top:10px">
-        @foreach($units as $unit)
-        @php
-          $st = strtolower($unit->status ?? '');
-          $isSold      = $st === 'sold';
-          $isReserved  = $st === 'reserved';
-          $isPending   = $st === 'pending';
-          $isHighDem   = !empty($unit->is_high_demand) || ($unit->demand_level ?? '') === 'high';
-          $isSecond    = !empty($unit->is_second_chance);
-          $hasDiscount = !empty($unit->discount) && $unit->discount > 0;
-          $cardCls = 'fg-card';
-          if ($isSold)         $cardCls .= ' is-sold';
-          elseif ($isReserved) $cardCls .= ' is-reserved';
-          elseif ($isPending)  $cardCls .= ' is-pending';
-          elseif ($isSecond)   $cardCls .= ' is-second-chance';
-          elseif ($isHighDem)  $cardCls .= ' is-high-demand';
-          $unitId = $unit->custom_id ?? $unit->id;
-          $shortlistedCount = (int) ($unit->shortlisted_count ?? 0);
-        @endphp
-        @php
-          $beds = (int) ($unit->bedrooms ?? 0);
-          if (!empty($unit->type) && strcasecmp($unit->type, 'Penthouse') === 0) {
-              $unitTypeLbl = 'Penthouse';
-          } elseif ($beds === 0) {
-              $unitTypeLbl = 'Studio';
-          } else {
-              $unitTypeLbl = $beds . ' Bed';
-          }
-          $floorRaw = trim((string) ($unit->floor ?? ''));
-          $floorNorm = ($floorRaw === '' || strcasecmp($floorRaw, 'ground') === 0) ? 'Ground' : $floorRaw;
-          $searchBlob = strtolower(implode(' ', array_filter([
-              $unitId, $unit->name, $unit->floor, $unit->direction,
-              $unit->outlook, $unit->type, $beds.' bed',
-          ])));
-        @endphp
-        <!--- unit - start  ---->
-        <div class="{{ $cardCls }}"
-             data-filter-unit="{{ $unitId }}"
-             data-filter-search="{{ $searchBlob }}"
-             data-filter-floor="{{ $unit->floor ?? '' }}"
-             data-filter-type="{{ $unit->type ?? '' }}"
-             data-filter-bedrooms="{{ $beds }}"
-             data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
-             data-filter-outlook="{{ $unit->outlook ?? '' }}"
-             data-filter-price="{{ (float) $unit->price }}"
-             data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
-             data-filter-status="{{ $st }}"
-             data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
-          <div class="fg-card-inner">
-
-            <!-- Image area -->
-            <div class="fg-card-img">
-              @if($unit->images->isNotEmpty())
-                <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" onerror="this.style.display='none'" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
-              @else
-                <div class="fg-card-img-noimage" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('No Image Available') }}</div>
-              @endif
-
-              <!-- Top row: status badge (left) + ADD TO LIST (right) -->
-              <div class="fg-chip-row">
-                @if($isReserved)
-                  <span class="fg-status-badge reserved">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    {{ __('RESERVED') }}
-                  </span>
-                @elseif($isPending)
-                  <span class="fg-status-badge pending">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    {{ __('PENDING') }}
-                  </span>
-                @elseif(!$isReserved && !$isSold && $isHighDem)
-                  <span class="fg-status-badge high-demand">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
-                    {{ __('HIGH DEMAND') }}
-                  </span>
-                @elseif(!$isReserved && !$isSold && $isSecond)
-                  <span class="fg-status-badge second">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    {{ __('2ND CHANCE') }}
-                  </span>
-                @else
-                  <span></span>
-                @endif
-
-                @php $isFav = in_array($unit->id, $wishlistIds ?? []); @endphp
-                <button type="button"
-                        class="fg-add-to-list {{ $isFav ? 'is-fav' : '' }} {{ app()->getLocale() === 'es' ? 'icon-only' : '' }}"
-                        aria-label="{{ __('Add to list') }}"
-                        aria-pressed="{{ $isFav ? 'true' : 'false' }}"
-                        data-wishlist-toggle data-unit-id="{{ $unit->id }}"
-                        title="Shortlisted by {{ $unit->shortlisted_count ?? 0 }} other">
-                  <span class="heart">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ $isFav ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                  </span>
-                  <span class="text">
-                    <span class="label">{{ $isFav ? __('Saved') : __('Add to list') }}</span>
-                    <span class="meta">{{ __('Shortlisted by') }} <span data-unit-count="{{ $unit->id }}">{{ $unit->shortlisted_count ?? 0 }}</span> {{ __('other') }}</span>
-                  </span>
-                </button>
-              </div>
-
-              <!-- Gold "RESERVE FROM $5000" banner -->
-              <div class="fg-reserve-banner" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('Reserve from $5000') }}</div>
-
-              @if($isSold)
-                <!-- SOLD overlay (Figma 125:5048) -->
-                <div class="fg-sold-badge"><span>{{ __('SOLD') }}</span></div>
-              @endif
-            </div>
-
-            <!-- Body -->
-            <div class="fg-card-body">
-
-              <!-- Head: name + ROI, subtitle, divider, price, discount -->
-              <div class="fg-card-head">
-                <div class="fg-card-title-row">
-                  <span class="name">{{ $unit->name }}</span>
-                  @if(!empty($unit->fully_furnished))
-                    <span class="furnished">{{ __('Fully furnished') }}</span>
-                  @endif
-                </div>
-                <div class="fg-card-subtitle">
-                  {{ $unit->floor ? ucfirst($unit->floor) . ' ' . __('Floor') : __('Ground Floor') }}
-                  @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
-                  @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
-                </div>
-                <div class="fg-card-divider"></div>
-                <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
-                  <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
-                  @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m</span>
-                  @endif
-                </div>
-                @if($hasDiscount)
-                  <button type="button" class="fg-discount" title="{{ __('Limited time offer') }}">{{ __('Unlock :amount Discount', ['amount' => '$'.number_format($unit->discount, 0, ',', ',')]) }}</button>
-                @endif
-              </div>
-
-              <!-- Stats row (6 boxes) -->
-              <div class="fg-stats" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
-                <div class="fg-stat" title="Bedrooms">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg>
-                  <span class="v">{{ $unit->bedrooms ?? 0 }}</span>
-                </div>
-                <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Bathrooms">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4a2 2 0 0 1 4 0"/><path d="M2 11h20"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><line x1="6" y1="22" x2="6" y2="20"/><line x1="18" y1="22" x2="18" y2="20"/></svg>
-                  <span class="v">{{ $unit->bathrooms ?? 0 }}</span>
-                </div>
-                <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Parking">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14"/><path d="M5 17V9l1.5-4h11L19 9v8"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-                  <span class="v">{{ $unit->parking_bays ?? 0 }}</span>
-                </div>
-                <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Internal area">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="2 2"/></svg>
-                  <span class="v">{{ number_format(($unit->internal_area ?? 0)) }}m<sup>2</sup></span>
-                </div>
-                <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="External area">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 3 3 8 3"/><polyline points="16 3 21 3 21 8"/><polyline points="21 16 21 21 16 21"/><polyline points="8 21 3 21 3 16"/></svg>
-                  <span class="v">{{ number_format(($unit->external_area ?? 0)) }}m<sup>2</sup></span>
-                </div>
-                <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Total area">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg>
-                  <span class="v">{{ number_format(($unit->total_area ?? 0)) }}m<sup>2</sup></span>
-                </div>
-              </div>
-
-              <!-- Buttons + availability -->
-              <div class="fg-card-actions">
-                @if($isSold)
-                  <div class="fg-card-buttons">
-                    <button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">{{ __('View Similar Units') }}</button>
-                  </div>
-                  <div class="fg-card-availability">
-                    <span class="dot"></span>
-                    <span>{{ __('This unit has been sold.') }}</span>
-                  </div>
-                @elseif($isReserved)
-                  <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
-                    <button class="fg-btn-cta" type="button" onclick="notifyWhenAvailable('{{ $unitId }}')">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                      {{ __('Notificar si se libera') }}
-                    </button>
-                  </div>
-                  <div class="fg-card-availability">
-                    <span class="dot"></span>
-                    <span>{{ __('Currently on hold by another buyer.') }}</span>
-                  </div>
-                @else
-                  <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
-                    <button class="fg-btn-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                      </svg>
-                      {{ __('Book Video Call') }}
-                    </button>
-                  </div>
-                  <div class="fg-card-availability advisor-live">
-                    <span class="dot"></span>
-                    <span>{{ __('An advisor is available right now.') }}</span>
-                  </div>
-                @endif
-              </div>
-            </div>
-          </div>
-
-          @if($isHighDem && !$isReserved && !$isPending && !$isSecond)
-            <div class="fg-card-status-strip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>{{ __(':count people viewed this unit today', ['count' => (int)($unit->views_today ?? 0) ?: $shortlistedCount]) }}</span>
-            </div>
-          @elseif($isPending)
-            <div class="fg-card-status-strip">
-              <span class="fg-card-status-dot"></span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>{{ __('Pending review · Hold expires soon') }}</span>
-            </div>
-          @elseif($isSecond)
-            <div class="fg-card-status-strip">
-              <span class="fg-card-status-dot"></span>
-              @php
-                $releasedDays = $unit->released_at ? (int) \Carbon\Carbon::parse($unit->released_at)->diffInDays(now()) : null;
-              @endphp
-              <span>{{ __('This unit was released') }} {{ $releasedDays !== null ? ($releasedDays === 0 ? __('today') : $releasedDays.' '.__(\Illuminate\Support\Str::plural('day', $releasedDays)).' '.__('ago')) : __('recently') }}</span>
-            </div>
-          @elseif($isReserved)
-            @php
-              $reservedFuture = !empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture();
-            @endphp
-            <div class="fg-card-status-strip is-reserved-strip" @if($reservedFuture) data-reserved-until="{{ \Carbon\Carbon::parse($unit->reserved_until)->toIso8601String() }}" @endif>
-              <span class="fg-card-status-dot"></span>
-              @if($reservedFuture)
-                <span>{{ __('Reserved for') }} <span class="fg-countdown" data-countdown>00:00:00</span> {{ __('remaining') }}</span>
-              @else
-                <span>{{ __('Reserved · Awaiting deposit') }}</span>
-              @endif
-            </div>
-          @endif
-        </div>
-        <!---- unit - end   ---->
-
+        @foreach($gridUnits as $unit)
+          @include('partials.home-unit-card')
         @endforeach
       </div>
       <!-- Infinite-scroll sentinel for the grid (revealed batch by batch). -->
@@ -2079,85 +1832,8 @@
             </tr>
           </thead>
           <tbody>
-            @foreach($units as $unit)
-              @php
-                $st = strtolower($unit->status ?? '');
-                $rowCls = 'row-available'; $statusCls = 'available'; $statusLabel = 'Available';
-                if ($st === 'sold')                       { $rowCls = 'row-sold is-sold'; $statusCls = 'sold'; $statusLabel = 'Sold'; }
-                elseif ($st === 'reserved')               { $rowCls = 'row-reserved'; $statusCls = 'reserved'; $statusLabel = 'Reserved'; }
-                elseif ($st === 'pending')                { $rowCls = 'row-pending'; $statusCls = 'pending'; $statusLabel = 'Pending'; }
-                elseif (!empty($unit->is_second_chance))  { $rowCls = 'row-second'; $statusCls = 'second'; $statusLabel = '2nd Chance'; }
-                elseif (!empty($unit->is_high_demand))    { $rowCls = 'row-hot'; $statusCls = 'hot'; $statusLabel = 'Hot'; }
-                $unitId = $unit->custom_id ?? $unit->id;
-                $tabKey = $statusCls === 'hot' || $statusCls === 'available' || $statusCls === 'reserved' ? 'available' : $statusCls;
-              @endphp
-              @php
-                $rowBeds = (int) ($unit->bedrooms ?? 0);
-                if (!empty($unit->type) && strcasecmp($unit->type, 'Penthouse') === 0) {
-                    $rowTypeLbl = 'Penthouse';
-                } elseif ($rowBeds === 0) {
-                    $rowTypeLbl = 'Studio';
-                } else {
-                    $rowTypeLbl = $rowBeds . ' Bed';
-                }
-                $rowFloorRaw  = trim((string) ($unit->floor ?? ''));
-                $rowFloorNorm = ($rowFloorRaw === '' || strcasecmp($rowFloorRaw, 'ground') === 0) ? 'Ground' : $rowFloorRaw;
-              @endphp
-              <tr class="{{ $rowCls }}"
-                  data-tab="{{ $tabKey }}"
-                  data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}"
-                  data-filter-unit="{{ $unitId }}"
-                  data-filter-floor="{{ $unit->floor ?? '' }}"
-                  data-filter-type="{{ $unit->type ?? '' }}"
-                  data-filter-bedrooms="{{ $rowBeds }}"
-                  data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
-                  data-filter-outlook="{{ $unit->outlook ?? '' }}"
-                  data-filter-price="{{ (float) $unit->price }}"
-                  data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
-                  data-filter-status="{{ $st }}"
-                  data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
-                <td><b>{{ $unit->name }}</b></td>
-                <td>
-                    <span class="fg-list-status {{ $statusCls }}">{{ strtoupper(__($statusLabel)) }}</span>
-                    @if($statusCls === 'reserved' && !empty($unit->reserved_until) && \Carbon\Carbon::parse($unit->reserved_until)->isFuture())
-                        <div style="font-size:10px;color:#92400e;margin-top:2px;">{{ __('Expira') }} {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</div>
-                    @endif
-                </td>
-                <td>{{ $unit->floor ? ucfirst($unit->floor) : __('Ground') }}</td>
-                <td>{{ ($unit->bedrooms ?? 0) }} {{ __('Bed') }}</td>
-                <td>
-                    {{ strtoupper($unit->direction ?? '—') }}
-                    @if($unit->outlook)
-                        <div style="font-size:10px;color:#a3a3a3;line-height:1.2;">{{ $outlookLabels[$unit->outlook] ?? $unit->outlook }}</div>
-                    @endif
-                </td>
-                <td>{{ ($unit->bedrooms ?? 0) }} / {{ ($unit->bathrooms ?? 0) }}</td>
-                <td>{{ number_format($unit->internal_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
-                <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
-                <td>
-                  <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
-                  @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m²</span>
-                  @endif
-                </td>
-                <td>
-                  <div class="fg-list-actions">
-                    <button class="fg-list-icon-btn" type="button" aria-label="{{ __('Save') }}">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                      </svg>
-                    </button>
-                    <button class="fg-list-info-btn" type="button" onclick="openMoreInfo('{{ $unitId }}')">{{ __('INFO') }}</button>
-                    @if($statusCls === 'sold')
-                      <button class="fg-list-cta" type="button" disabled>{{ __('Sold') }}</button>
-                    @elseif($statusCls === 'reserved')
-                      <button class="fg-list-cta" type="button" disabled style="opacity:.5;cursor:not-allowed;">{{ __('Reserved') }}</button>
-                    @else
-                      <button class="fg-list-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">{{ __('Book Video Call') }}</button>
-                    @endif
-                  </div>
-                </td>
-              </tr>
+            @foreach($gridUnits as $unit)
+              @include('partials.home-unit-row')
             @endforeach
           </tbody>
         </table>
@@ -4243,16 +3919,26 @@
         return true;
       }
 
-      // Mark eligibility (the lazy-reveal layer decides what's actually shown).
-      // Non-matching elements are hidden right away; matching ones are revealed
-      // in batches by applyLazyReveal() further below.
+      // Server pagination gate: the client filter engine works on the cards
+      // currently in the DOM. While not everything is loaded yet, any *active*
+      // filter first pulls the remaining units in (one shot) so the results are
+      // complete; an unfiltered view just shows what's painted and lets the
+      // infinite-scroll observer stream the rest.
+      if (!allUnitsLoaded && !options._afterLoad && hasActiveFilters()) {
+        setLazyLoading(true);
+        ensureAllLoaded().then(() => {
+          setLazyLoading(false);
+          applyFilters(Object.assign({}, options, { _afterLoad: true }));
+        });
+        return;
+      }
+
       const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
       let visibleGrid = 0;
       cards.forEach(c => {
         const ok = matches(c);
-        c._eligible = ok;
-        if (!ok) animateToggle(c, false);
-        else visibleGrid++;
+        animateToggle(c, ok);
+        if (ok) visibleGrid++;
       });
 
       const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
@@ -4262,9 +3948,8 @@
         const ok = matches(r);
         const tabOk = (activeTab === 'all') || (r.dataset.tab === activeTab);
         const show = ok && tabOk;
-        r._eligible = show;
-        if (!show) animateToggle(r, false, { kind: 'row' });
-        else visibleList++;
+        animateToggle(r, show, { kind: 'row' });
+        if (show) visibleList++;
       });
 
       // Sort cards in place when a sort is selected
@@ -4288,86 +3973,124 @@
         }
       }
 
-      // A fresh filter/sort/search resets the reveal window back to the first
-      // batch; scroll then re-extends it. (The observer passes keepReveal.)
-      if (!options.keepReveal) {
-        gridReveal = LAZY_BATCH_GRID;
-        listReveal = LAZY_BATCH_LIST;
-      }
-      applyLazyReveal('grid');
-      applyLazyReveal('list');
-
-      updateMatchCount(visibleGrid);
-      updateListMatchCount(visibleList);
+      // With no active filter and more units still streaming in, the real
+      // total is the catalog size — not just what's painted so far.
+      const showingAll = !hasActiveFilters();
+      updateMatchCount((showingAll && !allUnitsLoaded) ? TOTAL_UNITS : visibleGrid);
+      updateListMatchCount((showingAll && !allUnitsLoaded) ? TOTAL_UNITS : visibleList);
       if (!options.skipUrl) syncFiltersToUrl();
     }
 
-    // ── Lazy progressive reveal ──────────────────────────────────────────
-    // Only the first N eligible cards/rows are shown; the rest stay hidden
-    // until the user scrolls the sentinel into view (IntersectionObserver).
-    const LAZY_BATCH_GRID = 9;   // grid: initial render + per-scroll batch
-    const LAZY_BATCH_LIST = 15;  // list: initial render + per-scroll batch
-    let gridReveal = LAZY_BATCH_GRID;
-    let listReveal = LAZY_BATCH_LIST;
+    // ── Infinite scroll: stream additional unit pages from the API ──────────
+    // The server renders only the first page (HOME_PAGE_SIZE) of heavy cards /
+    // rows; the rest arrive as rendered HTML on scroll, keeping the DOM light.
+    const HOME_PAGE_SIZE = {{ \App\Http\Controllers\HomeController::HOME_PAGE_SIZE }};
+    let lazyOffset = 0;          // how many units are currently in the DOM
+    let allUnitsLoaded = false;  // true once every public unit is painted
+    let lazyBusy = false;        // a page fetch is in flight
+    let allLoadPromise = null;   // de-dupes concurrent "load everything" calls
 
-    function applyLazyReveal(which) {
-      const isGrid = which === 'grid';
-      const els = isGrid
-        ? Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'))
-        : Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
-      const limit = isGrid ? gridReveal : listReveal;
-      let shown = 0, fresh = 0, hasMore = false;
-      els.forEach(el => {
-        if (!el._eligible) return;            // non-matching → already hidden
-        if (shown < limit) {
-          const wasHidden = el.style.display === 'none'
-            || el.classList.contains('is-lazy-hidden');
-          el.classList.remove('is-fading-out', 'is-lazy-hidden');
-          el.style.display = '';
-          if (wasHidden) {
-            el.classList.remove('is-lazy-in');
-            void el.offsetWidth;             // restart the keyframe
-            el.style.setProperty('--lazy-i', fresh++);
-            el.classList.add('is-lazy-in');
-            const node = el;
+    function hasActiveFilters() {
+      const f = currentFilters;
+      if (f.unitNumber) return true;
+      if (f.minPrice != null || f.maxPrice != null) return true;
+      if ((f.types && f.types.length) || (f.directions && f.directions.length)
+          || (f.outlooks && f.outlooks.length) || (f.floors && f.floors.length)) return true;
+      if (f.sort && f.sort !== 'custom_id') return true;
+      const tab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
+      return tab !== 'all';
+    }
+
+    function updateLazyLoaders() {
+      const show = !allUnitsLoaded;
+      document.getElementById('gridLazyMore')?.classList.toggle('is-active', show);
+      document.getElementById('listLazyMore')?.classList.toggle('is-active', show);
+    }
+    function setLazyLoading(on) {
+      if (!on) { updateLazyLoaders(); return; }
+      document.getElementById('gridLazyMore')?.classList.add('is-active');
+      document.getElementById('listLazyMore')?.classList.add('is-active');
+    }
+
+    // Insert a page of server-rendered HTML into the grid + list, optionally
+    // with the staggered entrance animation (skipped for the bulk "load all").
+    function appendUnits(cardsHtml, rowsHtml, animate) {
+      const grid  = document.querySelector('.fg-units-grid');
+      const tbody = document.querySelector('#fgListTable tbody');
+      if (grid && cardsHtml) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = cardsHtml;
+        let i = 0;
+        Array.from(tmp.children).forEach(node => {
+          if (animate) {
+            node.style.setProperty('--lazy-i', i++ % HOME_PAGE_SIZE);
+            node.classList.add('is-lazy-in');
             setTimeout(() => node.classList.remove('is-lazy-in'), 1000);
           }
-          shown++;
-        } else {
-          el.style.display = 'none';
-          el.classList.add('is-lazy-hidden');
-          hasMore = true;
-        }
-      });
-      const loader = document.getElementById(isGrid ? 'gridLazyMore' : 'listLazyMore');
-      if (loader) loader.classList.toggle('is-active', hasMore);
+          grid.appendChild(node);
+        });
+      }
+      if (tbody && rowsHtml) {
+        const tmp = document.createElement('tbody');
+        tmp.innerHTML = rowsHtml;
+        let j = 0;
+        Array.from(tmp.children).forEach(node => {
+          if (animate) {
+            node.style.setProperty('--lazy-i', j++ % HOME_PAGE_SIZE);
+            node.classList.add('is-lazy-in');
+            setTimeout(() => node.classList.remove('is-lazy-in'), 1000);
+          }
+          tbody.appendChild(node);
+        });
+      }
+      // Freshly inserted prices must reflect the currently selected currency.
+      try { updateCurrencyDisplay(localStorage.getItem('selectedCurrency') || 'USD'); } catch (e) {}
     }
 
-    // Reveal the next batch when its sentinel scrolls near the viewport.
-    function initLazyReveal() {
+    function fetchLazyPage(all) {
+      const url = '/api/home-units?offset=' + lazyOffset + (all ? '&all=1' : '');
+      return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+          appendUnits(data.cards, data.rows, !all);
+          lazyOffset = data.offset;
+          allUnitsLoaded = !data.hasMore;
+          updateLazyLoaders();
+          return data;
+        })
+        .catch(() => { /* network hiccup — the observer will retry on next scroll */ });
+    }
+
+    // Pull every remaining unit in one shot (used right before a filter runs).
+    function ensureAllLoaded() {
+      if (allUnitsLoaded) return Promise.resolve();
+      if (allLoadPromise) return allLoadPromise;
+      allLoadPromise = fetchLazyPage(true).finally(() => { allLoadPromise = null; });
+      return allLoadPromise;
+    }
+
+    function initLazyScroll() {
+      lazyOffset = document.querySelectorAll('.fg-units-grid > .fg-card').length;
+      allUnitsLoaded = lazyOffset >= TOTAL_UNITS;
+      updateLazyLoaders();
+      if (!('IntersectionObserver' in window)) return;
       const grid = document.getElementById('gridLazyMore');
       const list = document.getElementById('listLazyMore');
-      if (!('IntersectionObserver' in window) || (!grid && !list)) return;
       const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          if (!entry.target.classList.contains('is-active')) return;
-          if (entry.target.id === 'gridLazyMore') {
-            gridReveal += LAZY_BATCH_GRID;
-            applyLazyReveal('grid');
-          } else {
-            listReveal += LAZY_BATCH_LIST;
-            applyLazyReveal('list');
-          }
-        });
-      }, { rootMargin: '0px 0px 160px 0px' });
+        if (allUnitsLoaded || lazyBusy) return;
+        const hit = entries.some(e => e.isIntersecting && e.target.classList.contains('is-active'));
+        if (!hit) return;
+        lazyBusy = true;
+        fetchLazyPage(false)
+          .then(() => {
+            // Re-apply the default sort so the freshly appended page slots into
+            // the grid's global order (and refresh the counters).
+            applyFilters({ skipUrl: true });
+          })
+          .finally(() => { lazyBusy = false; });
+      }, { rootMargin: '0px 0px 300px 0px' });
       if (grid) obs.observe(grid);
       if (list) obs.observe(list);
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initLazyReveal);
-    } else {
-      initLazyReveal();
     }
 
     // Sync current filter state to URL query string (no reload).
@@ -4657,6 +4380,10 @@
           applyFilters();
         });
       }
+
+      // Wire infinite scroll (counts the server-rendered first page) before the
+      // initial filter pass so counters & "load more" state are consistent.
+      initLazyScroll();
 
       // Restore filter state from URL (?q=&min=&max=&type=&dir=&out=&floor=&sort=)
       applyFiltersFromUrl();
@@ -4972,51 +4699,42 @@
         updateTypeLabel();
       }
 
-      // Custom matcher: bedrooms must match; exclude sold/reserved/pending and
-      // exclude the reference unit itself.
-      const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
-      let visible = 0;
-      cards.forEach(c => {
-        const cBeds   = parseInt(c.dataset.filterBedrooms || '0', 10);
-        const cStatus = (c.dataset.filterStatus || '').toLowerCase();
-        const cUnit   = (c.dataset.filterUnit || '');
-        const sameBeds = cBeds === beds;
-        const isAvail  = !['sold','reserved','pending'].includes(cStatus);
-        const notSelf  = cUnit !== refUnit;
-        const show = sameBeds && isAvail && notSelf;
-        c._eligible = show;
-        if (!show) c.style.display = 'none';
-        if (show) visible++;
-      });
-      // Also apply on the list view in case the user toggles.
-      const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
-      let listVisible = 0;
-      rows.forEach(r => {
-        const rBeds   = parseInt(r.dataset.filterBedrooms || '0', 10);
-        const rStatus = (r.dataset.filterStatus || '').toLowerCase();
-        const rUnit   = (r.dataset.filterUnit || '');
-        const show = (rBeds === beds) && !['sold','reserved','pending'].includes(rStatus) && rUnit !== refUnit;
-        r._eligible = show;
-        if (!show) r.style.display = 'none';
-        if (show) listVisible++;
-      });
-      // Restart the reveal window and animate the matching subset in.
-      gridReveal = LAZY_BATCH_GRID;
-      listReveal = LAZY_BATCH_LIST;
-      applyLazyReveal('grid');
-      applyLazyReveal('list');
-      updateMatchCount(visible);
-      updateListMatchCount(listVisible);
+      // Finding *every* similar unit needs the full catalog painted first.
+      ensureAllLoaded().then(() => {
+        // Custom matcher: bedrooms must match; exclude sold/reserved/pending and
+        // exclude the reference unit itself.
+        const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
+        let visible = 0;
+        cards.forEach(c => {
+          const cBeds   = parseInt(c.dataset.filterBedrooms || '0', 10);
+          const cStatus = (c.dataset.filterStatus || '').toLowerCase();
+          const cUnit   = (c.dataset.filterUnit || '');
+          const show = (cBeds === beds) && !['sold','reserved','pending'].includes(cStatus) && cUnit !== refUnit;
+          animateToggle(c, show);
+          if (show) visible++;
+        });
+        // Also apply on the list view in case the user toggles.
+        const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
+        let listVisible = 0;
+        rows.forEach(r => {
+          const rBeds   = parseInt(r.dataset.filterBedrooms || '0', 10);
+          const rStatus = (r.dataset.filterStatus || '').toLowerCase();
+          const rUnit   = (r.dataset.filterUnit || '');
+          const show = (rBeds === beds) && !['sold','reserved','pending'].includes(rStatus) && rUnit !== refUnit;
+          animateToggle(r, show, { kind: 'row' });
+          if (show) listVisible++;
+        });
+        updateMatchCount(visible);
+        updateListMatchCount(listVisible);
 
-      // Smooth scroll to the grid so the user sees the result.
-      const grid = document.querySelector('.fg-units-grid');
-      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Smooth scroll to the grid so the user sees the result.
+        const grid = document.querySelector('.fg-units-grid');
+        if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      if (visible === 0) {
         // No matches → fall back to opening the original unit modal so the user
         // can still see why it was sold.
-        if (typeof openMoreInfo === 'function') openMoreInfo(refUnit);
-      }
+        if (visible === 0 && typeof openMoreInfo === 'function') openMoreInfo(refUnit);
+      });
     };
   </script>
 

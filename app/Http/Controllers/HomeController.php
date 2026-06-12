@@ -13,21 +13,41 @@ class HomeController extends Controller
     /**
      * Display the home page with units data.
      */
-    public function index()
-    {
-        // Auto-release any 48h holds that expired
-        Unit::releaseExpiredHolds();
+    /**
+     * How many unit cards/rows are rendered server-side on first paint. The
+     * rest are streamed in on scroll via {@see homeUnits()} to keep the
+     * initial DOM light (the public catalog can hold hundreds of units).
+     */
+    public const HOME_PAGE_SIZE = 24;
 
-        // Only units explicitly toggled public are shown on home
-        $units = Unit::with(['images' => function($query) {
+    /**
+     * Base query for the public home catalog — single source of truth for the
+     * ordering so the server-rendered first page and the AJAX pages line up.
+     */
+    private function publicUnitsQuery()
+    {
+        return Unit::with(['images' => function ($query) {
                 $query->orderBy('sort_order');
             }])
             ->where('public', true)
             ->orderByRaw('display_on_home_page DESC')
             ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 0 ELSE 1 END")
             ->orderBy('custom_id')
-            ->orderBy('id')
-            ->get();
+            ->orderBy('id');
+    }
+
+    public function index()
+    {
+        // Auto-release any 48h holds that expired
+        Unit::releaseExpiredHolds();
+
+        // Full ordered set — still needed for the plan view (all floor markers)
+        // and the list status-tab badge counts.
+        $units = $this->publicUnitsQuery()->get();
+
+        // Only the first page is rendered as heavy grid cards / list rows; the
+        // remainder loads on scroll (see resources/views/home.blade.php).
+        $gridUnits = $units->take(self::HOME_PAGE_SIZE);
 
         // Calculate real units sold count (only sold status)
         $soldCount = Unit::where('public', true)
@@ -44,7 +64,45 @@ class HomeController extends Controller
             ? \App\Models\Wishlist::where('user_id', Auth::id())->pluck('unit_id')->all()
             : [];
 
-        return view('home', compact('units', 'soldCount', 'totalUnits', 'wishlistIds'));
+        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds'));
+    }
+
+    /**
+     * Stream the next page (or all remaining) public units as rendered HTML
+     * for the grid cards and list rows. Keeps the initial home DOM small while
+     * preserving the exact Blade markup (no client-side template duplication).
+     */
+    public function homeUnits(Request $request)
+    {
+        $offset = max(0, (int) $request->query('offset', 0));
+        $all    = $request->boolean('all');
+
+        $total = $this->publicUnitsQuery()->count();
+
+        $units = $this->publicUnitsQuery()
+            ->skip($offset)
+            ->take($all ? PHP_INT_MAX : self::HOME_PAGE_SIZE)
+            ->get();
+
+        $outlookLabels = \App\Support\UnitOptions::map('outlooks');
+        $wishlistIds = Auth::check()
+            ? \App\Models\Wishlist::where('user_id', Auth::id())->pluck('unit_id')->all()
+            : [];
+
+        $cards = '';
+        $rows  = '';
+        foreach ($units as $unit) {
+            $cards .= view('partials.home-unit-card', compact('unit', 'outlookLabels', 'wishlistIds'))->render();
+            $rows  .= view('partials.home-unit-row',  compact('unit', 'outlookLabels'))->render();
+        }
+
+        return response()->json([
+            'cards'   => $cards,
+            'rows'    => $rows,
+            'offset'  => $offset + $units->count(),
+            'hasMore' => ($offset + $units->count()) < $total,
+            'total'   => $total,
+        ]);
     }
 
     /**
