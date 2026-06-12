@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=8">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=9">
 </head>
 
 <body data-view="grid">

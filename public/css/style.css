@@ -1972,16 +1972,16 @@
       font-weight: 600;
       color: #ffffff;
       cursor: pointer;
-      background: var(--row-color, #1fc16b);
+      background: var(--brand, #5c7c68);
       transition: filter 0.15s ease;
       white-space: nowrap;
     }
     .fg-list-cta:hover { filter: brightness(1.05); }
-    .fg-list-table tr.row-available .fg-list-cta { background: #1fc16b; }
-    .fg-list-table tr.row-hot       .fg-list-cta { background: #fa7319; }
+    .fg-list-table tr.row-available .fg-list-cta { background: var(--brand); }
+    .fg-list-table tr.row-hot       .fg-list-cta { background: var(--brand); }
     .fg-list-table tr.row-reserved  .fg-list-cta { background: var(--brand); }
-    .fg-list-table tr.row-second    .fg-list-cta { background: #5b8def; }
-    .fg-list-table tr.row-pending   .fg-list-cta { background: #f59e0b; }
+    .fg-list-table tr.row-second    .fg-list-cta { background: var(--brand); }
+    .fg-list-table tr.row-pending   .fg-list-cta { background: var(--brand); }
     .fg-list-table tr.row-sold      .fg-list-cta { background: #c7cdd6; cursor: not-allowed; }
     .fg-list-pagination {
       display: flex;
