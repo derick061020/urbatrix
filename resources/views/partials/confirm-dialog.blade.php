@@ -8,7 +8,7 @@
          text:         'Esta unidad dejará de aparecer en tu lista.',
          confirmLabel: 'Quitar',
          tone:         'danger' | 'brand' (default danger),
-         icon:         'pi pi-heart-fill',
+         icon:         'pi pi-heart',
          onConfirm:    () => { ... }
        });
      ============================================================ --}}

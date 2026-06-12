@@ -4503,7 +4503,7 @@
           title: '¿Quitar de guardados?',
           text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
           confirmLabel: 'Quitar',
-          icon: 'pi pi-heart-fill',
+          icon: 'pi pi-heart',
           onConfirm: () => runModalWishlistToggle(unitId, wasFav),
         });
         return;
@@ -4548,7 +4548,7 @@
             title: '¿Quitar de guardados?',
             text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
             confirmLabel: 'Quitar',
-            icon: 'pi pi-heart-fill',
+            icon: 'pi pi-heart',
             onConfirm: () => runWishlistToggle(btn, unitId, wasFav),
           });
           return;
