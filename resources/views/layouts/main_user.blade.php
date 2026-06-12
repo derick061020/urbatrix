@@ -16,7 +16,7 @@
             rel="stylesheet"
         />
         <link
-            href="https://unpkg.com/primeicons/primeicons.css"
+            href="{{ asset('vendor/primeicons/primeicons.css') }}"
             rel="stylesheet"
         />
 
