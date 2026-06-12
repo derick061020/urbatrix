@@ -31,7 +31,7 @@ class HomeController extends Controller
             }])
             ->where('public', true)
             ->orderByRaw('display_on_home_page DESC')
-            ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 1 ELSE 0 END")
             ->orderBy('custom_id')
             ->orderBy('id');
     }
