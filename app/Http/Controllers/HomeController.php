@@ -18,7 +18,7 @@ class HomeController extends Controller
      * rest are streamed in on scroll via {@see homeUnits()} to keep the
      * initial DOM light (the public catalog can hold hundreds of units).
      */
-    public const HOME_PAGE_SIZE = 24;
+    public const HOME_PAGE_SIZE = 25;
 
     /**
      * Base query for the public home catalog — single source of truth for the

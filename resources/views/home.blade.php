@@ -3962,7 +3962,10 @@
           'size-desc':     (a,b) => parseFloat(b.dataset.filterArea||0)  - parseFloat(a.dataset.filterArea||0),
           'bedrooms-asc':  (a,b) => parseInt(a.dataset.filterBedrooms||0)- parseInt(b.dataset.filterBedrooms||0),
           'bedrooms-desc': (a,b) => parseInt(b.dataset.filterBedrooms||0)- parseInt(a.dataset.filterBedrooms||0),
-          'custom_id':     (a,b) => (a.dataset.filterUnit||'').localeCompare(b.dataset.filterUnit||'')
+          // Default order: follow the server's global ordering (display_on_home_page,
+          // status grouping, custom_id, id) via the stamped index — not a naive
+          // string compare, which scrambled featured/sold grouping across pages.
+          'custom_id':     (a,b) => (parseInt(a.dataset.order)||0) - (parseInt(b.dataset.order)||0)
         };
         const fn = sortFns[f.sort];
         if (fn) {
@@ -3986,6 +3989,7 @@
     // rows; the rest arrive as rendered HTML on scroll, keeping the DOM light.
     const HOME_PAGE_SIZE = {{ \App\Http\Controllers\HomeController::HOME_PAGE_SIZE }};
     let lazyOffset = 0;          // how many units are currently in the DOM
+    let serverOrderSeq = 0;      // monotonic index = each card's position in the server's global order
     let allUnitsLoaded = false;  // true once every public unit is painted
     let lazyBusy = false;        // a page fetch is in flight
     let allLoadPromise = null;   // de-dupes concurrent "load everything" calls
@@ -4022,6 +4026,10 @@
         tmp.innerHTML = cardsHtml;
         let i = 0;
         Array.from(tmp.children).forEach(node => {
+          // Stamp the card's place in the server's global order so the default
+          // (custom_id) sort can keep it slotted correctly instead of dumping
+          // every freshly loaded card at the bottom of the grid.
+          node.dataset.order = serverOrderSeq++;
           if (animate) {
             node.style.setProperty('--lazy-i', i++ % HOME_PAGE_SIZE);
             node.classList.add('is-lazy-in');
@@ -4070,7 +4078,12 @@
     }
 
     function initLazyScroll() {
-      lazyOffset = document.querySelectorAll('.fg-units-grid > .fg-card').length;
+      const initialCards = document.querySelectorAll('.fg-units-grid > .fg-card');
+      // Seed the server-order index on the first page (server-rendered) so later
+      // pages continue the same sequence and the grid stays globally ordered.
+      initialCards.forEach((c, idx) => { c.dataset.order = idx; });
+      serverOrderSeq = initialCards.length;
+      lazyOffset = initialCards.length;
       allUnitsLoaded = lazyOffset >= TOTAL_UNITS;
       updateLazyLoaders();
       if (!('IntersectionObserver' in window)) return;
