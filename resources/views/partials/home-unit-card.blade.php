@@ -34,6 +34,7 @@
         <!--- unit - start  ---->
         <div class="{{ $cardCls }}"
              data-filter-unit="{{ $unitId }}"
+             data-filter-name="{{ strtolower($unit->name ?? $unitId) }}"
              data-filter-search="{{ $searchBlob }}"
              data-filter-floor="{{ $unit->floor ?? '' }}"
              data-filter-type="{{ $unit->type ?? '' }}"

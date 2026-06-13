@@ -24,7 +24,7 @@
               <tr class="{{ $rowCls }}"
                   data-tab="{{ $tabKey }}"
                   data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}"
-                  data-filter-search="{{ strtolower(trim(($unit->name ?? '') . ' ' . ($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->type ?? '') . ' ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '') . ' ' . ($rowBeds ?? '') . ' bed')) }}"
+                  data-filter-name="{{ strtolower($unit->name ?? $unitId) }}"
                   data-filter-unit="{{ $unitId }}"
                   data-filter-floor="{{ $unit->floor ?? '' }}"
                   data-filter-type="{{ $unit->type ?? '' }}"

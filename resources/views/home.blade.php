@@ -2123,7 +2123,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" id="fgListSearchInput" placeholder="{{ __('Search unit, floor, type…') }}" oninput="filterListRows(this.value)">
+            <input type="text" id="fgListSearchInput" placeholder="{{ __('Search by unit…') }}" oninput="filterListRows(this.value)">
             <button type="button" class="fg-list-search-clear" aria-label="{{ __('Clear') }}" title="{{ __('Clear') }}" onclick="clearListSearch(event)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -4315,10 +4315,11 @@
         const outlook  = (el.dataset.filterOutlook  || '');
         const price    = parseFloat(el.dataset.filterPrice  || '0');
         const area     = parseFloat(el.dataset.filterArea   || '0');
-        const search   = (el.dataset.filterSearch   || '');
-        const unitLbl  = (el.dataset.filterUnit     || '').toLowerCase();
+        const name     = (el.dataset.filterName     || '').toLowerCase();
 
-        if (q && !search.includes(q) && !unitLbl.includes(q)) return false;
+        // El buscador de texto coincide SOLO por el nombre de la unidad
+        // (columna UNIDAD / nombre de la tarjeta), no por id interno, piso o tipo.
+        if (q && !name.includes(q)) return false;
         if (f.minPrice != null && price < f.minPrice) return false;
         if (f.maxPrice != null && price > f.maxPrice) return false;
 
