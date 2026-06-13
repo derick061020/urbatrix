@@ -2658,6 +2658,7 @@
       border-radius: 12px;
       padding: 4px;
       gap: 4px;
+      margin-bottom: 16px;
     }
     .mt-buyer-toggle button {
       flex: 1;
