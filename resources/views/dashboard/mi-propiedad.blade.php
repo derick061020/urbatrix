@@ -59,7 +59,7 @@
     ];
 
     $nextPay  = $reservation->payments->where('status', 'pending')->sortBy('due_date')->first();
-    $advisor  = \App\Models\Agent::where('active', true)->orderBy('id')->first();
+    $advisor  = \App\Models\User::where('role', 'admin')->orderBy('id')->first();
 @endphp
 
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">

@@ -6,7 +6,7 @@
 
 @section('content')
 @php
-    $advisor = \App\Models\Agent::where('active', true)->orderBy('id')->first();
+    $advisor = \App\Models\User::where('role', 'admin')->orderBy('id')->first();
     $myName  = trim((Auth::user()->first_name ?? '') . ' ' . (Auth::user()->last_name ?? '')) ?: (Auth::user()->name ?? 'Yo');
     $myInit  = strtoupper(substr($myName, 0, 1) . (str_contains($myName, ' ') ? substr(explode(' ', $myName)[1] ?? '', 0, 1) : ''));
     $advInit = strtoupper(substr($advisor->name ?? 'AR', 0, 2));
