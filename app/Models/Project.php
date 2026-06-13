@@ -11,15 +11,23 @@ class Project extends Model
 
     protected $fillable = [
         'name', 'type', 'stage', 'location', 'progress', 'color', 'icon_path', 'description',
+        'comms_active', 'comms_start_date',
     ];
 
     protected $casts = [
-        'progress' => 'integer',
+        'progress'         => 'integer',
+        'comms_active'     => 'boolean',
+        'comms_start_date' => 'date',
     ];
 
     public function units()
     {
         return $this->hasMany(Unit::class);
+    }
+
+    public function communications()
+    {
+        return $this->hasMany(ProjectCommunication::class);
     }
 
     public function tasks()

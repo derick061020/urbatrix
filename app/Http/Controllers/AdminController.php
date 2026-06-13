@@ -19,6 +19,7 @@ use App\Models\CrmTemplate;
 use App\Models\CrmAutomation;
 use App\Models\CrmAutomationStep;
 use App\Models\CrmChannelSetting;
+use App\Models\ProjectCommunication;
 use App\Models\ExportAuthorization;
 use App\Support\UnitOptions;
 use App\Helpers\PaymentPlanHelper;
@@ -2052,6 +2053,124 @@ class AdminController extends Controller
         return back()->with('success', 'Configuración de canales guardada.');
     }
     public function crmAnuncios()        { return view('admin.crm.anuncios'); }
+
+    /* =====================================================================
+     | Control de comunicaciones por proyecto
+     | Matriz proyecto × tipo × canal. Cada proyecto nace en silencio total.
+     ===================================================================== */
+    public function crmComunicaciones()
+    {
+        $catalog  = config('crm_communications');
+        $projects = Project::orderBy('name')->get();
+
+        // Mapa: [project_id][comm_code][channel] => bool
+        $config = [];
+        foreach ($projects as $project) {
+            $config[$project->id] = [];
+            foreach ($catalog['families'] as $family) {
+                foreach ($family['types'] as $type) {
+                    $config[$project->id][$type['code']] = [];
+                    foreach ($type['ch'] as $channel) {
+                        $config[$project->id][$type['code']][$channel] = false;
+                    }
+                }
+            }
+        }
+        foreach (ProjectCommunication::all() as $row) {
+            if (isset($config[$row->project_id][$row->comm_code][$row->channel])) {
+                $config[$row->project_id][$row->comm_code][$row->channel] = $row->enabled;
+            }
+        }
+
+        return view('admin.crm.comunicaciones', compact('catalog', 'projects', 'config'));
+    }
+
+    public function toggleCommunication(Request $request)
+    {
+        $data = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'code'       => 'required|string',
+            'channel'    => 'required|in:email,whatsapp,inapp',
+            'enabled'    => 'required|boolean',
+        ]);
+
+        if (!$this->commTypeSupportsChannel($data['code'], $data['channel'])) {
+            return response()->json(['ok' => false, 'message' => 'Canal no soportado para este tipo.'], 422);
+        }
+
+        ProjectCommunication::updateOrCreate(
+            ['project_id' => $data['project_id'], 'comm_code' => $data['code'], 'channel' => $data['channel']],
+            ['enabled' => $data['enabled']]
+        );
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function updateCommunicationMaster(Request $request)
+    {
+        $data = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'active'     => 'required|boolean',
+        ]);
+
+        Project::whereKey($data['project_id'])->update(['comms_active' => $data['active']]);
+
+        return response()->json(['ok' => true, 'active' => (bool) $data['active']]);
+    }
+
+    public function updateCommunicationStart(Request $request)
+    {
+        $data = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'date'       => 'nullable|date',
+        ]);
+
+        Project::whereKey($data['project_id'])->update(['comms_start_date' => $data['date'] ?: null]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function copyCommunicationConfig(Request $request)
+    {
+        $data = $request->validate([
+            'project_id' => 'required|exists:projects,id|different:source_id',
+            'source_id'  => 'required|exists:projects,id',
+        ]);
+
+        DB::transaction(function () use ($data) {
+            ProjectCommunication::where('project_id', $data['project_id'])->delete();
+
+            $rows = ProjectCommunication::where('project_id', $data['source_id'])
+                ->get()
+                ->map(fn ($r) => [
+                    'project_id' => $data['project_id'],
+                    'comm_code'  => $r->comm_code,
+                    'channel'    => $r->channel,
+                    'enabled'    => $r->enabled,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])->all();
+
+            if ($rows) ProjectCommunication::insert($rows);
+
+            Project::whereKey($data['project_id'])->update(['comms_active' => true]);
+        });
+
+        return response()->json(['ok' => true]);
+    }
+
+    private function commTypeSupportsChannel(string $code, string $channel): bool
+    {
+        foreach (config('crm_communications.families', []) as $family) {
+            if (!empty($family['locked'])) continue;
+            foreach ($family['types'] as $type) {
+                if ($type['code'] === $code) {
+                    return in_array($channel, $type['ch'], true);
+                }
+            }
+        }
+        return false;
+    }
     public function crmProyectoDetalle($id)
     {
         $proyecto = Project::withCount([

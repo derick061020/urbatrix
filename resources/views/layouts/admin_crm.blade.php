@@ -358,6 +358,9 @@
                 <a href="{{ route('admin.crm.anuncios') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.anuncios' ? 'active' : '' }}">
                     <i class="pi pi-megaphone"></i> {{ __('Anuncios') }}
                 </a>
+                <a href="{{ route('admin.crm.comunicaciones') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.comunicaciones' ? 'active' : '' }}">
+                    <i class="pi pi-sliders-h"></i> {{ __('Control de comunicaciones') }}
+                </a>
 
                 <div class="crm-nav-section">{{ __('Equipo') }}</div>
                 <a href="{{ route('admin.profiles') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'profiles' ? 'active' : '' }}">

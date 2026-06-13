@@ -351,6 +351,13 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // CRM Channel settings
     Route::post('/crm/canales',                             [AdminController::class, 'updateChannels'])->name('admin.crm.canales.update');
+
+    // CRM Control de comunicaciones por proyecto
+    Route::get('/crm/comunicaciones',                       [AdminController::class, 'crmComunicaciones'])->name('admin.crm.comunicaciones');
+    Route::post('/crm/comunicaciones/toggle',              [AdminController::class, 'toggleCommunication'])->name('admin.crm.comunicaciones.toggle');
+    Route::post('/crm/comunicaciones/master',             [AdminController::class, 'updateCommunicationMaster'])->name('admin.crm.comunicaciones.master');
+    Route::post('/crm/comunicaciones/arranque',           [AdminController::class, 'updateCommunicationStart'])->name('admin.crm.comunicaciones.arranque');
+    Route::post('/crm/comunicaciones/copiar',             [AdminController::class, 'copyCommunicationConfig'])->name('admin.crm.comunicaciones.copy');
     
     // Contract generation routes for admin
     Route::get('/crm/contract/{reservation}/generate', [AdminController::class, 'generateContract'])->name('admin.crm.contract.generate');
