@@ -2641,15 +2641,20 @@
               } else { projBox.style.display = 'none'; }
           }
 
-          // C · Renta estimada — desde est_rental (mensual)
-          const rent      = Number(unit.est_rental || 0);
+          // C · Renta estimada — como en el mock: siempre visible.
+          // Usa est_rental si está cargado; si no, lo estima desde el precio con
+          // un rendimiento bruto de referencia (~7.5% anual, igual que el mock).
+          const REF_GROSS_YIELD = 0.075;
+          const price     = Number(unit.price || 0);
+          let   rent      = Number(unit.est_rental || 0);
+          if (rent <= 0 && price > 0) rent = Math.round((price * REF_GROSS_YIELD) / 12);
           const rentBlock = document.getElementById('modalRentBlock');
           if (rentBlock) {
               if (rent > 0) {
                   document.getElementById('modalRentVal').textContent = '$' + number_format(rent, 0, ',', ',');
                   const yieldEl = document.getElementById('modalRentYield');
-                  if (yieldEl && unit.price) {
-                      const gy = (rent * 12 / Number(unit.price)) * 100;
+                  if (yieldEl) {
+                      const gy = price > 0 ? (rent * 12 / price) * 100 : REF_GROSS_YIELD * 100;
                       yieldEl.textContent = '· ~' + gy.toFixed(1) + '% {{ __('gross') }}';
                   }
                   rentBlock.style.display = '';
