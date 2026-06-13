@@ -2564,12 +2564,30 @@
                       'playground': 'Playground',
                       'bbq': 'BBQ Area',
                   };
+                  const amenityBenefits = {
+                      'pool': @json(__('oceanfront pool')),
+                      'gym': @json(__('fully equipped, on-site')),
+                      'beach_club': @json(__('direct beach access')),
+                      'restaurant': @json(__('dining steps away')),
+                      'spa': @json(__('wellness & rest')),
+                      'tennis': @json(__('on-site court')),
+                      'golf': @json(__('golf within the community')),
+                      'security': @json(__('round-the-clock peace of mind')),
+                      'parking': @json(__('private parking')),
+                      'concierge': @json(__('concierge service')),
+                      'playground': @json(__('space for the kids')),
+                      'bbq': @json(__('shared BBQ area')),
+                  };
                   let html = '<div class="mt-amenities-grid">';
                   let renderedAmenities = 0;
                   amenities.forEach(key => {
                       const label = amenityLabels[key] || String(key).replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
                       const icon = amenityIcons[key] || '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
-                      html += '<div class="mt-amenity-pill"><span class="mt-amenity-ico">' + icon + '</span><span>' + label + '</span></div>';
+                      const ben = amenityBenefits[key] || '';
+                      html += '<div class="mt-amenity-card">'
+                            +   '<div class="mt-amenity-top"><span class="mt-amenity-ico">' + icon + '</span><span class="mt-amenity-name">' + label + '</span></div>'
+                            +   (ben ? '<div class="mt-amenity-ben">' + ben + '</div>' : '')
+                            + '</div>';
                       renderedAmenities++;
                   });
                   html += '</div>';

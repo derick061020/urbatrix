@@ -2654,30 +2654,31 @@
     }
     .mt-buyer-toggle {
       display: flex;
-      background: #f2f5f8;
-      border-radius: 12px;
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: 999px;
       padding: 4px;
       gap: 4px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     .mt-buyer-toggle button {
       flex: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 9px 10px;
+      border-radius: 999px;
       background: transparent;
       border: none;
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
-      font-size: 12px;
-      color: #99a0ae;
-      letter-spacing: -0.072px;
-      transition: all 0.18s ease;
+      font-size: 13.5px;
+      color: #64748b;
+      letter-spacing: 0.01em;
+      transition: all 0.2s ease;
     }
     .mt-buyer-toggle button.active {
       background: #fff;
-      color: #222530;
-      box-shadow: 0 3px 3px -1.5px rgba(23, 23, 23, 0.06);
+      color: #111827;
+      box-shadow: 0 1px 3px rgba(16, 32, 61, 0.14);
     }
     .mt-fin-table {
       border: 1px solid #eaecf0;
@@ -2862,34 +2863,43 @@
     .mt-amenities-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px 10px;
+      gap: 8px;
     }
-    .mt-amenity-pill {
+    .mt-amenity-card {
+      background: #fff;
+      border: 1px solid #eef1f5;
+      border-radius: 11px;
+      padding: 9px 11px;
+    }
+    .mt-amenity-top {
       display: flex;
       align-items: center;
-      min-height: 40px;
-      gap: 10px;
-      padding: 9px 12px;
-      background: #f2f5f8;
-      border: 1px solid #d9dde5;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #525866;
-      line-height: 1.25;
+      gap: 8px;
+    }
+    .mt-amenity-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .mt-amenity-ben {
+      font-size: 10.5px;
+      color: #64748b;
+      margin-top: 3px;
+      padding-left: 23px;
+      line-height: 1.35;
     }
     .mt-amenity-ico {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 20px;
-      color: #5c7c68;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
       flex-shrink: 0;
     }
     .mt-amenity-ico svg {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
     }
     @media (max-width: 520px) {
       .mt-amenities-grid { grid-template-columns: 1fr; }
