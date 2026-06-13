@@ -86,6 +86,10 @@ Route::middleware(['auth'])->group(function () {
 // Dashboard route (protected)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Centro de soporte del comprador (vista estática · enlazada desde el menú del home)
+    Route::view('/support', 'support')->name('support');
+
     Route::get('/dashboard/progress', [DashboardController::class, 'progress'])->name('dashboard.progress');
     Route::get('/dashboard/documents', [DashboardController::class, 'documents'])->name('dashboard.documents');
     // Client uploads a file to fulfill an admin-requested document
