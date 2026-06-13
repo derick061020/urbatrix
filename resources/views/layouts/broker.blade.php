@@ -64,15 +64,48 @@
         </div>
 
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
-            <div class="brk-nav-section">Portal Broker</div>
-            <a href="{{ route('broker.comisiones') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'comisiones' ? 'active' : '' }}">
-                <i class="pi pi-dollar"></i> Mis comisiones
+            <a href="{{ route('broker.dashboard') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'dashboard' ? 'active' : '' }}">
+                <i class="pi pi-th-large"></i> Dashboard
             </a>
-            <a href="{{ route('broker.contrato') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'contrato' ? 'active' : '' }}">
-                <i class="pi pi-file-edit"></i> Mi contrato
+
+            <div class="brk-nav-section">Clientes</div>
+            <a href="{{ route('broker.cartera') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'cartera' ? 'active' : '' }}">
+                <i class="pi pi-users"></i> Mi cartera
+            </a>
+            <a href="{{ route('broker.registro') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'registro' ? 'active' : '' }}">
+                <i class="pi pi-user-plus"></i> Registrar cliente
+            </a>
+
+            <div class="brk-nav-section">Ventas</div>
+            <a href="{{ route('broker.inventario') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'inventario' ? 'active' : '' }}">
+                <i class="pi pi-building"></i> Inventario en vivo
+            </a>
+            <a href="{{ route('broker.herramientas') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'herramientas' ? 'active' : '' }}">
+                <i class="pi pi-wrench"></i> Herramientas de venta
             </a>
             <a href="{{ route('broker.material') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'material' ? 'active' : '' }}">
                 <i class="pi pi-folder-open"></i> Material de ventas
+            </a>
+
+            <div class="brk-nav-section">Comisiones</div>
+            <a href="{{ route('broker.comisiones') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'comisiones' ? 'active' : '' }}">
+                <i class="pi pi-dollar"></i> Estado de cuenta
+            </a>
+            <a href="{{ route('broker.calculadora') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'calculadora' ? 'active' : '' }}">
+                <i class="pi pi-calculator"></i> Calculadora
+            </a>
+            <a href="{{ route('broker.simulador') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'simulador' ? 'active' : '' }}">
+                <i class="pi pi-chart-line"></i> Simulador de cobro
+            </a>
+
+            <div class="brk-nav-section">Crecimiento</div>
+            <a href="{{ route('broker.metas') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'metas' ? 'active' : '' }}">
+                <i class="pi pi-star"></i> Metas e incentivos
+            </a>
+
+            <div class="brk-nav-section">Cuenta</div>
+            <a href="{{ route('broker.contrato') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'contrato' ? 'active' : '' }}">
+                <i class="pi pi-file-edit"></i> Mi contrato
             </a>
         </nav>
 
@@ -103,6 +136,9 @@
         <main class="flex-1 rounded-xl bg-white border border-ink-200 overflow-hidden">
             @if(session('success'))
                 <div class="m-4 px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="m-4 px-4 py-2 rounded-lg bg-err-soft text-err text-[12px]">{{ session('error') }}</div>
             @endif
             @yield('content')
         </main>

@@ -172,6 +172,15 @@ Route::middleware(['auth'])->group(function () {
 // ── Portal Broker (login propio, rol broker) ──────────────────────────────
 Route::prefix('broker')->middleware(['broker'])->group(function () {
     Route::get('/',            [BrokerController::class, 'index'])->name('broker.home');
+    Route::get('/dashboard',   [BrokerController::class, 'dashboard'])->name('broker.dashboard');
+    Route::get('/cartera',     [BrokerController::class, 'cartera'])->name('broker.cartera');
+    Route::get('/registro',    [BrokerController::class, 'registro'])->name('broker.registro');
+    Route::post('/registro',   [BrokerController::class, 'registroStore'])->name('broker.registro.store');
+    Route::get('/inventario',  [BrokerController::class, 'inventario'])->name('broker.inventario');
+    Route::get('/herramientas', [BrokerController::class, 'herramientas'])->name('broker.herramientas');
+    Route::get('/calculadora', [BrokerController::class, 'calculadora'])->name('broker.calculadora');
+    Route::get('/simulador',   [BrokerController::class, 'simulador'])->name('broker.simulador');
+    Route::get('/metas',       [BrokerController::class, 'metas'])->name('broker.metas');
     Route::get('/comisiones',  [BrokerController::class, 'comisiones'])->name('broker.comisiones');
     Route::get('/contrato',    [BrokerController::class, 'contrato'])->name('broker.contrato');
     Route::get('/material',    [BrokerController::class, 'material'])->name('broker.material');

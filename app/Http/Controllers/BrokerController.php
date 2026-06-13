@@ -6,8 +6,11 @@ use App\Models\Agent;
 use App\Models\BrokerMaterial;
 use App\Models\Deal;
 use App\Models\Project;
+use App\Models\Unit;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class BrokerController extends Controller
 {
@@ -35,17 +38,15 @@ class BrokerController extends Controller
 
     public function index()
     {
-        return redirect()->route('broker.comisiones');
+        return redirect()->route('broker.dashboard');
     }
 
     /**
-     * Mis comisiones (#13) — derivadas de los deals del agente.
+     * Comisiones derivadas de los deals del agente (colección compartida por
+     * el dashboard, la cartera y el estado de cuenta).
      */
-    public function comisiones()
+    private function buildCommissions(?Agent $agent, float $rate)
     {
-        $agent = $this->resolveAgent();
-        $rate  = (float) ($agent->commission_rate ?? 0);
-
         $deals = $agent
             ? Deal::with('unit')->where('agent_id', $agent->id)->orderByDesc('deal_date')->get()
             : collect();
@@ -58,11 +59,12 @@ class BrokerController extends Controller
             'CANCELLED' => 'overdue', 'LOST'      => 'overdue',
         ];
 
-        $commissions = $deals->map(function (Deal $deal) use ($rate, $statusMap) {
+        return $deals->map(function (Deal $deal) use ($rate, $statusMap) {
             $base = (float) $deal->deal_price;
             return [
                 'client'     => $deal->client_name,
                 'unit'       => optional($deal->unit)->custom_id ?? optional($deal->unit)->name ?? '—',
+                'project'    => optional(optional($deal->unit)->project)->name,
                 'concept'    => $deal->deal_number ? 'Cierre · '.$deal->deal_number : 'Cierre de venta',
                 'base'       => $base,
                 'commission' => round($base * $rate / 100, 2),
@@ -70,6 +72,17 @@ class BrokerController extends Controller
                 'status'     => $statusMap[strtoupper((string) $deal->status)] ?? 'pending',
             ];
         });
+    }
+
+    /**
+     * Estado de cuenta / Mis comisiones (#13).
+     */
+    public function comisiones()
+    {
+        $agent = $this->resolveAgent();
+        $rate  = (float) ($agent->commission_rate ?? 0);
+
+        $commissions = $this->buildCommissions($agent, $rate);
 
         $sumBy = fn ($s) => $commissions->where('status', $s)->sum('commission');
 
@@ -87,6 +100,283 @@ class BrokerController extends Controller
             'commissions'  => $commissions,
             'kpis'         => $kpis,
             'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Slug de referido del broker (para el enlace público y la atribución).
+     */
+    private function referralSlug(?Agent $agent): string
+    {
+        return $agent ? Str::slug($agent->name) : 'broker';
+    }
+
+    /**
+     * Dashboard del broker — resumen de actividad, comisiones y progreso.
+     */
+    public function dashboard()
+    {
+        $agent = $this->resolveAgent();
+        $rate  = (float) ($agent->commission_rate ?? 0);
+
+        $commissions = $this->buildCommissions($agent, $rate);
+        $deals = $agent
+            ? Deal::with('unit')->where('agent_id', $agent->id)->orderByDesc('deal_date')->get()
+            : collect();
+
+        $startMonth = now()->startOfMonth();
+        $closedStatuses = ['CLOSED', 'COMPLETED', 'PAID', 'WON'];
+
+        $collectedMonth = $commissions
+            ->where('status', 'paid')
+            ->filter(fn ($c) => $c['date'] && \Carbon\Carbon::parse($c['date'])->gte($startMonth))
+            ->sum('commission');
+
+        $closedDeals = $deals->filter(fn ($d) => in_array(strtoupper((string) $d->status), $closedStatuses));
+        $clientsTotal = $deals->pluck('client_email')->filter()->unique()->count() ?: $deals->count();
+
+        $kpis = [
+            'collected_month' => $collectedMonth,
+            'accumulated'     => $commissions->where('status', 'paid')->sum('commission'),
+            'pending'         => $commissions->where('status', 'pending')->sum('commission'),
+            'clients'         => $clientsTotal,
+            'closed'          => $closedDeals->count(),
+            'conversion'      => $deals->count() ? round($closedDeals->count() / $deals->count() * 100) : 0,
+        ];
+
+        // Próximas liberaciones (comisiones pendientes con fecha más próxima)
+        $upcoming = $commissions->where('status', 'pending')->sortBy('date')->take(4)->values();
+
+        // Meta de trimestre (objetivo simple en nº de ventas cerradas)
+        $goalTarget   = 5;
+        $goalProgress = $closedDeals->filter(fn ($d) => $d->deal_date && \Carbon\Carbon::parse($d->deal_date)->gte(now()->startOfQuarter()))->count();
+
+        return view('broker.dashboard', [
+            'activeRoute'  => 'dashboard',
+            'agent'        => $agent,
+            'rate'         => $rate,
+            'kpis'         => $kpis,
+            'upcoming'     => $upcoming,
+            'goalTarget'   => $goalTarget,
+            'goalProgress' => $goalProgress,
+            'referral'     => $this->referralSlug($agent),
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Mi cartera de clientes — derivada de los deals del agente.
+     */
+    public function cartera()
+    {
+        $agent = $this->resolveAgent();
+        $rate  = (float) ($agent->commission_rate ?? 0);
+
+        $deals = $agent
+            ? Deal::with('unit')->where('agent_id', $agent->id)->orderByDesc('deal_date')->get()
+            : collect();
+
+        $closedStatuses = ['CLOSED', 'COMPLETED', 'PAID', 'WON'];
+
+        $clients = $deals->map(function (Deal $deal) use ($rate, $closedStatuses) {
+            $base   = (float) $deal->deal_price;
+            $closed = in_array(strtoupper((string) $deal->status), $closedStatuses);
+            $st     = strtoupper((string) $deal->status);
+            $state  = $closed ? 'cerr' : (in_array($st, ['PENDING', 'IN_PROGRESS']) ? 'neg' : 'lead');
+            return [
+                'name'       => $deal->client_name,
+                'unit'       => optional($deal->unit)->custom_id ?? optional($deal->unit)->name ?? '—',
+                'project'    => optional(optional($deal->unit)->project)->name,
+                'state'      => $state,
+                'commission' => round($base * $rate / 100, 2),
+                'closed'     => $closed,
+                'date'       => $deal->deal_date,
+            ];
+        });
+
+        return view('broker.cartera', [
+            'activeRoute'  => 'cartera',
+            'agent'        => $agent,
+            'clients'      => $clients,
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Formulario para registrar/atribuirse un cliente.
+     */
+    public function registro()
+    {
+        $agent    = $this->resolveAgent();
+        $projects = Project::orderBy('name')->get(['id', 'name']);
+        $units    = Unit::orderBy('custom_id')->get(['id', 'custom_id', 'name', 'price', 'project_id']);
+
+        return view('broker.registro', [
+            'activeRoute'  => 'registro',
+            'agent'        => $agent,
+            'projects'     => $projects,
+            'units'        => $units,
+            'referral'     => $this->referralSlug($agent),
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Guarda el cliente como un deal/lead atribuido al broker. Verifica
+     * duplicados por email/teléfono: si ya existe se bloquea (no se revela
+     * a quién está asignado).
+     */
+    public function registroStore(Request $request)
+    {
+        $agent = $this->resolveAgent();
+        abort_unless($agent, 403, 'Tu usuario aún no está vinculado a un perfil de agente.');
+
+        $data = $request->validate([
+            'client_name'  => ['required', 'string', 'max:150'],
+            'client_email' => ['required', 'email', 'max:150'],
+            'client_phone' => ['required', 'string', 'max:50'],
+            'unit_id'      => ['nullable', 'exists:units,id'],
+            'stage'        => ['nullable', 'string', 'max:30'],
+            'consent'      => ['accepted'],
+        ]);
+
+        // Duplicados: si el cliente ya está en la base, se bloquea el registro.
+        $exists = Deal::where('client_email', $data['client_email'])
+            ->orWhere('client_phone', $data['client_phone'])
+            ->exists();
+
+        if ($exists) {
+            return back()->withInput()->with('error',
+                'Este cliente ya figura en la base de datos. El registro se bloquea; puedes solicitar revisión al administrador.');
+        }
+
+        $unit  = $data['unit_id'] ? Unit::find($data['unit_id']) : null;
+        $stage = strtoupper($data['stage'] ?? 'LEAD');
+
+        Deal::create([
+            'deal_number' => 'LEAD-'.now()->format('ymd').'-'.Str::upper(Str::random(4)),
+            'client_name'  => $data['client_name'],
+            'client_email' => $data['client_email'],
+            'client_phone' => $data['client_phone'],
+            'unit_id'      => $unit?->id,
+            'agent_id'     => $agent->id,
+            'deal_price'   => $unit?->price ?? 0,
+            'status'       => $stage === 'RESERVAR' ? 'PENDING' : 'OPEN',
+            'deal_date'    => now(),
+            'notes'        => 'Cliente registrado desde el Portal del Broker.',
+        ]);
+
+        return redirect()->route('broker.cartera')
+            ->with('success', $data['client_name'].' quedó registrado y asignado a ti.');
+    }
+
+    /**
+     * Inventario en vivo — unidades públicas con su disponibilidad real.
+     */
+    public function inventario()
+    {
+        $units = Unit::with('project')
+            ->where('public', true)
+            ->orderBy('project_id')
+            ->orderBy('custom_id')
+            ->get();
+
+        return view('broker.inventario', [
+            'activeRoute'  => 'inventario',
+            'units'        => $units,
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Herramientas de venta — material descargable, enlaces y propuestas.
+     */
+    public function herramientas()
+    {
+        $agent = $this->resolveAgent();
+
+        $materials = BrokerMaterial::visible()
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $clients = $agent
+            ? Deal::where('agent_id', $agent->id)->orderByDesc('deal_date')->get(['client_name', 'client_email'])
+            : collect();
+
+        $units = Unit::where('public', true)->orderBy('custom_id')->get(['id', 'custom_id', 'name', 'price']);
+
+        return view('broker.herramientas', [
+            'activeRoute'  => 'herramientas',
+            'materials'    => $materials,
+            'clients'      => $clients,
+            'units'        => $units,
+            'referral'     => $this->referralSlug($agent),
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Calculadora de comisión (cálculo en cliente; aquí solo defaults).
+     */
+    public function calculadora()
+    {
+        $agent = $this->resolveAgent();
+
+        return view('broker.calculadora', [
+            'activeRoute'  => 'calculadora',
+            'rate'         => (float) ($agent->commission_rate ?? 7),
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Simulador de cobro (fraccionamiento del inicial).
+     */
+    public function simulador()
+    {
+        $agent = $this->resolveAgent();
+
+        return view('broker.simulador', [
+            'activeRoute'  => 'simulador',
+            'rate'         => (float) ($agent->commission_rate ?? 7),
+            'previewAdmin' => $this->previewAdmin(),
+        ]);
+    }
+
+    /**
+     * Metas e incentivos — progreso del trimestre, nivel y ranking.
+     */
+    public function metas()
+    {
+        $agent = $this->resolveAgent();
+
+        $deals = $agent
+            ? Deal::where('agent_id', $agent->id)->get()
+            : collect();
+        $closedStatuses = ['CLOSED', 'COMPLETED', 'PAID', 'WON'];
+        $closedThisQuarter = $deals->filter(fn ($d) =>
+            in_array(strtoupper((string) $d->status), $closedStatuses)
+            && $d->deal_date && \Carbon\Carbon::parse($d->deal_date)->gte(now()->startOfQuarter())
+        )->count();
+
+        // Ranking por cierres del trimestre entre todos los agentes
+        $leaderboard = Agent::with(['deals'])->get()->map(function (Agent $a) use ($closedStatuses) {
+            $count = $a->deals->filter(fn ($d) =>
+                in_array(strtoupper((string) $d->status), $closedStatuses)
+                && $d->deal_date && \Carbon\Carbon::parse($d->deal_date)->gte(now()->startOfQuarter())
+            )->count();
+            return ['name' => $a->name, 'id' => $a->id, 'sales' => $count];
+        })->sortByDesc('sales')->values();
+
+        return view('broker.metas', [
+            'activeRoute'   => 'metas',
+            'agent'         => $agent,
+            'goalTarget'    => 5,
+            'goalProgress'  => $closedThisQuarter,
+            'levelTarget'   => 8,
+            'leaderboard'   => $leaderboard,
+            'previewAdmin'  => $this->previewAdmin(),
         ]);
     }
 

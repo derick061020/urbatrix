@@ -710,10 +710,78 @@ class AdminController extends Controller
             ];
         });
 
+        // ───────── Pestaña "Ventas y plataforma" ─────────
+        $closedStatuses = ['CLOSED', 'COMPLETED', 'PAID', 'WON', 'closed', 'completed', 'paid', 'won'];
+
+        $salesMonth  = (float) Deal::whereIn('status', $closedStatuses)
+            ->where('deal_date', '>=', $now->copy()->startOfMonth())->sum('deal_price');
+        $unitsMonth  = (int) Deal::whereIn('status', $closedStatuses)
+            ->where('deal_date', '>=', $now->copy()->startOfMonth())->count();
+        $salesTotal  = (float) Deal::whereIn('status', $closedStatuses)->sum('deal_price');
+        $unitsTotal  = (int) Deal::whereIn('status', $closedStatuses)->count();
+
+        // Pipeline: reservas activas (no canceladas/cerradas) y su valor
+        $pipelineValue = (float) Deal::whereNotIn('status', $closedStatuses)
+            ->whereNotIn('status', ['CANCELLED', 'LOST', 'cancelled', 'lost'])->sum('deal_price');
+        $pipelineCount = (int) Deal::whereNotIn('status', $closedStatuses)
+            ->whereNotIn('status', ['CANCELLED', 'LOST', 'cancelled', 'lost'])->count();
+
+        // Cobros (pagos confirmados)
+        $collectedMonth = (float) Payment::where('status', 'paid')
+            ->where('paid_at', '>=', $now->copy()->startOfMonth())->sum('amount');
+        $receivables    = (float) Payment::whereIn('status', ['pending', 'PENDING'])->sum('amount');
+        $overdueAmount  = (float) Payment::whereIn('status', ['pending', 'PENDING'])
+            ->whereNotNull('due_date')->where('due_date', '<', $now)->sum('amount');
+        $overdueCount   = (int) Payment::whereIn('status', ['pending', 'PENDING'])
+            ->whereNotNull('due_date')->where('due_date', '<', $now)->count();
+        $overduePct     = $receivables > 0 ? round($overdueAmount / $receivables * 100) : 0;
+
+        // Inventario por proyecto (conteos reales por estado de unidad)
+        $inventory = Project::withCount([
+                'units',
+                'units as sold_count'     => fn ($q) => $q->whereIn('status', ['SOLD', 'sold']),
+                'units as reserved_count' => fn ($q) => $q->whereIn('status', ['RESERVED', 'reserved']),
+            ])
+            ->orderBy('name')
+            ->get()
+            ->map(function (Project $p) use ($closedStatuses) {
+                $available = max(0, $p->units_count - $p->sold_count - $p->reserved_count);
+                $soldValue = (float) Deal::whereIn('status', $closedStatuses)
+                    ->whereHas('unit', fn ($q) => $q->where('project_id', $p->id))->sum('deal_price');
+                return [
+                    'name'      => $p->name,
+                    'type'      => $p->type,
+                    'total'     => $p->units_count,
+                    'sold'      => $p->sold_count,
+                    'reserved'  => $p->reserved_count,
+                    'available' => $available,
+                    'progress'  => (int) $p->progress,
+                    'value'     => $soldValue,
+                ];
+            });
+
+        $invTotals = [
+            'total'     => $inventory->sum('total'),
+            'sold'      => $inventory->sum('sold'),
+            'reserved'  => $inventory->sum('reserved'),
+            'available' => $inventory->sum('available'),
+            'value'     => $inventory->sum('value'),
+        ];
+
+        // Morosidad: cuotas vencidas (gestión)
+        $overduePayments = Payment::with('reservation.unit')
+            ->whereIn('status', ['pending', 'PENDING'])
+            ->whereNotNull('due_date')->where('due_date', '<', $now)
+            ->orderBy('due_date')->take(5)->get();
+
         return view('admin.estadisticas', compact(
             'activeUsers', 'totalUsers', 'newThisMonth',
             'viewsTotal', 'viewsThisMonth', 'popularUnits',
-            'recentUsers', 'byCountry', 'byCountryTotal', 'trend'
+            'recentUsers', 'byCountry', 'byCountryTotal', 'trend',
+            'salesMonth', 'unitsMonth', 'salesTotal', 'unitsTotal',
+            'pipelineValue', 'pipelineCount', 'collectedMonth', 'receivables',
+            'overdueAmount', 'overdueCount', 'overduePct',
+            'inventory', 'invTotals', 'overduePayments'
         ));
     }
 

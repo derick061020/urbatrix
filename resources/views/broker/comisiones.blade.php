@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Mis Comisiones — Portal Broker')
-@section('page_title', 'Mis Comisiones')
-@section('page_breadcrumb', 'Portal Broker · Mis comisiones')
+@section('title', 'Estado de cuenta — Portal Broker')
+@section('page_title', 'Estado de cuenta')
+@section('page_breadcrumb', 'Portal Broker · Comisiones')
 
 @section('content')
 @php
