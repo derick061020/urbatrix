@@ -920,7 +920,168 @@ class AdminController extends Controller
             ->orderBy('due_date')
             ->get();
 
-        return view('admin.crm.dashboard', compact('stats', 'proyectos', 'expedientesRecientes', 'aprobacionesUrgentes', 'tareasHoy'));
+        // ──────────────────────────────────────────────────────────────────
+        // Escritorio mejorado: bandeja unificada, riesgo, vencimientos, carga.
+        // Todo proviene de datos reales (Document/Approval/Task/Payment/Unit).
+        // ──────────────────────────────────────────────────────────────────
+        $contractTypes = ['payment_plan', 'purchase_promise', 'contract', 'promise'];
+
+        // Un solo pase sobre los expedientes activos con sus relaciones, para
+        // derivar "sin asesor", "carga por asesor" y "en riesgo" sin N+1.
+        $activeReservations = (clone $reservationsBase)
+            ->with(['unit.agent', 'documents', 'payments'])
+            ->get();
+
+        // Desglose de KPIs (el número de cabecera = suma exacta de su desglose)
+        $stats['docs_revisar'] = (clone $docsBase)->whereIn('status', ['pending', 'generated'])
+            ->where(fn ($q) => $q->whereNotIn('document_type', $contractTypes)->orWhereNull('document_type'))->count();
+        $stats['docs_firmar'] = (clone $docsBase)->whereIn('status', ['pending', 'generated'])
+            ->whereIn('document_type', $contractTypes)->count();
+
+        $stats['aprob_kyc']      = $isBroker ? 0 : Approval::where('status', 'pendiente')->where('type', 'kyc')->count();
+        $stats['aprob_contrato'] = $isBroker ? 0 : Approval::where('status', 'pendiente')->whereIn('type', ['contrato', 'promesa'])->count();
+        $stats['aprob_broker']   = $isBroker ? 0 : Approval::where('status', 'pendiente')->whereIn('type', ['broker', 'comision'])->count();
+        $stats['aprob_otros']    = max(0, ($stats['aprobaciones_cola'] ?? 0) - $stats['aprob_kyc'] - $stats['aprob_contrato'] - $stats['aprob_broker']);
+
+        $stats['sin_asesor'] = $activeReservations->filter(fn ($r) => $r->unit && !$r->unit->agent_id)->count();
+
+        // ── Bandeja de trabajo (cola priorizada por antigüedad) ──
+        $bandeja = collect();
+
+        // 1) Documentos pendientes (revisar / firmar / KYC)
+        $pendingDocs = (clone $docsBase)->with('reservation.unit')
+            ->whereIn('status', ['pending', 'generated'])
+            ->orderBy('updated_at')->take(40)->get();
+        foreach ($pendingDocs as $d) {
+            $isKyc      = $d->document_type === 'kyc';
+            $isContract = in_array($d->document_type, $contractTypes, true);
+            $r          = $d->reservation;
+            $cliente    = $r ? trim(($r->first_name ?? '').' '.($r->last_name ?? '')) : __('Cliente');
+            $unidad     = optional($r?->unit)->name ?? optional($r?->unit)->custom_id ?? __('Sin unidad');
+            $bandeja->push((object) [
+                'cat'    => $isKyc ? 'kyc' : ($isContract ? 'contrato' : 'documento'),
+                'ty'     => $isKyc ? 'KYC' : ($isContract ? 'Contrato' : 'Documento'),
+                'title'  => ($d->title ?: ucfirst((string) ($d->document_type ?? __('Documento')))).' — '.($isKyc ? __('verificación de identidad') : __('por revisar')),
+                'sub'    => trim($cliente.' · '.$unidad.($r?->reservation_code ? ' · '.$r->reservation_code : ''), ' ·'),
+                'date'   => $d->updated_at ?? $d->created_at,
+                'url'    => $r ? route('admin.crm.expediente.detalle', $r->id) : route('admin.crm.documentos'),
+                'action' => __('Revisar'),
+            ]);
+        }
+
+        // 2) Aprobaciones pendientes (broker / comisión / otras)
+        if (!$isBroker) {
+            foreach (Approval::with('reservation')->where('status', 'pendiente')->orderBy('created_at')->take(20)->get() as $a) {
+                $t   = strtolower((string) ($a->type ?? ''));
+                $cat = $t === 'kyc' ? 'kyc' : (in_array($t, ['contrato', 'promesa']) ? 'contrato' : (in_array($t, ['broker', 'comision']) ? 'broker' : 'documento'));
+                $bandeja->push((object) [
+                    'cat'    => $cat,
+                    'ty'     => ['kyc' => 'KYC', 'contrato' => 'Contrato', 'broker' => 'Broker', 'documento' => 'Documento'][$cat],
+                    'title'  => ($a->requested_by ?: __('Solicitud')).' — '.($a->amount_or_condition ?? ucfirst((string) ($a->type ?? __('aprobación')))),
+                    'sub'    => $a->notes ?? __('Pendiente de aprobación'),
+                    'date'   => $a->created_at,
+                    'url'    => route('admin.crm.aprobaciones'),
+                    'action' => __('Revisar'),
+                ]);
+            }
+        }
+
+        // 3) Expedientes sin asesor (la unidad no tiene agente asignado)
+        foreach ($activeReservations->filter(fn ($r) => $r->unit && !$r->unit->agent_id)->sortByDesc('created_at')->take(6) as $r) {
+            $cliente = trim(($r->first_name ?? '').' '.($r->last_name ?? '')) ?: __('Lead');
+            $bandeja->push((object) [
+                'cat'    => 'noadv',
+                'ty'     => __('Sin asesor'),
+                'title'  => $cliente.' — '.__('sin asesor asignado'),
+                'sub'    => (optional($r->unit)->name ?? __('Sin unidad')).($r->reservation_code ? ' · '.$r->reservation_code : ''),
+                'date'   => $r->created_at,
+                'url'    => route('admin.crm.expediente.detalle', $r->id),
+                'action' => __('Asignar'),
+            ]);
+        }
+
+        // 4) Tareas vencidas / de hoy
+        if (!$isBroker) {
+            foreach (Task::with('reservation')->where('status', '!=', 'completada')
+                        ->whereNotNull('due_date')->whereDate('due_date', '<=', today())
+                        ->orderBy('due_date')->take(10)->get() as $t) {
+                $bandeja->push((object) [
+                    'cat'    => 'tarea',
+                    'ty'     => __('Tarea'),
+                    'title'  => $t->title,
+                    'sub'    => trim(($t->responsible ? $t->responsible.' · ' : '').($t->area ?? __('Tarea')), ' ·'),
+                    'date'   => $t->due_date,
+                    'url'    => route('admin.crm.tareas'),
+                    'action' => __('Resolver'),
+                ]);
+            }
+        }
+
+        $bandejaTotal = $bandeja->count();
+        $bandeja = $bandeja->sortBy(fn ($i) => $i->date ?? now())->take(14)->values();
+
+        // ── En riesgo (lo que se puede enfriar) ──
+        $riesgo = collect();
+
+        // Reservas a punto de vencer
+        foreach ($activeReservations->filter(fn ($r) => $r->expires_at && $r->expires_at->isFuture()
+                    && $r->expires_at->lte(now()->addDays(3))
+                    && !in_array($r->status, ['completed', 'cancelled', 'expired']))
+                ->sortBy('expires_at')->take(3) as $r) {
+            $riesgo->push((object) [
+                'level' => 'r1', 'icon' => 'pi-clock',
+                'title' => __('Reserva de :name vence :when', ['name' => trim(($r->first_name ?? '').' '.($r->last_name ?? '')), 'when' => $r->expires_at->diffForHumans()]),
+                'sub'   => (optional($r->unit)->name ?? '—').' · '.__('depósito sin confirmar'),
+                'url'   => route('admin.crm.expediente.detalle', $r->id),
+            ]);
+        }
+
+        // Pagos vencidos
+        $overdueQuery = Payment::with('reservation.unit')->where('status', 'overdue');
+        if ($isBroker) $overdueQuery->whereHas('reservation', fn ($q) => $q->whereIn('unit_id', $brokerUnitIds));
+        foreach ($overdueQuery->orderBy('due_date')->take(3)->get() as $p) {
+            $r = $p->reservation;
+            $riesgo->push((object) [
+                'level' => 'r1', 'icon' => 'pi-dollar',
+                'title' => __('Cuota vencida de :name', ['name' => $r ? trim(($r->first_name ?? '').' '.($r->last_name ?? '')) : __('cliente')]),
+                'sub'   => (optional($r?->unit)->name ?? '—').' · $'.number_format((float) $p->amount, 0).' · '.($p->label ?? __('pago')),
+                'url'   => $r ? route('admin.crm.expediente.detalle', $r->id) : route('admin.crm.expedientes'),
+            ]);
+        }
+
+        // Expedientes estancados (sin actividad ≥ 9 días)
+        foreach ($activeReservations->filter(fn ($r) => $r->updated_at && $r->updated_at->lt(now()->subDays(9))
+                    && !in_array($r->status, ['completed', 'cancelled']))
+                ->sortBy('updated_at')->take(2) as $r) {
+            $riesgo->push((object) [
+                'level' => 'r2', 'icon' => 'pi-search',
+                'title' => __('Expediente sin actividad :when', ['when' => $r->updated_at->diffForHumans()]),
+                'sub'   => trim(($r->first_name ?? '').' '.($r->last_name ?? '')).' · '.(optional($r->unit)->name ?? '—'),
+                'url'   => route('admin.crm.expediente.detalle', $r->id),
+            ]);
+        }
+        $riesgo = $riesgo->take(5);
+
+        // ── Próximos vencimientos (cuotas por cobrar) ──
+        $vencQuery = Payment::with('reservation.unit')->where('status', 'pending')
+            ->whereNotNull('due_date')->whereDate('due_date', '>=', today());
+        if ($isBroker) $vencQuery->whereHas('reservation', fn ($q) => $q->whereIn('unit_id', $brokerUnitIds));
+        $vencimientos = $vencQuery->orderBy('due_date')->take(5)->get();
+
+        // ── Sin asesor + carga por asesor ──
+        $sinAsesor = $activeReservations->filter(fn ($r) => $r->unit && !$r->unit->agent_id)
+            ->sortByDesc('created_at')->take(4)->values();
+
+        $loadByAgent   = $activeReservations->groupBy(fn ($r) => optional($r->unit)->agent_id);
+        $cargaAsesores = ($isBroker ? collect() : Agent::where('active', true)->get())
+            ->map(fn ($a) => (object) ['name' => $a->name, 'count' => optional($loadByAgent->get($a->id))->count() ?? 0])
+            ->sortByDesc('count')->values();
+        $maxCarga = max(1, (int) ($cargaAsesores->max('count') ?? 1));
+
+        return view('admin.crm.dashboard', compact(
+            'stats', 'proyectos', 'expedientesRecientes', 'aprobacionesUrgentes', 'tareasHoy',
+            'bandeja', 'bandejaTotal', 'riesgo', 'vencimientos', 'sinAsesor', 'cargaAsesores', 'maxCarga'
+        ));
     }
 
     public function crmExpedientes(Request $request)
