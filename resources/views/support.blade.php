@@ -5,6 +5,9 @@
         ->take(2)
         ->map(fn ($p) => mb_strtoupper(mb_substr($p, 0, 1)))
         ->implode('');
+    $isAdminUser = $user && ($user->role ?? '') === 'admin';
+    $locale = app()->getLocale();
+    $isEs = ! str_starts_with($locale, 'en');
 @endphp
 <!doctype html>
 {{--
@@ -141,6 +144,33 @@
   @media (max-width:560px){ .qa{ grid-template-columns:1fr; } .channels{ grid-template-columns:1fr; } .hero h1{ font-size:27px; } .crumb{ display:none; } }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+
+  /* logo + profile trigger */
+  .logo-img{ height:28px; width:auto; max-width:150px; object-fit:contain; display:block; }
+  .profile-trigger{ display:inline-flex; align-items:center; gap:8px; padding:0; background:transparent; border:none; cursor:pointer; border-radius:9999px; }
+  .profile-trigger .pinfo{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; line-height:1; }
+  .profile-trigger .pname{ font-weight:600; font-size:12px; color:var(--brand-dark); }
+  .profile-trigger .prole{ font-weight:500; font-size:9px; color:#99a0ae; letter-spacing:.72px; text-transform:uppercase; }
+  .profile-trigger .pav{ width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; display:inline-block; }
+  .profile-trigger .pav-i{ width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#7b9a86,var(--brand-dark)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  @media (max-width:560px){ .profile-trigger .pinfo{ display:none; } }
+
+  /* ===== MENU DROPDOWN (réplica del header del home) ===== */
+  .menu-dropdown-container{ position:absolute; z-index:3000; right:0; top:calc(100% + 8px); transform-origin:right top; display:none; }
+  .menu-dropdown-container.menu-open{ display:block; }
+  #profileDropdown.menu-dropdown-container{
+    position:absolute; top:calc(100% + 14px); right:0; width:320px; display:flex; flex-direction:column;
+    align-items:flex-start; overflow:hidden; padding:6px; border-radius:18px; background:#fff;
+    box-shadow:0 20px 20px -10px rgba(23,23,23,.04),0 10px 10px -5px rgba(23,23,23,.04),0 6px 6px -3px rgba(23,23,23,.04),0 3px 3px -1.5px rgba(23,23,23,.04),0 1px 1px -.5px rgba(23,23,23,.04),0 0 0 1px rgba(23,23,23,.08);
+    z-index:3001; visibility:hidden; opacity:0; transform:translateX(8px); transition:opacity .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1), visibility .25s;
+  }
+  #profileDropdown.menu-dropdown-container.menu-open{ visibility:visible; opacity:1; transform:translateX(0); }
+  #profileDropdown .menu-item, #profileDropdown .logout-item{ transition:all .2s ease; cursor:pointer; font-family:var(--ff); }
+  #profileDropdown .menu-item:hover, #profileDropdown .logout-item:hover{ background:#f8fafc !important; transform:translateX(2px); }
+  #profileDropdown .logout-item:hover{ background:#fef2f2 !important; }
+  #profileDropdown .logout-item:hover svg{ color:#dc2626 !important; }
+  #profileDropdown .logout-item:hover > div:last-child{ color:#dc2626 !important; }
+  @media (max-width:560px){ #profileDropdown.menu-dropdown-container{ width:288px; } }
 </style>
 </head>
 <body>
@@ -150,11 +180,112 @@
       <a href="/" class="back" aria-label="Volver al inicio">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </a>
-      <span class="wordmark">Makai</span>
+      <a href="/" style="display:flex;align-items:center;text-decoration:none;flex:none;">
+        <img src="/images/makai-logo.png" alt="Makai" class="logo-img">
+      </a>
       <span class="crumb"><b>Soporte</b></span>
       <div class="tright">
-        <div class="lang"><button class="on">ES</button><button>EN</button></div>
-        <div class="uav">{{ $userInitials }}</div>
+        <!-- Toggle de idioma (real · persiste vía /locale) -->
+        <div class="lang">
+          <button type="button" id="lang-es" class="{{ $isEs ? 'on' : '' }}" onclick="setLanguage('es')">ES</button>
+          <button type="button" id="lang-en" class="{{ $isEs ? '' : 'on' }}" onclick="setLanguage('en')">EN</button>
+        </div>
+
+        <!-- Foto de perfil → abre el menú del home -->
+        <div style="position:relative;">
+          <button type="button" class="profile-trigger" onclick="toggleProfileMenu()" aria-label="Menú de perfil">
+            <span class="pinfo">
+              <span class="pname">{{ $user ? explode(' ', $user->name)[0] : 'Cliente' }}</span>
+              <span class="prole">{{ $isAdminUser ? __('Admin') : __('Cliente') }}</span>
+            </span>
+            @if($user && $user->avatar)
+              <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="pav">
+            @else
+              <span class="pav-i">{{ $userInitials }}</span>
+            @endif
+          </button>
+
+          <!-- PROFILE DROPDOWN (réplica del menú hamburguesa del home) -->
+          <div class="menu-dropdown-container" id="profileDropdown">
+
+            <!-- User info -->
+            <div style="display:flex;gap:8px;align-items:center;padding:8px;background:white;border-radius:10px;width:100%;flex-shrink:0;">
+              <div style="position:relative;border-radius:999px;width:40px;height:40px;flex-shrink:0;overflow:hidden;">
+                @if($user && $user->avatar)
+                  <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
+                @else
+                  <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--brand);color:white;font-family:var(--ff);font-weight:600;font-size:16px;border-radius:999px;">{{ $userInitials }}</span>
+                @endif
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
+                <div style="font-family:var(--ff);font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $user ? $user->name : 'Cliente' }}</div>
+                <div style="font-family:var(--ff);font-weight:500;font-size:12px;color:#a3a3a3;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $user ? $user->email : '' }}</div>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;"><div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div></div>
+
+            <!-- Menu Items -->
+            <a href="{{ $isAdminUser ? route('admin.crm.dashboard') : route('dashboard') }}" style="text-decoration:none;display:block;width:100%">
+              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:var(--ff);font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Dashboard') }}</div>
+              </div>
+            </a>
+
+            <a href="{{ route('dashboard.documents') }}" style="text-decoration:none;display:block;width:100%">
+              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:var(--ff);font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Documentos') }}</div>
+              </div>
+            </a>
+
+            <!-- Divider -->
+            <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;"><div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div></div>
+
+            <a href="{{ route('support') }}" style="text-decoration:none;display:block;width:100%">
+              <div class="menu-item" style="background:#eef2ef;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand-dark);"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:var(--ff);font-weight:600;font-size:14px;color:var(--brand-dark);letter-spacing:-0.084px;">{{ __('Soporte') }}</div>
+              </div>
+            </a>
+
+            <a href="{{ $isAdminUser ? route('admin.crm.avance-obra') : route('dashboard.progress') }}" style="text-decoration:none;display:block;width:100%">
+              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:var(--ff);font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Progreso de la construcción') }}</div>
+              </div>
+            </a>
+
+            <!-- Divider -->
+            <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;"><div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div></div>
+
+            <!-- Sign Out -->
+            <form method="POST" action="/logout" style="margin:0;width:100%;flex-shrink:0;">
+              @csrf
+              <button type="submit" class="logout-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;border:none;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#dc2626;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </div>
+                <div style="flex:1;text-align:start;min-width:0;font-family:var(--ff);font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Cerrar sesión') }}</div>
+              </button>
+            </form>
+
+            <!-- Footer -->
+            <div style="background:white;display:flex;align-items:center;overflow:hidden;padding:8px;width:100%;flex-shrink:0;">
+              <div style="flex:1;min-width:0;font-family:var(--ff);font-weight:500;font-size:12px;color:#a3a3a3;line-height:16px;">v.1.0.1 · {{ __('Términos y condiciones') }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -308,10 +439,49 @@
   document.querySelectorAll('.cat').forEach(function(c){
     c.addEventListener('click', function(){ document.querySelectorAll('.cat').forEach(function(x){x.classList.remove('on');}); c.classList.add('on'); });
   });
-  // toggle idioma (cosmético)
-  document.querySelectorAll('.lang button').forEach(function(b){
-    b.addEventListener('click', function(){ document.querySelectorAll('.lang button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); });
-  });
+
+  // ===== Toggle de idioma (real · persiste en backend y recarga) =====
+  function setLanguage(lang){
+    // Reflejo inmediato en la UI del toggle
+    document.querySelectorAll('.lang button').forEach(function(b){ b.classList.remove('on'); });
+    var btn = document.getElementById('lang-' + lang);
+    if (btn) btn.classList.add('on');
+
+    var serverLang = (document.documentElement.getAttribute('lang') || 'es').toLowerCase().split('-')[0];
+    if (serverLang === lang) return; // ya es el idioma activo
+
+    var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    fetch('{{ route("locale.update") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+      body: JSON.stringify({ locale: lang }),
+    }).then(function(r){ return r.ok ? r.json() : Promise.reject(r); })
+      .then(function(){ window.location.reload(); })
+      .catch(function(){ /* la UI local ya quedó actualizada */ });
+  }
+
+  // ===== Menú de perfil (mismo comportamiento que el home) =====
+  function toggleProfileMenu(){
+    var dropdown = document.getElementById('profileDropdown');
+    if (!dropdown) return;
+    if (dropdown.classList.contains('menu-open')) {
+      closeProfileMenu();
+    } else {
+      dropdown.classList.add('menu-open');
+      setTimeout(function(){ document.addEventListener('click', closeProfileMenuOnOutsideClick); }, 10);
+    }
+  }
+  function closeProfileMenu(){
+    var dropdown = document.getElementById('profileDropdown');
+    if (dropdown) dropdown.classList.remove('menu-open');
+    document.removeEventListener('click', closeProfileMenuOnOutsideClick);
+  }
+  function closeProfileMenuOnOutsideClick(e){
+    var dropdown = document.getElementById('profileDropdown');
+    if (dropdown && !dropdown.contains(e.target) && !e.target.closest('.profile-trigger')) {
+      closeProfileMenu();
+    }
+  }
 </script>
 </body>
 </html>
