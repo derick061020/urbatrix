@@ -2794,6 +2794,61 @@
     .mt-shell:not(.living-mode) .mt-living-only { display: none; }
     .mt-shell.living-mode .mt-investment-only { display: none; }
 
+    /* ── Ficha blocks (Para inversión / Para vivir) ─────────────────── */
+    .mt-block {
+      border: 1px solid #eef1f5;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .mt-block--green { background: #f0fdf4; border-color: #dcfce7; }
+    .mt-block--gold  { background: #fbf7ef; border-color: #efe6d3; }
+    .mt-b-head { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .mt-b-ic {
+      flex: none; width: 30px; height: 30px; border-radius: 9px;
+      background: #fff; border: 1px solid #eef1f5;
+      display: grid; place-items: center; color: #64748b;
+    }
+    .mt-block--green .mt-b-ic { color: #15803d; border-color: #dcfce7; }
+    .mt-block--gold  .mt-b-ic { color: #8a6a2e; border-color: #efe6d3; }
+    .mt-b-ic svg { width: 16px; height: 16px; }
+    .mt-eyebrow {
+      font-size: 10.5px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #94a3b8;
+    }
+    .mt-b-value {
+      font-size: 16px; font-weight: 600; color: #111827; letter-spacing: -.01em;
+    }
+    .mt-b-value .accent { color: #15803d; }
+    .mt-b-value .unit { font-size: 13px; font-weight: 500; color: #64748b; }
+    .mt-block--gold .mt-b-value { color: #8a6a2e; font-size: 15px; }
+    .mt-b-body { font-size: 12.5px; color: #64748b; margin-top: 5px; }
+    .mt-b-micro { font-size: 10.5px; color: #94a3b8; font-style: italic; margin-top: 7px; line-height: 1.45; }
+    .mt-vrow {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 10px; padding: 7px 0;
+    }
+    .mt-vrow + .mt-vrow { border-top: 1px dashed #dcfce7; }
+    .mt-vrow .k {
+      font-size: 11px; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: #15803d; opacity: .85;
+    }
+    .mt-vrow .v { font-size: 14px; font-weight: 600; color: #111827; text-align: right; }
+    .mt-vrow .v .arrow { color: #15803d; margin: 0 4px; }
+    .mt-vrow .v .hint { font-size: 11px; color: #15803d; font-weight: 500; }
+    .mt-chips, .mt-calm { display: flex; flex-wrap: wrap; gap: 7px; }
+    .mt-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 600; color: #111827;
+      background: #fff; border: 1px solid #eef1f5; border-radius: 999px; padding: 6px 11px;
+    }
+    .mt-chip svg { width: 13px; height: 13px; color: #64748b; }
+    .mt-calm span {
+      font-size: 12.5px; font-weight: 600; color: #1f2937;
+      background: #fff; border: 1px solid #eef1f5; border-radius: 999px; padding: 6px 11px;
+    }
+
     /* Living extras (amenities) */
     .mt-living-extras {
       display: block;

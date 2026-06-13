@@ -262,41 +262,121 @@
 
             
 
-            <!-- Amenities — For Living -->
-            <p class="mt-section-label mt-living-only" id="modalLifestyleLabel" style="display:none;margin-top:10px;">{{ __('Amenities & Lifestyle') }}</p>
-            <div class="mt-living-extras mt-living-only">
-              <div class="mt-living-row" id="modalRowAmen" style="display:none;">
-                <span class="txt" id="modalAmenities">—</span>
+            {{-- ══════════════ PARA INVERSIÓN ══════════════ --}}
+
+            <!-- A · Precio inteligente -->
+            <div class="mt-block mt-investment-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Smart entry price') }}</span>
               </div>
+              <div class="mt-b-value"><span id="modalSmartPpm">—</span> · <span class="accent">{{ __('12% below the area average') }}</span></div>
+              <p class="mt-b-micro">{{ __('Average based on comparable transactions in the zone.') }}</p>
             </div>
 
-            <!-- Projected value highlight (investment) -->
-            <div class="mt-projected mt-investment-only" id="modalProjected" style="display:none;">
-              <div class="mt-projected-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+            <!-- B · Valorización (histórica → escenario) -->
+            <div class="mt-block mt-block--green mt-investment-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Appreciation') }}</span>
               </div>
-              <div>
-                <p class="mt-projected-label">{{ __('PROJECTED VALUE AT DELIVERY') }}</p>
-                <div class="mt-projected-row">
-                  <span class="now" id="modalProjectedNow">$0 today</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  <span class="future" id="modalProjectedFuture">—</span>
-                  <span class="hint" id="modalProjectedHint">—</span>
-                </div>
+              <div class="mt-vrow">
+                <span class="k">{{ __('Historical') }}</span>
+                <span class="v">+8% {{ __('avg./yr') }} · 2018–2024</span>
               </div>
+              <div class="mt-vrow" id="modalProjected" style="display:none;">
+                <span class="k">{{ __('Scenario') }}</span>
+                <span class="v"><span id="modalProjectedNow">$0</span> <span class="arrow">→</span> <span id="modalProjectedFuture">—</span> <span class="hint" id="modalProjectedHint">—</span></span>
+              </div>
+              <p class="mt-b-micro">{{ __('Reference scenario built on the area\'s historical appreciation. Not a guarantee or offer of return.') }}</p>
             </div>
 
-            <!-- Investment commentary -->
+            <!-- C · Renta estimada -->
+            <div class="mt-block mt-investment-only" id="modalRentBlock" style="display:none;">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Estimated rental income') }}</span>
+              </div>
+              <div class="mt-b-value"><span id="modalRentVal">—</span><span class="unit">/{{ __('mo') }}</span> <span id="modalRentYield"></span></div>
+              <p class="mt-b-body">{{ __('Based on comparable-unit rates and average occupancy in the area.') }}</p>
+              <p class="mt-b-micro">{{ __('Reference estimate, not guaranteed.') }}</p>
+            </div>
+
+            <!-- D · CONFOTUR (factual) -->
+            <div class="mt-block mt-block--gold mt-investment-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                <span class="mt-eyebrow">{{ __('CONFOTUR benefits') }}</span>
+              </div>
+              <div class="mt-b-value">{{ __('15-year property-tax exemption + 0% transfer tax') }}</div>
+              <p class="mt-b-body">{{ __('CONFOTUR-approved project: save the 3% transfer tax') }} (<span id="modalConfoturSavings">—</span>) {{ __('plus the annual property tax for 15 years.') }}</p>
+              <p class="mt-b-micro">{{ __('Benefit subject to Law 158-01 (CONFOTUR) and the project\'s current qualification.') }}</p>
+            </div>
+
+            <!-- Investment commentary (optional, from DB) -->
             <div class="mt-compare mt-investment-only" id="modalCompare" style="display:none;">
               <span class="bullet"></span>
               <span id="modalCompareText">—</span>
             </div>
 
-            <!-- For-investment longform description -->
+            <!-- For-investment longform description (optional, from DB) -->
             <p class="mt-section-text mt-investment-only" id="modalInvestmentText" style="display:none;"></p>
 
-            <!-- For-living longform description -->
-            <p class="mt-section-text mt-living-note mt-living-only" id="modalLivingText" style="display:none;"></p>
+            {{-- ══════════════ PARA VIVIR ══════════════ --}}
+
+            <!-- 1 · Tu espacio -->
+            <div class="mt-block mt-living-only" id="modalSpaceBlock" style="display:none;">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Your space') }}</span>
+              </div>
+              <div class="mt-b-value" id="modalSpaceVal">—</div>
+              <p class="mt-b-body">{{ __('A terrace that extends your living room outdoors: open-air breakfasts and sunset views.') }}</p>
+            </div>
+
+            <!-- 2 · Un día aquí -->
+            <div class="mt-block mt-living-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+                <span class="mt-eyebrow">{{ __('A day here') }}</span>
+              </div>
+              <p class="mt-b-body" id="modalLivingText">{{ __('Mornings at the beach club, afternoons on the tennis court, dinners steps from the restaurant. All within the community.') }}</p>
+            </div>
+
+            <!-- 3 · Amenidades -->
+            <div class="mt-block mt-living-only" id="modalAmenBlock" style="display:none;">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+                <span class="mt-eyebrow" id="modalLifestyleLabel">{{ __('Amenities & Lifestyle') }}</span>
+              </div>
+              <div id="modalRowAmen"><span id="modalAmenities">—</span></div>
+            </div>
+
+            <!-- 4 · Dónde estás -->
+            <div class="mt-block mt-living-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Where you are') }}</span>
+              </div>
+              <div class="mt-chips">
+                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18c2 0 2-1.5 4-1.5S8 18 10 18s2-1.5 4-1.5S16 18 18 18s2-1.5 4-1.5"/></svg>3 min {{ __('beach') }}</span>
+                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5l7-2v4"/><circle cx="6" cy="18" r="3"/></svg>5 min {{ __('golf') }}</span>
+                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a1.8 1.8 0 0 0-2.5-2.5L13.5 8 5.3 6.2a1 1 0 0 0-.9 1.7L9 11l-2 2-2-.5-1 1 3 2 2 3 1-1L11 15l2-2 3.4 4.6a1 1 0 0 0 1.7-.9z"/></svg>15 min {{ __('airport') }}</span>
+              </div>
+            </div>
+
+            <!-- 5 · Sin preocupaciones -->
+            <div class="mt-block mt-living-only">
+              <div class="mt-b-head">
+                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                <span class="mt-eyebrow">{{ __('Peace of mind') }}</span>
+              </div>
+              <div class="mt-calm">
+                <span>{{ __('24/7 security') }}</span>
+                <span>{{ __('Managed & maintained') }}</span>
+                <span>{{ __('Private community') }}</span>
+              </div>
+            </div>
 
             <div class="mt-divider"></div>
 
@@ -2498,14 +2578,14 @@
                   amenRow.style.display = 'none';
               }
           }
-          // Show "Amenities & Lifestyle" label only when amenities exist
-          const lifestyleLabel = document.getElementById('modalLifestyleLabel');
-          if (lifestyleLabel) {
+          // Show the "Amenities" block only when amenities exist
+          const amenBlock = document.getElementById('modalAmenBlock');
+          if (amenBlock) {
               const anyVisible = document.getElementById('modalRowAmen')?.style.display !== 'none';
-              lifestyleLabel.style.display = anyVisible ? '' : 'none';
+              amenBlock.style.display = anyVisible ? '' : 'none';
           }
 
-          // Investment longform + Living longform
+          // Investment longform (optional) + "A day here" (DB overrides the default copy)
           const showText = (id, text) => {
               const el = document.getElementById(id);
               if (!el) return;
@@ -2513,20 +2593,62 @@
               else { el.style.display = 'none'; }
           };
           showText('modalInvestmentText', unit.for_investment_text);
-          showText('modalLivingText',     unit.for_living_text);
+          if (unit.for_living_text && String(unit.for_living_text).trim() !== '') {
+              const lt = document.getElementById('modalLivingText');
+              if (lt) lt.textContent = unit.for_living_text;
+          }
 
-          // Projected value + ROI (investment)
+          // A · Precio inteligente — $/m² calculado
+          const area = Number(unit.total_area || unit.internal_area || 0);
+          const ppm  = (area > 0 && unit.price) ? Math.round(Number(unit.price) / area) : 0;
+          const smartPpm = document.getElementById('modalSmartPpm');
+          if (smartPpm) smartPpm.textContent = ppm > 0 ? '$' + number_format(ppm, 0, ',', ',') + '/m²' : '—';
+
+          // B · Valorización — escenario (histórico real desde projected_value)
           const proj      = Number(unit.projected_value || 0);
           const projYear  = unit.projected_value_year || '';
           const roi       = unit.roi_percent ? Number(unit.roi_percent) : null;
           const projBox   = document.getElementById('modalProjected');
           if (projBox) {
               if (proj > 0) {
-                  document.getElementById('modalProjectedNow').textContent    = '$' + number_format(unit.price || 0, 0, ',', ',') + ' today';
-                  document.getElementById('modalProjectedFuture').textContent = '$' + number_format(proj, 0, ',', ',') + '+';
+                  document.getElementById('modalProjectedNow').textContent    = '$' + number_format(unit.price || 0, 0, ',', ',');
+                  document.getElementById('modalProjectedFuture').textContent = '$' + number_format(proj, 0, ',', ',');
                   document.getElementById('modalProjectedHint').textContent   = projYear ? ('est. ' + projYear) : (roi !== null ? roi + '% ROI' : '');
                   projBox.style.display = '';
               } else { projBox.style.display = 'none'; }
+          }
+
+          // C · Renta estimada — desde est_rental (mensual)
+          const rent      = Number(unit.est_rental || 0);
+          const rentBlock = document.getElementById('modalRentBlock');
+          if (rentBlock) {
+              if (rent > 0) {
+                  document.getElementById('modalRentVal').textContent = '$' + number_format(rent, 0, ',', ',');
+                  const yieldEl = document.getElementById('modalRentYield');
+                  if (yieldEl && unit.price) {
+                      const gy = (rent * 12 / Number(unit.price)) * 100;
+                      yieldEl.textContent = '· ~' + gy.toFixed(1) + '% {{ __('gross') }}';
+                  }
+                  rentBlock.style.display = '';
+              } else { rentBlock.style.display = 'none'; }
+          }
+
+          // D · CONFOTUR — ahorro de transferencia (3% del precio)
+          const confSav = document.getElementById('modalConfoturSavings');
+          if (confSav) confSav.textContent = unit.price ? '~$' + number_format(Number(unit.price) * 0.03, 0, ',', ',') : '~3%';
+
+          // 1 · Tu espacio — interiores + terraza
+          const spaceBlock = document.getElementById('modalSpaceBlock');
+          const spaceVal   = document.getElementById('modalSpaceVal');
+          if (spaceBlock && spaceVal) {
+              const inA = Number(unit.internal_area || 0), exA = Number(unit.external_area || 0);
+              if (inA > 0 || exA > 0) {
+                  let s = '';
+                  if (inA > 0) s += number_format(inA, 0, ',', ',') + ' m² {{ __('indoor') }}';
+                  if (exA > 0) s += (s ? ' + ' : '') + number_format(exA, 0, ',', ',') + ' m² {{ __('terrace') }}';
+                  spaceVal.textContent = s;
+                  spaceBlock.style.display = '';
+              } else { spaceBlock.style.display = 'none'; }
           }
 
           // Comparison text (investment)
