@@ -115,18 +115,19 @@
 </div>
 
 @if(!$projects->isEmpty())
+@php
+    $ccProjects = $projects->mapWithKeys(fn($p) => [$p->id => [
+        'name'     => $p->name,
+        'sub'      => trim((string) $p->location),
+        'active'   => (bool) $p->comms_active,
+        'arranque' => optional($p->comms_start_date)->format('Y-m-d'),
+    ]]);
+@endphp
 <script>
 (function(){
     const CATALOG  = @json($catalog['families']);
     const CHANNELS = @json($catalog['channels']);
-    const PROJECTS = @json(
-        $projects->mapWithKeys(fn($p) => [$p->id => [
-            'name'     => $p->name,
-            'sub'      => trim(($p->location ? $p->location : '')),
-            'active'   => (bool) $p->comms_active,
-            'arranque' => optional($p->comms_start_date)->format('Y-m-d'),
-        ]])
-    );
+    const PROJECTS = @json($ccProjects);
     const CONFIG = @json($config);
 
     const ROUTES = {
