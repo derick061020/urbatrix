@@ -1790,6 +1790,13 @@
       border-radius: 10px;
       width: 240px;
       max-width: 100%;
+      cursor: text;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .fg-list-search:focus-within {
+      border-color: #c7d2fe;
+      box-shadow: 0 0 0 3px rgba(91,141,239,0.12);
     }
     .fg-list-search input {
       flex: 1;
@@ -1800,8 +1807,29 @@
       color: #5c5c5c;
       background: transparent;
       min-width: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     .fg-list-search input::placeholder { color: #a3a3a3; }
+    /* Hide the browser's native search "X" so we can use our own. */
+    .fg-list-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+    .fg-list-search .fg-list-search-clear {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #eef1f5;
+      color: #5c5c5c;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fg-list-search .fg-list-search-clear:hover { background: #e2534e; color: #fff; }
+    .fg-list-search.has-value .fg-list-search-clear { display: inline-flex; }
     .fg-list-tabs {
       display: inline-flex;
       align-items: center;

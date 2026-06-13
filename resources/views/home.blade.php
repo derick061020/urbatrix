@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=10">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=11">
 </head>
 
 <body data-view="grid">
@@ -2119,11 +2119,16 @@
       <!-- LIST VIEW -->
       <div class="fg-list-wrap" id="fgListWrap">
         <div class="fg-list-toolbar">
-          <label class="fg-list-search">
+          <label class="fg-list-search" id="fgListSearchBox">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" placeholder="{{ __('Search unit, floor, type…') }}" oninput="filterListRows(this.value)">
+            <input type="text" id="fgListSearchInput" placeholder="{{ __('Search unit, floor, type…') }}" oninput="filterListRows(this.value)">
+            <button type="button" class="fg-list-search-clear" aria-label="{{ __('Clear') }}" title="{{ __('Clear') }}" onclick="clearListSearch(event)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </label>
           <div class="fg-list-tabs" role="tablist" aria-label="{{ __('Status filter') }}">
             <button type="button" class="fg-list-tab active" data-tab="all" onclick="setListTab(this)">{{ __('All') }} <span class="badge">{{ $units->count() }}</span></button>
@@ -4759,6 +4764,10 @@
       document.querySelectorAll('#outlookDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.querySelectorAll('#floorDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.querySelector('input[placeholder="Unit No."]').value = '';
+      const listInput = document.getElementById('fgListSearchInput');
+      if (listInput) listInput.value = '';
+      const listBox = document.getElementById('fgListSearchBox');
+      if (listBox) listBox.classList.remove('has-value');
       document.querySelector('#sortDropdown input[value="custom_id"]').checked = true;
 
       // Update labels
@@ -5058,6 +5067,15 @@
         toggle.classList.toggle('list-active', view === 'list');
         toggle.classList.toggle('plan-active', view === 'plan');
       }
+      // Al volver a la cuadrícula, limpia el texto buscado en la lista (el
+      // usuario espera empezar de cero en la otra vista).
+      if (view === 'grid') {
+        const listInput = document.getElementById('fgListSearchInput');
+        if (listInput && listInput.value) {
+          listInput.value = '';
+          if (typeof filterListRows === 'function') filterListRows('');
+        }
+      }
       // Recoloca la barra activa según el botón ahora seleccionado (grid/list).
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
@@ -5093,7 +5111,19 @@
       // Also reflect into the grid search input so both stay in sync.
       const gridInput = document.querySelector('input[placeholder="Unit No."]');
       if (gridInput) gridInput.value = currentFilters.unitNumber;
+      // Show/hide the inline clear (X) button.
+      const box = document.getElementById('fgListSearchBox');
+      if (box) box.classList.toggle('has-value', currentFilters.unitNumber.length > 0);
       if (typeof applyFilters === 'function') applyFilters();
+    }
+
+    // Clear (X) button inside the list search field.
+    function clearListSearch(ev) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      const input = document.getElementById('fgListSearchInput');
+      if (input) input.value = '';
+      filterListRows('');
+      if (input) input.focus();
     }
 
     // "View Similar Units" — on a sold card, filter the grid to other available
