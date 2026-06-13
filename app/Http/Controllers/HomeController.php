@@ -64,7 +64,10 @@ class HomeController extends Controller
             ? \App\Models\Wishlist::where('user_id', Auth::id())->pluck('unit_id')->all()
             : [];
 
-        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds'));
+        // Admin shown on the unit modal advisor card ("Chat" with an admin)
+        $admin = \App\Models\User::where('role', 'admin')->orderBy('id')->first();
+
+        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds', 'admin'));
     }
 
     /**

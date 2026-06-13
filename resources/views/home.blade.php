@@ -394,18 +394,23 @@
             </div>
 
             <!-- Advisor card -->
+            @php
+              $advisorName = $admin->name ?? 'Tu asesor';
+              $advisorParts = preg_split('/\s+/', trim($advisorName));
+              $advisorInit = strtoupper(mb_substr($advisorParts[0] ?? '', 0, 1) . mb_substr($advisorParts[1] ?? '', 0, 1)) ?: 'AS';
+            @endphp
             <div class="mt-advisor">
               <div class="mt-advisor-left">
                 <div class="mt-avatar">
-                  <span class="mt-avatar-letter">CM</span>
+                  <span class="mt-avatar-letter">{{ $advisorInit }}</span>
                   <span class="mt-avatar-status"></span>
                 </div>
                 <div>
-                  <div class="mt-advisor-name">Carlos Méndez</div>
+                  <div class="mt-advisor-name">{{ $advisorName }}</div>
                   <div class="mt-advisor-status">{{ __('Available right now') }}</div>
                 </div>
               </div>
-              <button type="button" class="mt-advisor-chat">
+              <button type="button" class="mt-advisor-chat" onclick="window.location.href='{{ route('dashboard.messages') }}'">
                 {{ __('Chat') }}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
