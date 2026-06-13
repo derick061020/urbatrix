@@ -1810,6 +1810,13 @@
       -webkit-tap-highlight-color: transparent;
     }
     .fg-list-search input::placeholder { color: #a3a3a3; }
+    /* Anula el recuadro de foco global (input:focus { box-shadow }) que dibuja
+       un cuadrado gris dentro de la caja redondeada. */
+    .fg-list-search input:focus {
+      box-shadow: none;
+      border: 0;
+      outline: 0;
+    }
     /* Hide the browser's native search "X" so we can use our own. */
     .fg-list-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
     .fg-list-search .fg-list-search-clear {
