@@ -738,7 +738,7 @@
                                             Book Video Call
                                         </a>
                                     </div>
-                                    <div class="fg-card-availability">
+                                    <div class="fg-card-availability" role="button" tabindex="0" title="Chatear ahora con el administrador" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
                                         <span class="dot"></span>
                                         <span>An advisor is available right now.</span>
                                     </div>

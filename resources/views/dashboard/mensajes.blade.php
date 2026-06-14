@@ -83,7 +83,7 @@
         @if($reservation)
             <form method="POST" action="{{ route('dashboard.messages.send') }}" class="px-4 py-3 border-t border-ink-100 flex items-center gap-2 m-0">
                 @csrf
-                <input type="text" name="body" required maxlength="5000" autocomplete="off"
+                <input id="msg-body" type="text" name="body" required maxlength="5000" autocomplete="off"
                        placeholder="Escribe un mensaje…"
                        class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
                 <button type="submit" class="cli-btn cli-btn-primary text-[12px] py-2 px-4">Enviar <i class="pi pi-send text-[11px]"></i></button>
@@ -99,6 +99,18 @@
 @push('scripts')
 <script>
   const s = document.getElementById('msg-scroll'); if (s) s.scrollTop = s.scrollHeight;
+
+  // Llegó desde "Un asesor está disponible ahora mismo" → preparar chat urgente
+  @if(request()->boolean('urgent') && $reservation)
+  (function () {
+    const input = document.getElementById('msg-body');
+    if (input) {
+      if (!input.value) input.value = '¡Hola! Necesito hablar con un asesor de forma urgente, por favor.';
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  })();
+  @endif
 </script>
 @endpush
 @endsection

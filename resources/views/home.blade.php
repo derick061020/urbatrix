@@ -4673,7 +4673,7 @@
         const advisorBlock = document.createElement('div');
         advisorBlock.style.cssText = 'padding:0.5rem 0.75rem 0.75rem 0.75rem;display:flex;flex-direction:column;align-items:center;gap:0.4rem;';
         advisorBlock.innerHTML = `
-          <div class="advisor-live" style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:rgb(34,150,80);font-weight:600;">
+          <div class="advisor-live" role="button" tabindex="0" title="Chatear ahora con el administrador" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}" style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:rgb(34,150,80);font-weight:600;cursor:pointer;">
             <span class="advisor-dot" style="width:7px;height:7px;border-radius:50%;background:rgb(34,197,94);"></span>
             <span>Tu asesor está disponible ahora mismo</span>
           </div>

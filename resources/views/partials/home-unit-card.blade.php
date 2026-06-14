@@ -203,7 +203,7 @@
                       {{ __('Book Video Call') }}
                     </button>
                   </div>
-                  <div class="fg-card-availability advisor-live">
+                  <div class="fg-card-availability advisor-live" role="button" tabindex="0" title="{{ __('Chat now with the administrator') }}" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
                     <span class="dot"></span>
                     <span>{{ __('An advisor is available right now.') }}</span>
                   </div>
