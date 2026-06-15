@@ -235,7 +235,7 @@
                 
                 $signedDocs = $allDocs->filter(function($d) {
                     return in_array($d->status, ['signed', 'approved', 'completed'])
-                        && in_array($d->document_type, ['payment_plan', 'purchase_promise', 'contract']);
+                        && in_array($d->document_type, ['contract']);
                 })->count();
                 
                 $kycDocs = $allDocs->whereIn('document_type', ['id_front', 'id_back', 'kyc'])->count();
