@@ -119,6 +119,9 @@
                 'center' => round($center, 2),
                 'end'    => round($cumStart, 2),
                 'done'   => $s['done'],
+                'amount' => $s['amount'],
+                'total'  => $s['total'],
+                'paidN'  => $s['paidN'],
             ];
         }
     @endphp
@@ -140,20 +143,25 @@
                 @endforeach
             </div>
             {{-- Etiquetas centradas bajo cada tramo (espaciado proporcional al monto) --}}
-            <div class="relative mt-3 text-[10px] uppercase tracking-wider font-semibold text-ink-400" style="height:14px;">
+            <div class="relative mt-3" style="height:42px;">
                 @foreach($markers as $m)
                     @php
                         // Clamp en los extremos para que la etiqueta no se corte.
                         if ($m['center'] <= 10) {
-                            $style = 'left:0;';
+                            $style = 'left:0; text-align:left;';
                         } elseif ($m['center'] >= 90) {
-                            $style = 'right:0;';
+                            $style = 'right:0; text-align:right;';
                         } else {
-                            $style = 'left:'.$m['center'].'%; transform:translateX(-50%);';
+                            $style = 'left:'.$m['center'].'%; transform:translateX(-50%); text-align:center;';
                         }
                     @endphp
-                    <span class="absolute whitespace-nowrap {{ $m['done'] ? 'text-ok-dark' : '' }}"
-                          style="{{ $style }}">{{ $m['label'] }}</span>
+                    <div class="absolute whitespace-nowrap" style="{{ $style }}">
+                        <div class="text-[10px] uppercase tracking-wider font-semibold {{ $m['done'] ? 'text-ok-dark' : 'text-ink-400' }}">{{ $m['label'] }}</div>
+                        <div class="text-[11px] font-semibold {{ $m['done'] ? 'text-ok-dark' : 'text-ink-600' }} mt-0.5">${{ number_format($m['amount'], 0) }}</div>
+                        @if($m['total'] > 1)
+                            <div class="text-[10px] text-ink-400 mt-0.5">{{ $m['paidN'] }}/{{ $m['total'] }} {{ __('cuotas') }}</div>
+                        @endif
+                    </div>
                 @endforeach
             </div>
         @else
