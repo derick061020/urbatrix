@@ -4,10 +4,9 @@
     }
 
     body {
-      background-color: #C0BCA4;
+      background-color: #84d1fe;
       margin: 0;
       padding: 0;
-      color: rgb(98, 84, 65);
     }
 
     .grid-template-columns {
@@ -2251,9 +2250,10 @@
       .fg-list-table th, .fg-list-table td { padding: 12px 8px; }
       .fg-list-table th { font-size: 10px; }
       .fg-list-table td { font-size: 12px; }
-      /* The action cell: hide the "info" button, keep the primary CTA compact */
+      /* The action cell: hide the "info" and "save" buttons, keep the primary CTA compact */
       .fg-list-actions { gap: 6px; }
       .fg-list-info-btn { display: none; }
+      .fg-list-icon-btn { display: none; }
       .fg-list-cta { padding: 6px 10px; font-size: 11px; }
 
       .fg-list-pagination { padding: 14px 4px; flex-wrap: wrap; gap: 8px; }
