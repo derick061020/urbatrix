@@ -54,35 +54,109 @@
         @endforeach
     </div>
 
-    {{-- Progress --}}
+    {{-- Progreso del plan de pagos — stepper por etapas reales del plan.
+         Cada etapa agrupa los pagos por payment_type: reserva → inicial →
+         construcción (cuotas) → entrega. Las etapas se distribuyen de forma
+         equidistante sin importar su % o monto, y el conector se rellena en
+         verde a medida que se completan. --}}
+    @php
+        $allPayments = $reservation->payments;
+
+        // Definición de etapas en orden, con los payment_type que agrupa cada una.
+        $phaseDefs = [
+            ['key' => 'reservation', 'types' => ['reservation'],               'label' => __('Reserva'),      'icon' => 'pi-bookmark-fill'],
+            ['key' => 'initial',     'types' => ['initial'],                   'label' => __('Pago inicial'), 'icon' => 'pi-flag-fill'],
+            ['key' => 'construction','types' => ['construction', 'installment'],'label' => __('Construcción'), 'icon' => 'pi-building'],
+            ['key' => 'delivery',    'types' => ['delivery'],                  'label' => __('Entrega'),      'icon' => 'pi-key'],
+        ];
+
+        $steps = [];
+        foreach ($phaseDefs as $def) {
+            $group = $allPayments->whereIn('payment_type', $def['types']);
+            if ($group->isEmpty()) {
+                continue; // la etapa no aplica a este plan
+            }
+            $total = $group->count();
+            $paidN = $group->where('status', 'paid')->count();
+            $steps[] = [
+                'label'   => $def['label'],
+                'icon'    => $def['icon'],
+                'total'   => $total,
+                'paidN'   => $paidN,
+                'amount'  => (float) $group->sum('amount'),
+                'paidAmt' => (float) $group->where('status', 'paid')->sum('amount'),
+                'done'    => $total > 0 && $paidN === $total,
+                'partial' => $paidN > 0 && $paidN < $total,
+            ];
+        }
+
+        // Fallback: si no hay fila de reserva pero existe seña configurada, mostrarla.
+        if (! collect($steps)->firstWhere('label', __('Reserva')) && (float) ($reservation->reservation_fee ?? 0) > 0) {
+            array_unshift($steps, [
+                'label' => __('Reserva'), 'icon' => 'pi-bookmark-fill',
+                'total' => 1, 'paidN' => 0, 'amount' => (float) $reservation->reservation_fee,
+                'paidAmt' => 0, 'done' => false, 'partial' => false,
+            ]);
+        }
+
+        $stepsTotal = count($steps);
+        $stepsDone  = collect($steps)->where('done', true)->count();
+        // La etapa "activa" es la primera no completada.
+        $activeIdx  = collect($steps)->search(fn ($s) => ! $s['done']);
+    @endphp
+
     <div class="cli-card p-5">
-        <div class="flex items-center justify-between text-[13px] mb-3">
+        <div class="flex items-center justify-between text-[13px] mb-6">
             <span class="font-semibold text-ink-950">{{ __('Progreso del plan de pagos') }}</span>
-            <span class="font-bold text-ok-dark text-[16px]">{{ $pct }}%</span>
+            <span class="font-bold text-ok-dark text-[15px]">
+                @if($stepsTotal > 0){{ $stepsDone }}/{{ $stepsTotal }} {{ __('etapas') }} · @endif{{ $pct }}%
+            </span>
         </div>
-        <div class="relative h-2 rounded-full bg-ink-100 overflow-visible">
-            <div class="absolute inset-y-0 left-0 rounded-full bg-ok transition-all" style="width:{{ $pct }}%"></div>
-            {{-- Milestone markers --}}
-            @foreach([['0%', 0], ['5% '.__('Reserva'), 5], ['20% '.__('Fin construcción'), 20], ['100% '.__('Entrega'), 100]] as [$label, $val])
-                @php
-                    $reached = $pct >= $val;
-                    $clr = $reached ? '#1fc16b' : '#cacfd8';
-                @endphp
-                <div class="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border-2 border-white"
-                     style="left:calc({{ $val }}% - 5px); background:{{ $clr }}; box-shadow:0 0 0 1px {{ $clr }};">
-                </div>
-            @endforeach
-        </div>
-        <div class="relative mt-3 text-[10px] uppercase tracking-wider font-semibold text-ink-400" style="height:14px;">
-            @foreach([['0%', 0, 'left-0'], ['5% '.__('Reserva'), 5, ''], ['20% '.__('Fin construcción'), 20, ''], ['100% '.__('Entrega'), 100, 'right-0']] as $i => [$label, $val, $align])
-                @php
-                    $reached = $pct >= $val;
-                    $transform = $val === 0 ? '' : ($val === 100 ? 'transform:translateX(-100%);' : 'transform:translateX(-50%);');
-                @endphp
-                <span class="absolute whitespace-nowrap {{ $reached ? 'text-ok-dark' : '' }}"
-                      style="left:{{ $val }}%; {{ $transform }}">{{ $label }}</span>
-            @endforeach
-        </div>
+
+        @if($stepsTotal > 0)
+            <div class="flex items-start">
+                @foreach($steps as $i => $s)
+                    @php
+                        $isDone   = $s['done'];
+                        $isActive = ! $isDone && $i === $activeIdx;
+                        // El conector a la izquierda se rellena si la etapa anterior está completa.
+                        $prevDone = $i > 0 && $steps[$i - 1]['done'];
+                        $nodeClass = $isDone
+                            ? 'bg-ok text-white border-ok'
+                            : ($isActive ? 'bg-white text-ok-dark border-ok' : 'bg-white text-ink-400 border-ink-200');
+                    @endphp
+                    <div class="flex-1 flex flex-col items-center relative min-w-0">
+                        {{-- Conector hacia la etapa anterior --}}
+                        @unless($loop->first)
+                            <div class="absolute top-[15px] h-0.5 {{ $prevDone ? 'bg-ok' : 'bg-ink-200' }}"
+                                 style="right:50%; left:-50%;"></div>
+                        @endunless
+
+                        {{-- Nodo --}}
+                        <div class="relative z-10 w-[30px] h-[30px] rounded-full border-2 flex items-center justify-center {{ $nodeClass }} {{ $isActive ? 'ring-4 ring-ok/15' : '' }} transition-colors">
+                            @if($isDone)
+                                <i class="pi pi-check text-[12px]"></i>
+                            @else
+                                <i class="pi {{ $s['icon'] }} text-[11px]"></i>
+                            @endif
+                        </div>
+
+                        {{-- Etiqueta --}}
+                        <div class="mt-2 text-center px-1">
+                            <div class="text-[11px] font-semibold leading-tight {{ $isDone ? 'text-ok-dark' : ($isActive ? 'text-ink-950' : 'text-ink-400') }}">{{ $s['label'] }}</div>
+                            <div class="text-[10px] text-ink-500 mt-0.5">${{ number_format($s['amount'], 0) }}</div>
+                            @if($s['total'] > 1)
+                                <div class="text-[9px] uppercase tracking-wider font-semibold {{ $isDone ? 'text-ok' : 'text-ink-400' }} mt-0.5">{{ $s['paidN'] }}/{{ $s['total'] }} {{ __('cuotas') }}</div>
+                            @elseif($isDone)
+                                <div class="text-[9px] uppercase tracking-wider font-semibold text-ok mt-0.5">{{ __('Pagado') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-[12px] text-ink-500 text-center py-2">{{ __('Aún no hay etapas del plan de pagos generadas.') }}</div>
+        @endif
     </div>
 
     {{-- Calendario de pagos --}}

@@ -96,12 +96,12 @@
         'type'               => 'reservation',
         'is_reservation'     => true,
         'payment'            => $senaPayment,
-        'label'              => 'Reserva (seña)',
+        'label'              => 'Reserva',
         'amount'             => (float) ($senaPayment->amount ?? $reservation->reservation_fee ?? 0),
         'percentage'         => $totalPlanAmount > 0
             ? round(((float) ($senaPayment->amount ?? $reservation->reservation_fee ?? 0) / $totalPlanAmount) * 100, 2)
             : 0,
-        'description'        => 'Pago de seña para asegurar la unidad',
+        'description'        => 'Pago de reserva para asegurar la unidad',
         'installment_number' => null,
         'due_date'           => optional($senaPayment->paid_at ?? $reservation->created_at)->format('Y-m-d'),
         'order'              => 0,
