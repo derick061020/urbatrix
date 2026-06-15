@@ -606,6 +606,38 @@
       margin-top: -10px;
     }
 
+    /* HERO — MOBILE: the 1366/620 ratio collapses the height on narrow
+       screens and squishes the building. Give it a proper portrait height. */
+    @media (max-width: 768px) {
+      .fg-hero {
+        aspect-ratio: auto;
+        height: 62vh;
+        min-height: 380px;
+        max-height: 560px;
+      }
+      /* Fill the whole hero with the sky so there's no seam above the building */
+      .fg-hero-sky {
+        top: 0;
+        height: 100%;
+        object-fit: cover;
+      }
+      /* Building enlarged and horizontally centered (margin keeps the entrance
+         translateY animation intact, since it only touches transform). */
+      .fg-hero-building {
+        width: 200%;
+        left: 50%;
+        margin-left: -100%;
+        right: auto;
+        bottom: 0;
+      }
+      .fg-hero-text {
+        top: 40%;
+        font-size: clamp(64px, 28vw, 200px);
+        /* Compensate the trailing letter-spacing so the word reads centered */
+        text-indent: 0.2em;
+      }
+    }
+
     @keyframes hero-text-enter {
       0%   { transform: translateY(-180%); opacity: 0; }
       60%  { opacity: 1; }
@@ -705,6 +737,64 @@
     }
     .fg-filter-btn.is-active:hover { background: #fff; border-color: var(--brand, #5c7c68); }
     .fg-filter-btn.is-active .fg-caret { color: var(--brand, #5c7c68); }
+
+    /* Header language toggle (ES / EN) */
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      height: 34px;
+      background: #f2f5f8;
+      border-radius: 9999px;
+      position: relative;
+    }
+    .lang-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 28px;
+      padding: 0 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      color: #717784;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .lang-btn:hover { color: #525866; }
+    .lang-btn.is-active {
+      background: #2f2f37;
+      color: #ffffff;
+    }
+    .lang-btn.is-active:hover { color: #ffffff; }
+
+    /* Header currency dropdown items */
+    .hcur-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #374151;
+      letter-spacing: -0.084px;
+      transition: background-color 0.15s ease;
+    }
+    .hcur-item:hover { background: #f2f5f8; }
+    .hcur-item .hcur-sym { color: #9ca3af; font-weight: 500; }
     /* Active search box (Unit No.) */
     .fg-search.is-active {
       border-color: var(--brand, #5c7c68);
@@ -739,6 +829,14 @@
       cursor: pointer; white-space: nowrap; height: 36px;
       flex-shrink: 0;
     }
+
+    /* FILTERS — desktop defaults: the group is transparent and the mobile-only
+       sheet chrome (trigger, backdrop, header, footer) is hidden. */
+    .fg-filters-group { display: contents; }
+    .fg-filters-mobile-trigger,
+    .fg-filters-backdrop,
+    .fg-filters-sheet-head,
+    .fg-filters-sheet-apply { display: none; }
 
     /* GRID/LIST TOGGLE — outer slate container with 2 pills + floating map-pin button */
     .fg-toggle-container {
@@ -1104,6 +1202,104 @@
     }
     @media (max-width: 560px) {
       .fg-units-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================
+       NAVBAR — MOBILE (leave only the essentials)
+       ============================================ */
+    @media (max-width: 768px) {
+      /* Hide currency selector, language toggle, saved counter, online-users
+         line, the units-sold count and the avatar label — keep only logo,
+         project switch, avatar and the hamburger. */
+      .nav-hide-mobile,
+      .nav-online,
+      .nav-center { display: none !important; }
+
+      /* Tighten the bar: logo + project switch on the left, avatar + menu on
+         the right. The pill is a flex item inside the centered <nav>; without
+         min-width:0 it keeps its max-content width and overflows the viewport,
+         pushing the avatar + hamburger off-screen to the right. */
+      nav { padding: 12px 10px 8px !important; box-sizing: border-box; }
+      nav > div {
+        gap: 8px !important;
+        padding: 6px 8px 6px 10px !important;
+        justify-content: space-between !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+      }
+
+      .logo-section { min-width: 0 !important; max-width: none !important; flex: 0 1 auto; gap: 6px !important; }
+      .logo-img { max-width: 130px !important; }
+
+      /* The project-switch chevron — give it a clearly tappable pill so it
+         doesn't read as "missing" next to the logo. */
+      .logo-trigger {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 9999px !important;
+        flex-shrink: 0;
+      }
+
+      /* Right cluster: avatar + hamburger, both always visible and tappable. */
+      nav > div > div:last-child { gap: 8px !important; flex-shrink: 0; }
+      nav > div > div:last-child > button[onclick*="toggleMenu"] {
+        display: inline-flex !important;
+        width: 40px !important;
+        height: 40px !important;
+        background: var(--brand-soft-2, #eef2ef) !important;
+        flex-shrink: 0;
+      }
+
+      /* PROFILE / MENU DROPDOWN — on mobile the 320px panel is anchored to the
+         avatar near the right edge, so it spills off-screen. Pin it to the
+         viewport with side margins (full-width, centered) and let it scroll. */
+      #profileDropdown.menu-dropdown-container {
+        position: fixed !important;
+        top: 74px !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: 360px;
+        margin: 0 auto;
+        max-height: calc(100vh - 90px);
+        overflow-y: auto;
+        transform: translateY(-8px) !important;
+      }
+      #profileDropdown.menu-dropdown-container.menu-open {
+        transform: translateY(0) !important;
+      }
+      /* The fixed-width language toggle inside the menu must fit the panel. */
+      #profileDropdown div[style*="width:308px"] { width: 100% !important; }
+      #profileDropdown #lang-indicator { display: none; }
+
+      /* PROJECT SELECTOR — same problem: the cards row is anchored to the logo
+         on the left and spills off the right edge. Pin it to the viewport,
+         centered, and size the 3 cards to fit the row. */
+      .project-selector {
+        position: fixed !important;
+        top: 74px !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: fit-content;
+        justify-content: center;
+        box-sizing: border-box;
+        transform: translateY(-8px) scale(0.96) !important;
+        transform-origin: top center;
+      }
+      .project-selector.projects-open {
+        transform: translateY(0) scale(1) !important;
+      }
+      .project-card {
+        flex: 1 1 0;
+        width: auto !important;
+        max-width: 112px;
+        height: 158px !important;
+      }
+    }
+
+    /* Very small phones — shrink the logo a touch more */
+    @media (max-width: 380px) {
+      .logo-img { max-width: 104px !important; }
     }
     /* CARD — Duna v2.1 spec */
     .fg-card {
@@ -2018,6 +2214,51 @@
     .fg-list-table tr.row-second    .fg-list-cta { background: var(--brand); }
     .fg-list-table tr.row-pending   .fg-list-cta { background: var(--brand); }
     .fg-list-table tr.row-sold      .fg-list-cta { background: #c7cdd6; cursor: not-allowed; }
+
+    /* ============================================
+       LIST VIEW — MOBILE (compact, no horizontal scroll)
+       ============================================ */
+    @media (max-width: 768px) {
+      .fg-list-wrap { padding: 0 12px 48px; }
+
+      /* Toolbar: search full width, tabs scroll horizontally, share full width */
+      .fg-list-toolbar { gap: 10px; padding: 12px 0; }
+      .fg-list-search { width: 100%; order: 1; }
+      .fg-list-tabs {
+        order: 2;
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-radius: 14px;
+      }
+      .fg-list-tabs::-webkit-scrollbar { display: none; }
+      .fg-list-tab { flex: 0 0 auto; white-space: nowrap; }
+      .fg-list-toolbar .fg-pill-matches { order: 3; width: 100%; margin-left: 0; justify-content: center; }
+
+      /* Compact table: drop the secondary columns so the essentials fit without
+         a horizontal scroll. Keep Unit, Status, Price and the action button. */
+      .fg-list-table { border-radius: 12px; }
+      .fg-list-table th:nth-child(3),  .fg-list-table td:nth-child(3),   /* Floor */
+      .fg-list-table th:nth-child(4),  .fg-list-table td:nth-child(4),   /* Type */
+      .fg-list-table th:nth-child(5),  .fg-list-table td:nth-child(5),   /* Direction */
+      .fg-list-table th:nth-child(6),  .fg-list-table td:nth-child(6),   /* Bed/Bath */
+      .fg-list-table th:nth-child(7),  .fg-list-table td:nth-child(7),   /* Int sqft */
+      .fg-list-table th:nth-child(8),  .fg-list-table td:nth-child(8) {  /* Ext sqft */
+        display: none;
+      }
+      .fg-list-table th, .fg-list-table td { padding: 12px 8px; }
+      .fg-list-table th { font-size: 10px; }
+      .fg-list-table td { font-size: 12px; }
+      /* The action cell: hide the "info" button, keep the primary CTA compact */
+      .fg-list-actions { gap: 6px; }
+      .fg-list-info-btn { display: none; }
+      .fg-list-cta { padding: 6px 10px; font-size: 11px; }
+
+      .fg-list-pagination { padding: 14px 4px; flex-wrap: wrap; gap: 8px; }
+    }
+
     .fg-list-pagination {
       display: flex;
       align-items: center;
@@ -2251,6 +2492,16 @@
       overflow: hidden;
       user-select: none;
     }
+    /* Stage = transform target for pan/zoom. On desktop it just fills the
+       canvas (no transform); on mobile JS drives translate()/scale(). */
+    .fg-plan-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
     .fg-plan-img {
       position: absolute;
       inset: 0;
@@ -2260,6 +2511,63 @@
       object-position: center;
       pointer-events: none;
     }
+
+    /* === Zoom controls (shown on the pannable mobile map) === */
+    .fg-plan-zoom {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 6;
+      display: none;            /* desktop: hidden, map isn't pannable */
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fg-plan-zoom-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      border: 1px solid rgba(16,24,40,0.08);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #2b303b;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(16,24,40,0.12);
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .fg-plan-zoom-btn:active { transform: scale(0.92); background: #f2f5f8; }
+    .fg-plan-zoom-reset { color: #5c7c68; }
+
+    /* === Drag hint pill === */
+    .fg-plan-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      z-index: 6;
+      display: none;            /* shown only on mobile, JS fades it out */
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(43,48,59,0.86);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 6px 20px rgba(16,24,40,0.22);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .fg-plan-hint.is-visible { opacity: 1; }
 
     /* === Hotspot markers — Figma 72×72 at exact x/y of 1366×769 frame === */
     .fg-plan-marker {
@@ -2349,11 +2657,112 @@
     @media (max-width: 900px) {
       .fg-plan-wrap { padding: 0; }
       .fg-plan-label { font-size: 10px; letter-spacing: 0.18em; }
-      .fg-plan-marker { width: 72px; }
-      .fg-plan-marker-price { font-size: 12px; }
-      .fg-plan-marker-sqft { font-size: 9px; }
       .fg-plan-compass svg { width: 56px; height: 56px; }
-      .fg-chip-floor { font-size: 12px; padding: 6px 10px 6px 8px; }
+    }
+
+    /* ===========================================================
+       MOBILE MAP — pannable / zoomable viewport (≤760px)
+       The canvas becomes a fixed-height viewport; the stage is
+       scaled up by JS so markers are large & legible, and the user
+       drags / pinches to explore it like a real map.
+       =========================================================== */
+    @media (max-width: 760px) {
+      .fg-plan-board {
+        border-radius: 18px;
+        box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+        border: 1px solid #eef1f4;
+      }
+
+      /* --- Polished filters / floor selector --- */
+      .fg-plan-topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px 14px 12px;
+      }
+      /* Floors lay out as an even 3-column grid so every chip is fully
+         visible and aligned — no clipped edges, no hidden horizontal scroll. */
+      .fg-plan-chips {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
+      .fg-chip-floor {
+        justify-content: space-between;
+        min-width: 0;
+        min-height: 38px;
+        padding: 7px 11px;
+        font-size: 12.5px;
+      }
+      .fg-chip-left { min-width: 0; }
+      .fg-chip-text {
+        font-size: 12.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .fg-chip-count { flex-shrink: 0; }
+
+      /* PISO label spans full width as a clean banner */
+      .fg-plan-piso {
+        align-self: stretch;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px;
+        background: #f6f8f5;
+        border: 1px solid #e7eee9;
+      }
+      .fg-plan-piso-left {
+        padding: 9px 14px;
+        font-size: 11.5px;
+        letter-spacing: 0.6px;
+      }
+      .fg-plan-piso-right {
+        padding: 9px 12px 9px 4px;
+        font-size: 11px;
+        letter-spacing: 0.4px;
+      }
+
+      /* --- The pannable map viewport --- */
+      .fg-plan-canvas {
+        aspect-ratio: auto;
+        height: 64vh;
+        max-height: 560px;
+        min-height: 380px;
+        border-radius: 16px;
+        margin: 0 14px 14px;
+        width: auto;
+        background: #f3f6f2;
+        touch-action: none;          /* JS owns the gestures */
+        cursor: grab;
+        box-shadow: inset 0 0 0 1px rgba(16,24,40,0.05);
+      }
+      .fg-plan-canvas.is-grabbing { cursor: grabbing; }
+
+      /* Stage no longer stretches to fill — it keeps the true map ratio so
+         marker percentages stay accurate while JS translates/scales it. A
+         base width wider than the viewport means the default "cover" zoom is
+         gentle, so markers spread out and stay legible (instead of cramming
+         the whole plan into ~360px the way the unscaled view did). */
+      .fg-plan-stage {
+        inset: auto;
+        top: 0;
+        left: 0;
+        width: min(820px, 220vw);
+        height: auto;
+        aspect-ratio: 1366 / 769;
+        touch-action: none;
+        transition: transform 0.18s cubic-bezier(0.22,1,0.36,1);
+      }
+      .fg-plan-stage.is-dragging { transition: none; }
+
+      .fg-plan-marker { width: clamp(80px, 11vw, 92px); }
+      .fg-plan-marker-price { font-size: 13px; }
+      .fg-plan-marker-sqft { font-size: 9px; }
+
+      .fg-plan-zoom { display: flex; }
+      .fg-plan-hint { display: flex; }
     }
 
     @media (max-width: 900px) {
@@ -2363,6 +2772,184 @@
       .fg-stat svg { width: 18px; height: 18px; }
       .fg-card-title-row .name { font-size: 16px; }
       .fg-card-price .price { font-size: 20px; }
+    }
+
+    /* ============================================
+       FILTERS — MOBILE BOTTOM-SHEET
+       ============================================ */
+    @media (max-width: 768px) {
+      .fg-filter-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-x: clip;
+      }
+      .fg-filter-bar > .fg-filters-left {
+        flex: 1 1 100%;
+        flex-wrap: nowrap;
+        gap: 10px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .fg-search {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+
+      /* The "Filtros" trigger button */
+      .fg-filters-mobile-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex: 0 0 auto;
+        height: 36px;
+        padding: 0 16px;
+        box-sizing: border-box;
+        background: #fff;
+        border: 1px solid #ebebeb;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(10,13,20,0.03);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--brand);
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .fg-filters-mobile-trigger svg { color: var(--brand); flex-shrink: 0; }
+
+      .fg-pill-matches {
+        width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      /* Backdrop */
+      .fg-filters-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+        background: rgba(15, 18, 27, 0.45);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .28s ease, visibility .28s ease;
+      }
+      .fg-filters-backdrop.is-open { opacity: 1; visibility: visible; }
+
+      /* The sheet itself */
+      .fg-filters-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1205;
+        max-height: 84vh;
+        overflow-y: auto;
+        padding: 8px 18px 24px;
+        background: #fff;
+        border-radius: 22px 22px 0 0;
+        box-shadow: 0 -10px 34px rgba(15,18,27,0.18);
+        transform: translateY(110%);
+        visibility: hidden;
+        transition: transform .34s cubic-bezier(.22,1,.36,1), visibility .34s;
+      }
+      .fg-filters-group.is-open { transform: translateY(0); visibility: visible; }
+
+      /* Drag-handle look + header */
+      .fg-filters-sheet-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        margin: 0 -18px 4px;
+        padding: 14px 18px 10px;
+        background: #fff;
+        border-bottom: 1px solid #f2f5f8;
+        z-index: 2;
+      }
+      .fg-filters-sheet-head::before {
+        content: "";
+        position: absolute;
+        top: 6px; left: 50%;
+        width: 40px; height: 4px;
+        transform: translateX(-50%);
+        background: #e5e7eb;
+        border-radius: 999px;
+      }
+      .fg-filters-sheet-head > span {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        color: #171717;
+      }
+      .fg-filters-sheet-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; height: 32px;
+        border-radius: 999px;
+        border: none;
+        background: #f2f5f8;
+        color: #5c5c5c;
+        cursor: pointer;
+      }
+
+      /* Each filter occupies a full-width row inside the sheet */
+      .fg-filters-group > div[style*="position:relative"] { width: 100%; }
+      .fg-filters-group .fg-filter-btn {
+        width: 100%;
+        justify-content: space-between;
+        height: 44px;
+      }
+      /* Dropdowns open inline (not absolutely positioned) inside the sheet.
+         Display is still driven by toggleFilterDropdown's inline style. */
+      .fg-filters-group .filter-dropdown {
+        position: static !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 4px 4px 8px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box;
+        margin-top: 2px;
+        background: #f9fafb !important;
+        border-radius: 10px !important;
+      }
+
+      .fg-filter-icon { width: 100%; border-radius: 10px; gap: 8px; }
+      .fg-filter-icon::after {
+        content: "Restablecer filtros";
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #5c5c5c;
+      }
+
+      .fg-filters-sheet-apply {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
+        padding: 13px;
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+      }
     }
 
     /* ===========================================================
@@ -3290,3 +3877,49 @@
       .mt-stats-row .mt-stat-box { flex: 1 1 calc(33% - 8px); min-width: 80px; }
       .mt-thumb { width: 64px; height: 44px; }
     }
+
+    /* === Phones: full-screen unit modal === */
+    @media (max-width: 600px) {
+      .mt-overlay { padding: 0; }
+      .mt-shell {
+        height: 100dvh;
+        max-height: 100dvh;
+        max-width: none;
+        border: none;
+        border-radius: 0;
+      }
+      /* Header — keep it tight and let the unit label truncate */
+      .mt-header { padding: 8px 12px; gap: 8px; }
+      .mt-header-left { gap: 8px; flex: 1; }
+      .mt-header-unit {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+      .mt-header-logo { height: 20px; }
+      /* WhatsApp pill becomes icon-only to save room */
+      .mt-pill-wa { padding: 6px; }
+      .mt-pill-wa span { display: none; }
+      .mt-close { flex-shrink: 0; }
+
+      /* Body scrolls as a whole; panels stack */
+      .mt-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .mt-left-inner { padding: 14px 14px 12px; }
+
+      /* CTA row — buttons stack so labels never clip */
+      .mt-cta-row { flex-direction: column; gap: 8px; padding: 12px 14px; }
+      .mt-btn-secondary,
+      .mt-btn-primary { width: 100%; flex: none; padding: 11px 14px; }
+
+      /* Gallery / tabs / thumbs */
+      .mt-right { min-height: 0; }
+      .mt-gallery { min-height: 240px; }
+      .mt-tab { padding: 9px 6px; font-size: 9px; }
+      .mt-tab span,
+      .mt-tab { letter-spacing: 0.03em; }
+      .mt-thumbs { flex-wrap: wrap; }
+      .mt-thumb { width: 56px; height: 40px; }
+    }
+

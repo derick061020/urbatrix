@@ -22,6 +22,8 @@
                 $rowFloorNorm = ($rowFloorRaw === '' || strcasecmp($rowFloorRaw, 'ground') === 0) ? 'Ground' : $rowFloorRaw;
               @endphp
               <tr class="{{ $rowCls }}"
+                  style="cursor:pointer;"
+                  onclick="if(!event.target.closest('button, a, input, .fg-list-actions'))openMoreInfo('{{ $unitId }}')"
                   data-tab="{{ $tabKey }}"
                   data-search="{{ strtolower(($unitId ?? '') . ' ' . ($unit->floor ?? '') . ' ' . ($unit->bedrooms ?? '') . ' bed ' . ($unit->direction ?? '') . ' ' . ($unit->outlook ?? '')) }}"
                   data-filter-name="{{ strtolower($unit->name ?? $unitId) }}"

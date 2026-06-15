@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=13">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=15">
 </head>
 
 <body data-view="grid">
@@ -1463,9 +1463,10 @@
             @foreach($units as $unitOpt)
               @php
                 $optId    = $unitOpt->custom_id ?? $unitOpt->id;
+                $optLabel = $unitOpt->name ?? $optId;
                 $optPrice = number_format((float)($unitOpt->price ?? 0), 0);
               @endphp
-              <option value="{{ $optId }}" data-price="{{ $optPrice }}">Unit {{ $optId }} · ${{ $optPrice }} USD</option>
+              <option value="{{ $optId }}" data-price="{{ $optPrice }}">Unit {{ $optLabel }} · ${{ $optPrice }} USD</option>
             @endforeach
           </select>
         </div>
@@ -1555,9 +1556,9 @@
         </div>
 
         <!-- CENTER: Units sold + online users -->
-        <div style="display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0;">
+        <div class="nav-center" style="display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0;">
           <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div class="nav-online" style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
             <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> {{ __('online_users') }}</span>
           </div>
@@ -1580,16 +1581,39 @@
 
         <!-- RIGHT: Saved counter + Avatar + Hamburger -->
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+
+          <!-- Currency selector (header) -->
+          <div class="nav-hide-mobile" style="position:relative;flex-shrink:0;">
+            <button type="button" class="fg-filter-btn" onclick="toggleHeaderCurrencyDropdown()" id="headerCurrencyBtn" style="height:34px;padding:6px 10px 6px 14px;border-radius:9999px;gap:6px;">
+              <span id="headerCurrencyLabel" style="font-weight:600;color:#374151;">USD $</span>
+              <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div id="headerCurrencyDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:200;background:white;border:1px solid #ebebeb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);min-width:148px;padding:6px;">
+              <button type="button" class="hcur-item" onclick="selectCurrency('USD')"><span>USD</span><span class="hcur-sym">$</span></button>
+              <button type="button" class="hcur-item" onclick="selectCurrency('EUR')"><span>EUR</span><span class="hcur-sym">€</span></button>
+              <button type="button" class="hcur-item" onclick="selectCurrency('CAD')"><span>CAD</span><span class="hcur-sym">C$</span></button>
+              <button type="button" class="hcur-item" onclick="selectCurrency('MXN')"><span>MXN</span><span class="hcur-sym">MX$</span></button>
+            </div>
+          </div>
+
+          <!-- Language toggle (header) -->
+          <div class="lang-toggle nav-hide-mobile" style="flex-shrink:0;">
+            <button type="button" data-lang="es" onclick="setLanguage('es')" class="lang-btn is-active">ES</button>
+            <button type="button" data-lang="en" onclick="setLanguage('en')" class="lang-btn">EN</button>
+          </div>
+
+          <span aria-hidden="true" class="nav-hide-mobile" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
+
           @php $isAdminUser = auth()->check() && (auth()->user()->role ?? '') === 'admin'; @endphp
           @if($isAdminUser)
-          <span aria-label="Saved units" aria-disabled="true" title="No disponible para administradores" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:not-allowed;border-radius:9999px;text-decoration:none;opacity:0.4;pointer-events:none;">
+          <span aria-label="Saved units" aria-disabled="true" title="No disponible para administradores" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:not-allowed;border-radius:9999px;text-decoration:none;opacity:0.4;pointer-events:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
             <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;">{{ __('guardados') }}</span>
           </span>
           @else
-          <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
+          <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
@@ -1597,12 +1621,12 @@
           </a>
           @endif
 
-          <span aria-hidden="true" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
+          <span aria-hidden="true" class="nav-hide-mobile" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
 
           <!-- Profile container with dropdown -->
           <div style="position:relative;">
             <button type="button" onclick="toggleProfileMenu()" aria-label="Profile" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
-              <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
+              <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
                 <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Samuel' }}</span>
                 <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? 'Admin' : 'Agente' }}</span>
               </span>
@@ -1986,6 +2010,24 @@
             <input type="text" placeholder="{{ __('Unit No.') }}">
           </label>
 
+          <!-- Mobile-only trigger that opens the filters bottom-sheet -->
+          <button type="button" class="fg-filters-mobile-trigger" onclick="openFiltersSheet()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <span>{{ __('Filtros') }}</span>
+          </button>
+
+          <!-- Backdrop for the mobile filters sheet -->
+          <div class="fg-filters-backdrop" onclick="closeFiltersSheet()" aria-hidden="true"></div>
+
+          <!-- On desktop this is display:contents (transparent); on mobile it becomes a bottom-sheet -->
+          <div class="fg-filters-group" id="filtersGroup">
+          <div class="fg-filters-sheet-head">
+            <span>{{ __('Filtros') }}</span>
+            <button type="button" class="fg-filters-sheet-close" onclick="closeFiltersSheet()" aria-label="{{ __('Cerrar') }}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('price')">
               <span id="priceLabel">{{ __('Precio') }}</span>
@@ -2094,6 +2136,10 @@
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
           </button>
+
+          <!-- Sheet footer (mobile only): apply & close -->
+          <button type="button" class="fg-filters-sheet-apply" onclick="closeFiltersSheet()">{{ __('Ver resultados') }}</button>
+          </div><!-- /.fg-filters-group -->
         </div>
 
         <button class="fg-pill-matches" type="button" onclick="shareMatches()">
@@ -2286,6 +2332,8 @@
 
           <!-- Map container (Figma 193:6600 — ContainerMap, 1366×769) -->
           <div class="fg-plan-canvas" style="background-color: white!important;" id="fgPlanCanvas">
+            <!-- Pannable / zoomable stage (transform driven by JS on mobile) -->
+            <div class="fg-plan-stage" id="fgPlanStage">
             <!-- Planview image — labels, compass, and PHASE 1 are baked in -->
             <img src="/images/plan-view/makai-planview.png"
                  alt="Plan view"
@@ -2337,6 +2385,26 @@
                 </button>
               @endforeach
             @endforeach
+            </div><!-- /.fg-plan-stage -->
+
+            <!-- Zoom controls (mobile pan/zoom map) -->
+            <div class="fg-plan-zoom" aria-hidden="false">
+              <button type="button" class="fg-plan-zoom-btn" id="fgPlanZoomIn" aria-label="{{ __('Acercar') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="fg-plan-zoom-btn" id="fgPlanZoomOut" aria-label="{{ __('Alejar') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="fg-plan-zoom-btn fg-plan-zoom-reset" id="fgPlanZoomReset" aria-label="{{ __('Restablecer') }}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 4v4h4"/></svg>
+              </button>
+            </div>
+
+            <!-- Drag-to-explore hint (mobile only, auto-fades) -->
+            <div class="fg-plan-hint" id="fgPlanHint" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l-3 3-3-3"/><path d="M19 9l3 3-3 3"/><path d="M2 12h20"/><path d="M12 2v20"/></svg>
+              <span>{{ __('Arrastra para explorar · pellizca para zoom') }}</span>
+            </div>
           </div>
 
         </div>
@@ -2974,6 +3042,144 @@
           });
         });
       })();
+
+      // =====================================================
+      // Mobile map — pan & pinch-zoom controller
+      // Turns the plan canvas into a navigable, zoomed map on
+      // phones so the price markers are large and legible.
+      // =====================================================
+      (function () {
+        const canvas = document.getElementById('fgPlanCanvas');
+        const stage  = document.getElementById('fgPlanStage');
+        if (!canvas || !stage) return;
+
+        const mq = window.matchMedia('(max-width: 760px)');
+        let scale = 1, tx = 0, ty = 0, minScale = 1, maxScale = 5;
+
+        const dims = () => ({
+          cw: canvas.clientWidth,  ch: canvas.clientHeight,
+          sw: stage.offsetWidth,   sh: stage.offsetHeight,
+        });
+
+        function clamp() {
+          const { cw, ch, sw, sh } = dims();
+          const w = sw * scale, h = sh * scale;
+          tx = w <= cw ? (cw - w) / 2 : Math.min(0, Math.max(cw - w, tx));
+          ty = h <= ch ? (ch - h) / 2 : Math.min(0, Math.max(ch - h, ty));
+        }
+        function apply() {
+          stage.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+        }
+        function fit() {
+          if (!mq.matches) { stage.style.transform = ''; return; }
+          const { cw, ch, sw, sh } = dims();
+          if (!cw || !ch || !sw || !sh) return;     // hidden view → skip
+          minScale = Math.max(cw / sw, ch / sh);     // cover the viewport
+          maxScale = minScale * 3.4;
+          scale = minScale;
+          tx = (cw - sw * scale) / 2;
+          ty = (ch - sh * scale) / 2;
+          clamp(); apply();
+          showHint();
+        }
+        // Exposed so the view switcher can re-fit once the map is visible.
+        window.__planFit = function () { requestAnimationFrame(fit); };
+
+        function zoomTo(ns, ox, oy) {
+          ns = Math.min(maxScale, Math.max(minScale, ns));
+          const k = ns / scale;
+          tx = ox - (ox - tx) * k;
+          ty = oy - (oy - ty) * k;
+          scale = ns;
+          clamp(); apply();
+        }
+        const center = () => { const r = canvas.getBoundingClientRect(); return { x: r.width / 2, y: r.height / 2 }; };
+
+        document.getElementById('fgPlanZoomIn') ?.addEventListener('click', () => { const c = center(); zoomTo(scale * 1.45, c.x, c.y); });
+        document.getElementById('fgPlanZoomOut')?.addEventListener('click', () => { const c = center(); zoomTo(scale / 1.45, c.x, c.y); });
+        document.getElementById('fgPlanZoomReset')?.addEventListener('click', fit);
+
+        // ---- Drag hint (auto-fades, dismissed on first touch) ----
+        let hintShown = false, hintTimer = null;
+        function showHint() {
+          if (hintShown || !mq.matches) return;
+          const h = document.getElementById('fgPlanHint'); if (!h) return;
+          hintShown = true; h.classList.add('is-visible');
+          hintTimer = setTimeout(hideHint, 3400);
+        }
+        function hideHint() {
+          const h = document.getElementById('fgPlanHint'); if (!h) return;
+          h.classList.remove('is-visible'); clearTimeout(hintTimer);
+        }
+
+        // ---- Touch gestures: 1 finger pan, 2 finger pinch ----
+        let mode = 0, last = { x: 0, y: 0 }, pinchDist = 0, pinchMid = { x: 0, y: 0 }, dragMoved = false;
+        const localPts = (e) => {
+          const r = canvas.getBoundingClientRect();
+          return [...e.touches].map(t => ({ x: t.clientX - r.left, y: t.clientY - r.top }));
+        };
+
+        stage.addEventListener('touchstart', function (e) {
+          if (!mq.matches) return;
+          const p = localPts(e);
+          dragMoved = false;
+          stage.classList.add('is-dragging');
+          canvas.classList.add('is-grabbing');
+          if (p.length >= 2) {
+            mode = 2;
+            pinchDist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+            pinchMid  = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+          } else {
+            mode = 1; last = p[0];
+          }
+          hideHint();
+        }, { passive: true });
+
+        stage.addEventListener('touchmove', function (e) {
+          if (!mq.matches || !mode) return;
+          e.preventDefault();
+          const p = localPts(e);
+          if (p.length >= 2) {
+            mode = 2;
+            const dist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+            const mid  = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+            let ns = Math.min(maxScale, Math.max(minScale, scale * (dist / (pinchDist || dist))));
+            const k = ns / scale;
+            tx = mid.x - (mid.x - tx) * k;
+            ty = mid.y - (mid.y - ty) * k;
+            scale = ns;
+            tx += mid.x - pinchMid.x;
+            ty += mid.y - pinchMid.y;
+            pinchDist = dist; pinchMid = mid; dragMoved = true;
+            clamp(); apply();
+          } else if (p.length === 1 && mode === 1) {
+            const dx = p[0].x - last.x, dy = p[0].y - last.y;
+            if (Math.abs(dx) + Math.abs(dy) > 6) dragMoved = true;
+            tx += dx; ty += dy; last = p[0];
+            clamp(); apply();
+          }
+        }, { passive: false });
+
+        stage.addEventListener('touchend', function (e) {
+          if (!mq.matches) return;
+          if (e.touches.length === 0) {
+            mode = 0;
+            stage.classList.remove('is-dragging');
+            canvas.classList.remove('is-grabbing');
+          } else if (e.touches.length === 1) {
+            mode = 1; last = localPts(e)[0];
+          }
+        }, { passive: true });
+
+        // Swallow the click that follows a drag so we don't open a unit modal
+        // just because the finger lifted over a marker.
+        stage.addEventListener('click', function (e) {
+          if (dragMoved) { e.preventDefault(); e.stopPropagation(); dragMoved = false; }
+        }, true);
+
+        window.addEventListener('resize', () => { if (mq.matches) fit(); else stage.style.transform = ''; });
+        if (mq.addEventListener) mq.addEventListener('change', fit);
+      })();
     });
 
     // ============================
@@ -3589,7 +3795,10 @@
       
       // Store currency preference
       localStorage.setItem('selectedCurrency', currency);
-      
+
+      // Keep the visible labels in sync (e.g. on page load with a saved currency)
+      if (typeof updateCurrencyLabels === 'function') updateCurrencyLabels(currency);
+
       // Update currency display throughout the page
       updateCurrencyDisplay(currency);
     }
@@ -3621,6 +3830,11 @@
         if (svg) svg.style.color = '#525866';
         if (indicator) indicator.style.left = (lang === 'es') ? '4px' : '156px';
       }
+
+      // Header segmented toggle(s) — class-based, independent of the profile toggle
+      document.querySelectorAll('.lang-toggle [data-lang]').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.lang === lang);
+      });
 
       localStorage.setItem('selectedLanguage', lang);
 
@@ -4081,6 +4295,24 @@
     };
 
     // Toggle filter dropdown
+    // Mobile filters bottom-sheet
+    function openFiltersSheet() {
+      const group = document.getElementById('filtersGroup');
+      const backdrop = document.querySelector('.fg-filters-backdrop');
+      if (group) group.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeFiltersSheet() {
+      const group = document.getElementById('filtersGroup');
+      const backdrop = document.querySelector('.fg-filters-backdrop');
+      if (group) group.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+      // Collapse any open dropdown inside the sheet
+      document.querySelectorAll('#filtersGroup .filter-dropdown').forEach(d => d.style.display = 'none');
+      document.body.style.overflow = '';
+    }
+
     function toggleFilterDropdown(filterType) {
       const dropdown = document.getElementById(filterType + 'Dropdown');
       if (!dropdown) return;
@@ -4132,11 +4364,45 @@
       }
     }
 
-    // Select currency
+    // Toggle the header currency dropdown (mirrors toggleCurrencyDropdown)
+    function toggleHeaderCurrencyDropdown() {
+      const dropdown = document.getElementById('headerCurrencyDropdown');
+      if (!dropdown) return;
+
+      document.querySelectorAll('.filter-dropdown').forEach(d => {
+        if (d !== dropdown) d.style.display = 'none';
+      });
+
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+      if (dropdown.style.display === 'block') {
+        setTimeout(() => {
+          document.addEventListener('click', function closeDropdown(e) {
+            if (!dropdown.contains(e.target) && !e.target.closest('#headerCurrencyBtn')) {
+              dropdown.style.display = 'none';
+              document.removeEventListener('click', closeDropdown);
+            }
+          });
+        }, 10);
+      }
+    }
+
+    // Select currency — keeps both the profile and header labels/dropdowns in sync
     function selectCurrency(currency) {
-      document.getElementById('currencyLabel').textContent = currency;
-      document.getElementById('currencyDropdown').style.display = 'none';
+      updateCurrencyLabels(currency);
+      const d1 = document.getElementById('currencyDropdown');
+      if (d1) d1.style.display = 'none';
+      const d2 = document.getElementById('headerCurrencyDropdown');
+      if (d2) d2.style.display = 'none';
       setCurrency(currency);
+    }
+
+    // Update every currency label on the page (profile shows the code, header adds the symbol)
+    function updateCurrencyLabels(currency) {
+      const profileLabel = document.getElementById('currencyLabel');
+      if (profileLabel) profileLabel.textContent = currency;
+      const headerLabel = document.getElementById('headerCurrencyLabel');
+      if (headerLabel) headerLabel.textContent = currency + ' ' + (CURRENCY_SYMBOLS[currency] || '');
     }
 
     // Apply price filter
@@ -5081,6 +5347,9 @@
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
+      // The mobile map needs its pan/zoom recomputed now that the canvas has
+      // real dimensions (it was hidden, so width/height were 0 before).
+      if (view === 'plan' && typeof window.__planFit === 'function') window.__planFit();
       // Reflect view in URL so the share link preserves grid/list/plan choice.
       const params = new URLSearchParams(window.location.search);
       if (view === 'grid') params.delete('view');
