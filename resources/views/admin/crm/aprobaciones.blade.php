@@ -121,7 +121,7 @@
                         <div class="text-[11px] text-ink-500 mt-0.5 truncate">
                             Pago: {{ $p->label ?? 'Cuota' }} · ${{ number_format($p->amount, 2) }}
                             @if($r?->unit_name) · Unidad {{ $r->unit_name }} @endif
-                            @if($p->{{ __('receipt_path) ·') }} <i class="pi pi-paperclip"></i> comprobante @endif
+                            @if($p->receipt_path) · <i class="pi pi-paperclip"></i> comprobante @endif
                         </div>
                     </div>
                     <span class="crm-pill bg-err-soft text-err">PAGO</span>
