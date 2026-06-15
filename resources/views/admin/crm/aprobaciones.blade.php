@@ -56,7 +56,7 @@
                         <div class="text-[13px] font-semibold text-ink-900">{{ trim(($u->first_name ?? '').' '.($u->last_name ?? '')) ?: $u->name }}</div>
                         <div class="text-[11px] text-ink-500 mt-0.5">
                             Nuevo registro · {{ $u->email }} · {{ $uRole }}
-                            @if($u->{{ __('kyc_id_document) ·') }} <i class="pi pi-paperclip"></i> documento adjunto @endif
+                            @if($u->kyc_id_document) · <i class="pi pi-paperclip"></i> documento adjunto @endif
                         </div>
                     </div>
                     <span class="crm-pill bg-info-soft text-info">{{ __('NUEVO USUARIO') }}</span>
@@ -86,7 +86,7 @@
                         <div class="text-[11px] text-ink-500 mt-0.5 truncate">
                             KYC del expediente {{ $r?->reservation_code ?? '—' }}
                             @if($r?->unit_name) · Unidad {{ $r->unit_name }} @endif
-                            @if($k->{{ __('file_path) ·') }} <i class="pi pi-paperclip"></i> doc adjunto @endif
+                            @if($k->file_path) · <i class="pi pi-paperclip"></i> doc adjunto @endif
                         </div>
                     </div>
                     <span class="crm-pill bg-info-soft text-info">KYC</span>
