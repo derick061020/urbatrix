@@ -114,8 +114,8 @@
     <div class="mb-6">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h1 class="text-4xl font-semibold text-[#625441]">Selector de Pagos</h1>
-                <p class="text-[#625441] mt-1">Administración de pagos según plan de financiamiento</p>
+                <h1 class="text-4xl font-semibold text-[#625441]">{{ __('Selector de Pagos') }}</h1>
+                <p class="text-[#625441] mt-1">{{ __('Administración de pagos según plan de financiamiento') }}</p>
             </div>
             <div class="flex gap-3">
                 <a href="/admin/crm/expedientes" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center gap-2">
@@ -142,34 +142,34 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="openWireTransferModal()" class="border border-[#667b6a] text-[#667b6a] rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#667b6a]/10">Datos transferencia</button>
-                    <a href="/dashboard?reservation={{ $reservation->id }}" class="bg-[#667b6a] text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#5a6d5e]">Ver Expediente</a>
+                    <button onclick="openWireTransferModal()" class="border border-[#667b6a] text-[#667b6a] rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#667b6a]/10">{{ __('Datos transferencia') }}</button>
+                    <a href="/dashboard?reservation={{ $reservation->id }}" class="bg-[#667b6a] text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-[#5a6d5e]">{{ __('Ver Expediente') }}</a>
                 </div>
             </div>
         </div>
         
         <!-- Payment Plan Summary -->
         <div class="bg-white rounded-lg p-6 border border-gray-200 mb-6">
-            <h3 class="text-lg font-semibold text-[#625441] mb-4">Resumen del Plan de Pagos</h3>
+            <h3 class="text-lg font-semibold text-[#625441] mb-4">{{ __('Resumen del Plan de Pagos') }}</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="text-center">
                     <div class="text-2xl font-bold text-[#667b6a]">{{ $paymentBreakdown['porcentaje_inicial'] }}%</div>
-                    <div class="text-sm text-[#806f56]">Inicial</div>
+                    <div class="text-sm text-[#806f56]">{{ __('Inicial') }}</div>
                     <div class="text-xs text-gray-500">${{ number_format($paymentBreakdown['pago_inicial'], 2, '.', ',') }}</div>
                 </div>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-[#667b6a]">{{ $paymentBreakdown['cantidad_cuotas'] }}</div>
-                    <div class="text-sm text-[#806f56]">Cuotas</div>
+                    <div class="text-sm text-[#806f56]">{{ __('Cuotas') }}</div>
                     <div class="text-xs text-gray-500">${{ number_format($paymentBreakdown['cuota'], 2, '.', ',') }} c/u</div>
                 </div>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-[#667b6a]">{{ $paymentBreakdown['porcentaje_entrega'] }}%</div>
-                    <div class="text-sm text-[#806f56]">Entrega</div>
+                    <div class="text-sm text-[#806f56]">{{ __('Entrega') }}</div>
                     <div class="text-xs text-gray-500">${{ number_format($paymentBreakdown['pago_entrega'], 2, '.', ',') }}</div>
                 </div>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-purple-600">{{ round(($paidAmount / $totalPlanAmount) * 100, 1) }}%</div>
-                    <div class="text-sm text-[#806f56]">Progreso</div>
+                    <div class="text-sm text-[#806f56]">{{ __('Progreso') }}</div>
                     <div class="text-xs text-gray-500">${{ number_format($paidAmount, 2, '.', ',') }} pagados</div>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-green-600">Pagados</p>
+                    <p class="text-sm text-green-600">{{ __('Pagados') }}</p>
                     <p class="text-lg font-semibold text-green-900">{{ $paidCount }}</p>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-blue-600">Pendientes</p>
+                    <p class="text-sm text-blue-600">{{ __('Pendientes') }}</p>
                     <p class="text-lg font-semibold text-blue-900">{{ $pendingCount }}</p>
                 </div>
             </div>
@@ -212,7 +212,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-red-600">Vencidos</p>
+                    <p class="text-sm text-red-600">{{ __('Vencidos') }}</p>
                     <p class="text-lg font-semibold text-red-900">{{ $overdueCount }}</p>
                 </div>
             </div>
@@ -225,7 +225,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-purple-600">Total Recaudado</p>
+                    <p class="text-sm text-purple-600">{{ __('Total Recaudado') }}</p>
                     <p class="text-lg font-semibold text-purple-900">${{ number_format($paidAmount, 2, '.', ',') }}</p>
                 </div>
             </div>
@@ -236,11 +236,11 @@
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-800">Plan de Pagos</h3>
+                <h3 class="text-lg font-semibold text-gray-800">{{ __('Plan de Pagos') }}</h3>
                 <div class="flex gap-2">
-                    <button onclick="expandAllPayments()" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">Expandir Todos</button>
-                    <button onclick="collapseAllPayments()" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">Contraer Todos</button>
-                    <button onclick="exportPayments()" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700">Exportar</button>
+                    <button onclick="expandAllPayments()" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">{{ __('Expandir Todos') }}</button>
+                    <button onclick="collapseAllPayments()" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">{{ __('Contraer Todos') }}</button>
+                    <button onclick="exportPayments()" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700">{{ __('Exportar') }}</button>
                 </div>
             </div>
         </div>
@@ -249,7 +249,7 @@
             <!-- Progress Bar -->
             <div class="mb-8">
                 <div class="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Progreso del Plan</span>
+                    <span>{{ __('Progreso del Plan') }}</span>
                     <span>{{ round(($paidAmount / $totalPlanAmount) * 100, 1) }}% Completado</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-3">
@@ -334,7 +334,7 @@
                             <div id="payment-details-{{ $index }}" class="hidden mt-4 pt-4 border-t border-gray-200">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <h5 class="font-semibold text-gray-700 mb-2">Detalles del Pago</h5>
+                                        <h5 class="font-semibold text-gray-700 mb-2">{{ __('Detalles del Pago') }}</h5>
                                         <div class="space-y-2 text-sm">
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Tipo:</span>
@@ -342,7 +342,7 @@
                                             </div>
                                             @if($paymentItem['installment_number'])
                                                 <div class="flex justify-between">
-                                                    <span class="text-gray-600">Cuota N°:</span>
+                                                    <span class="text-gray-600">{{ __('Cuota N°:') }}</span>
                                                     <span class="font-medium">{{ $paymentItem['installment_number'] }}</span>
                                                 </div>
                                             @endif
@@ -363,7 +363,7 @@
                                     
                                     @if($existingPayment)
                                         <div>
-                                            <h5 class="font-semibold text-gray-700 mb-2">Estado del Pago</h5>
+                                            <h5 class="font-semibold text-gray-700 mb-2">{{ __('Estado del Pago') }}</h5>
                                             <div class="space-y-2 text-sm">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-600">Estado:</span>
@@ -371,20 +371,20 @@
                                                 </div>
                                                 @if($existingPayment->payment_method)
                                                     <div class="flex justify-between">
-                                                        <span class="text-gray-600">Método:</span>
+                                                        <span class="text-gray-600">{{ __('Método:') }}</span>
                                                         <span class="font-medium">{{ $existingPayment->getPaymentMethodLabel() }}</span>
                                                     </div>
                                                 @endif
                                                 @if($existingPayment->paid_at)
                                                     <div class="flex justify-between">
-                                                        <span class="text-gray-600">Fecha Pago:</span>
+                                                        <span class="text-gray-600">{{ __('Fecha Pago:') }}</span>
                                                         <span class="font-medium">{{ \Carbon\Carbon::parse($existingPayment->paid_at)->format('d/m/Y H:i') }}</span>
                                                     </div>
                                                 @endif
                                                 @if($existingPayment->receipt_path)
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">Comprobante:</span>
-                                                        <a href="{{ $existingPayment->receipt_path }}" target="_blank" class="text-blue-600 hover:underline">Ver Comprobante</a>
+                                                        <a href="{{ $existingPayment->receipt_path }}" target="_blank" class="text-blue-600 hover:underline">{{ __('Ver Comprobante') }}</a>
                                                     </div>
                                                 @endif
                                                 @if($existingPayment->notes)
@@ -411,7 +411,7 @@
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white" id="modalTitle">Registrar Pago</h3>
+                <h3 class="text-xl font-bold text-white" id="modalTitle">{{ __('Registrar Pago') }}</h3>
                 <button onclick="closePaymentModal()" class="text-white hover:text-gray-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -428,57 +428,57 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Descripción') }}</label>
                             <input type="text" name="label" id="paymentLabel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Monto') }}</label>
                             <input type="number" name="amount" id="paymentAmount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Fecha de Vencimiento') }}</label>
                             <input type="date" name="due_date" id="paymentDueDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Estado') }}</label>
                             <select name="status" id="paymentStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="pending">Pendiente</option>
-                                <option value="paid">Pagado</option>
-                                <option value="overdue">Vencido</option>
-                                <option value="cancelled">Cancelado</option>
+                                <option value="pending">{{ __('Pendiente') }}</option>
+                                <option value="paid">{{ __('Pagado') }}</option>
+                                <option value="overdue">{{ __('Vencido') }}</option>
+                                <option value="cancelled">{{ __('Cancelado') }}</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Método de Pago') }}</label>
                             <select name="payment_method" id="paymentMethod" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Seleccionar...</option>
-                                <option value="cash">Efectivo</option>
-                                <option value="transfer">Transferencia</option>
-                                <option value="check">Cheque</option>
-                                <option value="card">Tarjeta</option>
-                                <option value="other">Otro</option>
+                                <option value="cash">{{ __('Efectivo') }}</option>
+                                <option value="transfer">{{ __('Transferencia') }}</option>
+                                <option value="check">{{ __('Cheque') }}</option>
+                                <option value="card">{{ __('Tarjeta') }}</option>
+                                <option value="other">{{ __('Otro') }}</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Pago</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Fecha de Pago') }}</label>
                             <input type="datetime-local" name="paid_at" id="paymentPaidAt" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-                        <textarea name="notes" id="paymentNotes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Notas adicionales..."></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Notas') }}</label>
+                        <textarea name="notes" id="paymentNotes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="{{ __('Notas adicionales...') }}"></textarea>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Boleta/Comprobante de Pago</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Boleta/Comprobante de Pago') }}</label>
                         <input type="file" name="payment_receipt" id="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-xs text-gray-500 mt-1">Formatos aceptados: PDF, JPG, PNG. Máximo 5MB.</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ __('Formatos aceptados: PDF, JPG, PNG. Máximo 5MB.') }}</p>
                     </div>
                     
                     @if(isset($existingPayment) && $existingPayment->receipt_path)
                     <div class="bg-gray-50 p-3 rounded-md">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Comprobante Actual</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Comprobante Actual') }}</label>
                         <div class="flex items-center gap-3">
                             <a href="{{ asset($existingPayment->receipt_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline">
                                 Ver comprobante
@@ -497,8 +497,8 @@
                             </svg>
                             Datos Transferencia
                         </button>
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Guardar Pago</button>
-                        <button type="button" onclick="closePaymentModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">{{ __('Guardar Pago') }}</button>
+                        <button type="button" onclick="closePaymentModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">{{ __('Cancelar') }}</button>
                     </div>
                 </form>
             </div>
@@ -514,18 +514,18 @@
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div class="px-6 py-4 border-b border-[#f2f5f8] flex items-center gap-3">
                 <div class="w-9 h-9 rounded-lg border border-[#eaecf0] flex items-center justify-center text-[#525866]"><i class="pi pi-building-columns"></i></div>
-                <div class="text-[15px] font-bold text-[#222530] flex-1">Datos para transferencia en USD</div>
+                <div class="text-[15px] font-bold text-[#222530] flex-1">{{ __('Datos para transferencia en USD') }}</div>
                 <button type="button" onclick="closeWireTransferModal()" class="text-[#99a0ae] hover:text-[#2b303b] p-1"><i class="pi pi-times text-[12px]"></i></button>
             </div>
             <div id="wireTransferContent" style="width:794px;max-width:90vw;background:#f0efec">
                 <div class="text-center py-8">
                     <i class="pi pi-spin pi-spinner text-[#99a0ae] text-[24px]"></i>
-                    <div class="text-[13px] text-[#717784] mt-2">Cargando datos...</div>
+                    <div class="text-[13px] text-[#717784] mt-2">{{ __('Cargando datos...') }}</div>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-[#f2f5f8] flex items-center gap-2 justify-end bg-[#f5f7fa]">
-                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> Descargar PDF</button>
-                <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">Cerrar</button>
+                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+                <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">{{ __('Cerrar') }}</button>
             </div>
         </div>
     </div>
@@ -642,7 +642,7 @@ function closePaymentModal() {
 }
 
 function removeReceipt() {
-    if (confirm('¿Está seguro de eliminar el comprobante de pago?')) {
+    if (confirm('{{ __("¿Está seguro de eliminar el comprobante de pago?") }}')) {
         // Add logic to remove receipt via AJAX
         fetch('/payments/remove-receipt', {
             method: 'POST',
@@ -664,7 +664,7 @@ function removeReceipt() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al eliminar comprobante');
+            alert('{{ __("Error al eliminar comprobante") }}');
         });
     }
 }

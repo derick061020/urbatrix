@@ -38,7 +38,7 @@
                                 <i class="pi pi-download text-[12px]"></i> Descargar
                             </a>
                         @else
-                            <span class="text-[11px] text-ink-300">No disponible</span>
+                            <span class="text-[11px] text-ink-300">{{ __('No disponible') }}</span>
                         @endif
                     </div>
                 </div>

@@ -16,8 +16,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $reservasCount }} contratos activos</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-exportar-contratos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nueva reserva</button>
+            <button type="button" onclick="document.getElementById('modal-exportar-contratos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva reserva') }}</button>
         </div>
     </div>
 
@@ -48,21 +48,21 @@
                 <input type="hidden" name="tab" value="{{ $currentTab }}">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Buscar documento…" class="crm-input pr-3">
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Buscar documento…') }}" class="crm-input pr-3">
                 </div>
                 <select name="unit_id" class="crm-input pl-3 w-full sm:w-44">
-                    <option value="">Todas las unidades</option>
+                    <option value="">{{ __('Todas las unidades') }}</option>
                     @foreach($units as $u)
                         <option value="{{ $u->id }}" @selected((string)($unitId ?? '') === (string)$u->id)>{{ $u->custom_id ?? $u->name }} {{ $u->name && $u->custom_id ? '· '.$u->name : '' }}</option>
                     @endforeach
                 </select>
-                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Desde">
+                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Desde') }}">
                 <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
-                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
                 @if($hasFilters)
-                    <a href="{{ route('admin.crm.contratos', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> Limpiar</a>
+                    <a href="{{ route('admin.crm.contratos', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> {{ __('Limpiar') }}</a>
                 @endif
-                <button type="button" class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
+                <button type="button" class="crm-btn crm-btn-ghost">{{ __('Acciones en lote') }} <i class="pi pi-angle-down text-[10px]"></i></button>
             </form>
         </div>
 
@@ -71,13 +71,13 @@
                 <thead class="bg-ink-50">
                     <tr>
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                        <th>Cliente</th>
-                        <th>Unidad</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Pagado</th>
-                        <th>Total</th>
-                        <th>Fecha firma</th>
+                        <th>{{ __('Cliente') }}</th>
+                        <th>{{ __('Unidad') }}</th>
+                        <th>{{ __('Tipo') }}</th>
+                        <th>{{ __('Estado') }}</th>
+                        <th>{{ __('Pagado') }}</th>
+                        <th>{{ __('Total') }}</th>
+                        <th>{{ __('Fecha firma') }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -105,7 +105,7 @@
                             <td class="text-[13px] font-semibold text-ink-900">{{ $r->first_name }} {{ $r->last_name }}</td>
                             <td>
                                 <div class="text-[13px] text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                <div class="text-[11px] text-ink-500">Makai Residences</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
                             </td>
                             <td><span class="crm-pill {{ $tipoColor[$tipo] }}">{{ $tipo }}</span></td>
                             <td><span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }}">{{ $estado[0] }}</span></td>
@@ -114,13 +114,13 @@
                             <td class="text-[12px] text-ink-700">{{ $fechaFirma }}</td>
                             <td class="text-right whitespace-nowrap">
                                 @if($estado[0] === 'Por firmar')
-                                    <a href="{{ route('admin.crm.contract.generate', $r->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Firmar</a>
+                                    <a href="{{ route('admin.crm.contract.generate', $r->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">{{ __('Firmar') }}</a>
                                 @endif
-                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
+                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Ver &rarr;') }}</a>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="text-center text-[12px] text-ink-500 py-8">Sin contratos activos.</td></tr>
+                        <tr><td colspan="9" class="text-center text-[12px] text-ink-500 py-8">{{ __('Sin contratos activos.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

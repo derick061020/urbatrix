@@ -4,8 +4,8 @@
 <div class="flex-1 bg-gray-50 p-6">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Mensajes</h1>
-        <p class="text-gray-600">Comunícate con tu broker</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('Mensajes') }}</h1>
+        <p class="text-gray-600">{{ __('Comunícate con tu broker') }}</p>
     </div>
 
     <!-- Messages Section -->
@@ -19,11 +19,11 @@
                     </div>
                     <div class="text-right">
                         @if($reservation->status == 'pending')
-                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">Pendiente</span>
+                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">{{ __('Pendiente') }}</span>
                         @elseif($reservation->status == 'confirmed')
-                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">Confirmada</span>
+                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">{{ __('Confirmada') }}</span>
                         @else
-                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">Cancelada</span>
+                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">{{ __('Cancelada') }}</span>
                         @endif
                     </div>
                 </div>
@@ -77,7 +77,7 @@
 
                     <!-- Message Input -->
                     <div class="flex items-center space-x-2 pt-4 border-t">
-                        <input type="text" placeholder="Escribe un mensaje a Carlos..." class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" placeholder="{{ __('Escribe un mensaje a Carlos...') }}" class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                             Enviar
                         </button>
@@ -91,8 +91,8 @@
                 <svg class="material-design-icon__svg text-gray-400 mx-auto mb-4" width="48" height="48" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes reservas</h3>
-                <p class="text-gray-600 mb-4">Comienza reservando una unidad desde el home</p>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No tienes reservas') }}</h3>
+                <p class="text-gray-600 mb-4">{{ __('Comienza reservando una unidad desde el home') }}</p>
                 <a href="/" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                     Ver Unidades
                 </a>

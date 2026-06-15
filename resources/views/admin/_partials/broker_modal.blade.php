@@ -12,7 +12,7 @@
                     <div class="text-[12px] text-ink-500 truncate">{{ $b->email }}{{ $b->phone ? ' · '.$b->phone : '' }}</div>
                 </div>
                 <div class="text-right shrink-0">
-                    <div class="text-[10px] uppercase tracking-wider text-ink-500">Comisión</div>
+                    <div class="text-[10px] uppercase tracking-wider text-ink-500">{{ __('Comisión') }}</div>
                     <div class="text-[30px] font-bold text-brand leading-none">{{ rtrim(rtrim(number_format($rate, 2), '0'), '.') }}%</div>
                 </div>
                 <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1 shrink-0"><i class="pi pi-times text-[12px]"></i></button>
@@ -41,22 +41,22 @@
                     @csrf @method('PUT')
                     <div class="p-6 space-y-4">
                         <div>
-                            <label class="text-[12px] font-semibold text-ink-700">Nombre completo</label>
+                            <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre completo') }}</label>
                             <input type="text" name="name" value="{{ $b->name }}" required class="crm-input pl-3 mt-1.5">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Email</label>
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Email') }}</label>
                                 <input type="email" name="email" value="{{ $b->email }}" required class="crm-input pl-3 mt-1.5">
                             </div>
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
                                 <input type="text" name="phone" value="{{ $b->phone }}" class="crm-input pl-3 mt-1.5">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 items-end">
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Tasa de comisión (%)</label>
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Tasa de comisión (%)') }}</label>
                                 <input type="number" name="commission_rate" value="{{ rtrim(rtrim(number_format($rate, 2), '0'), '.') }}" step="0.01" min="0" max="100" class="crm-input pl-3 mt-1.5">
                             </div>
                             <label class="flex items-center gap-2 text-[13px] text-ink-700 h-9 px-1">
@@ -65,8 +65,8 @@
                         </div>
                     </div>
                     <div class="px-6 py-4 border-t border-ink-100 bg-ink-50 flex items-center justify-end gap-2">
-                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-                        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+                        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar cambios') }}</button>
                     </div>
                 </form>
             </div>
@@ -78,18 +78,18 @@
                     <form method="POST" action="{{ route('admin.agents.documents.store', $b->id) }}" enctype="multipart/form-data"
                           class="border border-ink-100 rounded-xl p-4 bg-ink-50/40 space-y-3">
                         @csrf
-                        <div class="text-[12px] font-semibold text-ink-700">Subir contrato para este broker</div>
+                        <div class="text-[12px] font-semibold text-ink-700">{{ __('Subir contrato para este broker') }}</div>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" name="title" required placeholder="Título (ej. Contrato 2026)" class="crm-input pl-3">
+                            <input type="text" name="title" required placeholder="{{ __('Título (ej. Contrato 2026)') }}" class="crm-input pl-3">
                             <select name="category" class="crm-input pl-3">
-                                <option value="Contrato">Contrato</option>
-                                <option value="Anexo">Anexo</option>
-                                <option value="Legal">Legal</option>
+                                <option value="Contrato">{{ __('Contrato') }}</option>
+                                <option value="Anexo">{{ __('Anexo') }}</option>
+                                <option value="Legal">{{ __('Legal') }}</option>
                             </select>
                         </div>
                         <div class="flex items-center gap-2">
                             <input type="file" name="file" required class="crm-input pl-3 flex-1 py-1.5">
-                            <button type="submit" class="crm-btn crm-btn-primary shrink-0"><i class="pi pi-upload"></i> Subir</button>
+                            <button type="submit" class="crm-btn crm-btn-primary shrink-0"><i class="pi pi-upload"></i> {{ __('Subir') }}</button>
                         </div>
                     </form>
 
@@ -102,14 +102,14 @@
                                     <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $doc->title }}</div>
                                     <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }} · {{ $doc->downloads }} descargas</div>
                                 </div>
-                                <button type="button" class="text-ink-500 hover:text-brand p-1" title="Ver"
+                                <button type="button" class="text-ink-500 hover:text-brand p-1" title="{{ __('Ver') }}"
                                     onclick="openBrokerDoc({{ \Illuminate\Support\Js::from(['title'=>$doc->title,'format'=>strtoupper($doc->format),'kind'=>$doc->previewKind(),'url'=>$doc->fileUrl(),'download'=>$doc->downloadUrl()]) }})"><i class="pi pi-eye"></i></button>
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="text-ink-500 hover:text-brand p-1" title="Descargar"><i class="pi pi-download"></i></a>
-                                <button type="button" class="text-ink-400 hover:text-err p-1" title="Eliminar"
+                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="text-ink-500 hover:text-brand p-1" title="{{ __('Descargar') }}"><i class="pi pi-download"></i></a>
+                                <button type="button" class="text-ink-400 hover:text-err p-1" title="{{ __('Eliminar') }}"
                                     onclick="openBrokerDocDelete({{ \Illuminate\Support\Js::from(['url'=>route('admin.agents.documents.destroy', [$b->id, $doc->id]),'title'=>$doc->title]) }})"><i class="pi pi-trash"></i></button>
                             </div>
                         @empty
-                            <div class="px-4 py-8 text-center text-[12px] text-ink-400">Este broker todavía no tiene contratos. Subí el primero arriba.</div>
+                            <div class="px-4 py-8 text-center text-[12px] text-ink-400">{{ __('Este broker todavía no tiene contratos. Subí el primero arriba.') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                 <form method="POST" action="{{ route('admin.agents.units', $b->id) }}">
                     @csrf
                     <div class="p-6 space-y-3">
-                        <div class="text-[11px] text-ink-500">El broker solo verá expedientes de las unidades seleccionadas.</div>
+                        <div class="text-[11px] text-ink-500">{{ __('El broker solo verá expedientes de las unidades seleccionadas.') }}</div>
                         <div class="space-y-2 max-h-[360px] overflow-y-auto">
                             @forelse($units as $u)
                                 <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ink-50 cursor-pointer border border-ink-100">
@@ -133,13 +133,13 @@
                                     </div>
                                 </label>
                             @empty
-                                <div class="text-[12px] text-ink-500 text-center py-6">No hay unidades disponibles.</div>
+                                <div class="text-[12px] text-ink-500 text-center py-6">{{ __('No hay unidades disponibles.') }}</div>
                             @endforelse
                         </div>
                     </div>
                     <div class="px-6 py-4 border-t border-ink-100 bg-ink-50 flex items-center justify-end gap-2">
-                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-                        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar asignación</button>
+                        <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+                        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar asignación') }}</button>
                     </div>
                 </form>
             </div>

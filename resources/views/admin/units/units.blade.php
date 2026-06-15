@@ -37,23 +37,23 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $units->total() }} unidades totales</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-exportar-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-config-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-cog"></i> Configuraciones</button>
-            <a href="{{ route('admin.units.create') }}" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nueva unidad</a>
+            <button type="button" onclick="document.getElementById('modal-exportar-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-config-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-cog"></i> {{ __('Configuraciones') }}</button>
+            <a href="{{ route('admin.units.create') }}" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva unidad') }}</a>
         </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4">
         <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#1fc16b">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">Unidades disponibles</div>
+            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades disponibles') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countAvailable }}</div>
         </div>
         <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#fa7319">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">Unidades reservadas</div>
+            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades reservadas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countReserved }}</div>
         </div>
         <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#5c7c68">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">Unidades vendidas</div>
+            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades vendidas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countSold }}</div>
         </div>
     </div>
@@ -68,9 +68,9 @@
             <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="Buscar unidad…" class="crm-input pr-3">
+                    <input type="text" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
             </div>
         </div>
 
@@ -79,17 +79,17 @@
                 <thead class="bg-ink-50">
                     <tr>
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                        <th>Unidad</th>
-                        <th>Tipo</th>
-                        <th>Planta</th>
-                        <th>Camas/Baños</th>
-                        <th>Sqft Int.</th>
-                        <th>Sqft Terraza</th>
-                        <th>Precio</th>
-                        <th>Vistas</th>
-                        <th>Estado</th>
-                        <th>Cliente</th>
-                        <th>Público</th>
+                        <th>{{ __('Unidad') }}</th>
+                        <th>{{ __('Tipo') }}</th>
+                        <th>{{ __('Planta') }}</th>
+                        <th>{{ __('Camas/Baños') }}</th>
+                        <th>{{ __('Sqft Int.') }}</th>
+                        <th>{{ __('Sqft Terraza') }}</th>
+                        <th>{{ __('Precio') }}</th>
+                        <th>{{ __('Vistas') }}</th>
+                        <th>{{ __('Estado') }}</th>
+                        <th>{{ __('Cliente') }}</th>
+                        <th>{{ __('Público') }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -148,11 +148,11 @@
                                         aria-pressed="{{ $u->public ? 'true' : 'false' }}"></button>
                             </td>
                             <td class="text-right whitespace-nowrap">
-                                <a href="{{ route('admin.units.edit', $u->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Editar &rarr;</a>
+                                <a href="{{ route('admin.units.edit', $u->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Editar &rarr;') }}</a>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="13" class="text-center text-[12px] text-ink-500 py-8">No hay unidades creadas.</td></tr>
+                        <tr><td colspan="13" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay unidades creadas.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -180,7 +180,7 @@
         <div class="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="pi pi-cog text-brand"></i>
-                <h2 class="text-[15px] font-bold text-ink-900">Configuración de opciones</h2>
+                <h2 class="text-[15px] font-bold text-ink-900">{{ __('Configuración de opciones') }}</h2>
             </div>
             <button type="button" onclick="document.getElementById('modal-config-unidades').close()" class="text-ink-400 hover:text-ink-700"><i class="pi pi-times"></i></button>
         </div>
@@ -198,14 +198,14 @@
                 <section data-cfg-section="{{ $cat }}" class="{{ $loop->first ? '' : 'hidden' }}">
                     <p class="text-[12px] text-ink-500 mb-3">{{ $meta['hint'] }}</p>
                     <div data-cfg-rows="{{ $cat }}" class="space-y-2"></div>
-                    <button type="button" data-cfg-add="{{ $cat }}" class="crm-btn crm-btn-ghost mt-3 text-[12px]"><i class="pi pi-plus"></i> Agregar</button>
+                    <button type="button" data-cfg-add="{{ $cat }}" class="crm-btn crm-btn-ghost mt-3 text-[12px]"><i class="pi pi-plus"></i> {{ __('Agregar') }}</button>
                 </section>
             @endforeach
         </div>
 
         <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
-            <button type="button" onclick="document.getElementById('modal-config-unidades').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+            <button type="button" onclick="document.getElementById('modal-config-unidades').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar cambios') }}</button>
         </div>
     </form>
 </dialog>
@@ -244,7 +244,7 @@
             // Revert
             btn.classList.toggle('on', wasOn);
             btn.setAttribute('aria-pressed', String(wasOn));
-            alert('No se pudo cambiar la visibilidad. Intentá de nuevo.');
+            alert('{{ __("No se pudo cambiar la visibilidad. Intentá de nuevo.") }}');
         })
         .finally(() => { btn.disabled = false; });
     });

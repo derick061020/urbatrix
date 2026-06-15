@@ -7,14 +7,14 @@
 @section('content')
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
     <div class="flex items-center justify-between">
-        <div class="text-[14px] font-semibold text-ink-700">3 publicados · 2 fijados</div>
+        <div class="text-[14px] font-semibold text-ink-700">{{ __('3 publicados · 2 fijados') }}</div>
         <div class="flex items-center gap-2">
-            <button class="crm-btn crm-btn-ghost">Config. canales</button>
-            <button class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nuevo reporte</button>
+            <button class="crm-btn crm-btn-ghost">{{ __('Config. canales') }}</button>
+            <button class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo reporte') }}</button>
         </div>
     </div>
 
-    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wider px-2"><i class="pi pi-bookmark-fill text-err"></i> Fijados</div>
+    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wider px-2"><i class="pi pi-bookmark-fill text-err"></i> {{ __('Fijados') }}</div>
 
     @php
         $pinned = [
@@ -55,14 +55,14 @@
                     <div class="text-[10px] text-ink-400 mt-3">{{ $p['meta'] }}</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Archivar</button>
-                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Editar</button>
+                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Archivar') }}</button>
+                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Editar') }}</button>
                 </div>
             </div>
         </div>
     @endforeach
 
-    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wider px-2">Recientes</div>
+    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wider px-2">{{ __('Recientes') }}</div>
 
     @foreach($recent as $p)
         <div class="crm-card p-5">
@@ -78,8 +78,8 @@
                     <div class="text-[10px] text-ink-400 mt-3">{{ $p['meta'] }}</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Archivar</button>
-                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Editar</button>
+                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Archivar') }}</button>
+                    <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Editar') }}</button>
                 </div>
             </div>
         </div>

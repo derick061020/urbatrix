@@ -24,8 +24,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $totalBrokers }} brokers registrados</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-exportar-brokers').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nuevo broker</button>
+            <button type="button" onclick="document.getElementById('modal-exportar-brokers').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo broker') }}</button>
         </div>
     </div>
 
@@ -54,9 +54,9 @@
             <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="Buscar broker…" class="crm-input pr-3">
+                    <input type="text" placeholder="{{ __('Buscar broker…') }}" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
             </div>
         </div>
 
@@ -65,10 +65,10 @@
                 <thead class="bg-ink-50">
                     <tr>
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                        <th>Broker</th>
-                        <th>Unidades asignadas</th>
-                        <th>Estado</th>
-                        <th>Registrado</th>
+                        <th>{{ __('Broker') }}</th>
+                        <th>{{ __('Unidades asignadas') }}</th>
+                        <th>{{ __('Estado') }}</th>
+                        <th>{{ __('Registrado') }}</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -103,7 +103,7 @@
                             </td>
                             <td>
                                 @if($b->assignedUnits->isEmpty())
-                                    <span class="text-[12px] text-ink-400">Sin asignar</span>
+                                    <span class="text-[12px] text-ink-400">{{ __('Sin asignar') }}</span>
                                 @else
                                     <div class="flex flex-wrap gap-1 max-w-[320px]">
                                         @foreach($b->assignedUnits->take(4) as $u)
@@ -128,14 +128,14 @@
                                 <form method="POST" action="{{ route('admin.agents.delete', $b->id) }}" class="m-0 inline"
                                       onsubmit="return confirm('¿Eliminar broker {{ $b->name }}?');">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="text-[12px] text-err font-semibold hover:underline">Eliminar</button>
+                                    <button type="submit" class="text-[12px] text-err font-semibold hover:underline">{{ __('Eliminar') }}</button>
                                 </form>
                             </td>
                         </tr>
 
                         @include('admin._partials.broker_modal', ['b' => $b, 'rate' => $rate, 'init' => $init, 'bg' => $bg, 'units' => $units, 'assignedIds' => $assignedIds])
                     @empty
-                        <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-8">No hay brokers todavía. <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="text-brand font-semibold hover:underline">Crear uno</button></td></tr>
+                        <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay brokers todavía.') }} <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="text-brand font-semibold hover:underline">{{ __('Crear uno') }}</button></td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -145,19 +145,19 @@
 
 <dialog id="modal-nuevo-broker" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <form method="POST" action="{{ route('admin.agents.store') }}" class="w-[560px] bg-white rounded-2xl overflow-hidden">@csrf
-        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">Nuevo broker</div>
+        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">{{ __('Nuevo broker') }}</div>
         <div class="p-6 space-y-3">
-            <div><label class="text-[12px] font-semibold text-ink-700">Nombre completo</label><input type="text" name="name" required class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre completo') }}</label><input type="text" name="name" required class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="text-[12px] font-semibold text-ink-700">Email</label><input type="email" name="email" required class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">Teléfono</label><input type="text" name="phone" class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Email') }}</label><input type="email" name="email" required class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label><input type="text" name="phone" class="crm-input pl-3 mt-1"></div>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Contraseña temporal</label>
-                <input type="text" name="password" placeholder="(se genera una si la dejas vacía)" class="crm-input pl-3 mt-1">
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Contraseña temporal') }}</label>
+                <input type="text" name="password" placeholder="{{ __('(se genera una si la dejas vacía)') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Unidades asignadas (opcional)</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Unidades asignadas (opcional)') }}</label>
                 <div class="mt-1 max-h-[200px] overflow-y-auto border border-ink-100 rounded-lg p-2 space-y-1">
                     @forelse($units as $u)
                         <label class="flex items-center gap-2 text-[12px] px-2 py-1 hover:bg-ink-50 rounded cursor-pointer">
@@ -166,15 +166,15 @@
                             <span class="text-ink-500">· {{ $u->status }}</span>
                         </label>
                     @empty
-                        <div class="text-[12px] text-ink-500 text-center py-3">No hay unidades.</div>
+                        <div class="text-[12px] text-ink-500 text-center py-3">{{ __('No hay unidades.') }}</div>
                     @endforelse
                 </div>
             </div>
-            <div class="flex items-center gap-2"><input type="checkbox" name="active" value="1" checked class="w-4 h-4 accent-brand"><label class="text-[12px] text-ink-700">Activar inmediatamente</label></div>
+            <div class="flex items-center gap-2"><input type="checkbox" name="active" value="1" checked class="w-4 h-4 accent-brand"><label class="text-[12px] text-ink-700">{{ __('Activar inmediatamente') }}</label></div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary">Crear broker</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary">{{ __('Crear broker') }}</button>
         </div>
     </form>
 </dialog>
@@ -185,10 +185,10 @@
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-eye"></i></div>
             <div class="min-w-0 flex-1">
-                <div class="text-[15px] font-bold text-ink-900 truncate" id="brkDocTitle">Vista previa</div>
+                <div class="text-[15px] font-bold text-ink-900 truncate" id="brkDocTitle">{{ __('Vista previa') }}</div>
                 <div class="text-[11px] text-ink-400 uppercase tracking-wider" id="brkDocFmt"></div>
             </div>
-            <a href="#" id="brkDocDownload" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> Descargar</a>
+            <a href="#" id="brkDocDownload" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1 ml-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="flex-1 overflow-auto bg-ink-50 flex items-center justify-center p-4" id="brkDocBody" style="min-height:420px"></div>
@@ -201,12 +201,12 @@
         @csrf @method('DELETE')
         <div class="p-6 text-center">
             <div class="w-12 h-12 mx-auto rounded-full bg-err-soft flex items-center justify-center text-err mb-3"><i class="pi pi-trash text-[20px]"></i></div>
-            <div class="text-[15px] font-bold text-ink-900">Eliminar contrato</div>
-            <p class="text-[13px] text-ink-500 mt-1.5">¿Seguro que querés eliminar <b class="text-ink-700" id="brkDocDeleteName">este documento</b>? Esta acción no se puede deshacer.</p>
+            <div class="text-[15px] font-bold text-ink-900">{{ __('Eliminar contrato') }}</div>
+            <p class="text-[13px] text-ink-500 mt-1.5">{{ __('¿Seguro que querés eliminar') }} <b class="text-ink-700" id="brkDocDeleteName">{{ __('este documento') }}</b>{{ __('? Esta acción no se puede deshacer.') }}</p>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex justify-center gap-2">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> Eliminar</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
         </div>
     </form>
 </dialog>

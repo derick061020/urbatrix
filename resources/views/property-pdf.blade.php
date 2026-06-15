@@ -302,7 +302,7 @@ body {
     @endif
   </div>
   <div class="hero-reserve">
-    <div class="reserve-lbl">Reserva desde</div>
+    <div class="reserve-lbl">{{ __('Reserva desde') }}</div>
     <div class="reserve-amt">{{ $reserveAmt }} <span class="reserve-cur">USD</span></div>
   </div>
 </div>
@@ -317,7 +317,7 @@ body {
 
 <!-- SPECS -->
 <div class="section">
-  <div class="sec-title">Especificaciones de la unidad</div>
+  <div class="sec-title">{{ __('Especificaciones de la unidad') }}</div>
   <div class="specs-grid">
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -330,25 +330,25 @@ body {
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 12V6a2 2 0 0 1 4 0v6"/><path d="M2 12h20v3a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5v-3z"/>
       </svg>
-      <div class="spec-val">{{ $bathrooms }}</div><div class="spec-lbl">Baños</div>
+      <div class="spec-val">{{ $bathrooms }}</div><div class="spec-lbl">{{ __('Baños') }}</div>
     </div>
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h5a3 3 0 0 1 0 6H9"/>
       </svg>
-      <div class="spec-val">{{ $parking }}</div><div class="spec-lbl">Parking</div>
+      <div class="spec-val">{{ $parking }}</div><div class="spec-lbl">{{ __('Parking') }}</div>
     </div>
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M13 3h8v8"/><path d="M21 3l-8 8"/><path d="M11 21H3v-8"/><path d="M3 21l8-8"/>
       </svg>
-      <div class="spec-val">{{ $intArea ? $intArea . ' m²' : '—' }}</div><div class="spec-lbl">Interior</div>
+      <div class="spec-val">{{ $intArea ? $intArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Interior') }}</div>
     </div>
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 15V10a7 7 0 0 1 14 0v5"/><path d="M3 15h18"/><path d="M3 21h18"/>
       </svg>
-      <div class="spec-val">{{ $extArea ? $extArea . ' m²' : '—' }}</div><div class="spec-lbl">Terraza</div>
+      <div class="spec-val">{{ $extArea ? $extArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Terraza') }}</div>
     </div>
   </div>
 </div>
@@ -359,25 +359,25 @@ body {
   <div class="payment-grid">
     <div class="payment-card">
       <div class="payment-pct">{{ number_format(5000 / max($price,1) * 100, 1) }}%</div>
-      <div class="payment-label">Reserva</div>
+      <div class="payment-label">{{ __('Reserva') }}</div>
       <div class="payment-amount">{{ $reserveAmt }}</div>
-      <div class="payment-timing">A la firma</div>
+      <div class="payment-timing">{{ __('A la firma') }}</div>
     </div>
     <div class="payment-card">
       <div class="payment-pct">{{ $initialPct }}%</div>
-      <div class="payment-label">Inicial</div>
+      <div class="payment-label">{{ __('Inicial') }}</div>
       <div class="payment-amount">{{ $initialAmt }}</div>
-      <div class="payment-timing">60 días · Promesa</div>
+      <div class="payment-timing">{{ __('60 días · Promesa') }}</div>
     </div>
     <div class="payment-card">
       <div class="payment-pct">{{ $constructPct }}%</div>
-      <div class="payment-label">Construcción</div>
+      <div class="payment-label">{{ __('Construcción') }}</div>
       <div class="payment-amount">{{ $constructAmt }}</div>
       <div class="payment-timing">18 meses</div>
     </div>
     <div class="payment-card">
       <div class="payment-pct">{{ $finalPct }}%</div>
-      <div class="payment-label">Contraentrega</div>
+      <div class="payment-label">{{ __('Contraentrega') }}</div>
       <div class="payment-amount">{{ $finalAmt }}</div>
       <div class="payment-timing">{{ $projYear }}</div>
     </div>
@@ -388,19 +388,19 @@ body {
 <div class="section">
   <div class="metrics-row">
     <div class="metric-card">
-      <div class="metric-card-lbl">ROI Anual Estimado</div>
+      <div class="metric-card-lbl">{{ __('ROI Anual Estimado') }}</div>
       <div class="metric-card-val">{{ $roi }}</div>
-      <div class="metric-card-sub">Mercado actual</div>
+      <div class="metric-card-sub">{{ __('Mercado actual') }}</div>
     </div>
     <div class="metric-card">
-      <div class="metric-card-lbl">Plusvalía Proyectada</div>
+      <div class="metric-card-lbl">{{ __('Plusvalía Proyectada') }}</div>
       <div class="metric-card-val green">{{ $projVal }}</div>
-      <div class="metric-card-sub">A la entrega vs precio actual</div>
+      <div class="metric-card-sub">{{ __('A la entrega vs precio actual') }}</div>
     </div>
     <div class="metric-card">
-      <div class="metric-card-lbl">Disponibilidad</div>
+      <div class="metric-card-lbl">{{ __('Disponibilidad') }}</div>
       <div class="metric-card-val blue">{{ $unit->status === 'AVAILABLE' || $unit->status === 'available' ? 'Disponible' : ucfirst(strtolower($unit->status)) }}</div>
-      <div class="metric-card-sub">Estado actual de la unidad</div>
+      <div class="metric-card-sub">{{ __('Estado actual de la unidad') }}</div>
     </div>
   </div>
 </div>
@@ -409,15 +409,15 @@ body {
 <div class="section">
   <div class="cta-duo">
     <div class="cta-box cta-reserve">
-      <div class="cta-label">Asegura tu unidad</div>
+      <div class="cta-label">{{ __('Asegura tu unidad') }}</div>
       <div class="cta-amount">{{ $reserveAmt }}<span class="cta-amount-cur"> USD</span></div>
       <hr class="cta-rule">
-      <div class="cta-desc">Bloquea el precio actual. Reserva totalmente reembolsable en los primeros 30 días.</div>
-      <a class="cta-link" href="https://wa.me/{{ $advisorWA }}?text=Hola%2C+quiero+reservar+la+unidad+{{ urlencode($unitNum) }}">Iniciar reserva →</a>
+      <div class="cta-desc">{{ __('Bloquea el precio actual. Reserva totalmente reembolsable en los primeros 30 días.') }}</div>
+      <a class="cta-link" href="https://wa.me/{{ $advisorWA }}?text=Hola%2C+quiero+reservar+la+unidad+{{ urlencode($unitNum) }}">{{ __('Iniciar reserva →') }}</a>
     </div>
     <div class="cta-box cta-visit">
-      <div class="cta-label">Agenda tu visita</div>
-      <div class="cta-modes">Presencial · Tour 360°</div>
+      <div class="cta-label">{{ __('Agenda tu visita') }}</div>
+      <div class="cta-modes">{{ __('Presencial · Tour 360°') }}</div>
       <hr class="cta-rule">
       <div class="cta-desc">Recorre {{ $projectName }} desde donde estés o visítanos en Cap Cana.</div>
       <a class="cta-link" href="#">Agendar →</a>
@@ -427,7 +427,7 @@ body {
 
 <!-- ADVISOR -->
 <div class="section section-last">
-  <div class="sec-title">Tu asesor personal</div>
+  <div class="sec-title">{{ __('Tu asesor personal') }}</div>
   <div class="advisor-row">
     <div class="advisor-avatar">{{ strtoupper($advisorInitials ?: 'CR') }}</div>
     <div class="advisor-info">
@@ -451,7 +451,7 @@ body {
 </div><!-- /sheet-inner page 1 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Cap Cana, Punta Cana · República Dominicana') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 </div><!-- /sheet page 1 -->
@@ -463,7 +463,7 @@ body {
 <div class="p2-hdr">
   <div>
     <div class="p2-hdr-sub">{{ $projectName }} · Cap Cana</div>
-    <div class="p2-hdr-title">Detalles del Proyecto</div>
+    <div class="p2-hdr-title">{{ __('Detalles del Proyecto') }}</div>
   </div>
   <div class="p2-hdr-right">
     <div class="p2-hdr-unit">{{ $unitNum }} · Página 2 / 2</div>
@@ -474,7 +474,7 @@ body {
 <div class="section" style="padding-top:20px">
   <div class="two-col">
     <div>
-      <div class="sec-title">Beneficios fiscales y legales</div>
+      <div class="sec-title">{{ __('Beneficios fiscales y legales') }}</div>
       <div class="confotur-card">
         <div class="confotur-header">
           <div class="confotur-icon">
@@ -482,50 +482,50 @@ body {
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
             </svg>
           </div>
-          <div class="confotur-title">Proyecto acogido a CONFOTUR</div>
+          <div class="confotur-title">{{ __('Proyecto acogido a CONFOTUR') }}</div>
         </div>
-        <div class="confotur-text">Exención del impuesto de transferencia (3%) al momento de la compra y exoneración total del Impuesto al Patrimonio Inmobiliario (IPI 1% anual) durante 15 años. Aplica para inversores nacionales y extranjeros.</div>
+        <div class="confotur-text">{{ __('Exención del impuesto de transferencia (3%) al momento de la compra y exoneración total del Impuesto al Patrimonio Inmobiliario (IPI 1% anual) durante 15 años. Aplica para inversores nacionales y extranjeros.') }}</div>
         <div class="confotur-badges">
-          <div class="confotur-badge"><div class="confotur-badge-title">CONFOTUR</div><div class="confotur-badge-sub">Exención fiscal</div></div>
-          <div class="confotur-badge"><div class="confotur-badge-title">Ley 189-11</div><div class="confotur-badge-sub">Fideicomiso bancario</div></div>
-          <div class="confotur-badge"><div class="confotur-badge-title">RNI Registrado</div><div class="confotur-badge-sub">Catastro nacional</div></div>
+          <div class="confotur-badge"><div class="confotur-badge-title">CONFOTUR</div><div class="confotur-badge-sub">{{ __('Exención fiscal') }}</div></div>
+          <div class="confotur-badge"><div class="confotur-badge-title">Ley 189-11</div><div class="confotur-badge-sub">{{ __('Fideicomiso bancario') }}</div></div>
+          <div class="confotur-badge"><div class="confotur-badge-title">{{ __('RNI Registrado') }}</div><div class="confotur-badge-sub">{{ __('Catastro nacional') }}</div></div>
         </div>
       </div>
 
-      <div class="sec-title" style="margin-top:14px">Costos mensuales estimados</div>
+      <div class="sec-title" style="margin-top:14px">{{ __('Costos mensuales estimados') }}</div>
       <div class="costs-block">
-        <div class="costs-row"><span class="costs-dk">Cuota de mantenimiento (HOA)</span><span class="costs-dv">${{ $unit->levies ? number_format((float)$unit->levies, 0) : '310' }}</span></div>
-        <div class="costs-row"><span class="costs-dk">Servicios públicos promedio</span><span class="costs-dv">$180</span></div>
-        <div class="costs-row"><span class="costs-dk">Seguro de la propiedad</span><span class="costs-dv">$95</span></div>
-        <div class="costs-total"><span>Total mensual estimado</span><span>${{ number_format(((float)($unit->levies ?: 310)) + 180 + 95, 0) }} USD</span></div>
+        <div class="costs-row"><span class="costs-dk">{{ __('Cuota de mantenimiento (HOA)') }}</span><span class="costs-dv">${{ $unit->levies ? number_format((float)$unit->levies, 0) : '310' }}</span></div>
+        <div class="costs-row"><span class="costs-dk">{{ __('Servicios públicos promedio') }}</span><span class="costs-dv">$180</span></div>
+        <div class="costs-row"><span class="costs-dk">{{ __('Seguro de la propiedad') }}</span><span class="costs-dv">$95</span></div>
+        <div class="costs-total"><span>{{ __('Total mensual estimado') }}</span><span>${{ number_format(((float)($unit->levies ?: 310)) + 180 + 95, 0) }} USD</span></div>
       </div>
     </div>
 
     <div>
-      <div class="sec-title">Rentabilidad Airbnb estimada</div>
+      <div class="sec-title">{{ __('Rentabilidad Airbnb estimada') }}</div>
       <div class="airbnb-block">
         <div class="airbnb-header">
           <svg class="airbnb-header-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
           </svg>
-          <span class="airbnb-header-lbl">Proyección Renta Vacacional</span>
+          <span class="airbnb-header-lbl">{{ __('Proyección Renta Vacacional') }}</span>
         </div>
-        <div class="airbnb-row"><span class="airbnb-dk">Tarifa diaria promedio</span><span class="airbnb-dv green">${{ $unit->est_rental ? number_format((float)$unit->est_rental / 30, 0) : '240' }}</span></div>
-        <div class="airbnb-row"><span class="airbnb-dk">Ocupación anual estimada</span><span class="airbnb-dv">72%</span></div>
-        <div class="airbnb-row"><span class="airbnb-dk">Gastos operativos (35%)</span><span class="airbnb-dv red">-${{ number_format(((float)($unit->est_rental ?: 7200)) * 12 * 0.35 / 1000, 0) }}K</span></div>
+        <div class="airbnb-row"><span class="airbnb-dk">{{ __('Tarifa diaria promedio') }}</span><span class="airbnb-dv green">${{ $unit->est_rental ? number_format((float)$unit->est_rental / 30, 0) : '240' }}</span></div>
+        <div class="airbnb-row"><span class="airbnb-dk">{{ __('Ocupación anual estimada') }}</span><span class="airbnb-dv">72%</span></div>
+        <div class="airbnb-row"><span class="airbnb-dk">{{ __('Gastos operativos (35%)') }}</span><span class="airbnb-dv red">-${{ number_format(((float)($unit->est_rental ?: 7200)) * 12 * 0.35 / 1000, 0) }}K</span></div>
         <div class="airbnb-total">
-          <span class="airbnb-total-lbl">Ingreso neto anual</span>
+          <span class="airbnb-total-lbl">{{ __('Ingreso neto anual') }}</span>
           <span class="airbnb-total-val">${{ number_format(((float)($unit->est_rental ?: 7200)) * 12 * 0.65 / 1000, 0) }}K USD</span>
         </div>
       </div>
 
-      <div class="sec-title" style="margin-top:14px">Ubicación y entorno</div>
-      <div class="location-placeholder">Cap Cana · Punta Cana · República Dominicana</div>
+      <div class="sec-title" style="margin-top:14px">{{ __('Ubicación y entorno') }}</div>
+      <div class="location-placeholder">{{ __('Cap Cana · Punta Cana · República Dominicana') }}</div>
       <div class="distances-grid">
-        <div class="dist-row"><span class="dist-label">Playa Juanillo</span><span class="dist-time">3 min</span></div>
-        <div class="dist-row"><span class="dist-label">Aeropuerto PUJ</span><span class="dist-time">15 min</span></div>
-        <div class="dist-row"><span class="dist-label">Punta Espada Golf</span><span class="dist-time">5 min</span></div>
-        <div class="dist-row"><span class="dist-label">Supermercado</span><span class="dist-time">7 min</span></div>
+        <div class="dist-row"><span class="dist-label">{{ __('Playa Juanillo') }}</span><span class="dist-time">3 min</span></div>
+        <div class="dist-row"><span class="dist-label">{{ __('Aeropuerto PUJ') }}</span><span class="dist-time">15 min</span></div>
+        <div class="dist-row"><span class="dist-label">{{ __('Punta Espada Golf') }}</span><span class="dist-time">5 min</span></div>
+        <div class="dist-row"><span class="dist-label">{{ __('Supermercado') }}</span><span class="dist-time">7 min</span></div>
       </div>
     </div>
   </div>
@@ -533,7 +533,7 @@ body {
 
 <!-- AMENITIES -->
 <div class="section" style="margin-top:14px">
-  <div class="sec-title">Amenidades incluidas</div>
+  <div class="sec-title">{{ __('Amenidades incluidas') }}</div>
   <div class="amenities-list">
     @php
       $amenities = [
@@ -558,37 +558,37 @@ body {
 
 <!-- DETAILS -->
 <div class="section" style="margin-top:14px">
-  <div class="sec-title">Ficha completa de la unidad</div>
+  <div class="sec-title">{{ __('Ficha completa de la unidad') }}</div>
   <div class="details-grid">
     <div class="details-col">
-      <div class="detail-row"><span class="dk">Proyecto</span><span class="dv">{{ $projectName }}</span></div>
-      <div class="detail-row"><span class="dk">Unidad</span><span class="dv">{{ $unitNum }}</span></div>
-      <div class="detail-row"><span class="dk">Piso</span><span class="dv">{{ $floor }}</span></div>
-      <div class="detail-row"><span class="dk">Orientación</span><span class="dv">{{ $direction }}</span></div>
-      <div class="detail-row"><span class="dk">Vista</span><span class="dv">{{ $outlook }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Proyecto') }}</span><span class="dv">{{ $projectName }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Unidad') }}</span><span class="dv">{{ $unitNum }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook }}</span></div>
     </div>
     <div class="details-col">
-      <div class="detail-row"><span class="dk">Precio USD</span><span class="dv">{{ $priceFmt }}</span></div>
-      <div class="detail-row"><span class="dk">Precio / m²</span><span class="dv">{{ $pricePerM2 }}</span></div>
-      <div class="detail-row"><span class="dk">ROI estimado</span><span class="dv">{{ $roi }} anual</span></div>
-      <div class="detail-row"><span class="dk">Entrega estimada</span><span class="dv">{{ $projYear }}</span></div>
-      <div class="detail-row"><span class="dk">Reserva mínima</span><span class="dv">{{ $reserveAmt }} USD</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Precio USD') }}</span><span class="dv">{{ $priceFmt }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Precio / m²') }}</span><span class="dv">{{ $pricePerM2 }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('ROI estimado') }}</span><span class="dv">{{ $roi }} anual</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Entrega estimada') }}</span><span class="dv">{{ $projYear }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Reserva mínima') }}</span><span class="dv">{{ $reserveAmt }} USD</span></div>
     </div>
   </div>
 </div>
 
 <!-- QR -->
 <div class="section section-last" style="margin-top:14px">
-  <div class="sec-title">Canales directos de contacto</div>
+  <div class="sec-title">{{ __('Canales directos de contacto') }}</div>
   <div class="qr-section">
     <div class="qr-item">
       <div id="qr-whatsapp" class="qr-canvas"></div>
-      <div class="qr-text"><div class="qr-label">WhatsApp Directo</div><div class="qr-sub">Habla con tu asesor ahora</div></div>
+      <div class="qr-text"><div class="qr-label">{{ __('WhatsApp Directo') }}</div><div class="qr-sub">{{ __('Habla con tu asesor ahora') }}</div></div>
     </div>
     <div class="qr-divider"></div>
     <div class="qr-item">
       <div id="qr-project" class="qr-canvas"></div>
-      <div class="qr-text"><div class="qr-label">Visitar Proyecto</div><div class="qr-sub">{{ parse_url(url('/'), PHP_URL_HOST) }}</div></div>
+      <div class="qr-text"><div class="qr-label">{{ __('Visitar Proyecto') }}</div><div class="qr-sub">{{ parse_url(url('/'), PHP_URL_HOST) }}</div></div>
     </div>
   </div>
 </div>
@@ -596,7 +596,7 @@ body {
 </div><!-- /sheet-inner page 2 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>Cap Cana, Punta Cana · República Dominicana</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Cap Cana, Punta Cana · República Dominicana') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 

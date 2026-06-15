@@ -35,7 +35,7 @@
         {{-- Inbox list --}}
         <aside class="col-span-3 border-r border-ink-100 flex flex-col">
             <div class="p-3 border-b border-ink-100 flex items-center gap-2">
-                <button class="crm-tab active">Bandeja</button>
+                <button class="crm-tab active">{{ __('Bandeja') }}</button>
                 <span class="crm-pill bg-err-soft text-err">{{ $conversations->count() }}</span>
             </div>
             <div class="p-3 border-b border-ink-100">
@@ -70,7 +70,7 @@
                         </div>
                     </a>
                 @empty
-                    <div class="px-4 py-6 text-center text-[12px] text-ink-500">Sin conversaciones.</div>
+                    <div class="px-4 py-6 text-center text-[12px] text-ink-500">{{ __('Sin conversaciones.') }}</div>
                 @endforelse
             </div>
         </aside>
@@ -88,8 +88,8 @@
                         <div class="text-[14px] font-semibold text-ink-900">{{ $active->first_name }} {{ $active->last_name }}</div>
                         <div class="text-[11px] text-ink-500">{{ $active->unit->name ?? '—' }} · {{ $active->email }}</div>
                     </div>
-                    <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Ver expediente</a>
-                    <button type="button" onclick="toggleRightRail()" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Expandir menú">
+                    <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Ver expediente') }}</a>
+                    <button type="button" onclick="toggleRightRail()" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Expandir menú') }}">
                         <i class="pi pi-ellipsis-v"></i>
                     </button>
                 </div>
@@ -116,51 +116,51 @@
                             </div>
                         @endif
                     @empty
-                        <div class="text-center text-[12px] text-ink-500 mt-12">Sin mensajes aún. Envía el primero abajo.</div>
+                        <div class="text-center text-[12px] text-ink-500 mt-12">{{ __('Sin mensajes aún. Envía el primero abajo.') }}</div>
                     @endforelse
                 </div>
 
                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="p-3 border-t border-ink-100 bg-white flex items-center gap-2 m-0">@csrf
                     <input type="hidden" name="reservation_id" value="{{ $active->id }}">
                     <input type="hidden" name="channel" value="chat">
-                    <input type="text" name="message" required maxlength="5000" autocomplete="off" placeholder="Escribe un mensaje…" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
-                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-send text-[11px]"></i> Enviar</button>
+                    <input type="text" name="message" required maxlength="5000" autocomplete="off" placeholder="{{ __('Escribe un mensaje…') }}" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
+                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-send text-[11px]"></i> {{ __('Enviar') }}</button>
                 </form>
             @else
-                <div class="flex-1 flex items-center justify-center text-[12px] text-ink-500">Selecciona una conversación</div>
+                <div class="flex-1 flex items-center justify-center text-[12px] text-ink-500">{{ __('Selecciona una conversación') }}</div>
             @endif
         </section>
 
         {{-- Right rail --}}
         <aside id="right-rail" class="col-span-3 border-l border-ink-100 flex flex-col overflow-y-auto hidden">
             <div class="p-4 border-b border-ink-100">
-                <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">Enviar por canal</div>
+                <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">{{ __('Enviar por canal') }}</div>
                 @if($active)
                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="space-y-2 m-0">@csrf
                     <input type="hidden" name="reservation_id" value="{{ $active->id }}">
                     <div class="flex gap-2">
-                        <button type="submit" name="channel" value="email" class="crm-btn crm-btn-ghost text-[11px] py-1.5 flex-1 justify-center"><i class="pi pi-envelope"></i> Email</button>
+                        <button type="submit" name="channel" value="email" class="crm-btn crm-btn-ghost text-[11px] py-1.5 flex-1 justify-center"><i class="pi pi-envelope"></i> {{ __('Email') }}</button>
                         <button type="submit" name="channel" value="whatsapp" class="crm-btn crm-btn-ghost text-[11px] py-1.5 flex-1 justify-center"><i class="pi pi-whatsapp"></i> WhatsApp</button>
                     </div>
                     <div>
-                        <label class="text-[11px] text-ink-500">Plantilla rápida</label>
+                        <label class="text-[11px] text-ink-500">{{ __('Plantilla rápida') }}</label>
                         <select name="template" class="crm-input pl-3 mt-1 text-[12px]" onchange="this.form.message.value = this.options[this.selectedIndex].dataset.body || ''">
-                            <option value="">Seleccionar plantilla</option>
-                            <option data-body="Bienvenido a Makai Residences. Te confirmamos la reserva.">Bienvenida</option>
-                            <option data-body="Recordatorio: tu cuota está próxima a vencer.">Recordatorio de cuota</option>
-                            <option data-body="Tu documento KYC está pendiente. Por favor completa los datos.">KYC pendiente</option>
+                            <option value="">{{ __('Seleccionar plantilla') }}</option>
+                            <option data-body="Bienvenido a Makai Residences. Te confirmamos la reserva.">{{ __('Bienvenida') }}</option>
+                            <option data-body="Recordatorio: tu cuota está próxima a vencer.">{{ __('Recordatorio de cuota') }}</option>
+                            <option data-body="Tu documento KYC está pendiente. Por favor completa los datos.">{{ __('KYC pendiente') }}</option>
                         </select>
                     </div>
                     <textarea name="message" rows="3" required placeholder="Mensaje…" class="crm-input pl-3 pt-2 h-auto resize-none mt-2"></textarea>
-                    <button type="submit" class="crm-btn crm-btn-primary w-full justify-center"><i class="pi pi-send text-[11px]"></i> Enviar</button>
+                    <button type="submit" class="crm-btn crm-btn-primary w-full justify-center"><i class="pi pi-send text-[11px]"></i> {{ __('Enviar') }}</button>
                 </form>
                 @else
-                    <div class="text-[12px] text-ink-500">Selecciona una conversación.</div>
+                    <div class="text-[12px] text-ink-500">{{ __('Selecciona una conversación.') }}</div>
                 @endif
             </div>
             @if($active)
             <div class="p-4">
-                <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">Actividad reciente</div>
+                <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">{{ __('Actividad reciente') }}</div>
                 <div class="space-y-2 text-[12px] text-ink-700">
                     <div>• {{ $active->documents->count() }} documentos</div>
                     <div>• {{ $active->payments->count() ?? 0 }} pagos</div>

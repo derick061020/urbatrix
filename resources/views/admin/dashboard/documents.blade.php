@@ -4,8 +4,8 @@
 <div class="flex-1 bg-gray-50 p-6">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Documentos</h1>
-        <p class="text-gray-600">Gestiona y firma tus documentos importantes</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('Documentos') }}</h1>
+        <p class="text-gray-600">{{ __('Gestiona y firma tus documentos importantes') }}</p>
     </div>
 
     <!-- Documents Section -->
@@ -19,11 +19,11 @@
                     </div>
                     <div class="text-right">
                         @if($reservation->status == 'pending')
-                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">Pendiente</span>
+                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">{{ __('Pendiente') }}</span>
                         @elseif($reservation->status == 'confirmed')
-                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">Confirmada</span>
+                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">{{ __('Confirmada') }}</span>
                         @else
-                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">Cancelada</span>
+                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">{{ __('Cancelada') }}</span>
                         @endif
                     </div>
                 </div>
@@ -240,11 +240,11 @@
                                     Firmar
                                 </button>
                             @elseif($doc['status'] == 'review')
-                                <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">En revisión</span>
+                                <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">{{ __('En revisión') }}</span>
                             @elseif($doc['status'] == 'done')
-                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Completado</span>
+                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ __('Completado') }}</span>
                             @else
-                                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">Pendiente</span>
+                                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">{{ __('Pendiente') }}</span>
                             @endif
                         @endif
                     </div>
@@ -264,8 +264,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">Contrato</h3>
-                                    <p class="text-sm text-gray-600">Revisa los detalles de tu contrato</p>
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Contrato') }}</h3>
+                                    <p class="text-sm text-gray-600">{{ __('Revisa los detalles de tu contrato') }}</p>
                                 </div>
                             </div>
                             <button onclick="closePromesaModal({{ $reservation->id }})" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -285,7 +285,7 @@
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                                     <div class="grid grid-cols-2 gap-4 text-sm">
                                         <div class="flex justify-between">
-                                            <span class="font-medium text-gray-700">Código de Reserva:</span>
+                                            <span class="font-medium text-gray-700">{{ __('Código de Reserva:') }}</span>
                                             <span class="text-gray-900 font-medium">{{ $reservation->reservation_code }}</span>
                                         </div>
                                         <div class="flex justify-between">
@@ -318,7 +318,7 @@
                                 <textarea id="observaciones-{{ $reservation->id }}" 
                                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
                                           rows="4" 
-                                          placeholder="Ingrese cualquier observación o comentario sobre el contrato..."></textarea>
+                                          placeholder="{{ __('Ingrese cualquier observación o comentario sobre el contrato...') }}"></textarea>
                                 <div class="flex justify-end space-x-2 pt-4 border-t border-gray-200">
                                     <button onclick="savePromesaData({{ $reservation->id }})" 
                                             class="group relative inline-flex items-center px-4 py-2 bg-stone-700 text-white text-xs font-medium rounded-md hover:bg-stone-800 transition-all duration-200 border border-stone-600">
@@ -340,7 +340,7 @@
                                     <label class="flex items-center cursor-pointer">
                                         <input type="checkbox" id="conforme-{{ $reservation->id }}" 
                                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2">
-                                        <span class="ml-3 text-sm text-gray-700">Estoy conforme con los términos del contrato</span>
+                                        <span class="ml-3 text-sm text-gray-700">{{ __('Estoy conforme con los términos del contrato') }}</span>
                                     </label>
                                 </div>
                             </div>
@@ -387,7 +387,7 @@
                 <!-- JavaScript for Modal -->
                 <script>
                 function signDocument(documentId, documentType) {
-                    if (confirm('¿Estás seguro de que deseas firmar este documento?')) {
+                    if (confirm('{{ __("¿Estás seguro de que deseas firmar este documento?") }}')) {
                         fetch(`/documents/${documentId}/sign`, {
                             method: 'POST',
                             headers: {
@@ -412,13 +412,13 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('Error al firmar el documento');
+                            alert('{{ __("Error al firmar el documento") }}');
                         });
                     }
                 }
 
                 function generatePaymentPlan(reservationId) {
-                    if (confirm('¿Estás seguro de que deseas generar el plan de pagos?')) {
+                    if (confirm('{{ __("¿Estás seguro de que deseas generar el plan de pagos?") }}')) {
                         window.location.href = `/contract/${reservationId}/payment-plan`;
                     }
                 }
@@ -456,7 +456,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error al guardar observaciones');
+                        alert('{{ __("Error al guardar observaciones") }}');
                     });
                 }
 
@@ -465,7 +465,7 @@
                     const observaciones = document.getElementById('observaciones-' + reservationId).value;
                     
                     if (!conforme) {
-                        alert('Debe marcar la casilla de conformidad para continuar');
+                        alert('{{ __("Debe marcar la casilla de conformidad para continuar") }}');
                         return;
                     }
                     
@@ -495,12 +495,12 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error al procesar la solicitud');
+                        alert('{{ __("Error al procesar la solicitud") }}');
                     });
                 }
 
                 function signPurchasePromise(reservationId) {
-                    if (confirm('¿Estás seguro de que deseas firmar el Contrato?')) {
+                    if (confirm('{{ __("¿Estás seguro de que deseas firmar el Contrato?") }}')) {
                         // Obtener el documento de contrato
                         fetch(`/reservations/${reservationId}/documents`)
                             .then(response => response.json())
@@ -537,7 +537,7 @@
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('Error al firmar el documento');
+                                alert('{{ __("Error al firmar el documento") }}');
                             });
                     }
                 }
@@ -555,8 +555,8 @@
                 <svg class="material-design-icon__svg text-gray-400 mx-auto mb-4" width="48" height="48" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes reservas</h3>
-                <p class="text-gray-600 mb-4">Comienza reservando una unidad desde el home</p>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No tienes reservas') }}</h3>
+                <p class="text-gray-600 mb-4">{{ __('Comienza reservando una unidad desde el home') }}</p>
                 <a href="/" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                     Ver Unidades
                 </a>

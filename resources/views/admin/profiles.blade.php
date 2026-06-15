@@ -39,8 +39,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $totalUsers }} usuarios registrados · {{ $conUnidad }} con unidad</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-exportar-usuarios').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nuevo usuario</button>
+            <button type="button" onclick="document.getElementById('modal-exportar-usuarios').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo usuario') }}</button>
         </div>
     </div>
 
@@ -64,7 +64,7 @@
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center gap-3 bg-warn-soft/50 border-b border-warn/20">
                 <i class="pi pi-exclamation-circle text-warn"></i>
-                <div class="text-[14px] font-bold text-ink-950 flex-1">Verificación de identidad pendiente</div>
+                <div class="text-[14px] font-bold text-ink-950 flex-1">{{ __('Verificación de identidad pendiente') }}</div>
                 <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-err text-white text-[10px] font-bold">{{ $pendingKyc->count() }}</span>
             </div>
             <div class="divide-y divide-ink-100">
@@ -84,15 +84,15 @@
                         </div>
                         <div class="flex items-center gap-2">
                             @if($docUrl)
-                                <a href="{{ $docUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-ink-200 text-[11px] font-semibold text-ink-700 hover:bg-ink-50"><i class="pi pi-eye text-[10px]"></i> Ver doc</a>
+                                <a href="{{ $docUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-ink-200 text-[11px] font-semibold text-ink-700 hover:bg-ink-50"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver doc') }}</a>
                             @endif
                             <form method="POST" action="{{ route('admin.users.verify-kyc', $u->id) }}" class="m-0">
                                 @csrf
-                                <button type="submit" name="decision" value="approved" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-ok-soft text-ok-dark text-[11px] font-semibold hover:bg-ok/20"><i class="pi pi-check text-[10px]"></i> Aprobar</button>
+                                <button type="submit" name="decision" value="approved" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-ok-soft text-ok-dark text-[11px] font-semibold hover:bg-ok/20"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>
                             </form>
                             <form method="POST" action="{{ route('admin.users.verify-kyc', $u->id) }}" class="m-0">
                                 @csrf
-                                <button type="submit" name="decision" value="rejected" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-err-soft text-err text-[11px] font-semibold hover:bg-err/20"><i class="pi pi-times text-[10px]"></i> Rechazar</button>
+                                <button type="submit" name="decision" value="rejected" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-err-soft text-err text-[11px] font-semibold hover:bg-err/20"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
                             </form>
                         </div>
                     </div>
@@ -111,9 +111,9 @@
             <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="Buscar usuario…" class="crm-input pr-3">
+                    <input type="text" placeholder="{{ __('Buscar usuario…') }}" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
             </div>
         </div>
 
@@ -122,12 +122,12 @@
                 <thead class="bg-ink-50">
                     <tr>
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                        <th>Usuario</th>
-                        <th>Rol</th>
-                        <th>Unidad</th>
-                        <th>Progreso KYC</th>
-                        <th>Estado</th>
-                        <th>Registrado</th>
+                        <th>{{ __('Usuario') }}</th>
+                        <th>{{ __('Rol') }}</th>
+                        <th>{{ __('Unidad') }}</th>
+                        <th>{{ __('Progreso KYC') }}</th>
+                        <th>{{ __('Estado') }}</th>
+                        <th>{{ __('Registrado') }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -218,13 +218,13 @@
                                         <i class="pi pi-pencil text-[11px]"></i> Editar
                                     </button>
                                     @if($r)
-                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Exp. &rarr;</a>
+                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Exp. &rarr;') }}</a>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-8">No hay usuarios. <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">Crear uno</button></td></tr>
+                        <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay usuarios.') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Crear uno') }}</button></td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -240,13 +240,13 @@
         <input type="hidden" name="edited_user_id" id="eu-id">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-user-edit"></i></div>
-            <div class="text-[15px] font-bold text-ink-900 flex-1">Editar usuario</div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Editar usuario') }}</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
             @if($errors->any())
                 <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px]">
-                    <div class="flex items-center gap-2 mb-1 font-semibold"><i class="pi pi-exclamation-circle"></i> Revisa los datos:</div>
+                    <div class="flex items-center gap-2 mb-1 font-semibold"><i class="pi pi-exclamation-circle"></i> {{ __('Revisa los datos:') }}</div>
                     <ul class="list-disc pl-5">
                         @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                     </ul>
@@ -255,56 +255,56 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Nombre</label>
-                    <input type="text" name="first_name" id="eu-first" class="crm-input pl-3 mt-1" placeholder="Nombre">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre') }}</label>
+                    <input type="text" name="first_name" id="eu-first" class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre') }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Apellido</label>
-                    <input type="text" name="last_name" id="eu-last" class="crm-input pl-3 mt-1" placeholder="Apellido">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Apellido') }}</label>
+                    <input type="text" name="last_name" id="eu-last" class="crm-input pl-3 mt-1" placeholder="{{ __('Apellido') }}">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="text-[12px] font-semibold text-ink-700">Nombre para mostrar <span class="text-ink-400 font-normal">(opcional)</span></label>
-                    <input type="text" name="name" id="eu-name" class="crm-input pl-3 mt-1" placeholder="Nombre completo">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre para mostrar') }} <span class="text-ink-400 font-normal">(opcional)</span></label>
+                    <input type="text" name="name" id="eu-name" class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre completo') }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Correo electrónico</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Correo electrónico') }}</label>
                     <input type="email" name="email" id="eu-email" required class="crm-input pl-3 mt-1" placeholder="usuario@correo.com">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
                     <input type="text" name="phone" id="eu-phone" class="crm-input pl-3 mt-1" placeholder="+57 300 000 0000">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">País</label>
-                    <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="Colombia">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('País') }}</label>
+                    <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="{{ __('Colombia') }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Rol</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Rol') }}</label>
                     <select name="role" id="eu-role" class="crm-input pl-3 mt-1">
-                        <option value="user">Usuario</option>
-                        <option value="admin">Admin</option>
+                        <option value="user">{{ __('Usuario') }}</option>
+                        <option value="admin">{{ __('Admin') }}</option>
                     </select>
                 </div>
             </div>
 
             <div class="border-t border-ink-100 pt-4">
-                <div class="text-[13px] font-semibold text-ink-900 mb-1">Restablecer contraseña</div>
-                <div class="text-[11px] text-ink-500 mb-3">Déjalo en blanco para no cambiarla.</div>
+                <div class="text-[13px] font-semibold text-ink-900 mb-1">{{ __('Restablecer contraseña') }}</div>
+                <div class="text-[11px] text-ink-500 mb-3">{{ __('Déjalo en blanco para no cambiarla.') }}</div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Nueva contraseña</label>
-                        <input type="password" name="password" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="Mín. 8 caracteres">
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Nueva contraseña') }}</label>
+                        <input type="password" name="password" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="{{ __('Mín. 8 caracteres') }}">
                     </div>
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Confirmar</label>
-                        <input type="password" name="password_confirmation" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="Repite la contraseña">
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Confirmar') }}</label>
+                        <input type="password" name="password_confirmation" autocomplete="new-password" class="crm-input pl-3 mt-1" placeholder="{{ __('Repite la contraseña') }}">
                     </div>
                 </div>
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar cambios') }}</button>
         </div>
     </form>
 </dialog>

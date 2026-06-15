@@ -40,19 +40,19 @@
             </div>
         </div>
         @if($signed)
-            <span class="cli-pill bg-ok-soft text-ok">Firmado</span>
+            <span class="cli-pill bg-ok-soft text-ok">{{ __('Firmado') }}</span>
         @elseif($accepted)
-            <span class="cli-pill bg-info-soft text-info">Pendiente de firma</span>
+            <span class="cli-pill bg-info-soft text-info">{{ __('Pendiente de firma') }}</span>
         @elseif($awaitingAdmin)
-            <span class="cli-pill bg-warn-soft text-warn">Revisión por asesor</span>
+            <span class="cli-pill bg-warn-soft text-warn">{{ __('Revisión por asesor') }}</span>
         @else
-            <span class="cli-pill bg-info-soft text-info">Pendiente de tu respuesta</span>
+            <span class="cli-pill bg-info-soft text-info">{{ __('Pendiente de tu respuesta') }}</span>
         @endif
     </div>
 
     @if(! empty($obs))
         <div class="px-5 py-4 bg-ink-50 border-b border-ink-100">
-            <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-2">Conversación con tu asesor</div>
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-ink-500 mb-2">{{ __('Conversación con tu asesor') }}</div>
             <div class="space-y-2 max-h-56 overflow-y-auto">
                 @foreach($obs as $o)
                     @php
@@ -78,19 +78,19 @@
     <div class="px-5 py-4 flex flex-wrap items-center gap-2 justify-between border-t border-ink-100">
         <div class="flex items-center gap-2">
             @if($d->file_path)
-                <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-ghost text-[12px]"><i class="pi pi-download text-[10px]"></i> Descargar</a>
+                <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-ghost text-[12px]"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
             @endif
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
             @if($signed)
-                <span class="text-[12px] text-ok-dark font-semibold"><i class="pi pi-check-circle"></i> Firmado correctamente</span>
+                <span class="text-[12px] text-ok-dark font-semibold"><i class="pi pi-check-circle"></i> {{ __('Firmado correctamente') }}</span>
             @elseif($accepted)
-                <button type="button" onclick="signDocument({{ $d->id }})" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-pen text-[10px]"></i> Firmar</button>
+                <button type="button" onclick="signDocument({{ $d->id }})" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-pen text-[10px]"></i> {{ __('Firmar') }}</button>
             @else
-                <button type="button" onclick="document.getElementById('contract-obs-{{ $d->id }}').classList.toggle('hidden')" class="cli-btn cli-btn-ghost text-[12px]"><i class="pi pi-comments text-[10px]"></i> Enviar observación</button>
+                <button type="button" onclick="document.getElementById('contract-obs-{{ $d->id }}').classList.toggle('hidden')" class="cli-btn cli-btn-ghost text-[12px]"><i class="pi pi-comments text-[10px]"></i> {{ __('Enviar observación') }}</button>
                 <form method="POST" action="{{ $acceptRoute }}" class="m-0">@csrf
-                    <button type="submit" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-check text-[10px]"></i> Aceptar contrato</button>
+                    <button type="submit" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-check text-[10px]"></i> {{ __('Aceptar contrato') }}</button>
                 </form>
             @endif
         </div>
@@ -99,10 +99,10 @@
     @if(! $accepted && ! $signed)
         <form id="contract-obs-{{ $d->id }}" method="POST" action="{{ $obsRoute }}" class="hidden px-5 pb-4 space-y-2 m-0">
             @csrf
-            <textarea name="message" rows="3" required maxlength="2000" placeholder="Indicá qué cambios necesitás en el contrato…" class="cli-input w-full pl-3 pt-2 h-auto resize-none"></textarea>
+            <textarea name="message" rows="3" required maxlength="2000" placeholder="{{ __('Indicá qué cambios necesitás en el contrato…') }}" class="cli-input w-full pl-3 pt-2 h-auto resize-none"></textarea>
             <div class="flex items-center gap-2 justify-end">
-                <button type="button" onclick="document.getElementById('contract-obs-{{ $d->id }}').classList.add('hidden')" class="cli-btn cli-btn-ghost text-[12px]">Cancelar</button>
-                <button type="submit" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-send text-[10px]"></i> Enviar observación</button>
+                <button type="button" onclick="document.getElementById('contract-obs-{{ $d->id }}').classList.add('hidden')" class="cli-btn cli-btn-ghost text-[12px]">{{ __('Cancelar') }}</button>
+                <button type="submit" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-send text-[10px]"></i> {{ __('Enviar observación') }}</button>
             </div>
         </form>
     @endif

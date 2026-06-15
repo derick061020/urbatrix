@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Duna · KYC — Verificación de Identidad</title>
+<title>{{ __('Duna · KYC — Verificación de Identidad') }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 @page { margin: 0; size: A4 portrait; }
@@ -252,33 +252,33 @@ body {
       <span class="hdr-name">MAKAI</span>
     </div>
     <div class="hdr-right">
-      <div class="hdr-doc">KYC · Verificación de Identidad</div>
+      <div class="hdr-doc">{{ __('KYC · Verificación de Identidad') }}</div>
       <div class="hdr-ref">{{ $proyecto }} · Cap Cana, R.D. · Exp. #{{ $referencia }}</div>
     </div>
   </div>
 
   <div class="cover-band">
-    <div class="cover-eyebrow">Conozca a su Cliente</div>
+    <div class="cover-eyebrow">{{ __('Conozca a su Cliente') }}</div>
     <div class="cover-name">{{ $comprador_nombre }}</div>
     <div class="cover-sub">Titular de la compra · {{ $proyecto }} · {{ $unidad }}</div>
 
     <div class="cover-meta">
       <div class="meta-cell">
-        <div class="meta-lbl">Expediente</div>
+        <div class="meta-lbl">{{ __('Expediente') }}</div>
         <div class="meta-val">{{ $referencia }}</div>
       </div>
       <div class="meta-cell">
-        <div class="meta-lbl">Fecha de llenado</div>
+        <div class="meta-lbl">{{ __('Fecha de llenado') }}</div>
         <div class="meta-val">{{ $fecha_llenado }}</div>
       </div>
       <div class="meta-cell">
-        <div class="meta-lbl">Estado KYC</div>
+        <div class="meta-lbl">{{ __('Estado KYC') }}</div>
         <div class="meta-val">
           <span class="status-tag {{ $estado_clase }}">{{ $estado }}</span>
         </div>
       </div>
       <div class="meta-cell">
-        <div class="meta-lbl">Asesor</div>
+        <div class="meta-lbl">{{ __('Asesor') }}</div>
         <div class="meta-val">{{ $asesor }}</div>
       </div>
     </div>
@@ -298,22 +298,22 @@ body {
           <div class="dc-val">{{ $nombres }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">Apellidos</div>
+          <div class="dc-lbl">{{ __('Apellidos') }}</div>
           <div class="dc-val">{{ $apellidos }}</div>
         </div>
       </div>
 
       <div class="dg c3">
         <div class="dc">
-          <div class="dc-lbl">Fecha de nacimiento</div>
+          <div class="dc-lbl">{{ __('Fecha de nacimiento') }}</div>
           <div class="dc-val">{{ $fecha_nacimiento }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">Nacionalidad</div>
+          <div class="dc-lbl">{{ __('Nacionalidad') }}</div>
           <div class="dc-val">{{ $nacionalidad }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">País de residencia</div>
+          <div class="dc-lbl">{{ __('País de residencia') }}</div>
           <div class="dc-val">{{ $pais_residencia }}</div>
         </div>
       </div>
@@ -327,15 +327,15 @@ body {
 
       <div class="dg cdoc">
         <div class="dc">
-          <div class="dc-lbl">Tipo de documento</div>
+          <div class="dc-lbl">{{ __('Tipo de documento') }}</div>
           <div class="dc-val">{{ $id_tipo }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">Número de documento</div>
+          <div class="dc-lbl">{{ __('Número de documento') }}</div>
           <div class="dc-val">{{ $id_numero }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">Fecha de expedición</div>
+          <div class="dc-lbl">{{ __('Fecha de expedición') }}</div>
           <div class="dc-val">{{ $id_expedicion }}</div>
         </div>
       </div>
@@ -343,15 +343,15 @@ body {
       <div class="id-img-row">
         <div class="id-img-box">
           @if($id_imagen_url)
-            <img src="{{ $id_imagen_url }}" alt="Documento de identidad">
+            <img src="{{ $id_imagen_url }}" alt="{{ __('Documento de identidad') }}">
           @else
             <svg class="id-img-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="16" rx="2"/>
               <circle cx="9" cy="10" r="2"/>
               <path d="M15 8h2M15 12h2M7 16h10"/>
             </svg>
-            <div class="id-img-lbl">Frente del documento</div>
-            <div class="id-img-sub">Adjunto en el expediente</div>
+            <div class="id-img-lbl">{{ __('Frente del documento') }}</div>
+            <div class="id-img-sub">{{ __('Adjunto en el expediente') }}</div>
           @endif
         </div>
         <div class="id-img-box">
@@ -359,8 +359,8 @@ body {
             <rect x="3" y="4" width="18" height="16" rx="2"/>
             <path d="M7 9h10M7 13h6M7 17h4"/>
           </svg>
-          <div class="id-img-lbl">Reverso del documento</div>
-          <div class="id-img-sub">Adjunto en el expediente</div>
+          <div class="id-img-lbl">{{ __('Reverso del documento') }}</div>
+          <div class="id-img-sub">{{ __('Adjunto en el expediente') }}</div>
         </div>
       </div>
     </div>
@@ -373,25 +373,25 @@ body {
 
       <div class="dg c2">
         <div class="dc">
-          <div class="dc-lbl">Teléfono móvil</div>
+          <div class="dc-lbl">{{ __('Teléfono móvil') }}</div>
           <div class="dc-val">{{ $telefono }}</div>
         </div>
         <div class="dc">
-          <div class="dc-lbl">Correo electrónico</div>
+          <div class="dc-lbl">{{ __('Correo electrónico') }}</div>
           <div class="dc-val">{{ $email }}</div>
         </div>
       </div>
 
       <div class="dg" style="grid-template-columns: 1fr;">
         <div class="dc">
-          <div class="dc-lbl">Dirección de residencia</div>
+          <div class="dc-lbl">{{ __('Dirección de residencia') }}</div>
           <div class="dc-val">{{ $direccion }}</div>
         </div>
       </div>
     </div>
 
     <div class="declaration">
-      <div class="declaration-title">Declaración del titular</div>
+      <div class="declaration-title">{{ __('Declaración del titular') }}</div>
       <div class="declaration-text">
         Yo, <strong>{{ $comprador_nombre }}</strong>, declaro bajo juramento que los datos suministrados en el presente formulario son verídicos, completos y exactos al momento de su llenado. Me comprometo a notificar a Duna Development Group cualquier cambio que se produzca en la información aquí registrada. Asimismo, autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la empresa.
       </div>
@@ -399,27 +399,27 @@ body {
 
     <div class="sig-row">
       <div class="sig-block">
-        <div class="sig-role">Titular de la compra</div>
+        <div class="sig-role">{{ __('Titular de la compra') }}</div>
         <div class="sig-name">{{ $comprador_nombre }}</div>
         <div class="sig-entity">Comprador · {{ $proyecto }}</div>
         <div class="sig-line"></div>
-        <div class="sig-label">Firma · Fecha: _____ / _____ / _________</div>
+        <div class="sig-label">{{ __('Firma · Fecha: _____ / _____ / _________') }}</div>
       </div>
       <div class="sig-block">
-        <div class="sig-role">Verificado por</div>
+        <div class="sig-role">{{ __('Verificado por') }}</div>
         <div class="sig-name">{{ $asesor }}</div>
-        <div class="sig-entity">Asesor Comercial · Duna Development Group</div>
+        <div class="sig-entity">{{ __('Asesor Comercial · Duna Development Group') }}</div>
         <div class="sig-line"></div>
-        <div class="sig-label">Firma · Sello · Fecha: _____ / _____ / _________</div>
+        <div class="sig-label">{{ __('Firma · Sello · Fecha: _____ / _____ / _________') }}</div>
       </div>
     </div>
 
   </div>
 
   <div class="footer">
-    <div class="footer-l">Duna Development Group · Confidencial</div>
-    <div class="footer-c">Este documento contiene información personal protegida. Uso interno exclusivo.</div>
-    <div class="footer-r">KYC · Pág. 1 de 1</div>
+    <div class="footer-l">{{ __('Duna Development Group · Confidencial') }}</div>
+    <div class="footer-c">{{ __('Este documento contiene información personal protegida. Uso interno exclusivo.') }}</div>
+    <div class="footer-r">{{ __('KYC · Pág. 1 de 1') }}</div>
   </div>
 
 </div>

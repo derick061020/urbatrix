@@ -27,9 +27,9 @@
                     <i class="pi pi-file text-white text-[22px]"></i>
                 </div>
                 <div>
-                    <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">Presupuesto</div>
+                    <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Presupuesto') }}</div>
                     <div class="font-display text-[32px] font-medium leading-tight">{{ $unidad }}</div>
-                    <div class="text-[13px] opacity-80">Makai Residences · Cap Cana, Punta Cana</div>
+                    <div class="text-[13px] opacity-80">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
                 </div>
             </div>
         </div>
@@ -40,8 +40,8 @@
             <div class="flex items-start gap-3">
                 <i class="pi pi-info-circle text-warn-dark text-[20px] mt-0.5"></i>
                 <div>
-                    <div class="text-[13px] font-bold text-warn-dark">Tu asesor está revisando el plan de pagos</div>
-                    <div class="text-[12px] text-warn-dark mt-1">Hemos recibido tu observación y estamos preparando una nueva propuesta. Te notificaremos cuando esté lista para tu revisión.</div>
+                    <div class="text-[13px] font-bold text-warn-dark">{{ __('Tu asesor está revisando el plan de pagos') }}</div>
+                    <div class="text-[12px] text-warn-dark mt-1">{{ __('Hemos recibido tu observación y estamos preparando una nueva propuesta. Te notificaremos cuando esté lista para tu revisión.') }}</div>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
     <div class="cli-card p-6 space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <div class="text-[15px] font-bold text-ink-950">Plan de Pagos Seleccionado</div>
+                <div class="text-[15px] font-bold text-ink-950">{{ __('Plan de Pagos Seleccionado') }}</div>
                 <div class="text-[12px] text-ink-500">Plan {{ $reservation->payment_method }} — Configurado por tu asesor</div>
             </div>
             <span class="crm-pill bg-ok-soft text-ok-dark text-[11px]">
@@ -61,35 +61,35 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="border border-ink-200 rounded-xl p-4">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Precio del inmueble</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Precio del inmueble') }}</div>
                 <div class="font-display text-[20px] font-bold text-ink-950 mt-2">${{ number_format($precio, 0) }}</div>
             </div>
             <div class="border border-ink-200 rounded-xl p-4">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Costos legales</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Costos legales') }}</div>
                 <div class="font-display text-[20px] font-bold text-ink-950 mt-2">${{ number_format($breakdown['costos_legales'], 0) }}</div>
             </div>
             <div class="border border-ink-200 rounded-xl p-4">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Total a pagar</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Total a pagar') }}</div>
                 <div class="font-display text-[20px] font-bold text-ok-dark mt-2">${{ number_format($totalConLegales, 0) }}</div>
             </div>
         </div>
 
         {{-- Breakdown --}}
         <div class="space-y-3">
-            <div class="text-[13px] font-bold text-ink-950">Desglose del plan</div>
+            <div class="text-[13px] font-bold text-ink-950">{{ __('Desglose del plan') }}</div>
 
             <div class="border border-ink-200 rounded-xl overflow-hidden">
                 <table class="w-full">
                     <thead class="bg-ink-50">
                         <tr>
-                            <th class="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">Concepto</th>
-                            <th class="text-center px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">Porcentaje</th>
-                            <th class="text-right px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">Monto</th>
+                            <th class="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Concepto') }}</th>
+                            <th class="text-center px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Porcentaje') }}</th>
+                            <th class="text-right px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Monto') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100">
                         <tr>
-                            <td class="px-4 py-3.5 text-[13px] text-ink-700">Pago Inicial</td>
+                            <td class="px-4 py-3.5 text-[13px] text-ink-700">{{ __('Pago Inicial') }}</td>
                             <td class="px-4 py-3.5 text-center text-[13px] text-ink-700">{{ $breakdown['porcentaje_inicial'] }}%</td>
                             <td class="px-4 py-3.5 text-right text-[13px] font-semibold text-ink-950">${{ number_format($breakdown['pago_inicial'], 0) }}</td>
                         </tr>
@@ -107,7 +107,7 @@
                         @endif
                         @if($breakdown['pago_entrega'] > 0)
                         <tr>
-                            <td class="px-4 py-3.5 text-[13px] text-ink-700">Pago a la Entrega</td>
+                            <td class="px-4 py-3.5 text-[13px] text-ink-700">{{ __('Pago a la Entrega') }}</td>
                             <td class="px-4 py-3.5 text-center text-[13px] text-ink-700">{{ $breakdown['porcentaje_entrega'] }}%</td>
                             <td class="px-4 py-3.5 text-right text-[13px] font-semibold text-ink-950">${{ number_format($breakdown['pago_entrega'], 0) }}</td>
                         </tr>
@@ -119,7 +119,7 @@
 
         @if($reservation->budget_notes)
         <div class="px-4 py-3 rounded-xl bg-ink-50 border border-ink-200">
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-1">Nota del asesor</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-1">{{ __('Nota del asesor') }}</div>
             <div class="text-[13px] text-ink-700">{{ $reservation->budget_notes }}</div>
         </div>
         @endif
@@ -130,7 +130,7 @@
         @endphp
         @if(!empty($observations))
         <div class="px-4 py-3 rounded-xl bg-warn-soft/30 border border-warn/20 space-y-3">
-            <div class="text-[11px] uppercase tracking-wide font-semibold text-warn-dark">Conversación con tu asesor</div>
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-warn-dark">{{ __('Conversación con tu asesor') }}</div>
             <div class="space-y-2 max-h-48 overflow-y-auto">
                 @foreach($observations as $o)
                     @php $fromAdmin = ($o['from'] ?? '') === 'admin'; @endphp
@@ -147,15 +147,15 @@
 
         {{-- Send observation form --}}
         <div class="px-4 py-3 rounded-xl bg-ink-50 border border-ink-200">
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">¿Tienes alguna observación?</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">{{ __('¿Tienes alguna observación?') }}</div>
             <form id="observation-form" onsubmit="return sendObservation(event)" class="space-y-3">
                 @csrf
-                <textarea name="message" rows="3" class="w-full rounded-lg border border-ink-300 px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none" placeholder="Escribe tu observación sobre el plan de pagos..."></textarea>
+                <textarea name="message" rows="3" class="w-full rounded-lg border border-ink-300 px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent resize-none" placeholder="{{ __('Escribe tu observación sobre el plan de pagos...') }}"></textarea>
                 <div class="flex items-center gap-2">
                     <button type="submit" id="observation-btn" class="cli-btn cli-btn-ghost text-[12px]">
                         <i class="pi pi-send"></i> Enviar observación
                     </button>
-                    <span class="text-[11px] text-ink-500">Tu asesor revisará y responderá</span>
+                    <span class="text-[11px] text-ink-500">{{ __('Tu asesor revisará y responderá') }}</span>
                 </div>
             </form>
         </div>
@@ -190,7 +190,7 @@ async function sendObservation(e) {
     const message = textarea.value.trim();
 
     if (!message) {
-        alert('Por favor escribe tu observación.');
+        alert('{{ __("Por favor escribe tu observación.") }}');
         return false;
     }
 
@@ -217,7 +217,7 @@ async function sendObservation(e) {
             btn.innerHTML = '<i class="pi pi-send"></i> Enviar observación';
         }
     } catch (err) {
-        alert('Error de red. Intenta de nuevo.');
+        alert('{{ __("Error de red. Intenta de nuevo.") }}');
         btn.disabled = false;
         btn.innerHTML = '<i class="pi pi-send"></i> Enviar observación';
     }
@@ -230,7 +230,7 @@ async function acceptBudget(e) {
     const cb = document.getElementById('terms-accept');
     
     if (!cb.checked) {
-        alert('Debes aceptar los términos para continuar.');
+        alert('{{ __("Debes aceptar los términos para continuar.") }}');
         return false;
     }
 
@@ -256,7 +256,7 @@ async function acceptBudget(e) {
             btn.innerHTML = '<i class="pi pi-check"></i> Aceptar Presupuesto';
         }
     } catch (err) {
-        alert('Error de red. Intenta de nuevo.');
+        alert('{{ __("Error de red. Intenta de nuevo.") }}');
         btn.disabled = false;
         btn.innerHTML = '<i class="pi pi-check"></i> Aceptar Presupuesto';
     }

@@ -26,7 +26,7 @@
         <div class="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center mb-4">
             <i class="pi pi-shield text-[22px]"></i>
         </div>
-        <h1 class="text-[22px] font-semibold text-[#171717]">Verificación en dos pasos</h1>
+        <h1 class="text-[22px] font-semibold text-[#171717]">{{ __('Verificación en dos pasos') }}</h1>
         <p class="text-[14px] text-[#717784] mt-1.5" id="tf-sub">
             Ingresá el código de 6 dígitos de tu app de autenticación.
         </p>
@@ -41,7 +41,7 @@
         {{-- Código del authenticator --}}
         <form method="POST" action="{{ route('2fa.challenge.verify') }}" class="mt-5" id="tf-code-form">
             @csrf
-            <label class="text-[12px] font-semibold text-[#2b303b]">Código de autenticación</label>
+            <label class="text-[12px] font-semibold text-[#2b303b]">{{ __('Código de autenticación') }}</label>
             <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
                    class="tf-input mt-1.5 tracking-[0.3em] text-center" placeholder="000000" autofocus>
             <button type="submit"
@@ -53,7 +53,7 @@
         {{-- Código de respaldo --}}
         <form method="POST" action="{{ route('2fa.challenge.verify') }}" class="mt-5 hidden" id="tf-recovery-form">
             @csrf
-            <label class="text-[12px] font-semibold text-[#2b303b]">Código de respaldo</label>
+            <label class="text-[12px] font-semibold text-[#2b303b]">{{ __('Código de respaldo') }}</label>
             <input type="text" name="recovery_code"
                    class="tf-input mt-1.5 text-center uppercase" placeholder="XXXX-XXXX">
             <button type="submit"
@@ -70,7 +70,7 @@
 
         <div class="mt-4 pt-4 border-t border-[#f2f5f8] text-center">
             <form method="POST" action="{{ route('logout') }}" class="m-0">@csrf
-                <button type="submit" class="text-[12px] text-[#a3a3a3] hover:text-[#717784]">Cancelar e iniciar sesión de nuevo</button>
+                <button type="submit" class="text-[12px] text-[#a3a3a3] hover:text-[#717784]">{{ __('Cancelar e iniciar sesión de nuevo') }}</button>
             </form>
         </div>
     </div>

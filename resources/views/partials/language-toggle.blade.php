@@ -33,14 +33,14 @@
 </div>
 @else
 <div class="lang-toggle-compact" data-lang-toggle>
-    <button type="button" data-lang="es" class="lang-compact-btn {{ $currentLocale === 'es' ? 'is-active' : '' }}" title="Español">
+    <button type="button" data-lang="es" class="lang-compact-btn {{ $currentLocale === 'es' ? 'is-active' : '' }}" title="{{ __('Español') }}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="20" height="20" rx="10" fill="#AA151B"/>
             <rect y="6.67" width="20" height="6.66" fill="#F1BF00"/>
         </svg>
         ES
     </button>
-    <button type="button" data-lang="en" class="lang-compact-btn {{ $currentLocale === 'en' ? 'is-active' : '' }}" title="English">
+    <button type="button" data-lang="en" class="lang-compact-btn {{ $currentLocale === 'en' ? 'is-active' : '' }}" title="{{ __('English') }}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="20" height="20" rx="10" fill="#B22234"/>
             <rect y="1.54" width="20" height="1.54" fill="white"/>

@@ -61,13 +61,13 @@ $attendants = json_decode($attendants);
 <div class="bg-gray-100 min-h-screen w-full">
     <div class="p-8">
 
-        <h1 class="text-3xl font-semibold text-[#5c4a32] mb-1">Social Chat Settings</h1>
-        <p class="text-gray-500 mb-6">Edit the Social Chat Settings interactive Social Chat list settings.</p>
+        <h1 class="text-3xl font-semibold text-[#5c4a32] mb-1">{{ __('Social Chat Settings') }}</h1>
+        <p class="text-gray-500 mb-6">{{ __('Edit the Social Chat Settings interactive Social Chat list settings.') }}</p>
         <hr class="border-gray-300 mb-6">
 
         {{-- Social Chat Platforms --}}
         <div class="mb-5">
-            <label class="block text-sm text-gray-600 mb-1">Social Chat Platforms:</label>
+            <label class="block text-sm text-gray-600 mb-1">{{ __('Social Chat Platforms:') }}</label>
             <select class="w-72 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
                 <option>WhatsApp</option>
             </select>
@@ -76,36 +76,36 @@ $attendants = json_decode($attendants);
         {{-- Chat Style / Header / Icon Src / Icon Alt --}}
         <div class="grid grid-cols-4 gap-4 mb-5">
             <div>
-                <label class="block text-sm text-gray-600 mb-1">Chat Style:</label>
+                <label class="block text-sm text-gray-600 mb-1">{{ __('Chat Style:') }}</label>
                 <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
-                    <option>WhatsApp Style</option>
+                    <option>{{ __('WhatsApp Style') }}</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm text-gray-600 mb-1">Header Message Platform:</label>
+                <label class="block text-sm text-gray-600 mb-1">{{ __('Header Message Platform:') }}</label>
                 <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
                     <option>WhatsApp</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm text-gray-600 mb-1">Icon Src:</label>
+                <label class="block text-sm text-gray-600 mb-1">{{ __('Icon Src:') }}</label>
                 <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
-                    <option>WhatsApp Icon Src</option>
+                    <option>{{ __('WhatsApp Icon Src') }}</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm text-gray-600 mb-1">Icon Alt:</label>
+                <label class="block text-sm text-gray-600 mb-1">{{ __('Icon Alt:') }}</label>
                 <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
-                    <option>WhatsApp Icon Alt</option>
+                    <option>{{ __('WhatsApp Icon Alt') }}</option>
                 </select>
             </div>
         </div>
 
         {{-- Footer Details --}}
         <div class="mb-6">
-            <label class="block text-sm text-gray-600 mb-1">Footer Details:</label>
+            <label class="block text-sm text-gray-600 mb-1">{{ __('Footer Details:') }}</label>
             <select class="w-72 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
-                <option>No Footer</option>
+                <option>{{ __('No Footer') }}</option>
             </select>
         </div>
 
@@ -125,7 +125,7 @@ $attendants = json_decode($attendants);
 
             {{-- Search --}}
             <div class="relative w-64 mb-4">
-                <input type="text" placeholder="Search by Attendant Name"
+                <input type="text" placeholder="{{ __('Search by Attendant Name') }}"
                     class="w-full border border-gray-300 rounded-md pl-3 pr-9 py-2 text-sm text-gray-600 focus:outline-none focus:ring-1 focus:ring-[#4a5240]">
                 <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
             </div>
@@ -135,16 +135,16 @@ $attendants = json_decode($attendants);
                 <table class="w-full text-sm text-left">
                     <thead>
                         <tr class="border-b border-gray-200 text-xs text-gray-600 uppercase bg-gray-50">
-                            <th class="py-3 px-4 font-semibold">Edit</th>
-                            <th class="py-3 px-4 font-semibold">Disabled</th>
-                            <th class="py-3 px-4 font-semibold">Avatar</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('Edit') }}</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('Disabled') }}</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('Avatar') }}</th>
                             <th class="py-3 px-4 font-semibold">Name</th>
                             <th class="py-3 px-4 font-semibold">Label</th>
-                            <th class="py-3 px-4 font-semibold">App</th>
-                            <th class="py-3 px-4 font-semibold">Phone Number</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('App') }}</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('Phone Number') }}</th>
                             <th class="py-3 px-4 font-semibold">Href</th>
-                            <th class="py-3 px-4 font-semibold">Username</th>
-                            <th class="py-3 px-4 font-semibold">User App ID</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('Username') }}</th>
+                            <th class="py-3 px-4 font-semibold">{{ __('User App ID') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">

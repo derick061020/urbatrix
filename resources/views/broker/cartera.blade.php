@@ -13,12 +13,12 @@
 @endphp
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
-    <p class="text-[12px] text-ink-500">Tus clientes, su avance y su comisión asociada.</p>
+    <p class="text-[12px] text-ink-500">{{ __('Tus clientes, su avance y su comisión asociada.') }}</p>
 
     <div class="brk-card overflow-hidden">
         <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 flex items-center justify-between">
-            <span class="text-[14px] font-bold text-ink-950">Clientes</span>
-            <a href="{{ route('broker.registro') }}" class="brk-btn brk-btn-primary">+ Registrar cliente</a>
+            <span class="text-[14px] font-bold text-ink-950">{{ __('Clientes') }}</span>
+            <a href="{{ route('broker.registro') }}" class="brk-btn brk-btn-primary">{{ __('+ Registrar cliente') }}</a>
         </div>
         <table class="w-full">
             <thead class="bg-white">

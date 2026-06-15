@@ -10,10 +10,10 @@
     <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
         <div class="relative w-full sm:w-64">
             <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-            <input type="text" placeholder="Buscar documento…" class="crm-input pr-3">
+            <input type="text" placeholder="{{ __('Buscar documento…') }}" class="crm-input pr-3">
         </div>
-        <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
-        <button class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
+        <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
+        <button class="crm-btn crm-btn-ghost">{{ __('Acciones en lote') }} <i class="pi pi-angle-down text-[10px]"></i></button>
     </div>
 </div>
 
@@ -22,12 +22,12 @@
         <thead class="bg-ink-50">
             <tr>
                 <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                <th>Documento</th>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Archivo</th>
+                <th>{{ __('Documento') }}</th>
+                <th>{{ __('Cliente') }}</th>
+                <th>{{ __('Tipo') }}</th>
+                <th>{{ __('Estado') }}</th>
+                <th>{{ __('Fecha') }}</th>
+                <th>{{ __('Archivo') }}</th>
                 <th></th>
             </tr>
         </thead>
@@ -60,23 +60,23 @@
                     <td class="text-right whitespace-nowrap">
                         @if($d->status === 'pending')
                             <form method="POST" action="{{ route('documents.approve', $d->id) }}" class="inline m-0">@csrf
-                                <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Aprobar</button>
+                                <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">{{ __('Aprobar') }}</button>
                             </form>
                         @endif
                         @if($d->status === 'generated')
                             <form method="POST" action="{{ route('documents.sign', $d->id) }}" class="inline m-0">@csrf
-                                <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Firmar</button>
+                                <button class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">{{ __('Firmar') }}</button>
                             </form>
                         @endif
                         @if($d->file_path)
-                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-[12px] text-brand font-semibold hover:underline mr-2"><i class="pi pi-eye text-[10px]"></i> Ver</button>
-                            <a href="{{ route('documents.download', $d->id) }}" class="text-[12px] text-brand font-semibold hover:underline mr-2">Descargar</a>
+                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-[12px] text-brand font-semibold hover:underline mr-2"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                            <a href="{{ route('documents.download', $d->id) }}" class="text-[12px] text-brand font-semibold hover:underline mr-2">{{ __('Descargar') }}</a>
                         @endif
-                        <a href="{{ route('admin.crm.expediente.detalle', $d->reservation_id ?? 0) }}?tab=documentos" class="text-[12px] text-brand font-semibold hover:underline">Ir a expediente &rarr;</a>
+                        <a href="{{ route('admin.crm.expediente.detalle', $d->reservation_id ?? 0) }}?tab=documentos" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Ir a expediente &rarr;') }}</a>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-8">No hay documentos. <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="text-brand font-semibold hover:underline">Subir documento</button></td></tr>
+                <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay documentos.') }} <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="text-brand font-semibold hover:underline">{{ __('Subir documento') }}</button></td></tr>
             @endforelse
         </tbody>
     </table>

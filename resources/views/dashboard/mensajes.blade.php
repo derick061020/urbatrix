@@ -28,11 +28,11 @@
             </div>
             <div class="flex-1">
                 <div class="text-[15px] font-bold text-ink-950">{{ $advisor->name ?? 'Tu asesor' }}</div>
-                <div class="text-[12px] text-ink-500">Tu asesor · Makai Residences</div>
+                <div class="text-[12px] text-ink-500">{{ __('Tu asesor · Makai Residences') }}</div>
             </div>
             @if($advisor?->phone)
                 <a href="https://wa.me/{{ preg_replace('/\D/', '', $advisor->phone) }}" target="_blank" class="cli-btn cli-btn-ghost"><i class="pi pi-whatsapp text-[12px]"></i> WhatsApp</a>
-                <a href="tel:{{ $advisor->phone }}" class="cli-btn cli-btn-ghost"><i class="pi pi-phone text-[12px]"></i> Llamar</a>
+                <a href="tel:{{ $advisor->phone }}" class="cli-btn cli-btn-ghost"><i class="pi pi-phone text-[12px]"></i> {{ __('Llamar') }}</a>
             @endif
         </div>
 
@@ -84,9 +84,9 @@
             <form method="POST" action="{{ route('dashboard.messages.send') }}" class="px-4 py-3 border-t border-ink-100 flex items-center gap-2 m-0">
                 @csrf
                 <input id="msg-body" type="text" name="body" required maxlength="5000" autocomplete="off"
-                       placeholder="Escribe un mensaje…"
+                       placeholder="{{ __('Escribe un mensaje…') }}"
                        class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
-                <button type="submit" class="cli-btn cli-btn-primary text-[12px] py-2 px-4">Enviar <i class="pi pi-send text-[11px]"></i></button>
+                <button type="submit" class="cli-btn cli-btn-primary text-[12px] py-2 px-4">{{ __('Enviar') }} <i class="pi pi-send text-[11px]"></i></button>
             </form>
         @else
             <div class="px-4 py-3 border-t border-ink-100 text-center text-[12px] text-ink-500">

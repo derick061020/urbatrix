@@ -26,8 +26,8 @@
     <div class="flex items-center justify-between">
         <div class="text-[14px] font-semibold text-ink-700">Entrega estimada {{ $deliveryGlobal }}</div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('admin.crm.export', ['resource' => 'avance-obra']) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</a>
-            <button type="button" class="crm-btn crm-btn-primary" onclick="document.getElementById('reportModal').showModal()"><i class="pi pi-plus"></i> Nuevo reporte</button>
+            <a href="{{ route('admin.crm.export', ['resource' => 'avance-obra']) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</a>
+            <button type="button" class="crm-btn crm-btn-primary" onclick="document.getElementById('reportModal').showModal()"><i class="pi pi-plus"></i> {{ __('Nuevo reporte') }}</button>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
     <div class="crm-card p-4 flex items-center gap-3 flex-wrap">
         @foreach($projects as $p)
             @php $isActive = optional($activeProject)->id === $p->id; @endphp
-            <div class="px-4 py-2 rounded-lg border text-left {{ $isActive ? 'border-brand bg-brand-tint text-brand' : 'border-ink-200 text-ink-400 opacity-50 cursor-not-allowed' }}" @unless($isActive) title="Solo el proyecto activo registra avance de obra" @endunless>
+            <div class="px-4 py-2 rounded-lg border text-left {{ $isActive ? 'border-brand bg-brand-tint text-brand' : 'border-ink-200 text-ink-400 opacity-50 cursor-not-allowed' }}" @unless($isActive) title="{{ __('Solo el proyecto activo registra avance de obra') }}" @endunless>
                 <div class="text-[13px] font-semibold">{{ $p->name }}</div>
                 <div class="text-[10px] opacity-70">{{ $isActive ? 'Activo · '.$p->progress.'%' : ($p->stage ?: 'En preparación') }}</div>
             </div>
@@ -63,7 +63,7 @@
                         </div>
                     </div>
                     <div>
-                        <div class="text-[14px] font-semibold text-ink-900">Avance global de obra</div>
+                        <div class="text-[14px] font-semibold text-ink-900">{{ __('Avance global de obra') }}</div>
                         <div class="text-[12px] text-ink-500">{{ $unitsCount ? $unitsCount.' unidades · ' : '' }}{{ $location }}</div>
                         <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $deliveryGlobal }}</div>
                     </div>
@@ -83,7 +83,7 @@
                             <div class="crm-progress"><span style="background:{{ $color }};width:{{ $pct }}%"></span></div>
                         </div>
                     @empty
-                        <div class="text-[12px] text-ink-400 text-center py-4">Aún no se han registrado fases. Publica un reporte para definir el avance por etapa.</div>
+                        <div class="text-[12px] text-ink-400 text-center py-4">{{ __('Aún no se han registrado fases. Publica un reporte para definir el avance por etapa.') }}</div>
                     @endforelse
                 </div>
             </div>
@@ -92,7 +92,7 @@
         {{-- Reportes publicados --}}
         <div class="crm-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between border-b border-ink-100">
-                <h3 class="text-[14px] font-semibold text-ink-900">Reportes publicados</h3>
+                <h3 class="text-[14px] font-semibold text-ink-900">{{ __('Reportes publicados') }}</h3>
                 <span class="crm-pill bg-ink-100 text-ink-600">{{ $reports->count() }}</span>
             </div>
             <div class="divide-y divide-ink-100">
@@ -104,10 +104,10 @@
                                 <div class="text-[11px] text-ink-500 mt-0.5">{{ $r->description }}</div>
                                 <div class="flex items-center gap-3 mt-2">
                                     <span class="text-[11px] text-ink-400">{{ $r->overall_progress }}% · {{ $r->photos ? count($r->photos).' fotos' : 'sin fotos' }}</span>
-                                    <button type="button" onclick="openReportModal({{ $r->id }})" class="inline-flex items-center gap-1 text-[11px] text-brand font-semibold hover:underline"><i class="pi pi-eye text-[10px]"></i> Ver reporte</button>
+                                    <button type="button" onclick="openReportModal({{ $r->id }})" class="inline-flex items-center gap-1 text-[11px] text-brand font-semibold hover:underline"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver reporte') }}</button>
                                     <form method="POST" action="{{ route('admin.crm.avance-obra.notify', $r) }}">
                                         @csrf
-                                        <button class="text-[11px] text-brand font-semibold hover:underline">Notificar avance mensual</button>
+                                        <button class="text-[11px] text-brand font-semibold hover:underline">{{ __('Notificar avance mensual') }}</button>
                                     </form>
                                 </div>
                                 @if($r->notified_at)
@@ -118,10 +118,10 @@
                         </div>
                     </div>
                 @empty
-                    <div class="px-5 py-8 text-center text-[12px] text-ink-400">Todavía no hay reportes publicados.</div>
+                    <div class="px-5 py-8 text-center text-[12px] text-ink-400">{{ __('Todavía no hay reportes publicados.') }}</div>
                 @endforelse
                 <div class="px-5 py-3 text-center">
-                    <button type="button" class="text-[12px] text-brand font-semibold hover:underline" onclick="document.getElementById('reportModal').showModal()"><i class="pi pi-plus text-[10px]"></i> Agregar reporte de avance</button>
+                    <button type="button" class="text-[12px] text-brand font-semibold hover:underline" onclick="document.getElementById('reportModal').showModal()"><i class="pi pi-plus text-[10px]"></i> {{ __('Agregar reporte de avance') }}</button>
                 </div>
             </div>
         </div>
@@ -181,7 +181,7 @@
 
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg bg-brand-tint text-brand flex items-center justify-center"><i class="pi pi-chart-bar"></i></div>
-            <div class="text-[15px] font-bold text-ink-900 flex-1">Publicar reporte de avance</div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Publicar reporte de avance') }}</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
 
@@ -195,29 +195,29 @@
             {{-- Período + Tipo --}}
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Período *</label>
-                    <input type="text" name="period" required placeholder="ej. Junio 2026" class="crm-input mt-1 w-full">
+                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Período *') }}</label>
+                    <input type="text" name="period" required placeholder="{{ __('ej. Junio 2026') }}" class="crm-input mt-1 w-full">
                 </div>
                 <div>
-                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Tipo de reporte</label>
+                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Tipo de reporte') }}</label>
                     <select name="report_type" class="crm-input mt-1 w-full">
-                        <option value="Mensual" selected>Mensual</option>
-                        <option value="Quincenal">Quincenal</option>
-                        <option value="Semanal">Semanal</option>
-                        <option value="Hito">Hito</option>
+                        <option value="Mensual" selected>{{ __('Mensual') }}</option>
+                        <option value="Quincenal">{{ __('Quincenal') }}</option>
+                        <option value="Semanal">{{ __('Semanal') }}</option>
+                        <option value="Hito">{{ __('Hito') }}</option>
                     </select>
                 </div>
             </div>
 
             {{-- Título --}}
             <div>
-                <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Título</label>
+                <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Título') }}</label>
                 <input type="text" name="title" required value="Reporte mensual" class="crm-input mt-1 w-full">
             </div>
 
             {{-- Avance por fase --}}
             <div class="rounded-xl border border-ink-100 bg-ink-50/40 p-4">
-                <div class="text-[11px] font-semibold uppercase tracking-wide text-ink-500 mb-3">Avance por fase</div>
+                <div class="text-[11px] font-semibold uppercase tracking-wide text-ink-500 mb-3">{{ __('Avance por fase') }}</div>
                 <div class="space-y-3.5">
                     @foreach($aorPhases as $i => $ph)
                         @php $pct = (int) $ph['pct']; @endphp
@@ -238,21 +238,21 @@
                     @endforeach
                 </div>
                 <div class="mt-4 pt-3 border-t border-ink-100 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Avance global calculado</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Avance global calculado') }}</span>
                     <span class="text-[20px] font-bold text-ok" id="aorGlobalLbl">{{ $aorGlobal }}%</span>
                 </div>
             </div>
 
             {{-- Descripción --}}
             <div>
-                <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Descripción / Resumen del período *</label>
-                <textarea name="description" rows="3" required placeholder="Describe los avances más importantes de este período…" class="crm-input mt-1 w-full"></textarea>
+                <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Descripción / Resumen del período *') }}</label>
+                <textarea name="description" rows="3" required placeholder="{{ __('Describe los avances más importantes de este período…') }}" class="crm-input mt-1 w-full"></textarea>
             </div>
 
             {{-- Fotos --}}
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Fotos del avance</label>
+                    <label class="text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Fotos del avance') }}</label>
                     <span class="text-[11px] text-ink-400"><span id="aorPhotoCount">0</span> / 8 fotos</span>
                 </div>
                 <div class="grid grid-cols-4 gap-2.5">
@@ -262,13 +262,13 @@
                             <input type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="aorPhotoPick(this)">
                             <span class="aor-tile-lbl flex flex-col items-center gap-1">
                                 <i class="pi pi-upload text-[14px]"></i>
-                                <span class="text-[10px]">Subir</span>
+                                <span class="text-[10px]">{{ __('Subir') }}</span>
                             </span>
                         </label>
                     @endfor
                 </div>
                 <div class="flex items-center justify-between mt-2">
-                    <span class="text-[10px] text-ink-400">JPG, PNG, WebP · Máx. 10 MB por foto</span>
+                    <span class="text-[10px] text-ink-400">{{ __('JPG, PNG, WebP · Máx. 10 MB por foto') }}</span>
                 </div>
             </div>
 
@@ -276,15 +276,15 @@
             <label class="flex items-start gap-3 p-3 rounded-lg bg-ok-soft/60 border border-ok/20 cursor-pointer">
                 <input type="checkbox" name="notify" value="1" checked class="accent-ok mt-0.5">
                 <span>
-                    <span class="block text-[12px] font-semibold text-ink-800">Notificar a compradores activos</span>
-                    <span class="block text-[11px] text-ink-500">Se enviará por Email y WhatsApp según configuración de plantillas</span>
+                    <span class="block text-[12px] font-semibold text-ink-800">{{ __('Notificar a compradores activos') }}</span>
+                    <span class="block text-[11px] text-ink-500">{{ __('Se enviará por Email y WhatsApp según configuración de plantillas') }}</span>
                 </span>
             </label>
         </div>
 
         <div class="px-6 py-4 border-t border-ink-100 flex justify-end gap-2">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-chart-bar"></i> Publicar reporte</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-chart-bar"></i> {{ __('Publicar reporte') }}</button>
         </div>
     </form>
 </dialog>

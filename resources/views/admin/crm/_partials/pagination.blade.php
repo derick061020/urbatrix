@@ -5,7 +5,7 @@
         $active = 'text-white bg-[#5c7c68] border border-[#5c7c68]';
         $disabled = 'text-ink-300 bg-white border border-ink-100 cursor-not-allowed';
     @endphp
-    <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" role="navigation" aria-label="Paginación">
+    <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" role="navigation" aria-label="{{ __('Paginación') }}">
         <p class="text-[12px] text-ink-500">
             Mostrando <span class="font-semibold text-ink-700">{{ $paginator->firstItem() }}</span>–<span class="font-semibold text-ink-700">{{ $paginator->lastItem() }}</span>
             de <span class="font-semibold text-ink-700">{{ $paginator->total() }}</span>
@@ -16,7 +16,7 @@
             @if ($paginator->onFirstPage())
                 <span class="{{ $linkBase }} {{ $disabled }}" aria-disabled="true"><i class="pi pi-angle-left text-[12px]"></i></span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="{{ $linkBase }} {{ $idle }}" aria-label="Anterior"><i class="pi pi-angle-left text-[12px]"></i></a>
+                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="{{ $linkBase }} {{ $idle }}" aria-label="{{ __('Anterior') }}"><i class="pi pi-angle-left text-[12px]"></i></a>
             @endif
 
             {{-- Números --}}
@@ -38,7 +38,7 @@
 
             {{-- Siguiente --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="{{ $linkBase }} {{ $idle }}" aria-label="Siguiente"><i class="pi pi-angle-right text-[12px]"></i></a>
+                <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="{{ $linkBase }} {{ $idle }}" aria-label="{{ __('Siguiente') }}"><i class="pi pi-angle-right text-[12px]"></i></a>
             @else
                 <span class="{{ $linkBase }} {{ $disabled }}" aria-disabled="true"><i class="pi pi-angle-right text-[12px]"></i></span>
             @endif

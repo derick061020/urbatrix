@@ -94,7 +94,7 @@
             </button>
             <button type="button" class="crm-btn crm-btn-primary" id="pa-new-btn"
                     onclick="paOpenNew()">
-                <i class="pi pi-plus"></i> <span id="pa-new-label">Nueva plantilla</span>
+                <i class="pi pi-plus"></i> <span id="pa-new-label">{{ __('Nueva plantilla') }}</span>
             </button>
         </div>
     </div>
@@ -113,7 +113,7 @@
         {{-- ============ TAB 1: PLANTILLAS ============ --}}
         <div data-pa-panel="plantillas" class="{{ $tab === 'plantillas' ? '' : 'hidden' }}">
             <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
-                <button type="button" class="crm-tab pa-filter {{ $filter === 'todas' ? 'active' : '' }}" data-cat="todas">Todas</button>
+                <button type="button" class="crm-tab pa-filter {{ $filter === 'todas' ? 'active' : '' }}" data-cat="todas">{{ __('Todas') }}</button>
                 @foreach($allCategories as $key => $label)
                     @if($key === 'otro' && empty($counts['by_category'][$key]))
                         @continue
@@ -147,25 +147,25 @@
                                 @endif
                             </div>
                         </div>
-                        <button type="button" class="pa-icon-btn" title="Vista previa" onclick="paOpenPreview({{ $tpl->id }})">
+                        <button type="button" class="pa-icon-btn" title="{{ __('Vista previa') }}" onclick="paOpenPreview({{ $tpl->id }})">
                             <i class="pi pi-eye"></i>
                         </button>
-                        <button type="button" class="pa-icon-btn" title="Duplicar" onclick="paDuplicate({{ $tpl->id }})">
+                        <button type="button" class="pa-icon-btn" title="{{ __('Duplicar') }}" onclick="paDuplicate({{ $tpl->id }})">
                             <i class="pi pi-copy"></i>
                         </button>
-                        <button type="button" class="pa-icon-btn danger" title="Eliminar" onclick="paDeleteTemplate({{ $tpl->id }}, @js($tpl->name))">
+                        <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteTemplate({{ $tpl->id }}, @js($tpl->name))">
                             <i class="pi pi-trash"></i>
                         </button>
                         <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditTemplate({{ $tpl->id }})">
                             Editar
                         </button>
-                        <a href="#" class="text-[12px] text-brand font-semibold hover:underline" onclick="event.preventDefault(); paOpenPreview({{ $tpl->id }});">Ver &rarr;</a>
+                        <a href="#" class="text-[12px] text-brand font-semibold hover:underline" onclick="event.preventDefault(); paOpenPreview({{ $tpl->id }});">{{ __('Ver &rarr;') }}</a>
                     </div>
                 @empty
                     <div class="pa-empty">
                         <i class="pi pi-inbox"></i>
-                        <div class="text-[13px] font-semibold">No hay plantillas en esta categoría</div>
-                        <div class="text-[12px] mt-1">Crea una nueva plantilla para empezar.</div>
+                        <div class="text-[13px] font-semibold">{{ __('No hay plantillas en esta categoría') }}</div>
+                        <div class="text-[12px] mt-1">{{ __('Crea una nueva plantilla para empezar.') }}</div>
                     </div>
                 @endforelse
             </div>
@@ -218,19 +218,19 @@
                             @csrf
                             <button type="submit" class="pa-toggle {{ $auto->is_active ? 'on' : '' }}" title="{{ $auto->is_active ? 'Pausar' : 'Activar' }}"></button>
                         </form>
-                        <button type="button" class="pa-icon-btn" title="Ejecutar ahora" onclick="paRunAutomation({{ $auto->id }})">
+                        <button type="button" class="pa-icon-btn" title="{{ __('Ejecutar ahora') }}" onclick="paRunAutomation({{ $auto->id }})">
                             <i class="pi pi-play"></i>
                         </button>
-                        <button type="button" class="pa-icon-btn danger" title="Eliminar" onclick="paDeleteAutomation({{ $auto->id }}, @js($auto->name))">
+                        <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteAutomation({{ $auto->id }}, @js($auto->name))">
                             <i class="pi pi-trash"></i>
                         </button>
-                        <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditAutomation({{ $auto->id }})">Editar</button>
+                        <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditAutomation({{ $auto->id }})">{{ __('Editar') }}</button>
                     </div>
                 @empty
                     <div class="pa-empty">
                         <i class="pi pi-bolt"></i>
-                        <div class="text-[13px] font-semibold">No hay automatizaciones</div>
-                        <div class="text-[12px] mt-1">Crea un flujo para enviar plantillas automáticamente.</div>
+                        <div class="text-[13px] font-semibold">{{ __('No hay automatizaciones') }}</div>
+                        <div class="text-[12px] mt-1">{{ __('Crea un flujo para enviar plantillas automáticamente.') }}</div>
                     </div>
                 @endforelse
             </div>
@@ -244,7 +244,7 @@
 <div class="crm-pa-modal" id="pa-modal-template" role="dialog" aria-modal="true">
     <div class="crm-pa-dialog wide">
         <header>
-            <h3 id="pa-tpl-title">Nueva plantilla</h3>
+            <h3 id="pa-tpl-title">{{ __('Nueva plantilla') }}</h3>
             <button type="button" class="pa-icon-btn" onclick="paCloseModal('pa-modal-template')"><i class="pi pi-times"></i></button>
         </header>
         <form id="pa-tpl-form" method="POST" action="{{ route('admin.crm.plantillas.store') }}" class="contents">
@@ -252,11 +252,11 @@
             <input type="hidden" name="_method" id="pa-tpl-method" value="POST">
             <div class="pa-body grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="pa-field md:col-span-2">
-                    <label>Nombre de la plantilla *</label>
-                    <input class="pa-input" name="name" id="pa-tpl-name" required maxlength="160" placeholder="Ej.: Bienvenida — Reserva confirmada">
+                    <label>{{ __('Nombre de la plantilla *') }}</label>
+                    <input class="pa-input" name="name" id="pa-tpl-name" required maxlength="160" placeholder="{{ __('Ej.: Bienvenida — Reserva confirmada') }}">
                 </div>
                 <div class="pa-field">
-                    <label>Categoría *</label>
+                    <label>{{ __('Categoría *') }}</label>
                     <select class="pa-select" name="category" id="pa-tpl-category" required>
                         @foreach($allCategories as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
@@ -264,7 +264,7 @@
                     </select>
                 </div>
                 <div class="pa-field">
-                    <label>Ícono</label>
+                    <label>{{ __('Ícono') }}</label>
                     <select class="pa-select" name="icon" id="pa-tpl-icon">
                         @foreach($iconChoices as $ic)
                             <option value="{{ $ic }}">{{ $ic }}</option>
@@ -272,7 +272,7 @@
                     </select>
                 </div>
                 <div class="pa-field md:col-span-2">
-                    <label>Canales de envío *</label>
+                    <label>{{ __('Canales de envío *') }}</label>
                     <div class="flex flex-wrap gap-2" id="pa-tpl-channels">
                         @foreach($channelDefs as $key => $def)
                             <label class="pa-chip">
@@ -283,14 +283,14 @@
                     </div>
                 </div>
                 <div class="pa-field md:col-span-2">
-                    <label>Asunto (solo email)</label>
+                    <label>{{ __('Asunto (solo email)') }}</label>
                     <input class="pa-input" name="subject" id="pa-tpl-subject" maxlength="255" placeholder="Ej.: ¡Bienvenido a Makai, @{{nombre_cliente}}!">
                 </div>
                 <div class="pa-field md:col-span-2">
-                    <label>Cuerpo del mensaje *</label>
+                    <label>{{ __('Cuerpo del mensaje *') }}</label>
                     <textarea class="pa-textarea" name="body" id="pa-tpl-body" required placeholder="Contenido del mensaje (HTML para email). Usa variables como @{{nombre_cliente}} para personalizar."></textarea>
                     <div class="text-[11px] text-ink-500 mt-2">
-                        <span class="font-semibold">Variables disponibles (clic para insertar):</span><br>
+                        <span class="font-semibold">{{ __('Variables disponibles (clic para insertar):') }}</span><br>
                         @php
                             $paVars = [
                                 'nombre_cliente'         => 'Nombre del cliente',
@@ -332,8 +332,8 @@
                 <input type="hidden" name="variables[]" value="">
             </div>
             <footer>
-                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-template')">Cancelar</button>
-                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar plantilla</button>
+                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-template')">{{ __('Cancelar') }}</button>
+                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar plantilla') }}</button>
             </footer>
         </form>
     </div>
@@ -343,34 +343,34 @@
 <div class="crm-pa-modal" id="pa-modal-preview" role="dialog" aria-modal="true">
     <div class="crm-pa-dialog">
         <header>
-            <h3 id="pa-prev-title">Vista previa</h3>
+            <h3 id="pa-prev-title">{{ __('Vista previa') }}</h3>
             <button type="button" class="pa-icon-btn" onclick="paCloseModal('pa-modal-preview')"><i class="pi pi-times"></i></button>
         </header>
         <div class="pa-body space-y-3">
             <div>
-                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">Categoría · Canales</div>
+                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">{{ __('Categoría · Canales') }}</div>
                 <div class="text-[12px] text-ink-700" id="pa-prev-meta">—</div>
             </div>
             <div>
-                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">Asunto</div>
+                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">{{ __('Asunto') }}</div>
                 <div class="pa-preview-block" id="pa-prev-subject">—</div>
             </div>
             <div>
-                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">Vista previa del correo</div>
-                <iframe id="pa-prev-frame" title="Vista previa del correo"
+                <div class="text-[11px] uppercase font-semibold text-ink-500 mb-1">{{ __('Vista previa del correo') }}</div>
+                <iframe id="pa-prev-frame" title="{{ __('Vista previa del correo') }}"
                         style="width:100%;height:46vh;border:1px solid #eaecf0;border-radius:10px;background:#EFEDE8;"></iframe>
             </div>
             <form id="pa-test-form" method="POST" class="border-t border-ink-100 pt-3">
                 @csrf
-                <label class="block text-[11px] uppercase font-semibold text-ink-500 mb-1">Enviar prueba a</label>
+                <label class="block text-[11px] uppercase font-semibold text-ink-500 mb-1">{{ __('Enviar prueba a') }}</label>
                 <div class="flex items-center gap-2">
-                    <input type="text" name="to" class="pa-input" required placeholder="correo@ejemplo.com o +1 809 555 0100">
-                    <button type="submit" class="crm-btn crm-btn-primary whitespace-nowrap"><i class="pi pi-send"></i> Enviar</button>
+                    <input type="text" name="to" class="pa-input" required placeholder="{{ __('correo@ejemplo.com o +1 809 555 0100') }}">
+                    <button type="submit" class="crm-btn crm-btn-primary whitespace-nowrap"><i class="pi pi-send"></i> {{ __('Enviar') }}</button>
                 </div>
             </form>
         </div>
         <footer>
-            <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-preview')">Cerrar</button>
+            <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-preview')">{{ __('Cerrar') }}</button>
             <button type="button" class="crm-btn crm-btn-primary" id="pa-prev-edit-btn">
                 <i class="pi pi-pencil"></i> Editar plantilla
             </button>
@@ -382,7 +382,7 @@
 <div class="crm-pa-modal" id="pa-modal-automation" role="dialog" aria-modal="true">
     <div class="crm-pa-dialog">
         <header>
-            <h3 id="pa-auto-title">Nueva automatización</h3>
+            <h3 id="pa-auto-title">{{ __('Nueva automatización') }}</h3>
             <button type="button" class="pa-icon-btn" onclick="paCloseModal('pa-modal-automation')"><i class="pi pi-times"></i></button>
         </header>
         <form id="pa-auto-form" method="POST" action="{{ route('admin.crm.automatizaciones.store') }}" class="contents">
@@ -390,15 +390,15 @@
             <input type="hidden" name="_method" id="pa-auto-method" value="POST">
             <div class="pa-body grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="pa-field md:col-span-2">
-                    <label>Nombre del flujo *</label>
-                    <input class="pa-input" name="name" id="pa-auto-name" required maxlength="160" placeholder="Ej.: Recordatorio cuota 3 días antes">
+                    <label>{{ __('Nombre del flujo *') }}</label>
+                    <input class="pa-input" name="name" id="pa-auto-name" required maxlength="160" placeholder="{{ __('Ej.: Recordatorio cuota 3 días antes') }}">
                 </div>
                 <div class="pa-field md:col-span-2">
-                    <label>Descripción</label>
-                    <textarea class="pa-textarea" name="description" id="pa-auto-description" maxlength="1000" style="min-height:70px" placeholder="¿Cuándo y por qué se envía este mensaje?"></textarea>
+                    <label>{{ __('Descripción') }}</label>
+                    <textarea class="pa-textarea" name="description" id="pa-auto-description" maxlength="1000" style="min-height:70px" placeholder="{{ __('¿Cuándo y por qué se envía este mensaje?') }}"></textarea>
                 </div>
                 <div class="pa-field">
-                    <label>Evento disparador *</label>
+                    <label>{{ __('Evento disparador *') }}</label>
                     <select class="pa-select" name="trigger_event" id="pa-auto-trigger" required>
                         @foreach($triggerEvents as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
@@ -406,7 +406,7 @@
                     </select>
                 </div>
                 <div class="pa-field">
-                    <label>Estado</label>
+                    <label>{{ __('Estado') }}</label>
                     <label class="pa-chip">
                         <input type="checkbox" name="is_active" id="pa-auto-active" value="1" checked>
                         <i class="pi pi-power-off"></i> Activo
@@ -415,7 +415,7 @@
 
                 {{-- ====== Cadena de fases ====== --}}
                 <div class="pa-field md:col-span-2">
-                    <label>Cadena de fases *</label>
+                    <label>{{ __('Cadena de fases *') }}</label>
                     <p class="text-[11px] text-ink-500 -mt-1 mb-2">
                         El disparador inicia la cadena. Cada fase envía una plantilla; el retraso se cuenta
                         respecto de la fase anterior (la primera, desde el disparo).
@@ -427,8 +427,8 @@
                 </div>
             </div>
             <footer>
-                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-automation')">Cancelar</button>
-                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar flujo</button>
+                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-automation')">{{ __('Cancelar') }}</button>
+                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar flujo') }}</button>
             </footer>
         </form>
     </div>
@@ -438,7 +438,7 @@
 <div class="crm-pa-modal" id="pa-modal-channels" role="dialog" aria-modal="true">
     <div class="crm-pa-dialog">
         <header>
-            <h3>Configuración de canales</h3>
+            <h3>{{ __('Configuración de canales') }}</h3>
             <button type="button" class="pa-icon-btn" onclick="paCloseModal('pa-modal-channels')"><i class="pi pi-times"></i></button>
         </header>
         <form method="POST" action="{{ route('admin.crm.canales.update') }}" class="contents">
@@ -467,11 +467,11 @@
                         @if($key === 'email')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="pa-field">
-                                    <label>Remitente (nombre)</label>
-                                    <input class="pa-input" name="channels[email][config][from_name]" value="{{ $cfg['from_name'] ?? '' }}" placeholder="Makai CRM">
+                                    <label>{{ __('Remitente (nombre)') }}</label>
+                                    <input class="pa-input" name="channels[email][config][from_name]" value="{{ $cfg['from_name'] ?? '' }}" placeholder="{{ __('Makai CRM') }}">
                                 </div>
                                 <div class="pa-field">
-                                    <label>Email remitente</label>
+                                    <label>{{ __('Email remitente') }}</label>
                                     <input class="pa-input" type="email" name="channels[email][config][from_email]" value="{{ $cfg['from_email'] ?? '' }}" placeholder="no-reply@makai.do">
                                 </div>
                                 <div class="pa-field md:col-span-2">
@@ -482,11 +482,11 @@
                         @elseif($key === 'whatsapp')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="pa-field">
-                                    <label>Número de negocio</label>
+                                    <label>{{ __('Número de negocio') }}</label>
                                     <input class="pa-input" name="channels[whatsapp][config][business_number]" value="{{ $cfg['business_number'] ?? '' }}" placeholder="+1 809 555 0100">
                                 </div>
                                 <div class="pa-field">
-                                    <label>Proveedor API</label>
+                                    <label>{{ __('Proveedor API') }}</label>
                                     <select class="pa-select" name="channels[whatsapp][config][api_provider]">
                                         @foreach(['twilio' => 'Twilio', 'meta' => 'Meta Cloud API', 'gupshup' => 'Gupshup'] as $k => $v)
                                             <option value="{{ $k }}" {{ ($cfg['api_provider'] ?? '') === $k ? 'selected' : '' }}>{{ $v }}</option>
@@ -497,26 +497,26 @@
                         @elseif($key === 'sms')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="pa-field">
-                                    <label>Proveedor</label>
-                                    <input class="pa-input" name="channels[sms][config][provider]" value="{{ $cfg['provider'] ?? '' }}" placeholder="Twilio / Nexmo">
+                                    <label>{{ __('Proveedor') }}</label>
+                                    <input class="pa-input" name="channels[sms][config][provider]" value="{{ $cfg['provider'] ?? '' }}" placeholder="{{ __('Twilio / Nexmo') }}">
                                 </div>
                                 <div class="pa-field">
-                                    <label>Sender ID</label>
+                                    <label>{{ __('Sender ID') }}</label>
                                     <input class="pa-input" name="channels[sms][config][sender_id]" value="{{ $cfg['sender_id'] ?? '' }}" placeholder="MAKAI">
                                 </div>
                             </div>
                         @elseif($key === 'push')
                             <div class="pa-field">
-                                <label>App key</label>
-                                <input class="pa-input" name="channels[push][config][app_key]" value="{{ $cfg['app_key'] ?? '' }}" placeholder="Firebase / OneSignal key">
+                                <label>{{ __('App key') }}</label>
+                                <input class="pa-input" name="channels[push][config][app_key]" value="{{ $cfg['app_key'] ?? '' }}" placeholder="{{ __('Firebase / OneSignal key') }}">
                             </div>
                         @endif
                     </div>
                 @endforeach
             </div>
             <footer>
-                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-channels')">Cancelar</button>
-                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> Guardar configuración</button>
+                <button type="button" class="crm-btn crm-btn-ghost" onclick="paCloseModal('pa-modal-channels')">{{ __('Cancelar') }}</button>
+                <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> {{ __('Guardar configuración') }}</button>
             </footer>
         </form>
     </div>
@@ -843,7 +843,7 @@
     };
 
     window.paRunAutomation = (id) => {
-        if (!confirm('¿Ejecutar este flujo ahora?')) return;
+        if (!confirm('{{ __("¿Ejecutar este flujo ahora?") }}')) return;
         const f = document.getElementById('pa-run-automation-form');
         f.action = `${AUTO_BASE}/${id}/run`;
         f.submit();

@@ -15,32 +15,32 @@
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-upload"></i></div>
             <div class="flex-1">
                 <div class="text-[15px] font-bold text-ink-900">Exportar {{ $label }}</div>
-                <div class="text-[11px] text-ink-500">Puedes exportar sin código adicional.</div>
+                <div class="text-[11px] text-ink-500">{{ __('Puedes exportar sin código adicional.') }}</div>
             </div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="p-5 space-y-4">
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Formato de exportación</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Formato de exportación') }}</label>
                 <select name="format" class="crm-input pl-3 mt-1">
-                    <option value="csv">CSV — valores separados por coma</option>
-                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="csv">{{ __('CSV — valores separados por coma') }}</option>
+                    <option value="xlsx">{{ __('Excel (.xlsx)') }}</option>
                     <option value="pdf">PDF</option>
                 </select>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Rango de datos</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Rango de datos') }}</label>
                 <select name="range" class="crm-input pl-3 mt-1">
-                    <option value="3m">Últimos 3 meses</option>
-                    <option value="6m">Últimos 6 meses</option>
-                    <option value="1y">Último año</option>
-                    <option value="all">Todo</option>
+                    <option value="3m">{{ __('Últimos 3 meses') }}</option>
+                    <option value="6m">{{ __('Últimos 6 meses') }}</option>
+                    <option value="1y">{{ __('Último año') }}</option>
+                    <option value="all">{{ __('Todo') }}</option>
                 </select>
             </div>
         </div>
         <div class="px-5 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> Descargar</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar') }}</button>
         </div>
     </form>
 </dialog>
@@ -68,17 +68,17 @@
             </p>
 
             <div class="mt-5 border border-ink-100 rounded-xl p-4 text-left bg-ink-50/40">
-                <div class="text-[10px] font-bold tracking-wider text-ink-500 uppercase mb-2">Cómo funciona</div>
+                <div class="text-[10px] font-bold tracking-wider text-ink-500 uppercase mb-2">{{ __('Cómo funciona') }}</div>
                 <ol class="space-y-1.5 text-[12px] text-ink-700">
-                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">1</span> Solicitas el código de autorización</li>
-                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">2</span> El admin recibe un código de 6 dígitos en su correo</li>
-                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">3</span> El admin te comparte el código</li>
-                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">4</span> Ingresas el código y se descarga la exportación</li>
+                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">1</span> {{ __('Solicitas el código de autorización') }}</li>
+                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">2</span> {{ __('El admin recibe un código de 6 dígitos en su correo') }}</li>
+                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">3</span> {{ __('El admin te comparte el código') }}</li>
+                    <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-white border border-ink-200 text-[10px] font-bold flex items-center justify-center text-ink-700 flex-shrink-0">4</span> {{ __('Ingresas el código y se descarga la exportación') }}</li>
                 </ol>
             </div>
 
             <button type="button" data-action="request-code" class="mt-5 w-full crm-btn crm-btn-primary justify-center">
-                <span data-text>Solicitar código de autorización</span>
+                <span data-text>{{ __('Solicitar código de autorización') }}</span>
                 <span data-loading class="hidden"><i class="pi pi-spin pi-spinner"></i></span>
             </button>
             <div class="mt-3 text-[11px] text-ink-500 flex items-center justify-center gap-1.5">
@@ -97,7 +97,7 @@
             <div class="mx-auto w-12 h-12 rounded-full bg-ink-100 flex items-center justify-center text-ink-600 mb-4">
                 <i class="pi pi-lock text-[18px]"></i>
             </div>
-            <div class="text-[16px] font-bold text-ink-900">Código enviado</div>
+            <div class="text-[16px] font-bold text-ink-900">{{ __('Código enviado') }}</div>
             <p class="text-[12px] text-ink-500 mt-1">
                 Se envió un código de 6 dígitos al correo del administrador:<br>
                 <span class="font-semibold text-ink-700" data-admin-email>—</span>
@@ -114,14 +114,14 @@
             </div>
 
             <button type="button" data-action="verify-code" class="mt-5 w-full crm-btn crm-btn-primary justify-center" disabled>
-                <span data-text>Enviar código</span>
+                <span data-text>{{ __('Enviar código') }}</span>
                 <span data-loading class="hidden"><i class="pi pi-spin pi-spinner"></i></span>
             </button>
 
             <div data-error class="hidden mt-3 text-[12px] text-danger-dark bg-danger-soft rounded-lg px-3 py-2"></div>
 
-            <div class="mt-4 text-[12px] text-ink-500">¿Tienes problemas para recibir el código?</div>
-            <button type="button" data-action="resend-code" class="text-[12px] font-semibold text-ink-900 underline mt-1">Reenviar código</button>
+            <div class="mt-4 text-[12px] text-ink-500">{{ __('¿Tienes problemas para recibir el código?') }}</div>
+            <button type="button" data-action="resend-code" class="text-[12px] font-semibold text-ink-900 underline mt-1">{{ __('Reenviar código') }}</button>
             <div data-expires class="mt-2 text-[11px] text-ink-500"></div>
         </div>
     </div>
@@ -213,7 +213,7 @@
                 body: JSON.stringify({ resource: dialog.dataset.resource, code: code }),
             });
             if (!res.ok) {
-                const data = await res.json().catch(() => ({ message: 'El código es inválido o ya caducó.' }));
+                const data = await res.json().catch(() => ({ message: '{{ __("El código es inválido o ya caducó.") }}' }));
                 throw new Error(data.message || 'El código es inválido o ya caducó.');
             }
             // Forzar descarga del CSV devuelto

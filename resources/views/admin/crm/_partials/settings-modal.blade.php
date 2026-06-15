@@ -251,12 +251,12 @@
     }
 </style>
 
-<div id="settingsModal" class="st-overlay" role="dialog" aria-modal="true" aria-label="Configuración de la cuenta">
+<div id="settingsModal" class="st-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Configuración de la cuenta') }}">
     <div class="st-shell" id="settingsShell">
 
         {{-- Sidebar --}}
         <aside class="st-sidebar">
-            <div class="st-section-label">Configuración Personal</div>
+            <div class="st-section-label">{{ __('Configuración Personal') }}</div>
             <button type="button" class="st-nav-item active" data-st-pane="profile">
                 <i class="pi pi-user"></i> Información Personal
                 <i class="pi pi-angle-right chev"></i>
@@ -283,13 +283,13 @@
             {{-- Header --}}
             <div class="st-head">
                 <div>
-                    <div class="st-head-title" data-st-title>Configuración de la cuenta</div>
-                    <div class="st-head-sub"   data-st-sub>Administra y colabora en la configuración de tu cuenta</div>
+                    <div class="st-head-title" data-st-title>{{ __('Configuración de la cuenta') }}</div>
+                    <div class="st-head-sub"   data-st-sub>{{ __('Administra y colabora en la configuración de tu cuenta') }}</div>
                 </div>
                 <div class="st-head-actions">
-                    <button type="button" class="st-btn st-btn-ghost" onclick="closeSettingsModal()">Descartar</button>
+                    <button type="button" class="st-btn st-btn-ghost" onclick="closeSettingsModal()">{{ __('Descartar') }}</button>
                     <button type="button" class="st-btn st-btn-primary" id="stSaveBtn" onclick="submitSettingsProfile()">
-                        <span id="stSaveLabel">Guardar cambios</span>
+                        <span id="stSaveLabel">{{ __('Guardar cambios') }}</span>
                     </button>
                 </div>
             </div>
@@ -299,17 +299,17 @@
 
             {{-- PROFILE TABS --}}
             <div class="st-tabs" data-st-tabs="profile">
-                <button type="button" class="st-tab active" data-st-tab="profile-perfil">Perfil</button>
-                <button type="button" class="st-tab" data-st-tab="profile-region">Idioma y región</button>
+                <button type="button" class="st-tab active" data-st-tab="profile-perfil">{{ __('Perfil') }}</button>
+                <button type="button" class="st-tab" data-st-tab="profile-region">{{ __('Idioma y región') }}</button>
             </div>
             {{-- SECURITY TABS --}}
             <div class="st-tabs" data-st-tabs="security" style="display:none;">
-                <button type="button" class="st-tab active" data-st-tab="security-pwd">Contraseña y 2FA</button>
-                <button type="button" class="st-tab" data-st-tab="security-session">Sesión Activa</button>
+                <button type="button" class="st-tab active" data-st-tab="security-pwd">{{ __('Contraseña y 2FA') }}</button>
+                <button type="button" class="st-tab" data-st-tab="security-session">{{ __('Sesión Activa') }}</button>
             </div>
             {{-- NOTIFICATIONS TABS --}}
             <div class="st-tabs" data-st-tabs="notifications" style="display:none;">
-                <button type="button" class="st-tab active" data-st-tab="notifications-main">Notificaciones</button>
+                <button type="button" class="st-tab active" data-st-tab="notifications-main">{{ __('Notificaciones') }}</button>
             </div>
 
             <div class="st-body">
@@ -324,15 +324,15 @@
                         {{-- Foto --}}
                         <div class="st-row">
                             <div>
-                                <div class="st-row-label">Foto de perfil</div>
-                                <div class="st-row-desc">Mínimo 400x400px, formatos PNG o JPEG.</div>
+                                <div class="st-row-label">{{ __('Foto de perfil') }}</div>
+                                <div class="st-row-desc">{{ __('Mínimo 400x400px, formatos PNG o JPEG.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 <div class="st-avatar-row">
                                     <div class="st-avatar" id="stAvatar" @if($sAvatar) style="background-image:url('{{ $sAvatar }}'); color:transparent;" @endif>
                                         @if(!$sAvatar){{ $sInit }}@endif
                                         @if($sAvatar)
-                                            <button type="button" class="st-avatar-del" onclick="stRemoveAvatar()" title="Eliminar foto"><i class="pi pi-times"></i></button>
+                                            <button type="button" class="st-avatar-del" onclick="stRemoveAvatar()" title="{{ __('Eliminar foto') }}"><i class="pi pi-times"></i></button>
                                         @endif
                                     </div>
                                     <label class="st-btn st-btn-ghost" style="cursor:pointer;">
@@ -347,18 +347,18 @@
                         {{-- Nombre completo --}}
                         <div class="st-row" data-st-field>
                             <div>
-                                <div class="st-row-label">Nombre completo</div>
-                                <div class="st-row-desc">Tu nombre será visible para tus contactos.</div>
+                                <div class="st-row-label">{{ __('Nombre completo') }}</div>
+                                <div class="st-row-desc">{{ __('Tu nombre será visible para tus contactos.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 <div class="st-value">
                                     <span class="st-value-text" data-st-display>{{ $sName ?: '—' }}</span>
-                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="Editar"><i class="pi pi-pencil"></i></button>
+                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="{{ __('Editar') }}"><i class="pi pi-pencil"></i></button>
                                 </div>
                                 <div class="st-edit-wrap">
-                                    <input type="text" name="name" value="{{ $sName }}" placeholder="Tu nombre completo" data-st-input>
-                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">Cancelar</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">Guardar</button>
+                                    <input type="text" name="name" value="{{ $sName }}" placeholder="{{ __('Tu nombre completo') }}" data-st-input>
+                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -366,18 +366,18 @@
                         {{-- Correo --}}
                         <div class="st-row" data-st-field>
                             <div>
-                                <div class="st-row-label">Correo electrónico</div>
-                                <div class="st-row-desc">Se recomienda correo electrónico empresarial.</div>
+                                <div class="st-row-label">{{ __('Correo electrónico') }}</div>
+                                <div class="st-row-desc">{{ __('Se recomienda correo electrónico empresarial.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 <div class="st-value">
                                     <span class="st-value-text" data-st-display>{{ $sEmail ?: '—' }}</span>
-                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="Editar"><i class="pi pi-pencil"></i></button>
+                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="{{ __('Editar') }}"><i class="pi pi-pencil"></i></button>
                                 </div>
                                 <div class="st-edit-wrap">
                                     <input type="email" name="email" value="{{ $sEmail }}" placeholder="tu@correo.com" data-st-input>
-                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">Cancelar</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">Guardar</button>
+                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -385,18 +385,18 @@
                         {{-- Teléfono --}}
                         <div class="st-row editing" data-st-field>
                             <div>
-                                <div class="st-row-label">Número de teléfono</div>
-                                <div class="st-row-desc">Se recomienda número de teléfono empresarial.</div>
+                                <div class="st-row-label">{{ __('Número de teléfono') }}</div>
+                                <div class="st-row-desc">{{ __('Se recomienda número de teléfono empresarial.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 <div class="st-value">
                                     <span class="st-value-text" data-st-display>{{ $sPhone ?: '—' }}</span>
-                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="Editar"><i class="pi pi-pencil"></i></button>
+                                    <button type="button" class="st-edit-btn" onclick="stToggleEdit(this)" aria-label="{{ __('Editar') }}"><i class="pi pi-pencil"></i></button>
                                 </div>
                                 <div class="st-edit-wrap open">
                                     <input type="tel" name="phone" value="{{ $sPhone ?: '+1 (123) 456-6789' }}" placeholder="+57 300 000 0000" data-st-input>
-                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">Cancelar</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">Guardar</button>
+                                    <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -410,20 +410,20 @@
                     <div class="st-pane" data-st-pane="profile-region">
                         <div class="st-row compact">
                             <div>
-                                <div class="st-row-label">Idioma</div>
-                                <div class="st-row-desc">Idioma para la interfaz del CRM.</div>
+                                <div class="st-row-label">{{ __('Idioma') }}</div>
+                                <div class="st-row-desc">{{ __('Idioma para la interfaz del CRM.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 <select name="locale" class="st-value" style="border:none; outline:none;">
-                                    <option value="es" @selected(app()->getLocale() === 'es')>Español</option>
-                                    <option value="en" @selected(app()->getLocale() === 'en')>English</option>
+                                    <option value="es" @selected(app()->getLocale() === 'es')>{{ __('Español') }}</option>
+                                    <option value="en" @selected(app()->getLocale() === 'en')>{{ __('English') }}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="st-row compact">
                             <div>
-                                <div class="st-row-label">Zona horaria</div>
-                                <div class="st-row-desc">Las fechas y horas se muestran en esta zona.</div>
+                                <div class="st-row-label">{{ __('Zona horaria') }}</div>
+                                <div class="st-row-desc">{{ __('Las fechas y horas se muestran en esta zona.') }}</div>
                             </div>
                             <div class="st-row-right">
                                 @php
@@ -474,32 +474,32 @@
                 <div class="st-pane" data-st-pane="security-pwd">
                     <div class="st-row compact">
                         <div>
-                            <div class="st-row-label">Cambiar Contraseña</div>
-                            <div class="st-row-desc">Actualiza la contraseña para mejorar la seguridad de tu cuenta.</div>
+                            <div class="st-row-label">{{ __('Cambiar Contraseña') }}</div>
+                            <div class="st-row-desc">{{ __('Actualiza la contraseña para mejorar la seguridad de tu cuenta.') }}</div>
                         </div>
                         <div class="st-row-right">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="stTogglePwdPanel()">Cambiar Contraseña</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="stTogglePwdPanel()">{{ __('Cambiar Contraseña') }}</button>
                         </div>
                     </div>
 
                     <div class="st-collapse" id="stPwdPanel">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Contraseña actual</label>
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Contraseña actual') }}</label>
                                 <input type="password" id="stPwdCurrent" class="crm-input pl-3 mt-1" autocomplete="current-password" placeholder="••••••••">
                             </div>
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Nueva contraseña</label>
-                                <input type="password" id="stPwdNew" class="crm-input pl-3 mt-1" autocomplete="new-password" placeholder="Mín. 8 caracteres">
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Nueva contraseña') }}</label>
+                                <input type="password" id="stPwdNew" class="crm-input pl-3 mt-1" autocomplete="new-password" placeholder="{{ __('Mín. 8 caracteres') }}">
                             </div>
                             <div>
-                                <label class="text-[12px] font-semibold text-ink-700">Confirmar</label>
-                                <input type="password" id="stPwdConfirm" class="crm-input pl-3 mt-1" autocomplete="new-password" placeholder="Repite la contraseña">
+                                <label class="text-[12px] font-semibold text-ink-700">{{ __('Confirmar') }}</label>
+                                <input type="password" id="stPwdConfirm" class="crm-input pl-3 mt-1" autocomplete="new-password" placeholder="{{ __('Repite la contraseña') }}">
                             </div>
                         </div>
                         <div class="flex items-center gap-2 mt-3 justify-end">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="stTogglePwdPanel(false)">Cancelar</button>
-                            <button type="button" class="st-btn st-btn-primary" onclick="submitSettingsPassword()">Confirmar cambio</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="stTogglePwdPanel(false)">{{ __('Cancelar') }}</button>
+                            <button type="button" class="st-btn st-btn-primary" onclick="submitSettingsPassword()">{{ __('Confirmar cambio') }}</button>
                         </div>
                     </div>
 
@@ -512,10 +512,10 @@
                                 Autenticación 2FA
                                 <span id="st2faBadge" class="st-2fa-badge {{ $st2faOn ? 'on' : '' }}">{{ $st2faOn ? 'Activa' : 'Inactiva' }}</span>
                             </div>
-                            <div class="st-row-desc">Agrega una capa extra de protección a tu cuenta.</div>
+                            <div class="st-row-desc">{{ __('Agrega una capa extra de protección a tu cuenta.') }}</div>
                         </div>
                         <div class="st-row-right">
-                            <button type="button" class="st-btn st-btn-ghost" id="st2faManageBtn" onclick="st2faTogglePanel()">Administrar Autenticación</button>
+                            <button type="button" class="st-btn st-btn-ghost" id="st2faManageBtn" onclick="st2faTogglePanel()">{{ __('Administrar Autenticación') }}</button>
                         </div>
                     </div>
 
@@ -525,15 +525,15 @@
                             <div class="st-2fa-grid">
                                 <div class="st-2fa-qr" id="st2faQr"></div>
                                 <div class="st-2fa-steps">
-                                    <p class="st-2fa-help">1. Escaneá el código QR con Google Authenticator, Authy, 1Password o similar.</p>
-                                    <p class="st-2fa-help">2. ¿No podés escanear? Cargá esta clave manualmente:</p>
+                                    <p class="st-2fa-help">{{ __('1. Escaneá el código QR con Google Authenticator, Authy, 1Password o similar.') }}</p>
+                                    <p class="st-2fa-help">{{ __('2. ¿No podés escanear? Cargá esta clave manualmente:') }}</p>
                                     <code class="st-2fa-secret" id="st2faSecret">—</code>
-                                    <p class="st-2fa-help">3. Ingresá el código de 6 dígitos que muestra la app:</p>
+                                    <p class="st-2fa-help">{{ __('3. Ingresá el código de 6 dígitos que muestra la app:') }}</p>
                                     <div class="flex items-center gap-2">
                                         <input type="text" id="st2faConfirmCode" inputmode="numeric" maxlength="6"
                                                class="crm-input pl-3" style="max-width:160px; letter-spacing:.25em; text-align:center;" placeholder="000000">
-                                        <button type="button" class="st-btn st-btn-primary" onclick="st2faConfirm()">Confirmar y activar</button>
-                                        <button type="button" class="st-btn st-btn-ghost" onclick="st2faTogglePanel(false)">Cancelar</button>
+                                        <button type="button" class="st-btn st-btn-primary" onclick="st2faConfirm()">{{ __('Confirmar y activar') }}</button>
+                                        <button type="button" class="st-btn st-btn-ghost" onclick="st2faTogglePanel(false)">{{ __('Cancelar') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -546,8 +546,8 @@
                                 La 2FA está activa. Cada vez que inicies sesión te pediremos un código.
                             </p>
                             <div class="flex items-center gap-2">
-                                <input type="password" id="st2faDisablePwd" class="crm-input pl-3" style="max-width:220px;" placeholder="Tu contraseña actual">
-                                <button type="button" class="st-btn st-btn-ghost" style="color:#e93544;" onclick="st2faDisable()">Desactivar 2FA</button>
+                                <input type="password" id="st2faDisablePwd" class="crm-input pl-3" style="max-width:220px;" placeholder="{{ __('Tu contraseña actual') }}">
+                                <button type="button" class="st-btn st-btn-ghost" style="color:#e93544;" onclick="st2faDisable()">{{ __('Desactivar 2FA') }}</button>
                             </div>
                         </div>
                     </div>
@@ -555,11 +555,11 @@
                     {{-- =========== CÓDIGOS DE RESPALDO =========== --}}
                     <div class="st-row compact">
                         <div>
-                            <div class="st-row-label">Códigos de Respaldo</div>
-                            <div class="st-row-desc">Genera códigos de respaldo para tu dispositivo 2FA.</div>
+                            <div class="st-row-label">{{ __('Códigos de Respaldo') }}</div>
+                            <div class="st-row-desc">{{ __('Genera códigos de respaldo para tu dispositivo 2FA.') }}</div>
                         </div>
                         <div class="st-row-right">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faShowRecoveryCodes()">Generar Códigos</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faShowRecoveryCodes()">{{ __('Generar Códigos') }}</button>
                         </div>
                     </div>
 
@@ -569,8 +569,8 @@
                         </p>
                         <div class="st-2fa-codes" id="st2faCodesList"></div>
                         <div class="flex items-center gap-2 mt-3">
-                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faCopyCodes()"><i class="pi pi-copy"></i> Copiar</button>
-                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faRegenerate()"><i class="pi pi-refresh"></i> Regenerar</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faCopyCodes()"><i class="pi pi-copy"></i> {{ __('Copiar') }}</button>
+                            <button type="button" class="st-btn st-btn-ghost" onclick="st2faRegenerate()"><i class="pi pi-refresh"></i> {{ __('Regenerar') }}</button>
                         </div>
                     </div>
                 </div>
@@ -578,12 +578,12 @@
                 <div class="st-pane" data-st-pane="security-session">
                     <div class="st-row compact">
                         <div>
-                            <div class="st-row-label">Sesión actual</div>
+                            <div class="st-row-label">{{ __('Sesión actual') }}</div>
                             <div class="st-row-desc">Última actividad: {{ now()->isoFormat('D MMMM YYYY · HH:mm') }}</div>
                         </div>
                         <div class="st-row-right">
                             <form method="POST" action="{{ route($stLogoutRoute) }}" class="m-0" data-logout-confirm>@csrf
-                                <button type="submit" class="st-btn st-btn-ghost" style="color:#e93544;">Cerrar sesión</button>
+                                <button type="submit" class="st-btn st-btn-ghost" style="color:#e93544;">{{ __('Cerrar sesión') }}</button>
                             </form>
                         </div>
                     </div>
@@ -728,7 +728,7 @@
         reader.readAsDataURL(file);
     });
     window.stRemoveAvatar = function(){
-        if (!confirm('¿Eliminar la foto de perfil?')) return;
+        if (!confirm('{{ __("¿Eliminar la foto de perfil?") }}')) return;
         const avatar = document.getElementById('stAvatar');
         avatar.style.backgroundImage = '';
         avatar.style.color = '#fff';
@@ -821,8 +821,8 @@
         const password = document.getElementById('st2faDisablePwd').value;
         if (!password) { stShowAlert('Ingresá tu contraseña para desactivar la 2FA.', 'err'); return; }
         st2faConfirm2({
-            title: 'Desactivar autenticación 2FA',
-            text:  'Tu cuenta quedará protegida únicamente por la contraseña. Podés volver a activarla cuando quieras.',
+            title: '{{ __("Desactivar autenticación 2FA") }}',
+            text: '{{ __("Tu cuenta quedará protegida únicamente por la contraseña. Podés volver a activarla cuando quieras.") }}',
             confirmLabel: 'Desactivar',
             icon: 'pi pi-shield',
             onConfirm: async () => {
@@ -857,8 +857,8 @@
 
     window.st2faRegenerate = function(){
         st2faConfirm2({
-            title: 'Regenerar códigos de respaldo',
-            text:  'Esto invalidará tus códigos anteriores: los que hayas guardado dejarán de funcionar.',
+            title: '{{ __("Regenerar códigos de respaldo") }}',
+            text: '{{ __("Esto invalidará tus códigos anteriores: los que hayas guardado dejarán de funcionar.") }}',
             confirmLabel: 'Regenerar',
             tone: 'brand',
             icon: 'pi pi-refresh',

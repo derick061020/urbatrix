@@ -59,7 +59,7 @@
             </span>
             <div class="flex-1 min-w-0 leading-none">
                 <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
-                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Portal Broker</div>
+                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Portal Broker') }}</div>
             </div>
         </div>
 
@@ -68,7 +68,7 @@
                 <i class="pi pi-th-large"></i> Dashboard
             </a>
 
-            <div class="brk-nav-section">Clientes</div>
+            <div class="brk-nav-section">{{ __('Clientes') }}</div>
             <a href="{{ route('broker.cartera') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'cartera' ? 'active' : '' }}">
                 <i class="pi pi-users"></i> Mi cartera
             </a>
@@ -76,7 +76,7 @@
                 <i class="pi pi-user-plus"></i> Registrar cliente
             </a>
 
-            <div class="brk-nav-section">Ventas</div>
+            <div class="brk-nav-section">{{ __('Ventas') }}</div>
             <a href="{{ route('broker.inventario') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'inventario' ? 'active' : '' }}">
                 <i class="pi pi-building"></i> Inventario en vivo
             </a>
@@ -87,7 +87,7 @@
                 <i class="pi pi-folder-open"></i> Material de ventas
             </a>
 
-            <div class="brk-nav-section">Comisiones</div>
+            <div class="brk-nav-section">{{ __('Comisiones') }}</div>
             <a href="{{ route('broker.comisiones') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'comisiones' ? 'active' : '' }}">
                 <i class="pi pi-dollar"></i> Estado de cuenta
             </a>
@@ -98,12 +98,12 @@
                 <i class="pi pi-chart-line"></i> Simulador de cobro
             </a>
 
-            <div class="brk-nav-section">Crecimiento</div>
+            <div class="brk-nav-section">{{ __('Crecimiento') }}</div>
             <a href="{{ route('broker.metas') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'metas' ? 'active' : '' }}">
                 <i class="pi pi-star"></i> Metas e incentivos
             </a>
 
-            <div class="brk-nav-section">Cuenta</div>
+            <div class="brk-nav-section">{{ __('Cuenta') }}</div>
             <a href="{{ route('broker.contrato') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'contrato' ? 'active' : '' }}">
                 <i class="pi pi-file-edit"></i> Mi contrato
             </a>
@@ -113,10 +113,10 @@
             <span class="brk-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'B', 0, 1)) }}</span>
             <div class="flex-1 min-w-0 leading-tight">
                 <div class="text-[12px] font-semibold text-ink-900 truncate">{{ auth()->user()->name }}</div>
-                <div class="text-[10px] text-ink-500 truncate">Broker</div>
+                <div class="text-[10px] text-ink-500 truncate">{{ __('Broker') }}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}">@csrf
-                <button class="text-ink-400 hover:text-err" title="Salir"><i class="pi pi-sign-out"></i></button>
+                <button class="text-ink-400 hover:text-err" title="{{ __('Salir') }}"><i class="pi pi-sign-out"></i></button>
             </form>
         </div>
     </aside>
@@ -129,7 +129,7 @@
                 <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', 'Duna Development')</div>
             </div>
             @if(($previewAdmin ?? false))
-                <span class="ml-auto brk-pill bg-warn-soft text-warn-dark">Vista admin</span>
+                <span class="ml-auto brk-pill bg-warn-soft text-warn-dark">{{ __('Vista admin') }}</span>
             @endif
         </header>
 

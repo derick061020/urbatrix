@@ -18,27 +18,27 @@
 
 @section('content')
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
-    <p class="text-[12px] text-ink-500">Cómo y cuándo cobras según el cliente fracciona su inicial.</p>
+    <p class="text-[12px] text-ink-500">{{ __('Cómo y cuándo cobras según el cliente fracciona su inicial.') }}</p>
 
     <div class="brk-card p-5">
         <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
             {{-- Inputs --}}
             <div class="space-y-3.5">
-                <div><label class="brk-lbl">Precio del inmueble</label><div class="brk-inp"><span>$</span><input id="s_precio" type="number" value="400000" step="1000"></div></div>
-                <div><label class="brk-lbl">Descuento</label><div class="brk-inp"><input id="s_desc" type="number" value="0" step="0.5"><span>%</span></div></div>
-                <div><label class="brk-lbl">Tu comisión</label><div class="brk-inp"><input id="s_com" type="number" value="{{ rtrim(rtrim(number_format($rate,2),'0'),'.') }}" step="0.1"><span>%</span></div></div>
-                <div><label class="brk-lbl">Pago inicial</label><div class="brk-inp"><input id="s_ini" type="number" value="20" min="20" step="1"><span>%</span></div></div>
-                <div><label class="brk-lbl">El cliente fracciona el inicial en…</label><div class="brk-inp"><input id="s_fr" type="number" value="4" min="1" max="12" step="1"><span>pagos</span></div></div>
-                <div><label class="brk-lbl">¿Y si cierras varias?</label><div class="brk-inp"><input id="s_uds" type="number" value="3" min="1" step="1"><span>uds</span></div></div>
+                <div><label class="brk-lbl">{{ __('Precio del inmueble') }}</label><div class="brk-inp"><span>$</span><input id="s_precio" type="number" value="400000" step="1000"></div></div>
+                <div><label class="brk-lbl">{{ __('Descuento') }}</label><div class="brk-inp"><input id="s_desc" type="number" value="0" step="0.5"><span>%</span></div></div>
+                <div><label class="brk-lbl">{{ __('Tu comisión') }}</label><div class="brk-inp"><input id="s_com" type="number" value="{{ rtrim(rtrim(number_format($rate,2),'0'),'.') }}" step="0.1"><span>%</span></div></div>
+                <div><label class="brk-lbl">{{ __('Pago inicial') }}</label><div class="brk-inp"><input id="s_ini" type="number" value="20" min="20" step="1"><span>%</span></div></div>
+                <div><label class="brk-lbl">{{ __('El cliente fracciona el inicial en…') }}</label><div class="brk-inp"><input id="s_fr" type="number" value="4" min="1" max="12" step="1"><span>{{ __('pagos') }}</span></div></div>
+                <div><label class="brk-lbl">{{ __('¿Y si cierras varias?') }}</label><div class="brk-inp"><input id="s_uds" type="number" value="3" min="1" step="1"><span>uds</span></div></div>
             </div>
 
             {{-- Resultado --}}
             <div>
                 <div class="border border-ink-200 rounded-xl overflow-hidden">
                     <div class="bg-brand-tint border-b border-brand/20 p-5">
-                        <div class="text-[11px] font-semibold uppercase tracking-wider text-brand-dark">Comisión por venta</div>
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-brand-dark">{{ __('Comisión por venta') }}</div>
                         <div class="text-[32px] font-bold text-ink-950 leading-none mt-1.5" id="s_comision_total">$28,000</div>
-                        <div class="text-[12px] text-brand-dark mt-1.5" id="s_inicial_line">sobre un inicial de $80,000</div>
+                        <div class="text-[12px] text-brand-dark mt-1.5" id="s_inicial_line">{{ __('sobre un inicial de $80,000') }}</div>
                     </div>
                     <div class="p-4 overflow-x-auto">
                         <table class="w-full min-w-[420px]">
@@ -54,12 +54,12 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 bg-white border border-ink-200 rounded-xl px-4 py-3 mt-3.5">
-                    <span class="text-[12.5px] text-ink-500">Si cierras <b id="s_uds_l">3</b> ventas como esta:</span>
+                    <span class="text-[12.5px] text-ink-500">{{ __('Si cierras') }} <b id="s_uds_l">3</b> {{ __('ventas como esta:') }}</span>
                     <span class="ml-auto text-[18px] font-bold text-ok" id="s_comision_uds">$84,000</span>
                 </div>
                 <div class="flex items-start gap-2.5 bg-info-soft border border-info/20 rounded-xl p-3 mt-3.5">
                     <i class="pi pi-check-circle text-info mt-0.5"></i>
-                    <span class="text-[11.5px] text-ink-600">Al completar el inicial, tu comisión queda liquidada al 100%. Estimación, no vinculante.</span>
+                    <span class="text-[11.5px] text-ink-600">{{ __('Al completar el inicial, tu comisión queda liquidada al 100%. Estimación, no vinculante.') }}</span>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <title>Sidebar Navigation</title>
+        <title>{{ __('Sidebar Navigation') }}</title>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
         <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
         <link
@@ -153,7 +153,7 @@
                                 </span>
                                 <div class="flex-1 min-w-0 leading-none">
                                     <div class="text-[14px] font-bold text-white tracking-tight">MAKAI</div>
-                                    <div class="text-[9px] font-semibold text-white/70 tracking-[0.18em] uppercase mt-1">Duna Development</div>
+                                    <div class="text-[9px] font-semibold text-white/70 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
                                 </div>
                             </div>
                             <div
@@ -167,10 +167,10 @@
                             <a href="/" class="block">
                                 <button
                                     type="button"
-                                    aria-label="View Price List"
+                                    aria-label="{{ __('View Price List') }}"
                                     class="w-full h-12 relative flex items-center justify-center bg-brand-primary border border-brand-primary text-text-primary-inverse rounded-md font-semibold hover:bg-brand-primary-hover transition duration-200 cursor-pointer select-none"
                                 >
-                                    <span class="text-16 transition-all duration-300 ease-in-out">View Price List</span>
+                                    <span class="text-16 transition-all duration-300 ease-in-out">{{ __('View Price List') }}</span>
                                 </button>
                             </a>
                         </div>

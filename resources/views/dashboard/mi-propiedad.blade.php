@@ -104,7 +104,7 @@
             <div class="relative z-10">
                 <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
                 <div class="font-display text-[48px] font-medium leading-tight mt-1">{{ $unidad }}</div>
-                <div class="text-[13px] opacity-80 mt-1">Makai Residences · Cap Cana, Punta Cana</div>
+                <div class="text-[13px] opacity-80 mt-1">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
 
                 {{-- Quick stats pills --}}
                 <div class="mt-6 inline-flex items-stretch rounded-2xl bg-white/10 backdrop-blur border border-white/15 overflow-hidden">

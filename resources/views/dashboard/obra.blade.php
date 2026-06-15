@@ -33,8 +33,8 @@
                         </div>
                     </div>
                     <div>
-                        <div class="text-[14px] font-semibold text-ink-950">Avance global de obra</div>
-                        <div class="text-[12px] text-ink-500">Cap Cana · Punta Cana</div>
+                        <div class="text-[14px] font-semibold text-ink-950">{{ __('Avance global de obra') }}</div>
+                        <div class="text-[12px] text-ink-500">{{ __('Cap Cana · Punta Cana') }}</div>
                         <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $delivery }}</div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
         {{-- Reportes publicados --}}
         <div class="cli-card overflow-hidden">
             <div class="px-5 py-3 flex items-center justify-between bg-ink-50/60 border-b border-ink-100">
-                <div class="text-[14px] font-bold text-ink-950">Reportes publicados</div>
+                <div class="text-[14px] font-bold text-ink-950">{{ __('Reportes publicados') }}</div>
                 <span class="cli-pill bg-err-soft text-err">{{ $reports->count() }}</span>
             </div>
             <div class="divide-y divide-ink-100">
@@ -117,7 +117,7 @@
                                 @endif
                                 <div class="flex items-center gap-3 mt-2">
                                     <span class="text-[12px] font-bold" style="color:#1fc16b">{{ $r->overall_progress }}%</span>
-                                    <span class="text-[11px] text-ink-400">avance global</span>
+                                    <span class="text-[11px] text-ink-400">{{ __('avance global') }}</span>
                                     <button type="button" onclick="openReportModal({{ $r->id }})" class="ml-auto inline-flex items-center gap-1.5 text-[12px] font-semibold text-brand hover:underline">
                                         <i class="pi pi-eye text-[11px]"></i> Ver reporte
                                     </button>
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="px-5 py-10 text-center text-[12px] text-ink-400">Aún no hay reportes de avance publicados. Te notificaremos por correo cuando publiquemos el primero.</div>
+                    <div class="px-5 py-10 text-center text-[12px] text-ink-400">{{ __('Aún no hay reportes de avance publicados. Te notificaremos por correo cuando publiquemos el primero.') }}</div>
                 @endforelse
             </div>
         </div>

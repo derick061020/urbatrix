@@ -23,7 +23,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Property Information -->
         <div class="border border-gray-200 rounded p-6 bg-white">
-            <h3 class="text-lg font-semibold text-[#625441] mb-4">Información de la Unidad</h3>
+            <h3 class="text-lg font-semibold text-[#625441] mb-4">{{ __('Información de la Unidad') }}</h3>
             
             @if($reservation->unit && $reservation->unit->images->count() > 0)
                 <div class="relative rounded-lg overflow-hidden mb-4">
@@ -39,7 +39,7 @@
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->unit_name ?? $reservation->unit->name ?? 'Unit ' . $reservation->unit_id }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-sm text-[#806f56]">Código:</span>
+                    <span class="text-sm text-[#806f56]">{{ __('Código:') }}</span>
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->reservation_code }}</span>
                 </div>
                 <div class="flex justify-between">
@@ -47,11 +47,11 @@
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->status ?? 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-sm text-[#806f56]">Precio Total:</span>
+                    <span class="text-sm text-[#806f56]">{{ __('Precio Total:') }}</span>
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->formatted_price ?? 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-sm text-[#806f56]">Plan de Pagos:</span>
+                    <span class="text-sm text-[#806f56]">{{ __('Plan de Pagos:') }}</span>
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->payment_method ?? 'No definido' }}</span>
                 </div>
             </div>
@@ -59,7 +59,7 @@
 
         <!-- Personal Information -->
         <div class="border border-gray-200 rounded p-6 bg-white">
-            <h3 class="text-lg font-semibold text-[#625441] mb-4">Información Personal</h3>
+            <h3 class="text-lg font-semibold text-[#625441] mb-4">{{ __('Información Personal') }}</h3>
             
             <div class="space-y-3">
                 <div class="flex justify-between">
@@ -71,16 +71,16 @@
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->email }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-sm text-[#806f56]">Teléfono:</span>
+                    <span class="text-sm text-[#806f56]">{{ __('Teléfono:') }}</span>
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->phone }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-sm text-[#806f56]">País:</span>
+                    <span class="text-sm text-[#806f56]">{{ __('País:') }}</span>
                     <span class="text-sm font-medium text-[#625441]">{{ $reservation->country }}</span>
                 </div>
                 @if($reservation->profession)
                     <div class="flex justify-between">
-                        <span class="text-sm text-[#806f56]">Profesión:</span>
+                        <span class="text-sm text-[#806f56]">{{ __('Profesión:') }}</span>
                         <span class="text-sm font-medium text-[#625441]">{{ $reservation->profession }}</span>
                     </div>
                 @endif
@@ -88,7 +88,7 @@
             
             <!-- Quick Communication Actions -->
             <div class="mt-6 pt-4 border-t border-gray-200">
-                <h4 class="text-sm font-semibold text-[#625441] mb-3">Comunicación Rápida</h4>
+                <h4 class="text-sm font-semibold text-[#625441] mb-3">{{ __('Comunicación Rápida') }}</h4>
                 <div class="flex flex-wrap gap-2">
                     @if($reservation->email)
                         <a href="mailto:{{ $reservation->email }}" 
@@ -127,15 +127,15 @@
 
     <!-- Documents Section -->
     <div class="border border-gray-200 rounded p-6 bg-white mb-6">
-        <h3 class="text-lg font-semibold text-[#625441] mb-4">Documentos del Cliente</h3>
+        <h3 class="text-lg font-semibold text-[#625441] mb-4">{{ __('Documentos del Cliente') }}</h3>
         
         @if($reservation->id_document_path || $reservation->id_document_back_path)
             <div class="space-y-4">
                 @if($reservation->id_document_path)
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-sm font-semibold text-[#625441]">Documento de Identidad (Frente)</h4>
-                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Subido</span>
+                        <h4 class="text-sm font-semibold text-[#625441]">{{ __('Documento de Identidad (Frente)') }}</h4>
+                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ __('Subido') }}</span>
                     </div>
                     
                     <div class="flex items-center gap-3">
@@ -149,7 +149,7 @@
                         @else
                             <div class="w-16 h-16 border border-gray-300 rounded overflow-hidden bg-gray-100">
                                 <img src="{{ asset($reservation->id_document_path) }}" 
-                                     alt="Documento de Identidad" 
+                                     alt="{{ __('Documento de Identidad') }}" 
                                      class="w-full h-full object-cover"
                                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0IDJINkEyIDIgMCAwIDAgNCA0VjIwQTIgMiAwIDAgMCA2IDIySDE4QTIgMiAwIDAgMCAyMCAyMFY4TDE0IDJNMjAgMjBINlY0SDEzVjlIMjBWMjBNMTAgMTlIMTJWMTZIMTBWMTlNMTAgMTRIMTJWMTBIMTBWMTRaIiBmaWxsPSIjOUNCOUI5Ii8+Cjwvc3ZnPgo='">
                             </div>
@@ -193,7 +193,7 @@
                             @endif
                             @if($reservation->document_number)
                                 <div>
-                                    <span class="text-gray-600">Número:</span>
+                                    <span class="text-gray-600">{{ __('Número:') }}</span>
                                     <span class="font-medium text-[#625441] ml-2">{{ $reservation->document_number }}</span>
                                 </div>
                             @endif
@@ -206,8 +206,8 @@
                 @if($reservation->id_document_back_path)
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-sm font-semibold text-[#625441]">Documento de Identidad (Reverso)</h4>
-                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Subido</span>
+                        <h4 class="text-sm font-semibold text-[#625441]">{{ __('Documento de Identidad (Reverso)') }}</h4>
+                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ __('Subido') }}</span>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -221,7 +221,7 @@
                         @else
                             <div class="w-16 h-16 border border-gray-300 rounded overflow-hidden bg-gray-100">
                                 <img src="{{ asset($reservation->id_document_back_path) }}"
-                                     alt="Documento de Identidad (Reverso)"
+                                     alt="{{ __('Documento de Identidad (Reverso)') }}"
                                      class="w-full h-full object-cover">
                             </div>
                         @endif
@@ -256,13 +256,13 @@
                 <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <p class="text-gray-500 text-sm">El cliente aún no ha subido su documento de identidad</p>
+                <p class="text-gray-500 text-sm">{{ __('El cliente aún no ha subido su documento de identidad') }}</p>
             </div>
         @endif
         
         <!-- Payment Plan Section -->
         <div class="mb-6 pt-6 border-t border-gray-200">
-            <h4 class="text-sm font-semibold text-[#625441] mb-3">Plan de Pagos</h4>
+            <h4 class="text-sm font-semibold text-[#625441] mb-3">{{ __('Plan de Pagos') }}</h4>
             
             @php
                 $paymentPlanDocument = \App\Models\Document::where('reservation_id', $reservation->id)
@@ -273,7 +273,7 @@
             @if($paymentPlanDocument)
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <div class="flex items-center justify-between mb-3">
-                        <h5 class="text-sm font-semibold text-[#625441]">Plan de Pagos</h5>
+                        <h5 class="text-sm font-semibold text-[#625441]">{{ __('Plan de Pagos') }}</h5>
                         <span class="px-2 py-1 text-xs 
                             @if($paymentPlanDocument->status == 'signed') bg-green-100 text-green-800 rounded-full
                             @elseif($paymentPlanDocument->status == 'generated') bg-blue-100 text-blue-800 rounded-full
@@ -321,16 +321,16 @@
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span class="text-gray-600">Estado:</span>
-                                <span class="font-medium text-green-700 ml-2">Firmado</span>
+                                <span class="font-medium text-green-700 ml-2">{{ __('Firmado') }}</span>
                             </div>
                             <div>
-                                <span class="text-gray-600">Fecha de firma:</span>
+                                <span class="text-gray-600">{{ __('Fecha de firma:') }}</span>
                                 <span class="font-medium text-[#625441] ml-2">{{ $paymentPlanDocument->signed_at->format('d/m/Y H:i') }}</span>
                             </div>
                             @if($paymentPlanDocument->signed_by)
                             <div>
-                                <span class="text-gray-600">Firmado por:</span>
-                                <span class="font-medium text-[#625441] ml-2">Cliente</span>
+                                <span class="text-gray-600">{{ __('Firmado por:') }}</span>
+                                <span class="font-medium text-[#625441] ml-2">{{ __('Cliente') }}</span>
                             </div>
                             @endif
                         </div>
@@ -342,14 +342,14 @@
                     <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <p class="text-gray-500 text-sm">El plan de pagos aún no ha sido generado</p>
+                    <p class="text-gray-500 text-sm">{{ __('El plan de pagos aún no ha sido generado') }}</p>
                 </div>
             @endif
         </div>
         
         <!-- Contract Generation Section -->
         <div class="mt-6 pt-6 border-t border-gray-200">
-            <h4 class="text-sm font-semibold text-[#625441] mb-3">Generación de Contrato</h4>
+            <h4 class="text-sm font-semibold text-[#625441] mb-3">{{ __('Generación de Contrato') }}</h4>
             
             @php
                 $hasContract = \App\Models\Document::where('reservation_id', $reservation->id)
@@ -364,8 +364,8 @@
                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                         </svg>
                         <div>
-                            <p class="text-sm font-medium text-green-800">Contrato generado</p>
-                            <p class="text-xs text-green-600">El contrato ya está disponible para el cliente</p>
+                            <p class="text-sm font-medium text-green-800">{{ __('Contrato generado') }}</p>
+                            <p class="text-xs text-green-600">{{ __('El contrato ya está disponible para el cliente') }}</p>
                         </div>
                     </div>
                     
@@ -396,8 +396,8 @@
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H12V16H10V19M10,14H12V10H10V14Z"/>
                         </svg>
                         <div>
-                            <p class="text-sm font-medium text-yellow-800">Contrato no generado</p>
-                            <p class="text-xs text-yellow-600">Genera el contrato para que el cliente pueda revisarlo y firmar</p>
+                            <p class="text-sm font-medium text-yellow-800">{{ __('Contrato no generado') }}</p>
+                            <p class="text-xs text-yellow-600">{{ __('Genera el contrato para que el cliente pueda revisarlo y firmar') }}</p>
                         </div>
                     </div>
                     
@@ -439,7 +439,7 @@
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
                         <div>
-                            <p class="font-medium text-green-800">Cliente marcó como CONFORME</p>
+                            <p class="font-medium text-green-800">{{ __('Cliente marcó como CONFORME') }}</p>
                             @if(isset($contract->metadata['conforme_at']))
                                 <p class="text-sm text-green-600">Fecha: {{ \Carbon\Carbon::parse($contract->metadata['conforme_at'])->format('d/m/Y H:i') }}</p>
                             @endif
@@ -449,7 +449,7 @@
                 
                 @if($hasObservations)
                     <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h4 class="font-medium text-blue-800 mb-2">Observaciones del cliente:</h4>
+                        <h4 class="font-medium text-blue-800 mb-2">{{ __('Observaciones del cliente:') }}</h4>
                         <p class="text-gray-700 whitespace-pre-wrap">{{ $contract->metadata['observaciones'] }}</p>
                         @if(isset($contract->metadata['observaciones_at']))
                             <p class="text-sm text-blue-600 mt-2">Enviado: {{ \Carbon\Carbon::parse($contract->metadata['observaciones_at'])->format('d/m/Y H:i') }}</p>
@@ -463,8 +463,8 @@
                             <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
                         <div>
-                            <p class="font-medium text-purple-800">Contrato Firmado</p>
-                            <p class="text-sm text-purple-600">El cliente ha firmado el contrato exitosamente</p>
+                            <p class="font-medium text-purple-800">{{ __('Contrato Firmado') }}</p>
+                            <p class="text-sm text-purple-600">{{ __('El cliente ha firmado el contrato exitosamente') }}</p>
                             @if($contract->updated_at)
                                 <p class="text-sm text-purple-600 mt-1">Fecha de firma: {{ $contract->updated_at->format('d/m/Y H:i') }}</p>
                             @endif
@@ -527,7 +527,7 @@
 
     <div class="border border-gray-200 rounded p-6 bg-white mb-6">
         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h3 class="text-lg font-semibold text-[#625441]">Presupuesto</h3>
+            <h3 class="text-lg font-semibold text-[#625441]">{{ __('Presupuesto') }}</h3>
             <span class="px-3 py-1 text-xs font-medium rounded"
                   style="background:{{ $statusBadge['bg'] }};color:{{ $statusBadge['fg'] }};border:1px solid {{ $statusBadge['border'] }};">
                 {{ $statusBadge['label'] }}
@@ -544,15 +544,15 @@
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                     </svg>
                     <div>
-                        <p class="text-sm font-medium text-yellow-800">Presupuesto bloqueado</p>
-                        <p class="text-xs text-yellow-600">El presupuesto no puede editarse porque el cliente ya ha firmado el plan de pagos o el contrato.</p>
+                        <p class="text-sm font-medium text-yellow-800">{{ __('Presupuesto bloqueado') }}</p>
+                        <p class="text-xs text-yellow-600">{{ __('El presupuesto no puede editarse porque el cliente ya ha firmado el plan de pagos o el contrato.') }}</p>
                     </div>
                 </div>
             </div>
         @else
             <p class="text-sm text-[#806f56] mb-4">
                 Configura el plan de pagos del cliente. El presupuesto solo se mostrará en el dashboard del cliente cuando uses
-                <strong>Enviar al cliente</strong>.
+                <strong>{{ __('Enviar al cliente') }}</strong>.
             </p>
         @endif
 
@@ -561,18 +561,18 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm text-[#625441] mb-1">Plan</label>
+                    <label class="block text-sm text-[#625441] mb-1">{{ __('Plan') }}</label>
                     <select name="payment_method" id="bm_payment_method"
                             class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                             @if($isAnyDocumentSigned) disabled @endif>
-                        <option value="A"      @selected($bMethod === 'A')>Plan A — 80% inicial / 20% entrega</option>
-                        <option value="B"      @selected($bMethod === 'B')>Plan B — 60% inicial / 40% entrega</option>
-                        <option value="C"      @selected($bMethod === 'C')>Plan C — 25% inicial / 35% cuotas / 40% entrega</option>
-                        <option value="custom" @selected($bMethod === 'custom')>Personalizado</option>
+                        <option value="A"      @selected($bMethod === 'A')>{{ __('Plan A — 80% inicial / 20% entrega') }}</option>
+                        <option value="B"      @selected($bMethod === 'B')>{{ __('Plan B — 60% inicial / 40% entrega') }}</option>
+                        <option value="C"      @selected($bMethod === 'C')>{{ __('Plan C — 25% inicial / 35% cuotas / 40% entrega') }}</option>
+                        <option value="custom" @selected($bMethod === 'custom')>{{ __('Personalizado') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm text-[#625441] mb-1">Costos legales (USD)</label>
+                    <label class="block text-sm text-[#625441] mb-1">{{ __('Costos legales (USD)') }}</label>
                     <input type="number" step="0.01" min="0" name="legal_costs" value="{{ old('legal_costs', $bLegal) }}"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                            @if($isAnyDocumentSigned) disabled @endif>
@@ -588,7 +588,7 @@
                            @if($isAnyDocumentSigned) disabled @endif>
                 </div>
                 <div>
-                    <label class="block text-sm text-[#625441] mb-1">% Construcción</label>
+                    <label class="block text-sm text-[#625441] mb-1">{{ __('% Construcción') }}</label>
                     <input type="number" step="0.01" min="0" max="100" name="payment_construction_percentage"
                            id="bm_construction" value="{{ old('payment_construction_percentage', $bConstruction) }}"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
@@ -605,46 +605,46 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm text-[#625441] mb-1">Cantidad de cuotas (mensuales)</label>
+                    <label class="block text-sm text-[#625441] mb-1">{{ __('Cantidad de cuotas (mensuales)') }}</label>
                     <input type="number" step="1" min="0" max="120" name="payment_installments"
                            id="bm_installments" value="{{ old('payment_installments', $bInstallments) }}"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                            @if($isAnyDocumentSigned) disabled @endif>
                 </div>
                 <div>
-                    <label class="block text-sm text-[#625441] mb-1">Suma de porcentajes</label>
+                    <label class="block text-sm text-[#625441] mb-1">{{ __('Suma de porcentajes') }}</label>
                     <div id="bm_sum_display"
                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
                          style="font-family:monospace;">{{ $bInitial + $bConstruction + $bDelivery }}%</div>
-                    <p class="text-xs text-[#9b9b9b] mt-1">Debe sumar exactamente 100%.</p>
+                    <p class="text-xs text-[#9b9b9b] mt-1">{{ __('Debe sumar exactamente 100%.') }}</p>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm text-[#625441] mb-1">Notas internas (opcional)</label>
+                <label class="block text-sm text-[#625441] mb-1">{{ __('Notas internas (opcional)') }}</label>
                 <textarea name="budget_notes" rows="2"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                          placeholder="Observaciones para el equipo"
+                          placeholder="{{ __('Observaciones para el equipo') }}"
                           @if($isAnyDocumentSigned) disabled @endif>{{ old('budget_notes', $bNotes) }}</textarea>
             </div>
 
             <div class="border-t border-gray-200 pt-4">
-                <h4 class="text-sm font-semibold text-[#625441] mb-2">Vista previa para el cliente</h4>
+                <h4 class="text-sm font-semibold text-[#625441] mb-2">{{ __('Vista previa para el cliente') }}</h4>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
                     <div class="border border-gray-200 rounded p-3 bg-[#f9f8f6]">
-                        <div class="text-xs text-[#9b9b9b]">Pago inicial (con legales)</div>
+                        <div class="text-xs text-[#9b9b9b]">{{ __('Pago inicial (con legales)') }}</div>
                         <div class="font-semibold text-[#625441]" id="bm_pv_initial">${{ number_format($previewInitial + $bLegal, 2) }}</div>
                     </div>
                     <div class="border border-gray-200 rounded p-3 bg-[#f9f8f6]">
-                        <div class="text-xs text-[#9b9b9b]">Construcción</div>
+                        <div class="text-xs text-[#9b9b9b]">{{ __('Construcción') }}</div>
                         <div class="font-semibold text-[#625441]" id="bm_pv_construction">${{ number_format($previewConstruction, 2) }}</div>
                     </div>
                     <div class="border border-gray-200 rounded p-3 bg-[#f9f8f6]">
-                        <div class="text-xs text-[#9b9b9b]">Cuota mensual</div>
+                        <div class="text-xs text-[#9b9b9b]">{{ __('Cuota mensual') }}</div>
                         <div class="font-semibold text-[#625441]" id="bm_pv_cuota">${{ number_format($previewCuota, 2) }}</div>
                     </div>
                     <div class="border border-gray-200 rounded p-3 bg-[#f9f8f6]">
-                        <div class="text-xs text-[#9b9b9b]">Entrega</div>
+                        <div class="text-xs text-[#9b9b9b]">{{ __('Entrega') }}</div>
                         <div class="font-semibold text-[#625441]" id="bm_pv_delivery">${{ number_format($previewDelivery, 2) }}</div>
                     </div>
                 </div>
@@ -738,7 +738,7 @@
 
     <!-- Progress Section -->
     <div class="border border-gray-200 rounded p-6 bg-white mt-6">
-        <h3 class="text-lg font-semibold text-[#625441] mb-4">Progreso del Expediente</h3>
+        <h3 class="text-lg font-semibold text-[#625441] mb-4">{{ __('Progreso del Expediente') }}</h3>
         
         @php
             $totalDocs = max($reservation->documents->count(), 1);
@@ -750,7 +750,7 @@
         @endphp
         
         <div class="flex items-center gap-3 mb-4">
-            <div class="text-sm text-[#806f56] min-w-[140px]">Completitud documental</div>
+            <div class="text-sm text-[#806f56] min-w-[140px]">{{ __('Completitud documental') }}</div>
             <div class="flex-1 bg-gray-200 rounded h-2 overflow-hidden">
                 <div class="h-full transition-all duration-300" style="width:{{ $pct }}%;background:{{ $barColor }};"></div>
             </div>
@@ -758,7 +758,7 @@
         </div>
         
         <div class="flex items-center gap-2">
-            <span class="text-sm text-[#806f56]">Estado actual:</span>
+            <span class="text-sm text-[#806f56]">{{ __('Estado actual:') }}</span>
             @include('admin.crm._partials.badge', ['s' => $etapa])
         </div>
     </div>

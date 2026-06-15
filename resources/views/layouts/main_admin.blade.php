@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Sidebar Navigation</title>
+        <title>{{ __('Sidebar Navigation') }}</title>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
         <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
         <link
@@ -147,7 +147,7 @@
                         <div id="logo-section" class="pt-3 px-4 transition-all duration-300 ease-in-out">
                             <img
                                 src="https://dunadevelopment.com/wp-content/cache/seraphinite-accelerator/s/m/d/img/c97274bc659c16e3ced9d91b315e2fd2.63be.png"
-                                alt="Makai Residences"
+                                alt="{{ __('Makai Residences') }}"
                                 class="w-[208px] h-auto object-contain transition-all duration-300 ease-in-out"
                             />
                             <div
@@ -161,10 +161,10 @@
                             <a href="/" class="block">
                                 <button
                                     type="button"
-                                    aria-label="View Price List"
+                                    aria-label="{{ __('View Price List') }}"
                                     class="w-full h-12 relative flex items-center justify-center bg-brand-primary border border-brand-primary text-text-primary-inverse rounded-md font-semibold hover:bg-brand-primary-hover transition duration-200 cursor-pointer select-none"
                                 >
-                                    <span class="text-16 transition-all duration-300 ease-in-out">View Price List</span>
+                                    <span class="text-16 transition-all duration-300 ease-in-out">{{ __('View Price List') }}</span>
                                 </button>
                             </a>
                         </div>
@@ -408,7 +408,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">CRM Dashboard</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('CRM Dashboard') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -416,7 +416,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M20,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8A2,2 0 0,0 20,6M20,18H4V8H20V18Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Expedientes</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Expedientes') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -424,7 +424,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Gestión Documental</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Gestión Documental') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -432,7 +432,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M9,5A2,2 0 0,1 11,3H13A2,2 0 0,1 15,5H19A2,2 0 0,1 21,7V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V7A2,2 0 0,1 5,5H9M11,5V7H13V5H11M7,11H17V9H7V11M7,15H17V13H7V15M7,19H14V17H7V19Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Reservas y Contratos</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Reservas y Contratos') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -440,7 +440,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M14,6H22V8H14V6M14,10H22V12H14V10M14,14H20V16H14V14M2,2H12V12H2V2M4,4V10H10V4H4M2,14H12V22H2V14M4,16V20H10V16H4Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Proyectos</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Proyectos') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -448,7 +448,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Postventa</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Postventa') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -456,7 +456,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Aprobaciones</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Aprobaciones') }}</p>
                                     </a>
                                 </li>
                                 <li>
@@ -464,7 +464,7 @@
                                         <span class="p-1 text-text-primary-inverse">
                                             <svg class="material-design-icon__svg" width="20" height="20" viewBox="0 0 24 24"><path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V21A2,2 0 0,0 5,23H19A2,2 0 0,0 21,21V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M7,7H17V5H19V21H5V5H7V7M17,11H7V9H17V11M15,15H7V13H15V15M13,19H7V17H13V19Z"></path></svg>
                                         </span>
-                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">Tareas</p>
+                                        <p class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out">{{ __('Tareas') }}</p>
                                     </a>
                                 </li>
 
@@ -792,14 +792,14 @@
                                 <li>
                                     <button
                                         type="button"
-                                        aria-label="Log Out"
+                                        aria-label="{{ __('Log Out') }}"
                                         class="mt-5 w-full !justify-start !px-2 text-text-primary-inverse relative items-center inline-flex leading-[normal] py-2 rounded-md bg-transparent hover:bg-white/10 transition duration-200 ease-in-out cursor-pointer overflow-hidden select-none"
                                     >
                                         <span
                                             class="pi pi-sign-out mr-2"
                                         ></span>
                                         <span class="nav-text text-12 font-semibold transition-all duration-300 ease-in-out"
-                                            >Log Out</span
+                                            >{{ __('Log Out') }}</span
                                         >
                                     </button>
                                 </li>@endif

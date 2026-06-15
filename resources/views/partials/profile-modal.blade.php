@@ -72,8 +72,8 @@
 <div id="profileModal" class="profile-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
     <div class="profile-modal-card">
         <div class="profile-modal-head">
-            <h2 id="profileModalTitle" class="profile-modal-title">Mi perfil</h2>
-            <button type="button" class="profile-modal-x" onclick="closeProfileModal()" aria-label="Cerrar"><i class="pi pi-times"></i></button>
+            <h2 id="profileModalTitle" class="profile-modal-title">{{ __('Mi perfil') }}</h2>
+            <button type="button" class="profile-modal-x" onclick="closeProfileModal()" aria-label="{{ __('Cerrar') }}"><i class="pi pi-times"></i></button>
         </div>
 
         <form method="POST" action="{{ $pmAction }}" enctype="multipart/form-data">
@@ -86,7 +86,7 @@
                 @endif
                 @if ($errors->any())
                     <div class="pm-alert pm-alert-err">
-                        <div style="font-weight:600;margin-bottom:4px;"><i class="pi pi-exclamation-circle"></i> Revisa los datos:</div>
+                        <div style="font-weight:600;margin-bottom:4px;"><i class="pi pi-exclamation-circle"></i> {{ __('Revisa los datos:') }}</div>
                         <ul style="margin:0;padding-left:18px;">
                             @foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                         </ul>
@@ -109,7 +109,7 @@
                                 <input type="checkbox" name="remove_avatar" value="1"> Eliminar foto actual
                             </label>
                         @endif
-                        <div style="font-size:11px;color:#667085;margin-top:4px;">JPG, PNG o WebP · máx 4 MB</div>
+                        <div style="font-size:11px;color:#667085;margin-top:4px;">{{ __('JPG, PNG o WebP · máx 4 MB') }}</div>
                     </div>
                 </div>
 
@@ -117,28 +117,28 @@
                 <div class="profile-modal-section">
                     <div class="pm-grid">
                         <div>
-                            <label class="pm-label">Nombre</label>
-                            <input type="text" name="first_name" value="{{ old('first_name', $pmUser->first_name) }}" class="pm-input" placeholder="Nombre">
+                            <label class="pm-label">{{ __('Nombre') }}</label>
+                            <input type="text" name="first_name" value="{{ old('first_name', $pmUser->first_name) }}" class="pm-input" placeholder="{{ __('Nombre') }}">
                         </div>
                         <div>
-                            <label class="pm-label">Apellido</label>
-                            <input type="text" name="last_name" value="{{ old('last_name', $pmUser->last_name) }}" class="pm-input" placeholder="Apellido">
+                            <label class="pm-label">{{ __('Apellido') }}</label>
+                            <input type="text" name="last_name" value="{{ old('last_name', $pmUser->last_name) }}" class="pm-input" placeholder="{{ __('Apellido') }}">
                         </div>
                         <div class="pm-col-span-2">
-                            <label class="pm-label">Nombre para mostrar <span style="color:#98a2b3;font-weight:400;">(opcional)</span></label>
+                            <label class="pm-label">{{ __('Nombre para mostrar') }} <span style="color:#98a2b3;font-weight:400;">(opcional)</span></label>
                             <input type="text" name="name" value="{{ old('name', $pmUser->name) }}" class="pm-input" placeholder="{{ $pmFull }}">
                         </div>
                         <div>
-                            <label class="pm-label">Correo electrónico</label>
+                            <label class="pm-label">{{ __('Correo electrónico') }}</label>
                             <input type="email" name="email" required value="{{ old('email', $pmUser->email) }}" class="pm-input" placeholder="tu@correo.com">
                         </div>
                         <div>
-                            <label class="pm-label">Teléfono</label>
+                            <label class="pm-label">{{ __('Teléfono') }}</label>
                             <input type="text" name="phone" value="{{ old('phone', $pmUser->phone) }}" class="pm-input" placeholder="+57 300 000 0000">
                         </div>
                         <div class="pm-col-span-2">
-                            <label class="pm-label">País</label>
-                            <input type="text" name="country" value="{{ old('country', $pmUser->country) }}" class="pm-input" placeholder="Colombia">
+                            <label class="pm-label">{{ __('País') }}</label>
+                            <input type="text" name="country" value="{{ old('country', $pmUser->country) }}" class="pm-input" placeholder="{{ __('Colombia') }}">
                         </div>
                     </div>
                 </div>
@@ -146,28 +146,28 @@
                 {{-- Password --}}
                 <div class="pm-divider"></div>
                 <div class="profile-modal-section">
-                    <div class="pm-section-title">Cambiar contraseña</div>
-                    <div class="pm-section-sub">Déjalo en blanco si no quieres cambiarla.</div>
+                    <div class="pm-section-title">{{ __('Cambiar contraseña') }}</div>
+                    <div class="pm-section-sub">{{ __('Déjalo en blanco si no quieres cambiarla.') }}</div>
                     <div class="pm-grid">
                         <div class="pm-col-span-2">
-                            <label class="pm-label">Contraseña actual</label>
+                            <label class="pm-label">{{ __('Contraseña actual') }}</label>
                             <input type="password" name="current_password" autocomplete="current-password" class="pm-input" placeholder="••••••••">
                         </div>
                         <div>
-                            <label class="pm-label">Nueva contraseña</label>
-                            <input type="password" name="password" autocomplete="new-password" class="pm-input" placeholder="Mín. 8 caracteres">
+                            <label class="pm-label">{{ __('Nueva contraseña') }}</label>
+                            <input type="password" name="password" autocomplete="new-password" class="pm-input" placeholder="{{ __('Mín. 8 caracteres') }}">
                         </div>
                         <div>
-                            <label class="pm-label">Confirmar</label>
-                            <input type="password" name="password_confirmation" autocomplete="new-password" class="pm-input" placeholder="Repite la contraseña">
+                            <label class="pm-label">{{ __('Confirmar') }}</label>
+                            <input type="password" name="password_confirmation" autocomplete="new-password" class="pm-input" placeholder="{{ __('Repite la contraseña') }}">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="profile-modal-foot">
-                <button type="button" class="pm-btn pm-btn-ghost" onclick="closeProfileModal()">Cancelar</button>
-                <button type="submit" class="pm-btn pm-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+                <button type="button" class="pm-btn pm-btn-ghost" onclick="closeProfileModal()">{{ __('Cancelar') }}</button>
+                <button type="submit" class="pm-btn pm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar cambios') }}</button>
             </div>
         </form>
     </div>

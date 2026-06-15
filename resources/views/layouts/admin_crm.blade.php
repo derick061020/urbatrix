@@ -273,7 +273,7 @@
             </span>
             <div class="flex-1 min-w-0 leading-none">
                 <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
-                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Duna Development</div>
+                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
             </div>
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
         </a>

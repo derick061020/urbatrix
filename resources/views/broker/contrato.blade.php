@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-2">Tu comisión</div>
+                <div class="text-[10px] uppercase tracking-wider text-ink-500 mb-2">{{ __('Tu comisión') }}</div>
                 <div class="font-display text-[56px] font-bold text-brand leading-none">{{ rtrim(rtrim(number_format($rate,2),'0'),'.') }}%</div>
             </div>
         </div>
@@ -59,7 +59,7 @@
         <div x-show="tab==='documentos'" class="mt-4 space-y-4" style="display:none">
             @if($brokerDocs->count())
                 <div class="brk-card overflow-hidden">
-                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">Tus contratos</div>
+                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Tus contratos') }}</div>
                     <div class="divide-y divide-ink-100">
                         @foreach($brokerDocs as $doc)
                             <div class="px-5 py-3.5 flex items-center gap-3">
@@ -68,7 +68,7 @@
                                     <div class="text-[13px] font-semibold text-ink-950 truncate">{{ $doc->title }}</div>
                                     <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
                                 </div>
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> Descargar</a>
+                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
                             </div>
                         @endforeach
                     </div>
@@ -77,7 +77,7 @@
 
             <div class="brk-card overflow-hidden">
                 @if($brokerDocs->count())
-                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">Documentos generales</div>
+                    <div class="px-5 py-3 border-b border-ink-100 text-[11px] font-semibold uppercase tracking-wide text-ink-500">{{ __('Documentos generales') }}</div>
                 @endif
                 <div class="divide-y divide-ink-100">
                     @forelse($contractDocs as $doc)
@@ -88,12 +88,12 @@
                                 <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
                             </div>
                             @if($doc->downloadUrl())
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> Descargar</a>
+                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
                             @endif
                         </div>
                     @empty
                         @if(! $brokerDocs->count())
-                            <div class="px-5 py-10 text-center text-[12px] text-ink-400">No hay documentos de contrato disponibles. Duna los publicará aquí cuando estén listos.</div>
+                            <div class="px-5 py-10 text-center text-[12px] text-ink-400">{{ __('No hay documentos de contrato disponibles. Duna los publicará aquí cuando estén listos.') }}</div>
                         @endif
                     @endforelse
                 </div>

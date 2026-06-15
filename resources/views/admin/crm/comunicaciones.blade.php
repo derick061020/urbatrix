@@ -41,7 +41,7 @@
 
     <p class="text-[13px] text-ink-600 max-w-3xl">
         Activa o desactiva cada comunicación que el sistema envía al comprador, por proyecto y por canal.
-        Todo proyecto nuevo entra en <strong class="text-ink-900">silencio total</strong>: importar datos nunca
+        Todo proyecto nuevo entra en <strong class="text-ink-900">{{ __('silencio total') }}</strong>: importar datos nunca
         dispara comunicaciones hasta que tú las enciendas.
     </p>
 
@@ -59,19 +59,19 @@
         <div class="flex flex-wrap gap-5 items-start justify-between">
             <div>
                 <h2 class="font-display text-[18px] font-semibold text-ink-950" id="ccProjName">—</h2>
-                <div class="text-[12px] text-ink-500" id="ccProjSub">Duna Development Group · Cap Cana</div>
+                <div class="text-[12px] text-ink-500" id="ccProjSub">{{ __('Duna Development Group · Cap Cana') }}</div>
                 <div class="flex items-center gap-3 mt-3">
-                    <button class="cc-sw fam" id="ccMasterSw" role="switch" aria-checked="false" aria-label="Estado de comunicaciones del proyecto"></button>
-                    <span class="text-[13px] font-semibold text-ink-900">Comunicaciones del proyecto</span>
+                    <button class="cc-sw fam" id="ccMasterSw" role="switch" aria-checked="false" aria-label="{{ __('Estado de comunicaciones del proyecto') }}"></button>
+                    <span class="text-[13px] font-semibold text-ink-900">{{ __('Comunicaciones del proyecto') }}</span>
                     <span class="crm-pill" id="ccMasterPill"></span>
                 </div>
             </div>
             <div class="flex flex-wrap gap-4 items-end">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] uppercase tracking-wider font-semibold text-ink-400" for="ccArranque">Fecha de arranque</label>
+                    <label class="text-[10px] uppercase tracking-wider font-semibold text-ink-400" for="ccArranque">{{ __('Fecha de arranque') }}</label>
                     <input type="date" id="ccArranque" class="h-9 px-3 border border-ink-200 rounded-lg text-[13px] text-ink-900 outline-none focus:border-brand">
                 </div>
-                <button class="crm-btn crm-btn-ghost" id="ccCopyBtn"><i class="pi pi-copy"></i> Copiar de otro proyecto…</button>
+                <button class="crm-btn crm-btn-ghost" id="ccCopyBtn"><i class="pi pi-copy"></i> {{ __('Copiar de otro proyecto…') }}</button>
             </div>
         </div>
         <div class="mt-4 pt-4 border-t border-ink-100">
@@ -80,7 +80,7 @@
                 Los registros importados (origen migrado) nunca notifican.
             </p>
             <div class="hidden mt-4 rounded-lg border border-warn/30 border-l-4 border-l-warn bg-warn-soft px-4 py-3 text-[13px] text-ink-700" id="ccSilenceBanner">
-                <strong>Proyecto en silencio.</strong> Ninguna comunicación sale al comprador. Los interruptores están
+                <strong>{{ __('Proyecto en silencio.') }}</strong> Ninguna comunicación sale al comprador. Los interruptores están
                 bloqueados hasta que cambies el estado del proyecto a “Activo”.
             </div>
         </div>
@@ -89,12 +89,12 @@
     {{-- Catálogo --}}
     <div class="crm-card overflow-hidden">
         <div class="cc-grid cc-head px-4 py-2.5 border-b border-ink-100 text-[11px] uppercase tracking-wider font-semibold text-ink-400">
-            <div>Comunicación</div>
-            <div class="text-center">Email</div>
+            <div>{{ __('Comunicación') }}</div>
+            <div class="text-center">{{ __('Email') }}</div>
             <div class="text-center">WhatsApp</div>
             <div class="text-center">In-app</div>
-            <div>Plantilla</div>
-            <div>Activa desde</div>
+            <div>{{ __('Plantilla') }}</div>
+            <div>{{ __('Activa desde') }}</div>
         </div>
         <div id="ccCatalog"></div>
     </div>
@@ -103,10 +103,10 @@
     <div class="crm-card p-5 flex gap-3 items-start">
         <span class="text-[18px]"><i class="pi pi-megaphone text-brand"></i></span>
         <div>
-            <h3 class="text-[14px] font-semibold text-ink-900 m-0">Comunicaciones de marketing</h3>
+            <h3 class="text-[14px] font-semibold text-ink-900 m-0">{{ __('Comunicaciones de marketing') }}</h3>
             <p class="text-[12px] text-ink-500 m-0 mt-1">
                 Novedades, lanzamientos y promociones. No se controlan aquí: dependen del
-                <strong>consentimiento del comprador</strong> (casilla opcional, revocable), conforme a CAN-SPAM, GDPR y Ley 172-13.
+                <strong>{{ __('consentimiento del comprador') }}</strong> (casilla opcional, revocable), conforme a CAN-SPAM, GDPR y Ley 172-13.
             </p>
         </div>
     </div>

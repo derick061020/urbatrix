@@ -26,19 +26,19 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-home text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Información general</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Información general') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Nombre / Identificador <span class="text-err">*</span></label>
-            <input type="text" name="name" required value="{{ old('name', $u->name ?? '') }}" placeholder="Ej. A-1201" class="crm-input pl-3 mt-1">
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre / Identificador') }} <span class="text-err">*</span></label>
+            <input type="text" name="name" required value="{{ old('name', $u->name ?? '') }}" placeholder="{{ __('Ej. A-1201') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Código interno</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Código interno') }}</label>
             <input type="text" name="custom_id" value="{{ old('custom_id', $u->custom_id ?? '') }}" placeholder="A-1201" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Estado <span class="text-err">*</span></label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Estado') }} <span class="text-err">*</span></label>
             <select name="status" required class="crm-input pl-3 mt-1">
                 @php $currentStatus = old('status', $u->status ?? 'AVAILABLE'); @endphp
                 @foreach($statusOptions as $val => $label)
@@ -47,7 +47,7 @@
             </select>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Tipo <span class="text-err">*</span></label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Tipo') }} <span class="text-err">*</span></label>
             <select name="type" required class="crm-input pl-3 mt-1">
                 @foreach($typeOptions as $val => $label)
                     <option value="{{ $val }}" {{ $currentType === $val ? 'selected' : '' }}>{{ $label }}</option>
@@ -55,19 +55,19 @@
             </select>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Precio <span class="text-err">*</span></label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Precio') }} <span class="text-err">*</span></label>
             <div class="relative mt-1">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-ink-500">$</span>
                 <input type="number" step="0.01" min="0" name="price" required value="{{ old('price', $u->price ?? 0) }}" class="crm-input pl-7">
             </div>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Texto del precio</label>
-            <input type="text" name="price_wording" value="{{ old('price_wording', $u->price_wording ?? '') }}" placeholder="Desde / Por consultar…" class="crm-input pl-3 mt-1">
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Texto del precio') }}</label>
+            <input type="text" name="price_wording" value="{{ old('price_wording', $u->price_wording ?? '') }}" placeholder="{{ __('Desde / Por consultar…') }}" class="crm-input pl-3 mt-1">
         </div>
         <div class="sm:col-span-2">
-            <label class="text-[12px] font-semibold text-ink-700">Dirección</label>
-            <input type="text" name="address" list="unit-address-options" value="{{ old('address', $u->address ?? '') }}" placeholder="Ej. 1A Launch Boulevard" class="crm-input pl-3 mt-1">
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Dirección') }}</label>
+            <input type="text" name="address" list="unit-address-options" value="{{ old('address', $u->address ?? '') }}" placeholder="{{ __('Ej. 1A Launch Boulevard') }}" class="crm-input pl-3 mt-1">
             <datalist id="unit-address-options">
                 @foreach($addressOptions as $addr)
                     <option value="{{ $addr }}"></option>
@@ -80,8 +80,8 @@
             @include('admin.units._partials.toggle', ['name' => 'plot',         'label' => 'Lote',          'checked' => old('plot', $u->plot ?? false)])
         </div>
         <div class="sm:col-span-2 lg:col-span-3">
-            <label class="text-[12px] font-semibold text-ink-700">Descripción</label>
-            <textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none" placeholder="Notas internas sobre la unidad…">{{ old('description', $u->description ?? '') }}</textarea>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Descripción') }}</label>
+            <textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none" placeholder="{{ __('Notas internas sobre la unidad…') }}">{{ old('description', $u->description ?? '') }}</textarea>
         </div>
     </div>
 </div>
@@ -90,27 +90,27 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-bolt text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Disponibilidad &amp; demanda</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Disponibilidad &amp; demanda') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Reservada hasta</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Reservada hasta') }}</label>
             <input type="datetime-local" name="reserved_until"
                    value="{{ old('reserved_until', $u && $u->reserved_until ? \Carbon\Carbon::parse($u->reserved_until)->format('Y-m-d\TH:i') : '') }}"
                    class="crm-input pl-3 mt-1">
-            <p class="text-[10px] text-ink-400 mt-1">Aparece como contador en la card del front.</p>
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Aparece como contador en la card del front.') }}</p>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Liberada el</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Liberada el') }}</label>
             <input type="datetime-local" name="released_at"
                    value="{{ old('released_at', $u && $u->released_at ? \Carbon\Carbon::parse($u->released_at)->format('Y-m-d\TH:i') : '') }}"
                    class="crm-input pl-3 mt-1">
-            <p class="text-[10px] text-ink-400 mt-1">Usado por el texto "released N days ago" de 2nd Chance.</p>
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Usado por el texto "released N days ago" de 2nd Chance.') }}</p>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Vistas hoy</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Vistas hoy') }}</label>
             <input type="number" min="0" name="views_today" value="{{ old('views_today', $u->views_today ?? 0) }}" class="crm-input pl-3 mt-1">
-            <p class="text-[10px] text-ink-400 mt-1">Total acumulado: <b>{{ (int)($u->views_total ?? 0) }}</b>. Click para reiniciar el contador del día.</p>
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Total acumulado:') }} <b>{{ (int)($u->views_total ?? 0) }}</b>{{ __('. Click para reiniciar el contador del día.') }}</p>
         </div>
         <div class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-6 pt-1">
             @include('admin.units._partials.toggle', ['name' => 'is_high_demand',   'label' => 'High Demand',  'checked' => old('is_high_demand',   $u->is_high_demand   ?? false)])
@@ -123,7 +123,7 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-chart-line text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Contenido segmentado · Investment / Living</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Contenido segmentado · Investment / Living') }}</div>
     </div>
     <div class="p-5">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -131,26 +131,26 @@
             <div class="space-y-4 pb-6 lg:pb-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-ink-200">
                 <div class="flex items-center gap-2">
                     <span class="w-7 h-7 rounded-lg bg-info-soft text-info flex items-center justify-center"><i class="pi pi-chart-line text-[13px]"></i></span>
-                    <h3 class="text-[13px] font-bold text-ink-900">For Investment</h3>
+                    <h3 class="text-[13px] font-bold text-ink-900">{{ __('For Investment') }}</h3>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Texto "For Investment"</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Texto "For Investment"') }}</label>
                     <textarea name="for_investment_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
-                              placeholder="Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
+                              placeholder="{{ __('Mensaje orientado a inversores. Ej: ROI proyectado, alquiler corto plazo, plusvalía...') }}">{{ old('for_investment_text', $u->for_investment_text ?? '') }}</textarea>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Valor proyectado ($)</label>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Valor proyectado ($)') }}</label>
                         <input type="number" step="0.01" min="0" name="projected_value" value="{{ old('projected_value', $u->projected_value ?? '') }}" class="crm-input pl-3 mt-1">
                     </div>
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Año proyección</label>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Año proyección') }}</label>
                         <input type="text" maxlength="10" name="projected_value_year" value="{{ old('projected_value_year', $u->projected_value_year ?? '') }}" class="crm-input pl-3 mt-1" placeholder="2027">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Comentario comparativo</label>
-                    <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="Miami Beach reference: $900/m² · Makai $450/m² — 50% menos">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Comentario comparativo') }}</label>
+                    <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="{{ __('Miami Beach reference: $900/m² · Makai $450/m² — 50% menos') }}">
                 </div>
             </div>
 
@@ -158,25 +158,25 @@
             <div class="space-y-4 pt-6 lg:pt-0 lg:pl-8">
                 <div class="flex items-center gap-2">
                     <span class="w-7 h-7 rounded-lg bg-brand-soft text-brand flex items-center justify-center"><i class="pi pi-home text-[13px]"></i></span>
-                    <h3 class="text-[13px] font-bold text-ink-900">For Living</h3>
+                    <h3 class="text-[13px] font-bold text-ink-900">{{ __('For Living') }}</h3>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Texto "For Living"</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Texto "For Living"') }}</label>
                     <textarea name="for_living_text" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"
-                              placeholder="Mensaje orientado a residentes. Ej: barrio, escuelas, lifestyle, terraza...">{{ old('for_living_text', $u->for_living_text ?? '') }}</textarea>
+                              placeholder="{{ __('Mensaje orientado a residentes. Ej: barrio, escuelas, lifestyle, terraza...') }}">{{ old('for_living_text', $u->for_living_text ?? '') }}</textarea>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Walk score (0-100)</label>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Walk score (0-100)') }}</label>
                         <input type="number" min="0" max="100" name="walk_score" value="{{ old('walk_score', $u->walk_score ?? '') }}" class="crm-input pl-3 mt-1">
                     </div>
                     <div>
-                        <label class="text-[12px] font-semibold text-ink-700">Cercanía a escuelas</label>
-                        <input type="text" maxlength="255" name="school_proximity" value="{{ old('school_proximity', $u->school_proximity ?? '') }}" class="crm-input pl-3 mt-1" placeholder="International School – 1.2 km">
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Cercanía a escuelas') }}</label>
+                        <input type="text" maxlength="255" name="school_proximity" value="{{ old('school_proximity', $u->school_proximity ?? '') }}" class="crm-input pl-3 mt-1" placeholder="{{ __('International School – 1.2 km') }}">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Amenities</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Amenities') }}</label>
                     <div class="mt-2">
                     @php
                         $amenitiesOptions = UnitOptions::get('amenities');
@@ -211,15 +211,15 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-file-edit text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Reserva — Detalles</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Reserva — Detalles') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Descuento</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Descuento') }}</label>
             <input type="number" step="0.01" name="discount" value="{{ old('discount', $u->discount ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Parqueos adicionales</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Parqueos adicionales') }}</label>
             <select name="additional_parking" class="crm-input pl-3 mt-1">
                 @for($i = 0; $i <= 5; $i++)
                     <option value="{{ $i }}" {{ (int)old('additional_parking', $u->additional_parking ?? 0) === $i ? 'selected' : '' }}>{{ $i === 0 ? 'Ninguno' : $i }}</option>
@@ -227,11 +227,11 @@
             </select>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Ajuste de precio</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Ajuste de precio') }}</label>
             <input type="number" step="0.01" name="price_adjustment" value="{{ old('price_adjustment', $u->price_adjustment ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Precio de compra</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Precio de compra') }}</label>
             <input type="number" step="0.01" name="purchase_price" value="{{ old('purchase_price', $u->purchase_price ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
     </div>
@@ -241,30 +241,30 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-user text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Cliente y asesor</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Cliente y asesor') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Nombre</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre') }}</label>
             <input type="text" name="first_name" value="{{ old('first_name', $u->first_name ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Apellido</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Apellido') }}</label>
             <input type="text" name="last_name" value="{{ old('last_name', $u->last_name ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
             <input type="text" name="contact_number" value="{{ old('contact_number', $u->contact_number ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Email</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Email') }}</label>
             <input type="email" name="email" value="{{ old('email', $u->email ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div class="lg:col-span-2">
-            <label class="text-[12px] font-semibold text-ink-700">Asesor asignado</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Asesor asignado') }}</label>
             <select name="agent_id" class="crm-input pl-3 mt-1">
                 @php $currentAgent = old('agent_id', $u->agent_id ?? null); @endphp
-                <option value="" {{ $currentAgent === null || $currentAgent === '' ? 'selected' : '' }}>Ninguno</option>
+                <option value="" {{ $currentAgent === null || $currentAgent === '' ? 'selected' : '' }}>{{ __('Ninguno') }}</option>
                 @foreach($agents ?? [] as $agent)
                     <option value="{{ $agent->id }}" {{ (int)$currentAgent === (int)$agent->id ? 'selected' : '' }}>{{ $agent->name }}</option>
                 @endforeach
@@ -277,11 +277,11 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-th-large text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Especificaciones</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Especificaciones') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Planta</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Planta') }}</label>
             <select name="floor" class="crm-input pl-3 mt-1">
                 @php $currentFloor = old('floor', $u->floor ?? ''); @endphp
                 <option value="" {{ $currentFloor === '' ? 'selected' : '' }}>—</option>
@@ -291,27 +291,27 @@
             </select>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Layout</label>
-            <input type="text" name="layout" value="{{ old('layout', $u->layout ?? '') }}" placeholder="Ej. 2B-A" class="crm-input pl-3 mt-1">
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Layout') }}</label>
+            <input type="text" name="layout" value="{{ old('layout', $u->layout ?? '') }}" placeholder="{{ __('Ej. 2B-A') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
             <label class="text-[12px] font-semibold text-ink-700">Camas</label>
             <input type="number" min="0" name="bedrooms" value="{{ old('bedrooms', $u->bedrooms ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Baños</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Baños') }}</label>
             <input type="number" step="0.1" min="0" name="bathrooms" value="{{ old('bathrooms', $u->bathrooms ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Parqueos</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Parqueos') }}</label>
             <input type="number" min="0" name="parking_bays" value="{{ old('parking_bays', $u->parking_bays ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Piscinas</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Piscinas') }}</label>
             <input type="number" min="0" name="pools" value="{{ old('pools', $u->pools ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Orientación</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Orientación') }}</label>
             <select name="direction" class="crm-input pl-3 mt-1">
                 @php $currentDir = old('direction', $u->direction ?? ''); @endphp
                 <option value="" {{ $currentDir === '' ? 'selected' : '' }}>—</option>
@@ -321,7 +321,7 @@
             </select>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Vista</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Vista') }}</label>
             <select name="outlook" class="crm-input pl-3 mt-1">
                 @php $currentOutlook = old('outlook', $u->outlook ?? ''); @endphp
                 <option value="" {{ $currentOutlook === '' ? 'selected' : '' }}>—</option>
@@ -343,19 +343,19 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-arrows-h text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Dimensiones</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Dimensiones') }}</div>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Área interior (m²)</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área interior (m²)') }}</label>
             <input type="number" step="0.01" min="0" name="internal_area" value="{{ old('internal_area', $u->internal_area ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Área exterior / terraza (m²)</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área exterior / terraza (m²)') }}</label>
             <input type="number" step="0.01" min="0" name="external_area" value="{{ old('external_area', $u->external_area ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">Área total (m²)</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área total (m²)') }}</label>
             <input type="number" step="0.01" min="0" name="total_area" value="{{ old('total_area', $u->total_area ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
     </div>
@@ -366,7 +366,7 @@
     <div class="crm-card">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-wallet text-ink-500"></i>
-            <div class="text-[13px] font-bold text-ink-700">Gastos mensuales</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Gastos mensuales') }}</div>
         </div>
         <div class="p-5 grid grid-cols-3 gap-4">
             <div>
@@ -382,15 +382,15 @@
                 <input type="number" step="0.01" min="0" name="expense_3" value="{{ old('expense_3', $u->expense_3 ?? '') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Mantenimiento (levies)</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Mantenimiento (levies)') }}</label>
                 <input type="number" step="0.01" min="0" name="levies" value="{{ old('levies', $u->levies ?? '') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Impuestos (rates)</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Impuestos (rates)') }}</label>
                 <input type="number" step="0.01" min="0" name="rates" value="{{ old('rates', $u->rates ?? '') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">Alquiler estimado</label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Alquiler estimado') }}</label>
                 <input type="number" step="0.01" min="0" name="est_rental" value="{{ old('est_rental', $u->est_rental ?? '') }}" class="crm-input pl-3 mt-1">
             </div>
         </div>
@@ -399,7 +399,7 @@
     <div class="crm-card">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-tag text-ink-500"></i>
-            <div class="text-[13px] font-bold text-ink-700">Campos personalizados</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Campos personalizados') }}</div>
         </div>
         <div class="p-5 grid grid-cols-1 gap-4">
             <div>
@@ -422,7 +422,7 @@
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-cog text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">Configuración avanzada</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Configuración avanzada') }}</div>
     </div>
     <div class="p-5 space-y-4">
         @include('admin.units._partials.toggle', [
@@ -432,7 +432,7 @@
             'checked' => old('bypass_launch_date', $u->bypass_launch_date ?? false),
         ])
         <div class="h-px bg-ink-100"></div>
-        <div class="text-[11px] uppercase font-semibold text-ink-400 tracking-wide">Visualización</div>
+        <div class="text-[11px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Visualización') }}</div>
         @include('admin.units._partials.toggle', [
             'name' => 'display_on_home_page',
             'label' => 'Mostrar en la página principal',
@@ -445,7 +445,7 @@
             'checked' => old('show_enquire_button', $u->show_enquire_button ?? false),
         ])
         <div class="h-px bg-ink-100"></div>
-        <div class="text-[11px] uppercase font-semibold text-ink-400 tracking-wide">Precio</div>
+        <div class="text-[11px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Precio') }}</div>
         @include('admin.units._partials.toggle', [
             'name' => 'set_discount_globally',
             'label' => 'Aplicar descuento globalmente',

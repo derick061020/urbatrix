@@ -10,8 +10,8 @@
 <div class="bg-gray-100 min-h-screen w-full">
     <div class="p-8">
         <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-semibold text-[#5c4a32]">Menu</h1>
-        <button class="px-5 py-2 bg-[#5c6b4a] text-white text-sm font-semibold rounded hover:bg-[#4a5a3a] transition">Add</button>
+        <h1 class="text-3xl font-semibold text-[#5c4a32]">{{ __('Menu') }}</h1>
+        <button class="px-5 py-2 bg-[#5c6b4a] text-white text-sm font-semibold rounded hover:bg-[#4a5a3a] transition">{{ __('Add') }}</button>
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-hidden ">
@@ -19,14 +19,14 @@
             <thead>
                 <tr class="bg-[#5c6b4a] text-xs text-white uppercase">
                     <th class="py-3 px-6 font-semibold text-center">Title</th>
-                    <th class="py-3 px-6 font-semibold text-center">Order</th>
+                    <th class="py-3 px-6 font-semibold text-center">{{ __('Order') }}</th>
                     <th class="py-3 px-6 font-semibold text-center">Visible</th>
                     <th class="py-3 px-6 font-semibold text-center">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Main Website (EN)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Main Website (EN)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">1</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -37,7 +37,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Brochure (EN)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Brochure (EN)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">2</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -48,7 +48,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Floor Plans</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Floor Plans') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">3</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -59,7 +59,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">ROIs (EN)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('ROIs (EN)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">4</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -70,7 +70,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">FAQs (EN)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('FAQs (EN)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">5</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -81,7 +81,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Specifications (EN)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Specifications (EN)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">6</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -92,7 +92,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Main Website (ES)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Main Website (ES)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">7</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -103,7 +103,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Brochure (ES)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Brochure (ES)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">8</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">
@@ -114,7 +114,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">Makai Especificaciones (ES)</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Makai Especificaciones (ES)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">10</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">

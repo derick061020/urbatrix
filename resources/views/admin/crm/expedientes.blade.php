@@ -41,8 +41,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $reservations->total() }} clientes activos</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-exportar-expedientes').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> Exportar</button>
-            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nuevo Expediente</button>
+            <button type="button" onclick="document.getElementById('modal-exportar-expedientes').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo Expediente') }}</button>
         </div>
     </div>
 
@@ -57,21 +57,21 @@
                 <div class="relative w-full sm:w-64">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Buscar expediente…" class="crm-input pr-3">
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Buscar expediente…') }}" class="crm-input pr-3">
                 </div>
                 <select name="unit_id" class="crm-input pl-3 w-full sm:w-44">
-                    <option value="">Todas las unidades</option>
+                    <option value="">{{ __('Todas las unidades') }}</option>
                     @foreach($units as $u)
                         <option value="{{ $u->id }}" @selected((string)($unitId ?? '') === (string)$u->id)>{{ $u->custom_id ?? $u->name }} {{ $u->name && $u->custom_id ? '· '.$u->name : '' }}</option>
                     @endforeach
                 </select>
-                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Desde">
+                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Desde') }}">
                 <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
-                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> Filtros</button>
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
                 @if($hasFilters)
-                    <a href="{{ route('admin.crm.expedientes', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> Limpiar</a>
+                    <a href="{{ route('admin.crm.expedientes', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> {{ __('Limpiar') }}</a>
                 @endif
-                <button type="button" class="crm-btn crm-btn-ghost">Acciones en lote <i class="pi pi-angle-down text-[10px]"></i></button>
+                <button type="button" class="crm-btn crm-btn-ghost">{{ __('Acciones en lote') }} <i class="pi pi-angle-down text-[10px]"></i></button>
             </form>
         </div>
 
@@ -80,13 +80,13 @@
                 <thead class="bg-ink-50">
                     <tr>
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
-                        <th>Cliente</th>
-                        <th>Unidad</th>
-                        <th>Paso</th>
-                        <th>Estado</th>
-                        <th>Asesor</th>
-                        <th>Pagado</th>
-                        <th>Últ. actividad</th>
+                        <th>{{ __('Cliente') }}</th>
+                        <th>{{ __('Unidad') }}</th>
+                        <th>{{ __('Paso') }}</th>
+                        <th>{{ __('Estado') }}</th>
+                        <th>{{ __('Asesor') }}</th>
+                        <th>{{ __('Pagado') }}</th>
+                        <th>{{ __('Últ. actividad') }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -115,7 +115,7 @@
                             </td>
                             <td>
                                 <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                <div class="text-[11px] text-ink-500">Makai Residences</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
                             </td>
                             <td>
                                 @php $phaseNames = [1 => 'Reserva', 2 => 'KYC', 3 => 'Presupuesto', 4 => 'Plan de pagos / Documentos', 5 => 'Contrato firmado']; @endphp
@@ -136,11 +136,11 @@
                             </td>
                             <td><span class="text-[12px] text-ink-500">{{ $r->updated_at?->diffForHumans() }}</span></td>
                             <td class="text-right">
-                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">Ver &rarr;</a>
+                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Ver &rarr;') }}</a>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="text-center text-[12px] text-ink-500 py-8">No hay expedientes. Crea uno con <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">Nueva reserva</button>.</td></tr>
+                        <tr><td colspan="9" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay expedientes. Crea uno con') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Nueva reserva') }}</button>.</td></tr>
                     @endforelse
                 </tbody>
             </table>

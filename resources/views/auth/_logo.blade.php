@@ -7,6 +7,6 @@
     </span>
     <span class="flex flex-col leading-none">
         <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">MAKAI</span>
-        <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Duna Development</span>
+        <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
     </span>
 </a>

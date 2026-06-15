@@ -17,12 +17,12 @@
     <div class="crm-card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
         <a href="{{ route('admin.units') }}" class="w-10 h-10 rounded-full border border-ink-200 flex items-center justify-center text-ink-600 hover:bg-ink-50 shrink-0"><i class="pi pi-arrow-left text-[12px]"></i></a>
         <div class="flex-1 min-w-0">
-            <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">Nueva unidad</div>
-            <div class="text-[20px] font-bold text-ink-950 leading-tight">Crear una unidad</div>
-            <div class="text-[12px] text-ink-500 mt-0.5">Completá los datos básicos. Las imágenes se pueden subir tras crearla.</div>
+            <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Nueva unidad') }}</div>
+            <div class="text-[20px] font-bold text-ink-950 leading-tight">{{ __('Crear una unidad') }}</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">{{ __('Completá los datos básicos. Las imágenes se pueden subir tras crearla.') }}</div>
         </div>
         <div class="flex items-center gap-2">
-            <button type="submit" form="unit-create-form" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Crear unidad</button>
+            <button type="submit" form="unit-create-form" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Crear unidad') }}</button>
         </div>
     </div>
 
@@ -41,8 +41,8 @@
     </div>
 
     <div class="flex items-center justify-end gap-2 pt-2">
-        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">Cancelar</a>
-        <button type="submit" form="unit-create-form" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Crear unidad</button>
+        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</a>
+        <button type="submit" form="unit-create-form" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Crear unidad') }}</button>
     </div>
 </div>
 @endsection

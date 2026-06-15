@@ -157,7 +157,7 @@
             </span>
             <span class="flex flex-col leading-none">
                 <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">MAKAI</span>
-                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Duna Development</span>
+                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
             </span>
         </a>
 
@@ -185,15 +185,15 @@
 
         <div class="flex items-center gap-3">
             <div class="text-right hidden md:block">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Reserva</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Reserva') }}</div>
                 <div class="text-[11px] font-bold text-ink-950">{{ $reservation->reservation_code ?? '—' }}</div>
             </div>
-            <a href="/" class="auth-btn auth-btn-ghost w-10 px-0" title="Cerrar"><i class="pi pi-times text-[12px]"></i></a>
+            <a href="/" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Cerrar') }}"><i class="pi pi-times text-[12px]"></i></a>
         </div>
     </header>
 
     {{-- "Volver" button on steps 2-4 --}}
-    <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> Volver</button>
+    <button type="button" onclick="prevStep()" id="back-btn" class="hidden absolute top-[100px] left-7 lg:left-11 z-20 auth-btn auth-btn-ghost"><i class="pi pi-angle-left text-[12px]"></i> {{ __('Volver') }}</button>
 
     {{-- ============= BODY ============= --}}
     <main class="flex-1 px-5 py-8 relative">
@@ -210,87 +210,87 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-user text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Datos básicos y documentos</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Información de contacto y documento del adquiriente</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Datos básicos y documentos') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Información de contacto y documento del adquiriente') }}</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
-                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Datos de contacto</div>
+                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">{{ __('Datos de contacto') }}</div>
 
                 {{-- Los campos que ya trae la cuenta llegan bloqueados; los que falten quedan
                      editables para que el cliente pueda completarlos. --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="field-label">Nombre <span class="field-required">*</span></label>
-                        <input type="text" class="auth-input" data-name="first_name" value="{{ $reservation->first_name ?? '' }}" placeholder="Tu nombre" {{ !empty($reservation->first_name) ? 'readonly' : '' }}>
+                        <label class="field-label">{{ __('Nombre') }} <span class="field-required">*</span></label>
+                        <input type="text" class="auth-input" data-name="first_name" value="{{ $reservation->first_name ?? '' }}" placeholder="{{ __('Tu nombre') }}" {{ !empty($reservation->first_name) ? 'readonly' : '' }}>
                     </div>
                     <div>
-                        <label class="field-label">Apellido <span class="field-required">*</span></label>
-                        <input type="text" class="auth-input" data-name="last_name" value="{{ $reservation->last_name ?? '' }}" placeholder="Tu apellido" {{ !empty($reservation->last_name) ? 'readonly' : '' }}>
+                        <label class="field-label">{{ __('Apellido') }} <span class="field-required">*</span></label>
+                        <input type="text" class="auth-input" data-name="last_name" value="{{ $reservation->last_name ?? '' }}" placeholder="{{ __('Tu apellido') }}" {{ !empty($reservation->last_name) ? 'readonly' : '' }}>
                     </div>
                     <div>
                         <label class="field-label">E-mail <span class="field-required">*</span></label>
                         <input type="email" class="auth-input" data-name="email" value="{{ $reservation->email ?? '' }}" placeholder="tu@email.com" {{ !empty($reservation->email) ? 'readonly' : '' }}>
                     </div>
                     <div>
-                        <label class="field-label">Teléfono <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Teléfono') }} <span class="field-required">*</span></label>
                         <input type="tel" class="auth-input" data-name="phone" value="{{ $reservation->phone ?? '' }}" placeholder="+1 809 000 0000" {{ !empty($reservation->phone) ? 'readonly' : '' }}>
                     </div>
                 </div>
 
-                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mt-7 mb-4">Documento de identidad</div>
+                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mt-7 mb-4">{{ __('Documento de identidad') }}</div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="field-label">Tipo de identificación <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Tipo de identificación') }} <span class="field-required">*</span></label>
                         <select id="idType" class="auth-input auth-select">
                             <option value="">Seleccionar…</option>
-                            <option>Cédula</option><option>Pasaporte</option><option>Otro</option>
+                            <option>{{ __('Cédula') }}</option><option>{{ __('Pasaporte') }}</option><option>{{ __('Otro') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label class="field-label">Número de documento <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Número de documento') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="document_number">
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Foto del documento de identidad <span class="field-required">*</span></label>
-                        <p class="text-[11px] text-ink-500 -mt-1 mb-3">Subí el <b>frente</b> y el <b>reverso</b> de tu documento · PDF, JPG o PNG · máx. 4 MB</p>
+                        <label class="field-label">{{ __('Foto del documento de identidad') }} <span class="field-required">*</span></label>
+                        <p class="text-[11px] text-ink-500 -mt-1 mb-3">{{ __('Subí el') }} <b>{{ __('frente') }}</b> {{ __('y el') }} <b>{{ __('reverso') }}</b> {{ __('de tu documento · PDF, JPG o PNG · máx. 4 MB') }}</p>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                             {{-- ============ FRENTE ============ --}}
                             <div data-uploader>
-                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">Frente <span class="field-required">*</span></div>
+                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">{{ __('Frente') }} <span class="field-required">*</span></div>
                                 @if(!empty($existingKycDoc))
                                     @php $status = $existingKycDoc['status'] ?? 'pending'; @endphp
                                     <div data-existing class="flex items-center gap-3 p-3 rounded-xl border border-ink-200 bg-ink-50/50">
                                         <div class="w-10 h-10 rounded-lg bg-white border border-ink-200 flex items-center justify-center text-ok shrink-0"><i class="pi pi-check-circle text-[16px]"></i></div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="text-[12px] font-semibold text-ink-950">Cargado</div>
+                                            <div class="text-[12px] font-semibold text-ink-950">{{ __('Cargado') }}</div>
                                             <div class="text-[10px] text-ink-500 truncate">{{ $existingKycDoc['name'] }}</div>
                                             @if($status === 'rejected')
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> Rechazado</span>
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> {{ __('Rechazado') }}</span>
                                             @endif
                                         </div>
-                                        <a href="{{ $existingKycDoc['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="Ver documento"><i class="pi pi-eye text-[11px]"></i></a>
-                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="Cambiar"><i class="pi pi-refresh text-[11px]"></i></button>
+                                        <a href="{{ $existingKycDoc['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="{{ __('Ver documento') }}"><i class="pi pi-eye text-[11px]"></i></a>
+                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="{{ __('Cambiar') }}"><i class="pi pi-refresh text-[11px]"></i></button>
                                     </div>
                                     <div data-replace class="hidden mt-2">
                                         <div class="file-drop" onclick="pickFile(this)">
                                             <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
-                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir nuevo frente</div>
+                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">{{ __('Subir nuevo frente') }}</div>
                                             <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
                                             <input type="file" id="idDocument" name="id_document" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
                                             <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
                                         </div>
-                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">Cancelar</button>
+                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">{{ __('Cancelar') }}</button>
                                     </div>
                                     <input type="hidden" name="kyc_document_reused" value="1">
                                 @else
                                     <div class="file-drop" onclick="pickFile(this)">
                                         <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
-                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir frente</div>
+                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">{{ __('Subir frente') }}</div>
                                         <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
                                         <input type="file" id="idDocument" name="id_document" required class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
                                         <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
@@ -300,35 +300,35 @@
 
                             {{-- ============ REVERSO ============ --}}
                             <div data-uploader>
-                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">Reverso</div>
+                                <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">{{ __('Reverso') }}</div>
                                 @if(!empty($existingKycDocBack))
                                     @php $statusB = $existingKycDocBack['status'] ?? 'pending'; @endphp
                                     <div data-existing class="flex items-center gap-3 p-3 rounded-xl border border-ink-200 bg-ink-50/50">
                                         <div class="w-10 h-10 rounded-lg bg-white border border-ink-200 flex items-center justify-center text-ok shrink-0"><i class="pi pi-check-circle text-[16px]"></i></div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="text-[12px] font-semibold text-ink-950">Cargado</div>
+                                            <div class="text-[12px] font-semibold text-ink-950">{{ __('Cargado') }}</div>
                                             <div class="text-[10px] text-ink-500 truncate">{{ $existingKycDocBack['name'] }}</div>
                                             @if($statusB === 'rejected')
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> Rechazado</span>
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full bg-err-soft text-err text-[10px] font-semibold uppercase tracking-wider"><i class="pi pi-times text-[8px]"></i> {{ __('Rechazado') }}</span>
                                             @endif
                                         </div>
-                                        <a href="{{ $existingKycDocBack['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="Ver documento"><i class="pi pi-eye text-[11px]"></i></a>
-                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="Cambiar"><i class="pi pi-refresh text-[11px]"></i></button>
+                                        <a href="{{ $existingKycDocBack['url'] }}" target="_blank" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" title="{{ __('Ver documento') }}"><i class="pi pi-eye text-[11px]"></i></a>
+                                        <button type="button" class="auth-btn auth-btn-ghost text-[11px] py-1 px-2" onclick="replaceDoc(this)" title="{{ __('Cambiar') }}"><i class="pi pi-refresh text-[11px]"></i></button>
                                     </div>
                                     <div data-replace class="hidden mt-2">
                                         <div class="file-drop" onclick="pickFile(this)">
                                             <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
-                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir nuevo reverso</div>
+                                            <div class="text-[12px] font-semibold text-ink-700 mt-1">{{ __('Subir nuevo reverso') }}</div>
                                             <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
                                             <input type="file" id="idDocumentBack" name="id_document_back" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
                                             <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
                                         </div>
-                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">Cancelar</button>
+                                        <button type="button" class="text-[11px] text-ink-500 hover:underline mt-2" onclick="cancelReplace(this)">{{ __('Cancelar') }}</button>
                                     </div>
                                 @else
                                     <div class="file-drop" onclick="pickFile(this)">
                                         <i class="pi pi-cloud-upload text-ink-400 text-[20px]"></i>
-                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">Subir reverso</div>
+                                        <div class="text-[12px] font-semibold text-ink-700 mt-1">{{ __('Subir reverso') }}</div>
                                         <div class="text-[10px] text-ink-500 mt-1" data-file-size>0.00 / 4 MB</div>
                                         <input type="file" id="idDocumentBack" name="id_document_back" class="hidden" accept="image/*,.pdf" onchange="updateFileSize(this)">
                                         <div class="text-[11px] text-brand font-semibold mt-1" data-file-name></div>
@@ -340,17 +340,17 @@
                     </div>
 
                     <div>
-                        <label class="field-label">Fecha de expedición <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Fecha de expedición') }} <span class="field-required">*</span></label>
                         <input type="date" class="auth-input" data-name="expedition_date">
                     </div>
                     <div>
-                        <label class="field-label">Lugar de expedición <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Lugar de expedición') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="expedition_place">
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(2)" class="auth-btn auth-btn-primary w-full">{{ __('Continuar') }}</button>
                 </div>
             </div>
 
@@ -360,27 +360,27 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-info-circle text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Información personal</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Datos adicionales del adquiriente</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Información personal') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Datos adicionales del adquiriente') }}</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="field-label">Fecha de nacimiento <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Fecha de nacimiento') }} <span class="field-required">*</span></label>
                         <input type="date" class="auth-input" data-name="birth_date" id="birth_date" onchange="calculateAge()">
                     </div>
                     <div>
-                        <label class="field-label">Edad <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Edad') }} <span class="field-required">*</span></label>
                         <input type="number" class="auth-input" data-name="age" id="age" readonly>
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="field-label">Nacionalidad <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Nacionalidad') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="nationality">
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Estado civil <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Estado civil') }} <span class="field-required">*</span></label>
                         <select id="maritalStatus" class="auth-input auth-select" onchange="toggleSpouseFields()">
                             <option value="">Seleccionar…</option>
                             <option>Soltero/a</option>
@@ -392,40 +392,40 @@
 
                     <div id="spouseFields" class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4" style="display:none;">
                         <div class="sm:col-span-2">
-                            <label class="field-label">Nombre completo del cónyuge <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Nombre completo del cónyuge') }} <span class="field-required">*</span></label>
                             <input type="text" id="spouseName" class="auth-input">
                         </div>
                         <div>
-                            <label class="field-label">Nacionalidad (Cónyuge) <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Nacionalidad (Cónyuge)') }} <span class="field-required">*</span></label>
                             <input type="text" id="spouseNationality" class="auth-input">
                         </div>
                         <div>
-                            <label class="field-label">Cédula / Pasaporte (Cónyuge) <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Cédula / Pasaporte (Cónyuge)') }} <span class="field-required">*</span></label>
                             <input type="text" id="spouseDocument" class="auth-input">
                         </div>
                     </div>
 
                     <div>
-                        <label class="field-label">Género <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Género') }} <span class="field-required">*</span></label>
                         <select class="auth-input auth-select">
                             <option value="">Seleccionar…</option>
-                            <option>Masculino</option><option>Femenino</option><option>Otro</option>
+                            <option>{{ __('Masculino') }}</option><option>{{ __('Femenino') }}</option><option>{{ __('Otro') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label class="field-label">Lugar de nacimiento <span class="field-required">*</span></label>
-                        <input type="text" class="auth-input" placeholder="Ciudad / País">
+                        <label class="field-label">{{ __('Lugar de nacimiento') }} <span class="field-required">*</span></label>
+                        <input type="text" class="auth-input" placeholder="{{ __('Ciudad / País') }}">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="field-label">País de residencia <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('País de residencia') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input">
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="field-label">Agregar titular adicional <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Agregar titular adicional') }} <span class="field-required">*</span></label>
                         <select id="addCoBuyer" class="auth-input auth-select" onchange="toggleCoBuyersPanel(this.value)">
                             <option value="no">No</option>
-                            <option value="si">Sí</option>
+                            <option value="si">{{ __('Sí') }}</option>
                         </select>
                     </div>
                 </div>
@@ -435,8 +435,8 @@
                     <div class="h-px bg-ink-200/70 mb-5"></div>
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500">Titulares adicionales</div>
-                            <p class="text-[12px] text-ink-500 mt-1">Agregá los datos de cada copropietario. Todos serán incluidos en los contratos.</p>
+                            <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500">{{ __('Titulares adicionales') }}</div>
+                            <p class="text-[12px] text-ink-500 mt-1">{{ __('Agregá los datos de cada copropietario. Todos serán incluidos en los contratos.') }}</p>
                         </div>
                         <button type="button" id="addCoBuyerBtn" onclick="addCoBuyerRow()" class="auth-btn auth-btn-ghost text-[12px] py-2 px-3">
                             <i class="pi pi-plus text-[11px]"></i> Agregar otro
@@ -448,18 +448,18 @@
                 <template id="coBuyerTpl">
                     <div class="co-buyer-row rounded-2xl border border-ink-200 bg-ink-50/40 p-4">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="text-[13px] font-bold text-ink-900">Titular <span data-co-index>#2</span></div>
-                            <button type="button" onclick="removeCoBuyerRow(this)" class="text-err text-[11px] font-semibold inline-flex items-center gap-1 hover:underline" title="Quitar">
+                            <div class="text-[13px] font-bold text-ink-900">{{ __('Titular') }} <span data-co-index>#2</span></div>
+                            <button type="button" onclick="removeCoBuyerRow(this)" class="text-err text-[11px] font-semibold inline-flex items-center gap-1 hover:underline" title="{{ __('Quitar') }}">
                                 <i class="pi pi-trash text-[11px]"></i> Quitar
                             </button>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="field-label">Nombre <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Nombre') }} <span class="field-required">*</span></label>
                                 <input type="text" data-co-field="first_name" class="auth-input">
                             </div>
                             <div>
-                                <label class="field-label">Apellido <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Apellido') }} <span class="field-required">*</span></label>
                                 <input type="text" data-co-field="last_name" class="auth-input">
                             </div>
                             <div>
@@ -467,42 +467,42 @@
                                 <input type="email" data-co-field="email" class="auth-input">
                             </div>
                             <div>
-                                <label class="field-label">Teléfono <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Teléfono') }} <span class="field-required">*</span></label>
                                 <input type="tel" data-co-field="phone" class="auth-input">
                             </div>
                             <div>
-                                <label class="field-label">Tipo de documento <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Tipo de documento') }} <span class="field-required">*</span></label>
                                 <select data-co-field="id_type" class="auth-input auth-select">
                                     <option value="">Seleccionar…</option>
-                                    <option>Cédula</option><option>Pasaporte</option><option>Otro</option>
+                                    <option>{{ __('Cédula') }}</option><option>{{ __('Pasaporte') }}</option><option>{{ __('Otro') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="field-label">Número de documento <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Número de documento') }} <span class="field-required">*</span></label>
                                 <input type="text" data-co-field="document_number" class="auth-input">
                             </div>
                             <div>
-                                <label class="field-label">Fecha de nacimiento <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Fecha de nacimiento') }} <span class="field-required">*</span></label>
                                 <input type="date" data-co-field="birth_date" class="auth-input">
                             </div>
                             <div>
-                                <label class="field-label">Nacionalidad <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Nacionalidad') }} <span class="field-required">*</span></label>
                                 <input type="text" data-co-field="nationality" class="auth-input">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="field-label">Relación con el titular principal <span class="field-required">*</span></label>
+                                <label class="field-label">{{ __('Relación con el titular principal') }} <span class="field-required">*</span></label>
                                 <select data-co-field="relationship" class="auth-input auth-select">
                                     <option value="">Seleccionar…</option>
-                                    <option>Cónyuge</option>
+                                    <option>{{ __('Cónyuge') }}</option>
                                     <option>Hijo/a</option>
-                                    <option>Padre / Madre</option>
+                                    <option>{{ __('Padre / Madre') }}</option>
                                     <option>Hermano/a</option>
-                                    <option>Socio comercial</option>
-                                    <option>Otro</option>
+                                    <option>{{ __('Socio comercial') }}</option>
+                                    <option>{{ __('Otro') }}</option>
                                 </select>
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="field-label">Porcentaje de copropiedad (%)</label>
+                                <label class="field-label">{{ __('Porcentaje de copropiedad (%)') }}</label>
                                 <input type="number" min="1" max="99" step="1" data-co-field="ownership_pct" class="auth-input" placeholder="Ej. 50">
                             </div>
                         </div>
@@ -510,7 +510,7 @@
                 </template>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(3)" class="auth-btn auth-btn-primary w-full">{{ __('Continuar') }}</button>
                 </div>
             </div>
 
@@ -520,48 +520,48 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-map-marker text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Dirección de residencia</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Dirección donde recibes correspondencia y documentos legales</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Dirección de residencia') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Dirección donde recibes correspondencia y documentos legales') }}</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
-                        <label class="field-label">Dirección (Calle / número) <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Dirección (Calle / número)') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="address">
                     </div>
                     <div>
-                        <label class="field-label">Provincia / Estado <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Provincia / Estado') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="province">
                     </div>
                     <div>
-                        <label class="field-label">Barrio / Sector <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Barrio / Sector') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="neighborhood">
                     </div>
                     <div>
-                        <label class="field-label">Ciudad <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Ciudad') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="city">
                     </div>
                     <div>
-                        <label class="field-label">País <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('País') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="country_code">
                     </div>
                     <div>
-                        <label class="field-label">Nombre del edificio / Torre <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Nombre del edificio / Torre') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="building_name">
                     </div>
                     <div>
-                        <label class="field-label">Nro. Apartamento / Residencia <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Nro. Apartamento / Residencia') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="apartment_number">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="field-label">Código postal <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Código postal') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="postal_code">
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(4)" class="auth-btn auth-btn-primary w-full">{{ __('Continuar') }}</button>
                 </div>
             </div>
 
@@ -571,26 +571,26 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-briefcase text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Profesión</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Información laboral del adquiriente</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Profesión') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Información laboral del adquiriente') }}</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
-                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Datos profesionales</div>
+                <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">{{ __('Datos profesionales') }}</div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="field-label">Profesión <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Profesión') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="profession">
                     </div>
                     <div>
-                        <label class="field-label">Ocupación <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('Ocupación') }} <span class="field-required">*</span></label>
                         <input type="text" class="auth-input" data-name="occupation">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="field-label">¿Depende económicamente de alguien? <span class="field-required">*</span></label>
+                        <label class="field-label">{{ __('¿Depende económicamente de alguien?') }} <span class="field-required">*</span></label>
                         <select id="economicDependent" class="auth-input auth-select">
-                            <option value="">Seleccionar…</option><option>No</option><option>Sí</option>
+                            <option value="">Seleccionar…</option><option>No</option><option>{{ __('Sí') }}</option>
                         </select>
                     </div>
                 </div>
@@ -598,13 +598,13 @@
                 <label class="flex items-start gap-2 cursor-pointer mt-7">
                     <input type="checkbox" id="terms-checkbox" checked class="w-4 h-4 rounded accent-brand mt-0.5">
                     <span class="text-[13px] text-ink-600">
-                        Acepto los <a href="#" class="text-ink-950 hover:text-brand underline">Términos</a> y la
-                        <a href="#" class="text-ink-950 hover:text-brand underline">Política de Privacidad</a>.
+                        Acepto los <a href="#" class="text-ink-950 hover:text-brand underline">{{ __('Términos') }}</a> y la
+                        <a href="#" class="text-ink-950 hover:text-brand underline">{{ __('Política de Privacidad') }}</a>.
                     </span>
                 </label>
 
                 <div class="mt-8">
-                    <button type="button" onclick="goToStep(5)" class="auth-btn auth-btn-primary w-full">Continuar</button>
+                    <button type="button" onclick="goToStep(5)" class="auth-btn auth-btn-primary w-full">{{ __('Continuar') }}</button>
                 </div>
             </div>
 
@@ -614,8 +614,8 @@
                     <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                         <i class="pi pi-credit-card text-ink-600 text-[26px]"></i>
                     </div>
-                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Forma de pago</h1>
-                    <p class="text-[14px] text-ink-500 mt-2">Selecciona el plan de pagos que mejor se adapte</p>
+                    <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Forma de pago') }}</h1>
+                    <p class="text-[14px] text-ink-500 mt-2">{{ __('Selecciona el plan de pagos que mejor se adapte') }}</p>
                 </div>
                 <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -626,8 +626,8 @@
                     <label class="pay-card" data-pay="A">
                         <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-semibold text-ink-950">Plan A — 30/40/30</div>
-                            <div class="text-[12px] text-ink-500">30% al firmar · 40% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">{{ __('Plan A — 30/40/30') }}</div>
+                            <div class="text-[12px] text-ink-500">{{ __('30% al firmar · 40% durante construcción · 30% a la entrega') }}</div>
                         </div>
                         <input type="radio" name="payment_method" value="A" class="sr-only" onchange="onPaySelect(this)">
                         <span class="radio-dot"></span>
@@ -637,8 +637,8 @@
                     <label class="pay-card" data-pay="B">
                         <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-semibold text-ink-950">Plan B — 40/30/30</div>
-                            <div class="text-[12px] text-ink-500">40% al firmar · 30% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">{{ __('Plan B — 40/30/30') }}</div>
+                            <div class="text-[12px] text-ink-500">{{ __('40% al firmar · 30% durante construcción · 30% a la entrega') }}</div>
                         </div>
                         <input type="radio" name="payment_method" value="B" class="sr-only" onchange="onPaySelect(this)">
                         <span class="radio-dot"></span>
@@ -648,8 +648,8 @@
                     <label class="pay-card" data-pay="C">
                         <div class="w-10 h-10 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-percentage"></i></div>
                         <div class="flex-1">
-                            <div class="text-[14px] font-semibold text-ink-950">Plan C — 50/20/30</div>
-                            <div class="text-[12px] text-ink-500">50% al firmar · 20% durante construcción · 30% a la entrega</div>
+                            <div class="text-[14px] font-semibold text-ink-950">{{ __('Plan C — 50/20/30') }}</div>
+                            <div class="text-[12px] text-ink-500">{{ __('50% al firmar · 20% durante construcción · 30% a la entrega') }}</div>
                         </div>
                         <input type="radio" name="payment_method" value="C" class="sr-only" onchange="onPaySelect(this)">
                         <span class="radio-dot"></span>
@@ -657,18 +657,18 @@
                 </div>
 
                 <div class="mt-8">
-                    <button type="button" onclick="submitForm()" id="submit-btn" class="auth-btn auth-btn-primary w-full">Enviar formulario</button>
+                    <button type="button" onclick="submitForm()" id="submit-btn" class="auth-btn auth-btn-primary w-full">{{ __('Enviar formulario') }}</button>
                 </div>
             </div>
 
             {{-- Success state (hidden) --}}
             <div id="success-state" class="hidden text-center py-16">
                 <div class="check-circle"><i class="pi pi-check text-[28px] font-bold"></i></div>
-                <h2 class="font-display text-[26px] font-medium text-ink-950">Formulario enviado</h2>
-                <p class="text-[14px] text-ink-500 mt-2">Tu reserva ha sido procesada exitosamente.</p>
+                <h2 class="font-display text-[26px] font-medium text-ink-950">{{ __('Formulario enviado') }}</h2>
+                <p class="text-[14px] text-ink-500 mt-2">{{ __('Tu reserva ha sido procesada exitosamente.') }}</p>
                 <div class="redirect-box">
                     <span class="redirect-spinner"></span>
-                    <span class="redirect-text">Redirigiendo a tu panel…</span>
+                    <span class="redirect-text">{{ __('Redirigiendo a tu panel…') }}</span>
                 </div>
             </div>
 
@@ -702,7 +702,7 @@
 
                     {{-- Property details --}}
                     <div class="p-5">
-                        <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">Resumen de la reserva</div>
+                        <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-4">{{ __('Resumen de la reserva') }}</div>
 
                         @if($unit && ($unit->bedrooms || $unit->bathrooms || $unit->total_area))
                         <div class="grid grid-cols-3 gap-2 mb-4">
@@ -717,7 +717,7 @@
                             <div class="rounded-xl border border-ink-200 bg-ink-50/50 px-2 py-3 text-center">
                                 <i class="pi pi-inbox text-ink-400 text-[14px]"></i>
                                 <div class="text-[14px] font-bold text-ink-950 mt-1">{{ rtrim(rtrim((string) $unit->bathrooms, '0'), '.') }}</div>
-                                <div class="text-[10px] text-ink-500">Baños</div>
+                                <div class="text-[10px] text-ink-500">{{ __('Baños') }}</div>
                             </div>
                             @endif
                             @if($unit->total_area)
@@ -732,15 +732,15 @@
 
                         <div class="space-y-3 text-[13px]">
                             <div class="flex items-center justify-between">
-                                <span class="text-ink-500">Código</span>
+                                <span class="text-ink-500">{{ __('Código') }}</span>
                                 <span class="font-semibold text-ink-950">{{ $reservation->reservation_code ?? '—' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-ink-500">Unidad</span>
+                                <span class="text-ink-500">{{ __('Unidad') }}</span>
                                 <span class="font-semibold text-ink-950">{{ $reservation->unit_name ?? '—' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-ink-500">Nivel</span>
+                                <span class="text-ink-500">{{ __('Nivel') }}</span>
                                 <span class="font-semibold text-ink-950">{{ $unit->floor ?? 'N/A' }}</span>
                             </div>
                         </div>
@@ -748,7 +748,7 @@
                         <div class="h-px bg-ink-200/70 my-4"></div>
 
                         <div class="flex items-end justify-between">
-                            <span class="text-[12px] text-ink-500">Precio</span>
+                            <span class="text-[12px] text-ink-500">{{ __('Precio') }}</span>
                             <span class="font-display text-[20px] font-bold text-ink-950">{{ $reservation->formatted_price ?? '—' }}</span>
                         </div>
                     </div>
@@ -765,7 +765,7 @@
 
     {{-- ============= FOOTER ============= --}}
     <footer class="flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 border-t border-ink-100 bg-white">
-        <span>© 2026 MAKAI RESIDENCES</span>
+        <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
         <button class="flex items-center gap-1.5 hover:text-ink-700">
             <i class="pi pi-globe text-[12px]"></i><span>ESP</span><i class="pi pi-angle-down text-[10px]"></i>
         </button>

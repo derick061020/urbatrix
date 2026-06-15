@@ -153,7 +153,7 @@ body {
 
 <div class="toolbar">
   <span class="toolbar-title">Plan de Pagos · {{ $referencia }}</span>
-  <button class="toolbar-btn" onclick="window.print()">Descargar PDF</button>
+  <button class="toolbar-btn" onclick="window.print()">{{ __('Descargar PDF') }}</button>
 </div>
 
 <div class="sheet">
@@ -163,7 +163,7 @@ body {
       <div class="hdr-name">MAKAI</div>
     </div>
     <div class="hdr-right">
-      <div class="hdr-doc">Plan de Pagos · Confidencial</div>
+      <div class="hdr-doc">{{ __('Plan de Pagos · Confidencial') }}</div>
       <div class="hdr-ref">Ref: <span class="f">{{ $referencia }}</span></div>
     </div>
   </div>
@@ -172,11 +172,11 @@ body {
 
     <div class="doc-head">
       <div>
-        <div class="doc-title"><strong>Plan</strong> de Pagos</div>
-        <div class="doc-sub">Proyecto Makai Residences — Cap Cana, República Dominicana</div>
+        <div class="doc-title"><strong>{{ __('Plan') }}</strong> {{ __('de Pagos') }}</div>
+        <div class="doc-sub">{{ __('Proyecto Makai Residences — Cap Cana, República Dominicana') }}</div>
       </div>
       <div class="doc-meta">
-        <div class="doc-meta-label">Fecha</div>
+        <div class="doc-meta-label">{{ __('Fecha') }}</div>
         <div class="doc-meta-val"><span class="f">{{ $fecha }}</span></div>
       </div>
     </div>
@@ -187,35 +187,35 @@ body {
 
     <div class="unit-row" style="margin-bottom:28px;">
       <div class="unit-cell" style="padding-left:0;">
-        <div class="unit-lbl">Unidad</div>
+        <div class="unit-lbl">{{ __('Unidad') }}</div>
         <div class="unit-val"><span class="f">{{ $unidad }}</span></div>
       </div>
       <div class="unit-cell">
-        <div class="unit-lbl">Nivel</div>
+        <div class="unit-lbl">{{ __('Nivel') }}</div>
         <div class="unit-val"><span class="f">{{ $nivel }}</span></div>
       </div>
       <div class="unit-cell">
-        <div class="unit-lbl">Tipología</div>
+        <div class="unit-lbl">{{ __('Tipología') }}</div>
         <div class="unit-val"><span class="f">{{ $tipologia }}</span></div>
       </div>
       <div class="unit-cell">
-        <div class="unit-lbl">Entrega estimada</div>
+        <div class="unit-lbl">{{ __('Entrega estimada') }}</div>
         <div class="unit-val"><span class="f">{{ $entrega_estimada }}</span></div>
       </div>
       <div class="unit-cell">
-        <div class="unit-lbl">Precio total</div>
+        <div class="unit-lbl">{{ __('Precio total') }}</div>
         <div class="unit-val">US$ <span class="f">{{ $precio_total }}</span></div>
       </div>
     </div>
 
-    <div class="sec-title">Calendario de cuotas — Etapa de construcción</div>
+    <div class="sec-title">{{ __('Calendario de cuotas — Etapa de construcción') }}</div>
     <table class="inst-table">
       <thead>
         <tr>
           <th style="width:40px">N°</th>
-          <th>Mes</th>
-          <th>Concepto</th>
-          <th>Monto</th>
+          <th>{{ __('Mes') }}</th>
+          <th>{{ __('Concepto') }}</th>
+          <th>{{ __('Monto') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -223,44 +223,44 @@ body {
           <tr>
             <td>{{ $cuota['numero'] }}</td>
             <td><span class="f">{{ $cuota['mes'] }}</span></td>
-            <td>Cuota de construcción</td>
+            <td>{{ __('Cuota de construcción') }}</td>
             <td>US$ <span class="f">{{ $cuota['monto'] }}</span></td>
           </tr>
         @empty
           <tr>
             <td>—</td>
-            <td colspan="2">Sin cuotas mensuales · pago directo según etapas</td>
+            <td colspan="2">{{ __('Sin cuotas mensuales · pago directo según etapas') }}</td>
             <td>US$ <span class="f">{{ $monto_construccion }}</span></td>
           </tr>
         @endforelse
         <tr class="total-row">
-          <td colspan="3">Total cuotas de construcción</td>
+          <td colspan="3">{{ __('Total cuotas de construcción') }}</td>
           <td>US$ <span class="f">{{ $total_cuotas }}</span></td>
         </tr>
       </tbody>
     </table>
 
-    <div class="sec-title">Etapas del plan de pagos</div>
+    <div class="sec-title">{{ __('Etapas del plan de pagos') }}</div>
     <div class="stages">
 
       <div>
         <div class="stage-num">Etapa 1</div>
         <div class="stage-pct">{{ $pct_inicial }}<sup>%</sup></div>
         <div class="stage-amount">US$ <span class="f">{{ $monto_inicial }}</span></div>
-        <div class="stage-title">Pago Inicial</div>
-        <div class="stage-desc">A la firma de la Promesa de Compraventa, en un plazo máximo de 60 días naturales desde la reserva.</div>
+        <div class="stage-title">{{ __('Pago Inicial') }}</div>
+        <div class="stage-desc">{{ __('A la firma de la Promesa de Compraventa, en un plazo máximo de 60 días naturales desde la reserva.') }}</div>
       </div>
 
       <div>
         <div class="stage-num">Etapa 2</div>
         <div class="stage-pct">{{ $pct_construccion }}<sup>%</sup></div>
         <div class="stage-amount">US$ <span class="f">{{ $monto_construccion }}</span></div>
-        <div class="stage-title">Durante la Construcción</div>
+        <div class="stage-title">{{ __('Durante la Construcción') }}</div>
         @if($cantidad_cuotas > 0)
-          <div class="stage-desc"><span class="f">{{ $cantidad_cuotas }}</span> cuotas mensuales iguales de US$ <span class="f">{{ $monto_cuota }}</span>, pagaderas según el calendario adjunto.</div>
-          <div class="stage-tag"><span class="f">{{ $cantidad_cuotas }}</span> &times; US$ <span class="f">{{ $monto_cuota }}</span></div>
+          <div class="stage-desc"><span class="f">{{ $cantidad_cuotas }}</span> {{ __('cuotas mensuales iguales de US$') }} <span class="f">{{ $monto_cuota }}</span>{{ __(', pagaderas según el calendario adjunto.') }}</div>
+          <div class="stage-tag"><span class="f">{{ $cantidad_cuotas }}</span> {{ __('&times; US$') }} <span class="f">{{ $monto_cuota }}</span></div>
         @else
-          <div class="stage-desc">Pago directo durante la etapa de construcción, según las condiciones acordadas.</div>
+          <div class="stage-desc">{{ __('Pago directo durante la etapa de construcción, según las condiciones acordadas.') }}</div>
         @endif
       </div>
 
@@ -268,28 +268,28 @@ body {
         <div class="stage-num">Etapa 3</div>
         <div class="stage-pct">{{ $pct_entrega }}<sup>%</sup></div>
         <div class="stage-amount">US$ <span class="f">{{ $saldo_entrega }}</span></div>
-        <div class="stage-title">Saldo a la Entrega</div>
-        <div class="stage-desc">Al momento de la escrituración y entrega física de la unidad, estimado <span class="f">{{ $fecha_entrega }}</span>.</div>
+        <div class="stage-title">{{ __('Saldo a la Entrega') }}</div>
+        <div class="stage-desc">{{ __('Al momento de la escrituración y entrega física de la unidad, estimado') }} <span class="f">{{ $fecha_entrega }}</span>.</div>
       </div>
 
     </div>
 
     <div style="border-top:1.5px solid var(--ink); padding-top:16px;">
-      <p class="p" style="margin-bottom:18px;">Las partes aceptan las condiciones del presente plan de pagos en fe de lo cual suscriben:</p>
+      <p class="p" style="margin-bottom:18px;">{{ __('Las partes aceptan las condiciones del presente plan de pagos en fe de lo cual suscriben:') }}</p>
       <div class="sig-grid">
         <div>
-          <div class="sig-role">Promitente Comprador/a</div>
+          <div class="sig-role">{{ __('Promitente Comprador/a') }}</div>
           <div class="sig-name"><span class="f">{{ $comprador_nombre }}</span></div>
-          <div class="sig-entity">Pasaporte / Cédula: <span class="f">{{ $comprador_id }}</span></div>
+          <div class="sig-entity">{{ __('Pasaporte / Cédula:') }} <span class="f">{{ $comprador_id }}</span></div>
           <div class="sig-box"></div>
-          <div class="sig-label">Firma &nbsp;·&nbsp; Fecha: ____________________</div>
+          <div class="sig-label">{{ __('Firma &nbsp;·&nbsp; Fecha: ____________________') }}</div>
         </div>
         <div>
-          <div class="sig-role">Promitente Vendedora</div>
-          <div class="sig-name">Duna Development Group S.R.L.</div>
-          <div class="sig-entity">RNC: 1-31-12345-6 · Representante legal autorizado</div>
+          <div class="sig-role">{{ __('Promitente Vendedora') }}</div>
+          <div class="sig-name">{{ __('Duna Development Group S.R.L.') }}</div>
+          <div class="sig-entity">{{ __('RNC: 1-31-12345-6 · Representante legal autorizado') }}</div>
           <div class="sig-box"></div>
-          <div class="sig-label">Firma &nbsp;·&nbsp; Fecha: ____________________</div>
+          <div class="sig-label">{{ __('Firma &nbsp;·&nbsp; Fecha: ____________________') }}</div>
         </div>
       </div>
     </div>
@@ -297,9 +297,9 @@ body {
   </div>
 
   <div class="footer">
-    <div class="footer-l">MAKAI · Duna Development Group</div>
+    <div class="footer-l">{{ __('MAKAI · Duna Development Group') }}</div>
     <div class="footer-c">+1 (809) 710-9044 · info@dunadevelopment.com · Cap Cana, R.D.</div>
-    <div class="footer-r"><span class="f">{{ $referencia }}</span> · Validez 30 días naturales</div>
+    <div class="footer-r"><span class="f">{{ $referencia }}</span> {{ __('· Validez 30 días naturales') }}</div>
   </div>
 </div>
 

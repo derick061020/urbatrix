@@ -59,7 +59,7 @@
 
     {{-- Tabla --}}
     <div class="brk-card overflow-hidden">
-        <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">Historial de comisiones</div>
+        <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ __('Historial de comisiones') }}</div>
         <table class="w-full">
             <thead class="bg-white">
                 <tr>

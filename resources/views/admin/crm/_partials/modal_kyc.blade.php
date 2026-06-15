@@ -63,9 +63,9 @@
                 <div class="text-[15px] font-bold text-ink-900">KYC · {{ trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) ?: 'Cliente' }}</div>
                 <div class="text-[11px] text-ink-500">{{ $reservation->reservation_code ?? '' }} · Estado:
                     @php $st = $kycDoc->status ?? 'pending'; @endphp
-                    @if($st === 'approved')<span class="text-ok-dark font-semibold">Aprobado</span>
-                    @elseif($st === 'rejected')<span class="text-err font-semibold">Rechazado</span>
-                    @else<span class="text-warn font-semibold">Pendiente</span>@endif
+                    @if($st === 'approved')<span class="text-ok-dark font-semibold">{{ __('Aprobado') }}</span>
+                    @elseif($st === 'rejected')<span class="text-err font-semibold">{{ __('Rechazado') }}</span>
+                    @else<span class="text-warn font-semibold">{{ __('Pendiente') }}</span>@endif
                 </div>
             </div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
@@ -75,11 +75,11 @@
             @if($kycDocUrl)
                 <div class="flex items-center gap-3 p-3 rounded-lg bg-ink-50 border border-ink-100">
                     <i class="pi pi-paperclip text-ink-500"></i>
-                    <div class="flex-1 text-[12px] text-ink-700 truncate">Documento de identidad adjunto</div>
-                    <button type="button" onclick="openDocumentPreview(@js($kycPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> Ver archivo</button>
+                    <div class="flex-1 text-[12px] text-ink-700 truncate">{{ __('Documento de identidad adjunto') }}</div>
+                    <button type="button" onclick="openDocumentPreview(@js($kycPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver archivo') }}</button>
                 </div>
             @else
-                <div class="text-[12px] text-ink-500">Sin archivo adjunto.</div>
+                <div class="text-[12px] text-ink-500">{{ __('Sin archivo adjunto.') }}</div>
             @endif
 
             @foreach($sections as $sectionTitle => $rows)
@@ -140,13 +140,13 @@
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
             @if($kycDoc && $kycDoc->status === 'pending')
                 <form method="POST" action="{{ route('documents.reject', $kycDoc->id) }}" class="m-0">@csrf
-                    <button type="submit" class="crm-btn crm-btn-ghost text-err">Rechazar</button>
+                    <button type="submit" class="crm-btn crm-btn-ghost text-err">{{ __('Rechazar') }}</button>
                 </form>
                 <form method="POST" action="{{ route('documents.approve', $kycDoc->id) }}" class="m-0">@csrf
-                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Aprobar KYC</button>
+                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Aprobar KYC') }}</button>
                 </form>
             @endif
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cerrar</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cerrar') }}</button>
         </div>
     </div>
 </dialog>

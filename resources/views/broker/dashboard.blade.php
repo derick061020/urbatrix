@@ -8,7 +8,7 @@
 
     <div>
         <h1 class="font-display text-[20px] font-bold text-ink-950 leading-tight">Hola, {{ $agent->name ?? auth()->user()->name }} 👋</h1>
-        <p class="text-[12px] text-ink-500 mt-0.5">Tu actividad, tus comisiones y tu progreso.</p>
+        <p class="text-[12px] text-ink-500 mt-0.5">{{ __('Tu actividad, tus comisiones y tu progreso.') }}</p>
     </div>
 
     {{-- KPIs --}}
@@ -34,7 +34,7 @@
 
         {{-- Próximas liberaciones --}}
         <div class="brk-card overflow-hidden">
-            <div class="px-5 py-3 border-b border-ink-100 text-[14px] font-bold text-ink-950">Próximas liberaciones de comisión</div>
+            <div class="px-5 py-3 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ __('Próximas liberaciones de comisión') }}</div>
             <div class="divide-y divide-ink-100">
                 @forelse($upcoming as $u)
                     <div class="px-5 py-3.5 flex items-center gap-3">
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="px-5 py-8 text-center text-[12px] text-ink-400">Sin comisiones pendientes de liberar.</div>
+                    <div class="px-5 py-8 text-center text-[12px] text-ink-400">{{ __('Sin comisiones pendientes de liberar.') }}</div>
                 @endforelse
             </div>
         </div>
@@ -57,34 +57,34 @@
         <div class="brk-card p-5">
             @php $pct = $goalTarget ? min(100, round($goalProgress / $goalTarget * 100)) : 0; @endphp
             <div class="flex items-center justify-between mb-3">
-                <span class="text-[14px] font-bold text-ink-950">Tu trimestre</span>
-                <a href="{{ route('broker.metas') }}" class="brk-btn brk-btn-ghost" style="padding:6px 10px;font-size:11.5px">Ver metas</a>
+                <span class="text-[14px] font-bold text-ink-950">{{ __('Tu trimestre') }}</span>
+                <a href="{{ route('broker.metas') }}" class="brk-btn brk-btn-ghost" style="padding:6px 10px;font-size:11.5px">{{ __('Ver metas') }}</a>
             </div>
             <div class="flex items-center justify-between text-[12px] mb-1.5">
                 <span class="font-semibold text-ink-900">Meta: {{ $goalTarget }} ventas</span>
                 <span class="text-ink-500">{{ $goalProgress }} / {{ $goalTarget }}</span>
             </div>
             <div class="h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full bg-brand" style="width:{{ $pct }}%"></div></div>
-            <p class="text-[11.5px] text-ink-500 mt-2.5">Cierres del trimestre contabilizados sobre ventas reales. 🎯</p>
+            <p class="text-[11.5px] text-ink-500 mt-2.5">{{ __('Cierres del trimestre contabilizados sobre ventas reales. 🎯') }}</p>
 
             <div class="mt-4 pt-3.5 border-t border-ink-100">
                 <div class="flex items-center justify-between text-[12px] mb-1.5">
-                    <span class="font-semibold text-ink-900">Nivel Plata → Oro</span>
+                    <span class="font-semibold text-ink-900">{{ __('Nivel Plata → Oro') }}</span>
                     <span class="text-ink-500">{{ $goalProgress }} / 8 ventas</span>
                 </div>
                 <div class="h-2 rounded-full bg-ink-100 overflow-hidden"><div class="h-full rounded-full" style="width:{{ min(100, round($goalProgress/8*100)) }}%;background:linear-gradient(90deg,#d8b669,#b8902f)"></div></div>
-                <p class="text-[11px] text-ink-400 mt-1.5">Oro desbloquea <b>+1% de comisión</b> y acceso anticipado a inventario.</p>
+                <p class="text-[11px] text-ink-400 mt-1.5">{{ __('Oro desbloquea') }} <b>{{ __('+1% de comisión') }}</b> {{ __('y acceso anticipado a inventario.') }}</p>
             </div>
         </div>
     </div>
 
     {{-- Enlace de referido --}}
     <div class="brk-card p-5">
-        <div class="text-[14px] font-bold text-ink-950 mb-1">Tu enlace de referido</div>
-        <p class="text-[12.5px] text-ink-500 mb-3">Los clientes que entren por tu enlace quedan atribuidos a ti automáticamente.</p>
+        <div class="text-[14px] font-bold text-ink-950 mb-1">{{ __('Tu enlace de referido') }}</div>
+        <p class="text-[12.5px] text-ink-500 mb-3">{{ __('Los clientes que entren por tu enlace quedan atribuidos a ti automáticamente.') }}</p>
         <div class="flex items-center gap-3 bg-brand-tint border border-brand/20 rounded-xl px-4 py-3">
             <span class="flex-1 font-mono text-[13px] font-semibold text-brand-dark break-all" id="brkRefLink">{{ url('/r/'.$referral) }}</span>
-            <button type="button" class="brk-btn brk-btn-primary" onclick="brkCopyRef()">Copiar</button>
+            <button type="button" class="brk-btn brk-btn-primary" onclick="brkCopyRef()">{{ __('Copiar') }}</button>
         </div>
     </div>
 </div>

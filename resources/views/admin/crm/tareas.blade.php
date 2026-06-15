@@ -16,7 +16,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $pendientes->count() }} tareas pendientes</div>
         <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('modal-nueva-tarea').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> Nueva tarea</button>
+            <button type="button" onclick="document.getElementById('modal-nueva-tarea').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva tarea') }}</button>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
 
     <div class="crm-card overflow-hidden">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
-            <div class="text-[13px] font-bold text-ink-700">Pendientes</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Pendientes') }}</div>
             <span class="crm-pill bg-err-soft text-err">{{ $pendientes->count() }}</span>
         </div>
         <div class="divide-y divide-ink-100">
@@ -52,7 +52,7 @@
                     </form>
                 </div>
             @empty
-                <div class="px-5 py-8 text-center text-[12px] text-ink-500">No hay tareas pendientes.</div>
+                <div class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('No hay tareas pendientes.') }}</div>
             @endforelse
         </div>
     </div>
@@ -60,7 +60,7 @@
     @if($completadas->count())
     <div class="crm-card overflow-hidden">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
-            <div class="text-[13px] font-bold text-ink-700">Completadas</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Completadas') }}</div>
             <span class="crm-pill bg-ink-200 text-ink-600">{{ $completadas->count() }}</span>
         </div>
         <div class="divide-y divide-ink-100">
@@ -72,7 +72,7 @@
                         <div class="text-[13px] font-medium text-ink-400 line-through">{{ $t->title }}</div>
                         <div class="text-[11px] text-ink-400 mt-0.5"><i class="pi pi-user text-[9px]"></i> {{ $t->responsible ?? 'Para mí' }}</div>
                     </div>
-                    <span class="text-[11px] text-ink-400">Completado</span>
+                    <span class="text-[11px] text-ink-400">{{ __('Completado') }}</span>
                 </div>
             @endforeach
         </div>
@@ -82,42 +82,42 @@
 
 <dialog id="modal-nueva-tarea" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <form method="POST" action="{{ route('admin.crm.tareas.store') }}" class="w-[520px] bg-white rounded-2xl overflow-hidden">@csrf
-        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">Nueva tarea</div>
+        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">{{ __('Nueva tarea') }}</div>
         <div class="p-6 space-y-3">
-            <div><label class="text-[12px] font-semibold text-ink-700">Título</label><input type="text" name="title" required class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Título') }}</label><input type="text" name="title" required class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="text-[12px] font-semibold text-ink-700">Responsable</label><input type="text" name="responsible" required class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">Área</label><input type="text" name="area" class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Responsable') }}</label><input type="text" name="responsible" required class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Área') }}</label><input type="text" name="area" class="crm-input pl-3 mt-1"></div>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="text-[12px] font-semibold text-ink-700">Fecha límite</label><input type="date" name="due_date" required value="{{ now()->toDateString() }}" class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">Prioridad</label><select name="priority" required class="crm-input pl-3 mt-1"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="baja">Baja</option></select></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha límite') }}</label><input type="date" name="due_date" required value="{{ now()->toDateString() }}" class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Prioridad') }}</label><select name="priority" required class="crm-input pl-3 mt-1"><option value="alta">Alta</option><option value="media" selected>{{ __('Media') }}</option><option value="baja">{{ __('Baja') }}</option></select></div>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Expediente</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Expediente') }}</label>
                     <select name="reservation_id" class="crm-input pl-3 mt-1">
-                        <option value="">Sin expediente</option>
+                        <option value="">{{ __('Sin expediente') }}</option>
                         @foreach(($reservations ?? collect()) as $r)
                             <option value="{{ $r->id }}">{{ $r->first_name }} {{ $r->last_name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Proyecto</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Proyecto') }}</label>
                     <select name="project_id" class="crm-input pl-3 mt-1">
-                        <option value="">Sin proyecto</option>
+                        <option value="">{{ __('Sin proyecto') }}</option>
                         @foreach(($projects ?? collect()) as $p)
                             <option value="{{ $p->id }}">{{ $p->name }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div><label class="text-[12px] font-semibold text-ink-700">Notas</label><textarea name="notes" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Notas') }}</label><textarea name="notes" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary">Crear tarea</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary">{{ __('Crear tarea') }}</button>
         </div>
     </form>
 </dialog>

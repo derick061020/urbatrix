@@ -26,7 +26,7 @@
 
     @if ($errors->any())
         <div class="mb-5 px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err-dark text-[13px] font-medium">
-            <div class="flex items-center gap-2 mb-1"><i class="pi pi-exclamation-circle"></i> Revisa los datos:</div>
+            <div class="flex items-center gap-2 mb-1"><i class="pi pi-exclamation-circle"></i> {{ __('Revisa los datos:') }}</div>
             <ul class="list-disc pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -40,8 +40,8 @@
 
         {{-- Avatar card --}}
         <div class="cli-card p-5 sm:p-6">
-            <div class="text-[14px] font-semibold text-ink-900 mb-1">Foto de perfil</div>
-            <div class="text-[12px] text-ink-500 mb-4">Se mostrará en tu portal y en las comunicaciones con tu asesor.</div>
+            <div class="text-[14px] font-semibold text-ink-900 mb-1">{{ __('Foto de perfil') }}</div>
+            <div class="text-[12px] text-ink-500 mb-4">{{ __('Se mostrará en tu portal y en las comunicaciones con tu asesor.') }}</div>
 
             <div class="flex items-center gap-5 flex-wrap">
                 <div class="relative">
@@ -63,68 +63,68 @@
                             Eliminar foto actual
                         </label>
                     @endif
-                    <div class="text-[11px] text-ink-500">JPG, PNG o WebP · máx 4 MB</div>
+                    <div class="text-[11px] text-ink-500">{{ __('JPG, PNG o WebP · máx 4 MB') }}</div>
                 </div>
             </div>
         </div>
 
         {{-- Personal info --}}
         <div class="cli-card p-5 sm:p-6">
-            <div class="text-[14px] font-semibold text-ink-900 mb-1">Información básica</div>
-            <div class="text-[12px] text-ink-500 mb-4">Estos datos aparecerán en tus documentos y reservas.</div>
+            <div class="text-[14px] font-semibold text-ink-900 mb-1">{{ __('Información básica') }}</div>
+            <div class="text-[12px] text-ink-500 mb-4">{{ __('Estos datos aparecerán en tus documentos y reservas.') }}</div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Nombre</label>
-                    <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}" class="cli-input pl-3 mt-1" placeholder="Nombre">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre') }}</label>
+                    <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('Nombre') }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Apellido</label>
-                    <input type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}" class="cli-input pl-3 mt-1" placeholder="Apellido">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Apellido') }}</label>
+                    <input type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('Apellido') }}">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="text-[12px] font-semibold text-ink-700">Nombre para mostrar <span class="text-ink-400 font-normal">(opcional)</span></label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre para mostrar') }} <span class="text-ink-400 font-normal">(opcional)</span></label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}" class="cli-input pl-3 mt-1" placeholder="{{ $fullName }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Correo electrónico</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Correo electrónico') }}</label>
                     <input type="email" name="email" required value="{{ old('email', $user->email) }}" class="cli-input pl-3 mt-1" placeholder="tu@correo.com">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Teléfono</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
                     <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="cli-input pl-3 mt-1" placeholder="+57 300 000 0000">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="text-[12px] font-semibold text-ink-700">País</label>
-                    <input type="text" name="country" value="{{ old('country', $user->country) }}" class="cli-input pl-3 mt-1" placeholder="Colombia">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('País') }}</label>
+                    <input type="text" name="country" value="{{ old('country', $user->country) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('Colombia') }}">
                 </div>
             </div>
         </div>
 
         {{-- Password --}}
         <div class="cli-card p-5 sm:p-6">
-            <div class="text-[14px] font-semibold text-ink-900 mb-1">Cambiar contraseña</div>
-            <div class="text-[12px] text-ink-500 mb-4">Déjalo en blanco si no quieres cambiarla.</div>
+            <div class="text-[14px] font-semibold text-ink-900 mb-1">{{ __('Cambiar contraseña') }}</div>
+            <div class="text-[12px] text-ink-500 mb-4">{{ __('Déjalo en blanco si no quieres cambiarla.') }}</div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Contraseña actual</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Contraseña actual') }}</label>
                     <input type="password" name="current_password" autocomplete="current-password" class="cli-input pl-3 mt-1" placeholder="••••••••">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Nueva contraseña</label>
-                    <input type="password" name="password" autocomplete="new-password" class="cli-input pl-3 mt-1" placeholder="Mín. 8 caracteres">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Nueva contraseña') }}</label>
+                    <input type="password" name="password" autocomplete="new-password" class="cli-input pl-3 mt-1" placeholder="{{ __('Mín. 8 caracteres') }}">
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">Confirmar</label>
-                    <input type="password" name="password_confirmation" autocomplete="new-password" class="cli-input pl-3 mt-1" placeholder="Repite la contraseña">
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Confirmar') }}</label>
+                    <input type="password" name="password_confirmation" autocomplete="new-password" class="cli-input pl-3 mt-1" placeholder="{{ __('Repite la contraseña') }}">
                 </div>
             </div>
         </div>
 
         <div class="flex items-center justify-end gap-3">
-            <a href="{{ route('dashboard') }}" class="cli-btn cli-btn-ghost">Cancelar</a>
-            <button type="submit" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> Guardar cambios</button>
+            <a href="{{ route('dashboard') }}" class="cli-btn cli-btn-ghost">{{ __('Cancelar') }}</a>
+            <button type="submit" class="cli-btn cli-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar cambios') }}</button>
         </div>
     </form>
 </div>

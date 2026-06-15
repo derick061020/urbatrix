@@ -40,7 +40,7 @@
 
     <div class="flex items-center justify-between">
         <div class="text-[13px] text-ink-500">{{ $materials->count() }} recursos · {{ $materials->where('visible', true)->count() }} visibles para brokers</div>
-        <button type="button" class="crm-btn crm-btn-primary" id="matAddBtn"><i class="pi pi-plus"></i> Agregar material</button>
+        <button type="button" class="crm-btn crm-btn-primary" id="matAddBtn"><i class="pi pi-plus"></i> {{ __('Agregar material') }}</button>
     </div>
 
     <div class="crm-card overflow-hidden">
@@ -84,18 +84,18 @@
                                     'url'      => $m->fileUrl(),
                                     'download' => $m->downloadUrl(),
                                 ]); @endphp
-                                <button type="button" class="text-ink-500 hover:text-brand mr-3" title="Ver"
+                                <button type="button" class="text-ink-500 hover:text-brand mr-3" title="{{ __('Ver') }}"
                                     onclick="openPreviewMaterial({{ $previewJson }})"><i class="pi pi-eye"></i></button>
                             @endif
                             @php $matJson = \Illuminate\Support\Js::from($m->only(['id','title','description','category','external_url','sort_order','visible'])); @endphp
-                            <button type="button" class="text-ink-500 hover:text-brand mr-3" title="Editar"
+                            <button type="button" class="text-ink-500 hover:text-brand mr-3" title="{{ __('Editar') }}"
                                 onclick="openEditMaterial({{ $matJson }})"><i class="pi pi-pencil"></i></button>
-                            <button type="button" class="text-ink-400 hover:text-err" title="Eliminar"
+                            <button type="button" class="text-ink-400 hover:text-err" title="{{ __('Eliminar') }}"
                                 onclick="openDeleteMaterial({{ \Illuminate\Support\Js::from(['url' => route('admin.materials.destroy', $m), 'title' => $m->title]) }})"><i class="pi pi-trash"></i></button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-5 py-10 text-center text-[12px] text-ink-400">Aún no hay materiales. Agrega el primero para que tus brokers lo vean.</td></tr>
+                    <tr><td colspan="7" class="px-5 py-10 text-center text-[12px] text-ink-400">{{ __('Aún no hay materiales. Agrega el primero para que tus brokers lo vean.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -109,30 +109,30 @@
         <input type="hidden" name="_method" id="matMethod" value="POST">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-folder-open"></i></div>
-            <div class="text-[15px] font-bold text-ink-900 flex-1" id="matTitle">Agregar material</div>
+            <div class="text-[15px] font-bold text-ink-900 flex-1" id="matTitle">{{ __('Agregar material') }}</div>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="p-6 space-y-4 max-h-[72vh] overflow-y-auto">
             <div>
-                <label class="mat-label">Título <span class="text-err">*</span></label>
-                <input type="text" name="title" id="matInputTitle" required placeholder="Ej. Brochure comercial 2026" class="mat-field">
+                <label class="mat-label">{{ __('Título') }} <span class="text-err">*</span></label>
+                <input type="text" name="title" id="matInputTitle" required placeholder="{{ __('Ej. Brochure comercial 2026') }}" class="mat-field">
             </div>
             <div>
-                <label class="mat-label">Descripción</label>
-                <textarea name="description" id="matInputDesc" rows="2" placeholder="Breve nota sobre el recurso (opcional)" class="mat-field"></textarea>
+                <label class="mat-label">{{ __('Descripción') }}</label>
+                <textarea name="description" id="matInputDesc" rows="2" placeholder="{{ __('Breve nota sobre el recurso (opcional)') }}" class="mat-field"></textarea>
             </div>
             <div>
-                <label class="mat-label">Categoría</label>
-                <input type="text" name="category" id="matInputCat" placeholder="Renders, Brochure, Contrato…" class="mat-field">
+                <label class="mat-label">{{ __('Categoría') }}</label>
+                <input type="text" name="category" id="matInputCat" placeholder="{{ __('Renders, Brochure, Contrato…') }}" class="mat-field">
             </div>
 
             <div class="pt-1">
-                <label class="mat-label">Archivo</label>
+                <label class="mat-label">{{ __('Archivo') }}</label>
                 <label class="mat-drop" id="matDrop">
                     <span class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-500 shrink-0"><i class="pi pi-cloud-upload"></i></span>
                     <span class="min-w-0">
-                        <span class="block text-[13px] font-semibold text-ink-800" id="matDropName">Subir un archivo</span>
-                        <span class="block text-[11px] text-ink-400">El formato y el tamaño se detectan automáticamente.</span>
+                        <span class="block text-[13px] font-semibold text-ink-800" id="matDropName">{{ __('Subir un archivo') }}</span>
+                        <span class="block text-[11px] text-ink-400">{{ __('El formato y el tamaño se detectan automáticamente.') }}</span>
                     </span>
                     <input type="file" name="file" id="matInputFile">
                 </label>
@@ -140,7 +140,7 @@
 
             <div class="relative flex items-center gap-3 py-1">
                 <span class="flex-1 h-px bg-ink-100"></span>
-                <span class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">o enlace externo</span>
+                <span class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('o enlace externo') }}</span>
                 <span class="flex-1 h-px bg-ink-100"></span>
             </div>
             <div>
@@ -149,7 +149,7 @@
 
             <div class="grid grid-cols-2 gap-4 items-end pt-1">
                 <div>
-                    <label class="mat-label">Orden</label>
+                    <label class="mat-label">{{ __('Orden') }}</label>
                     <input type="number" name="sort_order" id="matInputOrder" value="0" min="0" class="mat-field">
                 </div>
                 <label class="flex items-center gap-2 text-[13px] text-ink-700 h-10 px-1">
@@ -158,8 +158,8 @@
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex justify-end gap-2">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> Guardar</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar') }}</button>
         </div>
     </form>
 </dialog>
@@ -170,12 +170,12 @@
         @csrf @method('DELETE')
         <div class="p-6 text-center">
             <div class="w-12 h-12 mx-auto rounded-full bg-err-soft flex items-center justify-center text-err mb-3"><i class="pi pi-trash text-[20px]"></i></div>
-            <div class="text-[15px] font-bold text-ink-900">Eliminar material</div>
-            <p class="text-[13px] text-ink-500 mt-1.5">¿Seguro que querés eliminar <b class="text-ink-700" id="matDeleteName">este material</b>? Esta acción no se puede deshacer.</p>
+            <div class="text-[15px] font-bold text-ink-900">{{ __('Eliminar material') }}</div>
+            <p class="text-[13px] text-ink-500 mt-1.5">{{ __('¿Seguro que querés eliminar') }} <b class="text-ink-700" id="matDeleteName">{{ __('este material') }}</b>{{ __('? Esta acción no se puede deshacer.') }}</p>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex justify-center gap-2">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> Eliminar</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary" style="background:#d92d20;border-color:#d92d20"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
         </div>
     </form>
 </dialog>
@@ -186,10 +186,10 @@
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-eye"></i></div>
             <div class="min-w-0 flex-1">
-                <div class="text-[15px] font-bold text-ink-900 truncate" id="matPreviewTitle">Vista previa</div>
+                <div class="text-[15px] font-bold text-ink-900 truncate" id="matPreviewTitle">{{ __('Vista previa') }}</div>
                 <div class="text-[11px] text-ink-400 uppercase tracking-wider" id="matPreviewFmt"></div>
             </div>
-            <a href="#" id="matPreviewDownload" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> Descargar</a>
+            <a href="#" id="matPreviewDownload" class="crm-btn crm-btn-primary"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1 ml-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="flex-1 overflow-auto bg-ink-50 flex items-center justify-center p-4" id="matPreviewBody" style="min-height:420px"></div>

@@ -80,7 +80,7 @@
             @if($tab === 'resumen')
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     <div class="crm-card overflow-hidden">
-                        <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 text-[13px] font-bold text-ink-700">Datos de contacto</div>
+                        <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 text-[13px] font-bold text-ink-700">{{ __('Datos de contacto') }}</div>
                         <div class="divide-y divide-ink-100">
                             @php $data = [
                                 ['Nombre completo',  $fullName],
@@ -101,8 +101,8 @@
                     </div>
                     <div class="crm-card overflow-hidden">
                         <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
-                            <div class="text-[13px] font-bold text-ink-700">Contrato activo</div>
-                            <a href="{{ route('admin.crm.contract.generate', $reservation->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Ver contrato</a>
+                            <div class="text-[13px] font-bold text-ink-700">{{ __('Contrato activo') }}</div>
+                            <a href="{{ route('admin.crm.contract.generate', $reservation->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Ver contrato') }}</a>
                         </div>
                         <div class="divide-y divide-ink-100">
                             @php $contract = [
@@ -166,15 +166,15 @@
 
                 <div class="crm-card overflow-hidden">
                     <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
-                        <div class="text-[13px] font-bold text-ink-700"><i class="pi pi-file"></i> Documentos del expediente</div>
+                        <div class="text-[13px] font-bold text-ink-700"><i class="pi pi-file"></i> {{ __('Documentos del expediente') }}</div>
                         <div class="flex items-center gap-2">
-                            <button type="button" onclick="document.getElementById('modal-solicitar-documento').showModal()" class="crm-btn crm-btn-ghost text-[11px] py-1.5 px-3"><i class="pi pi-inbox text-[10px]"></i> Solicitar documento</button>
-                            <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Subir documento</button>
+                            <button type="button" onclick="document.getElementById('modal-solicitar-documento').showModal()" class="crm-btn crm-btn-ghost text-[11px] py-1.5 px-3"><i class="pi pi-inbox text-[10px]"></i> {{ __('Solicitar documento') }}</button>
+                            <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> {{ __('Subir documento') }}</button>
                         </div>
                     </div>
                     <table class="w-full crm-table">
                         <thead class="bg-white">
-                            <tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Fecha</th><th>Archivo</th><th></th></tr>
+                            <tr><th>{{ __('Documento') }}</th><th>{{ __('Tipo') }}</th><th>{{ __('Estado') }}</th><th>{{ __('Fecha') }}</th><th>{{ __('Archivo') }}</th><th></th></tr>
                         </thead>
                         <tbody>
                             @php
@@ -223,7 +223,7 @@
                                         @if($hasFile)
                                             <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-brand hover:underline text-left">{{ $d->filename }}</button>
                                         @elseif($isRequested)
-                                            <span class="text-ink-400">Pendiente de subir</span>
+                                            <span class="text-ink-400">{{ __('Pendiente de subir') }}</span>
                                         @else
                                             {{ $d->filename }}
                                         @endif
@@ -234,26 +234,26 @@
                                             $hasSignNow  = (bool) data_get($d->metadata, 'signnow.document_id');
                                         @endphp
                                         @if($d->document_type === 'kyc')
-                                            <button type="button" onclick="document.getElementById('modal-kyc-{{ $d->id }}').showModal()" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> Ver</button>
+                                            <button type="button" onclick="document.getElementById('modal-kyc-{{ $d->id }}').showModal()" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                         @endif
                                         @if($hasSignNow && ! $d->isSigned())
-                                            <button type="button" onclick="syncSignNow({{ $d->id }}, this)" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1" title="Verificar si el cliente ya firmó en SignNow"><i class="pi pi-refresh text-[10px]"></i> Sincronizar firma</button>
+                                            <button type="button" onclick="syncSignNow({{ $d->id }}, this)" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1" title="{{ __('Verificar si el cliente ya firmó en SignNow') }}"><i class="pi pi-refresh text-[10px]"></i> {{ __('Sincronizar firma') }}</button>
                                         @endif
                                         @if($d->status === 'pending' && ! $isAutoGen && $hasFile)
-                                            <form method="POST" action="{{ route('documents.approve', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1">Aprobar</button></form>
-                                            <form method="POST" action="{{ route('documents.reject', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">Rechazar</button></form>
+                                            <form method="POST" action="{{ route('documents.approve', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1">{{ __('Aprobar') }}</button></form>
+                                            <form method="POST" action="{{ route('documents.reject', $d->id) }}" class="inline m-0">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">{{ __('Rechazar') }}</button></form>
                                         @endif
                                         @if($d->document_type !== 'kyc' && $hasFile)
-                                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> Ver</button>
-                                            <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> Descargar</a>
+                                            <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                            <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                         @endif
                                         @if($isRequested)
-                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm('¿Eliminar esta solicitud de documento?');">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="Eliminar solicitud"><i class="pi pi-trash text-[10px]"></i></button></form>
+                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm('¿Eliminar esta solicitud de documento?');">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">Sin documentos. <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="text-brand font-semibold hover:underline">Subir el primero</button></td></tr>
+                                <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin documentos.') }} <button type="button" onclick="document.getElementById('modal-subir-documento').showModal()" class="text-brand font-semibold hover:underline">{{ __('Subir el primero') }}</button></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -274,19 +274,19 @@
                 @if($showPaymentSchedule)
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-5 mt-5">
                     <div class="crm-card p-4">
-                        <div class="text-[10px] uppercase font-semibold text-ink-400">Total contrato</div>
+                        <div class="text-[10px] uppercase font-semibold text-ink-400">{{ __('Total contrato') }}</div>
                         <div class="text-[22px] font-bold text-ink-900 mt-1">${{ number_format($precio) }}</div>
                     </div>
                     <div class="crm-card p-4">
-                        <div class="text-[10px] uppercase font-semibold text-ink-400">Total pagado</div>
+                        <div class="text-[10px] uppercase font-semibold text-ink-400">{{ __('Total pagado') }}</div>
                         <div class="text-[22px] font-bold text-ok-dark mt-1">${{ number_format($paid) }}</div>
                     </div>
                     <div class="crm-card p-4">
-                        <div class="text-[10px] uppercase font-semibold text-ink-400">Saldo</div>
+                        <div class="text-[10px] uppercase font-semibold text-ink-400">{{ __('Saldo') }}</div>
                         <div class="text-[22px] font-bold text-ink-900 mt-1">${{ number_format($precio - $paid) }}</div>
                     </div>
                     <div class="crm-card p-4">
-                        <div class="text-[10px] uppercase font-semibold text-ink-400">Próximo pago</div>
+                        <div class="text-[10px] uppercase font-semibold text-ink-400">{{ __('Próximo pago') }}</div>
                         @php $nextPay = $reservation->payments->where('status', 'pending')->sortBy('due_date')->first(); @endphp
                         <div class="text-[22px] font-bold text-warn mt-1">${{ number_format($nextPay->amount ?? 0) }}</div>
                     </div>
@@ -294,19 +294,19 @@
 
                 <div class="crm-card mb-5 p-4">
                     <div class="flex items-center justify-between text-[12px] text-ink-700 mb-2">
-                        <span class="font-semibold">Progreso del plan de pagos</span><span class="font-bold">{{ $pct }}%</span>
+                        <span class="font-semibold">{{ __('Progreso del plan de pagos') }}</span><span class="font-bold">{{ $pct }}%</span>
                     </div>
                     <div class="crm-progress"><span class="bg-brand" style="width:{{ $pct }}%"></span></div>
                 </div>
 
                 <div class="crm-card overflow-hidden">
                     <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
-                        <div class="text-[13px] font-bold text-ink-700">Calendario de pagos</div>
-                        <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> Registrar pago</button>
+                        <div class="text-[13px] font-bold text-ink-700">{{ __('Calendario de pagos') }}</div>
+                        <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> {{ __('Registrar pago') }}</button>
                     </div>
                     <table class="w-full crm-table">
                         <thead class="bg-white">
-                            <tr><th>Cuota</th><th>Fecha</th><th>Monto programado</th><th>Pagado</th><th>Estado</th><th>Método</th></tr>
+                            <tr><th>{{ __('Cuota') }}</th><th>{{ __('Fecha') }}</th><th>{{ __('Monto programado') }}</th><th>{{ __('Pagado') }}</th><th>{{ __('Estado') }}</th><th>{{ __('Método') }}</th></tr>
                         </thead>
                         <tbody>
                             @php $statusPay = ['paid' => ['Pagado','ok'],'pending' => ['Pendiente','warn'],'overdue' => ['Vencido','err']]; @endphp
@@ -321,7 +321,7 @@
                                     <td class="text-[12px] text-ink-500">{{ $p->payment_method ?? '—' }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">Sin cuotas registradas. <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">Registrar pago</button></td></tr>
+                                <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin cuotas registradas.') }} <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">{{ __('Registrar pago') }}</button></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -331,7 +331,7 @@
             {{-- ============ HISTORIAL ============ --}}
             @elseif($tab === 'historial')
                 <div class="crm-card overflow-hidden">
-                    <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 text-[13px] font-bold text-ink-700">Actividad reciente</div>
+                    <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 text-[13px] font-bold text-ink-700">{{ __('Actividad reciente') }}</div>
                     <div class="divide-y divide-ink-100">
                         @php
                             $events = collect();
@@ -351,7 +351,7 @@
                                 <div class="text-[10px] text-ink-400 whitespace-nowrap mt-0.5">{{ optional($e[2])->diffForHumans() }}</div>
                             </div>
                         @empty
-                            <div class="px-5 py-8 text-center text-[12px] text-ink-500">Sin actividad registrada.</div>
+                            <div class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('Sin actividad registrada.') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -364,7 +364,7 @@
                             <div class="crm-avatar crm-avatar-sm" style="background:#7cb8e7">{{ $initial }}</div>
                             <div class="flex-1">
                                 <div class="text-[14px] font-semibold text-ink-900">{{ $fullName }}</div>
-                                <div class="text-[11px] text-ink-500">Conversación activa</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Conversación activa') }}</div>
                             </div>
                         </div>
                         <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-ink-50" id="admin-msg-scroll">
@@ -397,25 +397,25 @@
                                     </div>
                                 @endif
                             @empty
-                                <div class="text-center text-[12px] text-ink-500 mt-12">Sin mensajes. Envía el primero abajo.</div>
+                                <div class="text-center text-[12px] text-ink-500 mt-12">{{ __('Sin mensajes. Envía el primero abajo.') }}</div>
                             @endforelse
                         </div>
                         <form method="POST" action="{{ route('admin.crm.message.send') }}" class="p-3 border-t border-ink-100 flex items-center gap-2 m-0">@csrf
                             <input type="hidden" name="reservation_id" value="{{ $reservation->id }}">
                             <input type="hidden" name="channel" value="chat">
-                            <input type="text" name="message" required placeholder="Escribir mensaje al cliente…" autocomplete="off" maxlength="5000" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px]">
-                            <button type="submit" class="crm-btn crm-btn-primary">Enviar</button>
+                            <input type="text" name="message" required placeholder="{{ __('Escribir mensaje al cliente…') }}" autocomplete="off" maxlength="5000" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px]">
+                            <button type="submit" class="crm-btn crm-btn-primary">{{ __('Enviar') }}</button>
                         </form>
                     </div>
                     <div class="space-y-4">
                         <div class="crm-card p-4">
-                            <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">Enviar por canal</div>
+                            <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">{{ __('Enviar por canal') }}</div>
                             <div class="flex gap-2 mt-2">
                                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="flex-1 m-0">@csrf
                                     <input type="hidden" name="reservation_id" value="{{ $reservation->id }}">
                                     <input type="hidden" name="channel" value="email">
                                     <input type="hidden" name="message" value="Email enviado al cliente desde acción rápida.">
-                                    <button class="crm-btn crm-btn-ghost text-[11px] w-full justify-center"><i class="pi pi-envelope"></i> Email</button>
+                                    <button class="crm-btn crm-btn-ghost text-[11px] w-full justify-center"><i class="pi pi-envelope"></i> {{ __('Email') }}</button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="flex-1 m-0">@csrf
                                     <input type="hidden" name="reservation_id" value="{{ $reservation->id }}">
@@ -426,11 +426,11 @@
                             </div>
                         </div>
                         <div class="crm-card p-4">
-                            <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">Datos rápidos</div>
+                            <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">{{ __('Datos rápidos') }}</div>
                             <div class="text-[12px] text-ink-700 space-y-1">
                                 <div>• Email: <span class="font-semibold">{{ $email }}</span></div>
                                 <div>• Tel: <span class="font-semibold">{{ $phone }}</span></div>
-                                <div>• País: <span class="font-semibold">{{ $reservation->country ?? '—' }}</span></div>
+                                <div>{{ __('• País:') }} <span class="font-semibold">{{ $reservation->country ?? '—' }}</span></div>
                             </div>
                         </div>
                     </div>
@@ -451,18 +451,18 @@
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div class="px-6 py-4 border-b border-[#f2f5f8] flex items-center gap-3">
                 <div class="w-9 h-9 rounded-lg border border-[#eaecf0] flex items-center justify-center text-[#525866]"><i class="pi pi-building-columns"></i></div>
-                <div class="text-[15px] font-bold text-[#222530] flex-1">Datos para transferencia en USD</div>
+                <div class="text-[15px] font-bold text-[#222530] flex-1">{{ __('Datos para transferencia en USD') }}</div>
                 <button type="button" onclick="closeWireTransferModal()" class="text-[#99a0ae] hover:text-[#2b303b] p-1"><i class="pi pi-times text-[12px]"></i></button>
             </div>
             <div id="wireTransferContent" style="width:794px;max-width:90vw;background:#f0efec">
                 <div class="text-center py-8">
                     <i class="pi pi-spin pi-spinner text-[#99a0ae] text-[24px]"></i>
-                    <div class="text-[13px] text-[#717784] mt-2">Cargando datos...</div>
+                    <div class="text-[13px] text-[#717784] mt-2">{{ __('Cargando datos...') }}</div>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-[#f2f5f8] flex items-center gap-2 justify-end bg-[#f5f7fa]">
-                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> Descargar PDF</button>
-                <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">Cerrar</button>
+                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+                <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">{{ __('Cerrar') }}</button>
             </div>
         </div>
     </div>

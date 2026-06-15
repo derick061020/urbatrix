@@ -13,11 +13,11 @@
 @endphp
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
-    <p class="text-[12px] text-ink-500 max-w-2xl">Disponibilidad y precios en tiempo real. Comparte la ficha o reserva en nombre de tu cliente — sin dobles ventas.</p>
+    <p class="text-[12px] text-ink-500 max-w-2xl">{{ __('Disponibilidad y precios en tiempo real. Comparte la ficha o reserva en nombre de tu cliente — sin dobles ventas.') }}</p>
 
     <div class="brk-card overflow-hidden">
         <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 flex items-center justify-between">
-            <span class="text-[14px] font-bold text-ink-950">Unidades</span>
+            <span class="text-[14px] font-bold text-ink-950">{{ __('Unidades') }}</span>
             <span class="text-[11px] text-ink-400">actualizado en vivo · {{ $units->count() }} unidades</span>
         </div>
         <div class="overflow-x-auto">
@@ -45,18 +45,18 @@
                             <td class="px-5 py-3.5 text-[12px] text-ink-500 text-right">{{ $ppm ? '$'.number_format($ppm,0) : '—' }}</td>
                             <td class="px-5 py-3.5"><span class="brk-pill {{ $badge[1] }}">{{ $badge[0] }}</span></td>
                             <td class="px-5 py-3.5 text-right whitespace-nowrap">
-                                <a href="{{ route('property.pdf', $u->id) }}" target="_blank" class="brk-btn brk-btn-ghost" style="padding:6px 10px;font-size:11.5px">Compartir</a>
+                                <a href="{{ route('property.pdf', $u->id) }}" target="_blank" class="brk-btn brk-btn-ghost" style="padding:6px 10px;font-size:11.5px">{{ __('Compartir') }}</a>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-5 py-12 text-center text-[12px] text-ink-400">No hay unidades publicadas todavía.</td></tr>
+                        <tr><td colspan="7" class="px-5 py-12 text-center text-[12px] text-ink-400">{{ __('No hay unidades publicadas todavía.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
         <div class="px-5 py-3 border-t border-ink-100 flex items-start gap-2.5 bg-info-soft/40">
             <i class="pi pi-info-circle text-info mt-0.5"></i>
-            <p class="text-[11px] text-ink-600 m-0">Disponibilidad real en tiempo real. Una unidad solo queda <b>bloqueada con una reserva con depósito</b>; hasta entonces sigue disponible.</p>
+            <p class="text-[11px] text-ink-600 m-0">{{ __('Disponibilidad real en tiempo real. Una unidad solo queda') }} <b>{{ __('bloqueada con una reserva con depósito') }}</b>{{ __('; hasta entonces sigue disponible.') }}</p>
         </div>
     </div>
 </div>

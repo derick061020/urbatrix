@@ -12,10 +12,10 @@
             <div class="text-[14px] font-semibold text-ink-900">{{ $active->first_name }} {{ $active->last_name }}</div>
             <div class="text-[11px] text-ink-500">{{ $active->unit->name ?? '—' }} · {{ $active->email }}</div>
         </div>
-        <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">Ir a expediente</a>
-        <button type="button" data-comm-rail-toggle class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="Mostrar panel de canales">
+        <a href="{{ route('admin.crm.expediente.detalle', $active->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Ir a expediente') }}</a>
+        <button type="button" data-comm-rail-toggle class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Mostrar panel de canales') }}">
             <i class="pi pi-sliders-h"></i>
-            <span data-comm-rail-toggle-label>Canales</span>
+            <span data-comm-rail-toggle-label>{{ __('Canales') }}</span>
         </button>
     </div>
 
@@ -41,16 +41,16 @@
                 </div>
             @endif
         @empty
-            <div class="text-center text-[12px] text-ink-500 mt-12">Sin mensajes aún. Envía el primero abajo.</div>
+            <div class="text-center text-[12px] text-ink-500 mt-12">{{ __('Sin mensajes aún. Envía el primero abajo.') }}</div>
         @endforelse
     </div>
 
     <form method="POST" action="{{ route('admin.crm.message.send') }}" class="p-3 border-t border-ink-100 bg-white flex items-center gap-2 m-0">@csrf
         <input type="hidden" name="reservation_id" value="{{ $active->id }}">
         <input type="hidden" name="channel" value="chat">
-        <input type="text" name="message" required maxlength="5000" autocomplete="off" placeholder="Escribe un mensaje…" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
-        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-send text-[11px]"></i> Enviar</button>
+        <input type="text" name="message" required maxlength="5000" autocomplete="off" placeholder="{{ __('Escribe un mensaje…') }}" class="flex-1 h-9 border border-ink-200 rounded-lg px-3 text-[13px] focus:outline-none focus:border-brand">
+        <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-send text-[11px]"></i> {{ __('Enviar') }}</button>
     </form>
 @else
-    <div class="flex-1 flex items-center justify-center text-[12px] text-ink-500">Selecciona una conversación</div>
+    <div class="flex-1 flex items-center justify-center text-[12px] text-ink-500">{{ __('Selecciona una conversación') }}</div>
 @endif

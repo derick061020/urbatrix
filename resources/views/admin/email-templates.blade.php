@@ -11,16 +11,16 @@
 <div class="bg-gray-100 min-h-screen w-full">
     <div class="p-8">
 
-    <h1 class="text-3xl font-semibold text-[#5c4a32] mb-1">Email Templates</h1>
-    <p class="text-gray-500 mb-6">Add and edit email templates.</p>
+    <h1 class="text-3xl font-semibold text-[#5c4a32] mb-1">{{ __('Email Templates') }}</h1>
+    <p class="text-gray-500 mb-6">{{ __('Add and edit email templates.') }}</p>
     <hr class="border-gray-300 mb-6">
 
     <div class="bg-white rounded-lg shadow overflow-hidden ">
         <table class="w-full text-sm text-left">
             <thead>
                 <tr class="border-b border-gray-200 text-xs text-gray-600 uppercase bg-gray-50">
-                    <th class="py-3 px-6 font-semibold">Edit</th>
-                    <th class="py-3 px-6 font-semibold">Disabled</th>
+                    <th class="py-3 px-6 font-semibold">{{ __('Edit') }}</th>
+                    <th class="py-3 px-6 font-semibold">{{ __('Disabled') }}</th>
                     <th class="py-3 px-6 font-semibold">Name</th>
                 </tr>
             </thead>

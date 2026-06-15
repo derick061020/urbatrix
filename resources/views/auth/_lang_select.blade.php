@@ -9,11 +9,11 @@
     <div class="auth-lang-menu hidden" role="menu">
         <button type="button" role="menuitem" data-auth-lang="es" onclick="setAuthLocale('es')" class="auth-lang-item {{ $currentLocale === 'es' ? 'is-active' : '' }}">
             <i class="pi pi-check text-[10px] auth-lang-check"></i>
-            <span>Español</span>
+            <span>{{ __('Español') }}</span>
         </button>
         <button type="button" role="menuitem" data-auth-lang="en" onclick="setAuthLocale('en')" class="auth-lang-item {{ $currentLocale === 'en' ? 'is-active' : '' }}">
             <i class="pi pi-check text-[10px] auth-lang-check"></i>
-            <span>English</span>
+            <span>{{ __('English') }}</span>
         </button>
     </div>
 </div>

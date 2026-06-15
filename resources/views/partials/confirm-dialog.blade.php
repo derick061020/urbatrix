@@ -74,11 +74,11 @@
         <div class="confirm-dlg-icon" id="confirmDlgIconWrap" aria-hidden="true">
             <i class="pi pi-exclamation-triangle" id="confirmDlgIcon"></i>
         </div>
-        <h2 id="confirmDlgTitle" class="confirm-dlg-title">¿Estás seguro?</h2>
-        <p id="confirmDlgText" class="confirm-dlg-text">Esta acción no se puede deshacer.</p>
+        <h2 id="confirmDlgTitle" class="confirm-dlg-title">{{ __('¿Estás seguro?') }}</h2>
+        <p id="confirmDlgText" class="confirm-dlg-text">{{ __('Esta acción no se puede deshacer.') }}</p>
         <div class="confirm-dlg-actions">
-            <button type="button" class="confirm-dlg-btn confirm-dlg-cancel" id="confirmDlgCancel">Cancelar</button>
-            <button type="button" class="confirm-dlg-btn confirm-dlg-submit" id="confirmDlgConfirm">Confirmar</button>
+            <button type="button" class="confirm-dlg-btn confirm-dlg-cancel" id="confirmDlgCancel">{{ __('Cancelar') }}</button>
+            <button type="button" class="confirm-dlg-btn confirm-dlg-submit" id="confirmDlgConfirm">{{ __('Confirmar') }}</button>
         </div>
     </div>
 </div>

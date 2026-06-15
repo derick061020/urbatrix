@@ -95,7 +95,7 @@
                 <div class="text-right">
                     @php $updatedAt = optional($latestReport)->published_at ?? $proyecto->updated_at; @endphp
                     <div class="text-[11px] opacity-80">Actualizado: <span class="font-semibold">{{ optional($updatedAt)->locale('es')->isoFormat('D MMM YYYY') ?? '—' }}</span></div>
-                    <span class="crm-pill bg-ok-soft text-ok-dark mt-2 inline-flex"><span class="dot bg-ok"></span> FASE ACTIVA</span>
+                    <span class="crm-pill bg-ok-soft text-ok-dark mt-2 inline-flex"><span class="dot bg-ok"></span> {{ __('FASE ACTIVA') }}</span>
                 </div>
             </div>
 
@@ -124,12 +124,12 @@
             <div>
                 <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Inventario · {{ $totalUnits }} unidades totales</div>
                 <div class="mt-2 flex items-baseline gap-5">
-                    <div><span class="font-display text-[28px] font-bold text-err">{{ $sold }}</span> <span class="text-[12px] text-ink-500">vendidas</span></div>
-                    <div><span class="font-display text-[28px] font-bold text-ink-900">{{ $available }}</span> <span class="text-[12px] text-ink-500">disponibles</span></div>
+                    <div><span class="font-display text-[28px] font-bold text-err">{{ $sold }}</span> <span class="text-[12px] text-ink-500">{{ __('vendidas') }}</span></div>
+                    <div><span class="font-display text-[28px] font-bold text-ink-900">{{ $available }}</span> <span class="text-[12px] text-ink-500">{{ __('disponibles') }}</span></div>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">Valor total del proyecto</div>
+                <div class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">{{ __('Valor total del proyecto') }}</div>
                 <div class="font-display text-[28px] font-bold text-warn-dark mt-2">${{ number_format($valorTotal / 1_000_000, 2) }}M USD</div>
             </div>
         </div>
@@ -168,7 +168,7 @@
         {{-- Construction timeline --}}
         <div class="crm-card p-5">
             <div class="flex items-center justify-between">
-                <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Avance de obra</div>
+                <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Avance de obra') }}</div>
                 @if($latestReport)
                     <span class="text-[10px] text-ink-400">{{ $latestReport->period }}</span>
                 @endif
@@ -194,19 +194,19 @@
                 @empty
                     <li class="text-[12px] text-ink-400 py-3 text-center">
                         Aún no hay reportes de obra publicados.
-                        <a href="{{ route('admin.crm.avance-obra') }}" class="text-brand font-semibold hover:underline">Publicar avance →</a>
+                        <a href="{{ route('admin.crm.avance-obra') }}" class="text-brand font-semibold hover:underline">{{ __('Publicar avance →') }}</a>
                     </li>
                 @endforelse
             </ul>
             <div class="mt-4 pt-3 border-t border-ink-100 flex items-center justify-between">
-                <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">Avance general<br><span class="text-[11px] text-ink-500 normal-case font-medium">Entrega estimada {{ $entregaFmt }}</span></div>
+                <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Avance general') }}<br><span class="text-[11px] text-ink-500 normal-case font-medium">Entrega estimada {{ $entregaFmt }}</span></div>
                 <div class="font-display text-[24px] font-bold text-ok-dark">{{ $pctObra }}%</div>
             </div>
         </div>
 
         {{-- Investment case --}}
         <div class="crm-card p-5">
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">Caso de inversión</div>
+            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">{{ __('Caso de inversión') }}</div>
             <dl class="text-[13px] divide-y divide-ink-100">
                 @php
                     $rows = [
@@ -234,19 +234,19 @@
         {{-- Launch discount + signals --}}
         <div class="space-y-4">
             <div class="crm-card p-5 border-2 border-ok/40 bg-ok-soft/40">
-                <div class="text-[11px] uppercase tracking-wider font-semibold text-ok-dark">Descuento de lanzamiento</div>
+                <div class="text-[11px] uppercase tracking-wider font-semibold text-ok-dark">{{ __('Descuento de lanzamiento') }}</div>
                 <div class="font-display text-[36px] font-bold text-ok-dark leading-none mt-2">${{ number_format($launchDiscount, 0) }}</div>
                 <div class="text-[11px] text-ink-700 mt-1">Ahorro en precio de compra · Válido hasta {{ now()->addMonths(3)->locale('es')->isoFormat('MMM YYYY') }}</div>
-                <a href="{{ route('admin.units') }}" class="mt-3 inline-flex w-full justify-center crm-btn crm-btn-ghost text-[12px] bg-white">Editar descuento</a>
+                <a href="{{ route('admin.units') }}" class="mt-3 inline-flex w-full justify-center crm-btn crm-btn-ghost text-[12px] bg-white">{{ __('Editar descuento') }}</a>
             </div>
 
             <div class="crm-card p-5">
-                <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Señales del proyecto</div>
+                <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Señales del proyecto') }}</div>
                 <ul class="mt-3 space-y-2 text-[12px]">
                     <li class="flex items-center gap-2"><span class="dot bg-ok"></span> {{ $sold }} unidades cerradas desde lanzamiento</li>
-                    <li class="flex items-center gap-2"><span class="dot bg-warn"></span> Descuento activo · plazo limitado</li>
-                    <li class="flex items-center gap-2"><span class="dot bg-info"></span> Sin desviaciones de entrega</li>
-                    <li class="flex items-center gap-2"><span class="dot bg-ok"></span> Fideicomiso activo · DGII registrado</li>
+                    <li class="flex items-center gap-2"><span class="dot bg-warn"></span> {{ __('Descuento activo · plazo limitado') }}</li>
+                    <li class="flex items-center gap-2"><span class="dot bg-info"></span> {{ __('Sin desviaciones de entrega') }}</li>
+                    <li class="flex items-center gap-2"><span class="dot bg-ok"></span> {{ __('Fideicomiso activo · DGII registrado') }}</li>
                 </ul>
             </div>
         </div>
@@ -257,14 +257,14 @@
         <div class="px-5 py-3 border-b border-ink-100 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="pi pi-home text-ink-500"></i>
-                <h3 class="text-[14px] font-bold text-ink-900">Inventario por tipología</h3>
+                <h3 class="text-[14px] font-bold text-ink-900">{{ __('Inventario por tipología') }}</h3>
             </div>
-            <a href="{{ route('admin.units') }}" class="text-[11px] text-brand font-semibold hover:underline">Ver unidades →</a>
+            <a href="{{ route('admin.units') }}" class="text-[11px] text-brand font-semibold hover:underline">{{ __('Ver unidades →') }}</a>
         </div>
         <table class="w-full crm-table">
             <thead class="bg-ink-50">
                 <tr>
-                    <th>Tipología</th><th>Unidades</th><th>Superficie</th><th>Precio desde</th><th>Precio prom.</th><th>Vendidas</th><th>Disponibles</th><th>Yield est.</th>
+                    <th>{{ __('Tipología') }}</th><th>{{ __('Unidades') }}</th><th>{{ __('Superficie') }}</th><th>{{ __('Precio desde') }}</th><th>{{ __('Precio prom.') }}</th><th>{{ __('Vendidas') }}</th><th>{{ __('Disponibles') }}</th><th>{{ __('Yield est.') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -288,7 +288,7 @@
                         <td class="text-[13px] font-semibold text-ok-dark">{{ $d['yield'] }}%</td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-6">Sin tipologías registradas.</td></tr>
+                    <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin tipologías registradas.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -297,7 +297,7 @@
     {{-- ============ PAYMENT STRUCTURE + LOCATION ============ --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="crm-card p-5">
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">Estructura del plan de pagos</div>
+            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">{{ __('Estructura del plan de pagos') }}</div>
             @php
                 $planRows = [
                     ['5%',  'ok',   'Progreso de ventas', 'Al firmar el acuerdo de reserva', '$'.number_format(round($avgPrice * 0.05)).' USD'],
@@ -317,11 +317,11 @@
                     </div>
                 @endforeach
             </div>
-            <div class="mt-4 px-3 py-2 rounded-lg bg-ink-50 text-[11px] text-ink-600">Financiamiento bancario disponible para el 80% restante a través de bancos locales e internacionales colaboradores.</div>
+            <div class="mt-4 px-3 py-2 rounded-lg bg-ink-50 text-[11px] text-ink-600">{{ __('Financiamiento bancario disponible para el 80% restante a través de bancos locales e internacionales colaboradores.') }}</div>
         </div>
 
         <div class="crm-card p-5">
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Ubicación y amenidades</div>
+            <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Ubicación y amenidades') }}</div>
             <div class="font-display text-[20px] font-bold text-ink-900 mt-2">{{ $proyecto->location ?? 'Cap Cana, Punta Cana' }}</div>
             <div class="text-[12px] text-ink-600 mt-1">{{ $proyecto->description ?? 'República Dominicana · Zona de lujo en la región del Caribe más demandada por inversores internacionales.' }}</div>
             <div class="mt-4 grid grid-cols-2 gap-2 text-[12px]">
@@ -330,12 +330,12 @@
                 @endforeach
             </div>
             <div class="mt-4 pt-4 border-t border-ink-100">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Pool de renta gestionado</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Pool de renta gestionado') }}</div>
                 <div class="mt-2 flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-building"></i></div>
                     <div>
                         <div class="text-[13px] font-bold text-ink-900">{{ $proyecto->rental_pool ?? 'Duna Hospitality Group' }}</div>
-                        <div class="text-[11px] text-ink-500">Gestión profesional · 72% ocupación estimada</div>
+                        <div class="text-[11px] text-ink-500">{{ __('Gestión profesional · 72% ocupación estimada') }}</div>
                     </div>
                 </div>
             </div>

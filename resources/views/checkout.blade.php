@@ -143,25 +143,25 @@
             </span>
             <span class="flex flex-col leading-none">
                 <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">MAKAI</span>
-                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">Duna Development</span>
+                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
             </span>
         </a>
 
         {{-- Step indicator: 1. Datos · 2. Pago · 3. Confirmar --}}
         <div id="step-indicator" class="hidden lg:flex items-center gap-5">
-            <div class="step-pill done"><span class="num"><i class="pi pi-check text-[9px]"></i></span><span>Datos</span></div>
+            <div class="step-pill done"><span class="num"><i class="pi pi-check text-[9px]"></i></span><span>{{ __('Datos') }}</span></div>
             <i class="pi pi-angle-right text-ink-300 text-[12px]"></i>
-            <div class="step-pill active"><span class="num">2</span><span>Pago</span></div>
+            <div class="step-pill active"><span class="num">2</span><span>{{ __('Pago') }}</span></div>
             <i class="pi pi-angle-right text-ink-300 text-[12px]"></i>
-            <div class="step-pill"><span class="num">3</span><span>Confirmar</span></div>
+            <div class="step-pill"><span class="num">3</span><span>{{ __('Confirmar') }}</span></div>
         </div>
 
         <div class="flex items-center gap-3">
             <div class="text-right hidden md:block">
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">Reserva</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Reserva') }}</div>
                 <div class="text-[11px] font-bold text-ink-950">{{ $reservation->reservation_code ?? '—' }}</div>
             </div>
-            <a href="/" class="auth-btn auth-btn-ghost w-10 px-0" title="Cerrar"><i class="pi pi-times text-[12px]"></i></a>
+            <a href="/" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Cerrar') }}"><i class="pi pi-times text-[12px]"></i></a>
         </div>
     </header>
 
@@ -176,8 +176,8 @@
                 {{-- LEFT: payment form --}}
                 <div>
                     <div class="mb-6">
-                        <h1 class="font-display text-[24px] font-medium text-ink-950 leading-8">Completá tu reserva</h1>
-                        <p class="text-[14px] text-ink-500 mt-1">Abona la seña para asegurar la unidad. El cobro se realiza una sola vez.</p>
+                        <h1 class="font-display text-[24px] font-medium text-ink-950 leading-8">{{ __('Completá tu reserva') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-1">{{ __('Abona la seña para asegurar la unidad. El cobro se realiza una sola vez.') }}</p>
                     </div>
 
                     {{-- Buyer summary --}}
@@ -186,21 +186,21 @@
                             <div class="text-[14px] font-semibold text-ink-950 truncate">{{ trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) ?: 'Adquiriente' }}</div>
                             <div class="text-[12px] text-ink-500 truncate">{{ $reservation->email ?? '' }}{{ $reservation->phone ? ' · '.$reservation->phone : '' }}</div>
                         </div>
-                        <a href="/dashboard" class="text-[12px] text-brand font-semibold hover:underline shrink-0 ml-3">Editar</a>
+                        <a href="/dashboard" class="text-[12px] text-brand font-semibold hover:underline shrink-0 ml-3">{{ __('Editar') }}</a>
                     </div>
 
                     {{-- Card --}}
-                    <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-3">Tarjeta de crédito / débito</div>
+                    <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-3">{{ __('Tarjeta de crédito / débito') }}</div>
 
                     <div id="pay-error" class="hidden mb-4 px-3 py-2 rounded-lg bg-err-soft border border-err/30 text-[12px] text-err"></div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="sm:col-span-2">
-                            <label class="field-label">Número de tarjeta <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Número de tarjeta') }} <span class="field-required">*</span></label>
                             <div id="card-number" class="stripe-field"></div>
                         </div>
                         <div>
-                            <label class="field-label">Vencimiento <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Vencimiento') }} <span class="field-required">*</span></label>
                             <div id="card-expiry" class="stripe-field"></div>
                         </div>
                         <div>
@@ -208,41 +208,41 @@
                             <div id="card-cvc" class="stripe-field"></div>
                         </div>
                         <div>
-                            <label class="field-label">Código postal <span class="field-required">*</span></label>
+                            <label class="field-label">{{ __('Código postal') }} <span class="field-required">*</span></label>
                             <input type="text" id="billing_zip" class="auth-input" placeholder="10102" autocomplete="postal-code">
                         </div>
                         <div>
-                            <label class="field-label">Titular de la tarjeta <span class="field-required">*</span></label>
-                            <input type="text" id="card_name" class="auth-input" placeholder="Nombre como aparece en la tarjeta" value="{{ trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) }}">
+                            <label class="field-label">{{ __('Titular de la tarjeta') }} <span class="field-required">*</span></label>
+                            <input type="text" id="card_name" class="auth-input" placeholder="{{ __('Nombre como aparece en la tarjeta') }}" value="{{ trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) }}">
                         </div>
                     </div>
 
                     {{-- Billing address --}}
-                    <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mt-8 mb-3">Dirección de facturación</div>
+                    <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mt-8 mb-3">{{ __('Dirección de facturación') }}</div>
 
                     <div id="billing-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="sm:col-span-2">
-                            <label class="field-label">País</label>
+                            <label class="field-label">{{ __('País') }}</label>
                             <select id="billing_country" class="auth-input auth-select">
-                                <option value="CR">Costa Rica</option>
-                                <option value="MX">México</option>
-                                <option value="US">Estados Unidos</option>
-                                <option value="CO">Colombia</option>
-                                <option value="PA">Panamá</option>
-                                <option value="OT">Otro</option>
+                                <option value="CR">{{ __('Costa Rica') }}</option>
+                                <option value="MX">{{ __('México') }}</option>
+                                <option value="US">{{ __('Estados Unidos') }}</option>
+                                <option value="CO">{{ __('Colombia') }}</option>
+                                <option value="PA">{{ __('Panamá') }}</option>
+                                <option value="OT">{{ __('Otro') }}</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="field-label">Dirección</label>
-                            <input type="text" id="billing_line1" class="auth-input" placeholder="Calle y número">
+                            <label class="field-label">{{ __('Dirección') }}</label>
+                            <input type="text" id="billing_line1" class="auth-input" placeholder="{{ __('Calle y número') }}">
                         </div>
                         <div>
-                            <label class="field-label">Ciudad</label>
-                            <input type="text" id="billing_city" class="auth-input" placeholder="Ciudad">
+                            <label class="field-label">{{ __('Ciudad') }}</label>
+                            <input type="text" id="billing_city" class="auth-input" placeholder="{{ __('Ciudad') }}">
                         </div>
                         <div>
-                            <label class="field-label">Código postal</label>
-                            <input type="text" id="billing_postal" class="auth-input" placeholder="Código postal">
+                            <label class="field-label">{{ __('Código postal') }}</label>
+                            <input type="text" id="billing_postal" class="auth-input" placeholder="{{ __('Código postal') }}">
                         </div>
                     </div>
 
@@ -266,25 +266,25 @@
                                 <img src="{{ $img->path }}" alt="{{ $unitName }}" class="w-full h-36 object-cover" onerror="this.style.display='none'">
                             </div>
                         @endif
-                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">Proyecto Duna · Playa del Carmen</div>
+                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">{{ __('Proyecto Duna · Playa del Carmen') }}</div>
                         <div class="font-display text-[18px] font-bold text-ink-950 mt-1">Unidad {{ $unitName }}</div>
 
                         <ul class="mt-4 space-y-2 text-[12px] text-ink-600">
-                            <li class="flex items-center gap-2"><i class="pi pi-lock text-brand text-[12px]"></i> Bloqueo exclusivo por 30 días</li>
-                            <li class="flex items-center gap-2"><i class="pi pi-id-card text-brand text-[12px]"></i> Acceso al portal del comprador</li>
-                            <li class="flex items-center gap-2"><i class="pi pi-file text-brand text-[12px]"></i> Recibo oficial</li>
-                            <li class="flex items-center gap-2"><i class="pi pi-user text-brand text-[12px]"></i> Asesor dedicado</li>
-                            <li class="flex items-center gap-2"><i class="pi pi-shield text-brand text-[12px]"></i> Seguridad cifrada</li>
+                            <li class="flex items-center gap-2"><i class="pi pi-lock text-brand text-[12px]"></i> {{ __('Bloqueo exclusivo por 30 días') }}</li>
+                            <li class="flex items-center gap-2"><i class="pi pi-id-card text-brand text-[12px]"></i> {{ __('Acceso al portal del comprador') }}</li>
+                            <li class="flex items-center gap-2"><i class="pi pi-file text-brand text-[12px]"></i> {{ __('Recibo oficial') }}</li>
+                            <li class="flex items-center gap-2"><i class="pi pi-user text-brand text-[12px]"></i> {{ __('Asesor dedicado') }}</li>
+                            <li class="flex items-center gap-2"><i class="pi pi-shield text-brand text-[12px]"></i> {{ __('Seguridad cifrada') }}</li>
                         </ul>
 
                         <div class="h-px bg-ink-200/70 my-4"></div>
 
                         <div class="flex items-center justify-between text-[13px] text-ink-600">
-                            <span>Precio total</span>
+                            <span>{{ __('Precio total') }}</span>
                             <span class="font-semibold text-ink-950">${{ number_format((float) (optional($unit)->price ?? $reservation->unit_price ?? 0), 0, '.', ',') }} USD</span>
                         </div>
                         <div class="flex items-center justify-between text-[14px] mt-2">
-                            <span class="font-semibold text-ink-950">Monto de reserva</span>
+                            <span class="font-semibold text-ink-950">{{ __('Monto de reserva') }}</span>
                             <span class="font-display font-bold text-brand text-[18px]">${{ number_format($fee, 0, '.', ',') }}</span>
                         </div>
                     </div>
@@ -296,23 +296,23 @@
         <div id="success-view" class="hidden w-full max-w-[640px] relative text-center py-12">
             <div class="check-circle"><i class="pi pi-check text-[28px] font-bold"></i></div>
             <h2 class="font-display text-[28px] font-bold text-ink-950">$<span>{{ number_format($fee, 0, '.', ',') }}</span> USD</h2>
-            <h3 class="font-display text-[20px] font-medium text-ink-950 mt-2">¡Reserva confirmada!</h3>
+            <h3 class="font-display text-[20px] font-medium text-ink-950 mt-2">{{ __('¡Reserva confirmada!') }}</h3>
             <p class="text-[14px] text-ink-500 mt-2 max-w-[420px] mx-auto">
                 Pago procesado. La Unidad {{ $unitName }} quedó reservada a tu nombre por los próximos 30 días.
             </p>
             <p class="text-[12px] text-ink-400 mt-1">Ref: <span id="success-ref">{{ $reservation->reservation_code }}</span></p>
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
-                <a href="/form" class="auth-btn auth-btn-primary w-full sm:w-auto px-6"><i class="pi pi-id-card text-[13px]"></i> Completar KYC</a>
-                <a href="/dashboard" class="auth-btn auth-btn-ghost w-full sm:w-auto px-6">Ir a mi portal <i class="pi pi-arrow-right text-[12px]"></i></a>
+                <a href="/form" class="auth-btn auth-btn-primary w-full sm:w-auto px-6"><i class="pi pi-id-card text-[13px]"></i> {{ __('Completar KYC') }}</a>
+                <a href="/dashboard" class="auth-btn auth-btn-ghost w-full sm:w-auto px-6">{{ __('Ir a mi portal') }} <i class="pi pi-arrow-right text-[12px]"></i></a>
             </div>
         </div>
     </main>
 
     {{-- ============= FOOTER ============= --}}
     <footer class="flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 border-t border-ink-100 bg-white">
-        <span>© 2026 MAKAI RESIDENCES</span>
-        <span class="flex items-center gap-1.5"><i class="pi pi-lock text-[12px]"></i> Pago seguro con Stripe</span>
+        <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+        <span class="flex items-center gap-1.5"><i class="pi pi-lock text-[12px]"></i> {{ __('Pago seguro con Stripe') }}</span>
     </footer>
 </div>
 

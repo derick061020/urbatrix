@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>MAKAI · Duna Development</title>
+    <title>{{ __('MAKAI · Duna Development') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -414,7 +414,7 @@
 
 {{-- Full-screen hero background --}}
 <div class="auth-bg">
-    <img src="{{ asset('images/brand/login-hero.jpg') }}" alt="Makai Residences">
+    <img src="{{ asset('images/brand/login-hero.jpg') }}" alt="{{ __('Makai Residences') }}">
 </div>
 
 {{-- Floating panel --}}
@@ -445,7 +445,7 @@
                 {{-- Social buttons — icon only --}}
                 <div class="flex gap-3">
                     {{-- Apple sign-in temporarily disabled --}}
-                    <a href="{{ route('auth.google') }}" class="auth-btn-social" title="Iniciar sesión con Google">
+                    <a href="{{ route('auth.google') }}" class="auth-btn-social" title="{{ __('Iniciar sesión con Google') }}">
                         <svg width="20" height="20" viewBox="0 0 24 24">
                             <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 16.42 6.5l3.27-3.27A11.97 11.97 0 0 0 1.31 7.41z"/>
                             <path fill="#34A853" d="M16.04 18.01A7.36 7.36 0 0 1 12 19.1a7.08 7.08 0 0 1-6.72-4.82L1.29 17.41A12 12 0 0 0 12 24c2.93 0 5.73-1.04 7.83-3z"/>
@@ -497,7 +497,7 @@
         </div>
 
         <footer class="flex items-center justify-between text-[12px] text-ink-500">
-            <span>© 2026 MAKAI RESIDENCES</span>
+            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>
@@ -563,7 +563,7 @@
                     {{-- Social buttons — icon only --}}
                     <div class="flex gap-3 mb-5">
                         {{-- Apple sign-in temporarily disabled --}}
-                        <a href="{{ route('auth.google') }}" class="auth-btn-social" title="Registrarse con Google">
+                        <a href="{{ route('auth.google') }}" class="auth-btn-social" title="{{ __('Registrarse con Google') }}">
                             <svg width="20" height="20" viewBox="0 0 24 24">
                                 <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 16.42 6.5l3.27-3.27A11.97 11.97 0 0 0 1.31 7.41z"/>
                                 <path fill="#34A853" d="M16.04 18.01A7.36 7.36 0 0 1 12 19.1a7.08 7.08 0 0 1-6.72-4.82L1.29 17.41A12 12 0 0 0 12 24c2.93 0 5.73-1.04 7.83-3z"/>
@@ -582,7 +582,7 @@
                     <form id="form-step0" class="space-y-4" onsubmit="return submitStep0(event)">
                         <div>
                             <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Nombre completo') }} <span class="text-err">*</span></label>
-                            <input type="text" name="full_name" required placeholder="Samuel Urbina" class="auth-input" autocomplete="name">
+                            <input type="text" name="full_name" required placeholder="{{ __('Samuel Urbina') }}" class="auth-input" autocomplete="name">
                         </div>
                         <div>
                             <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Dirección de correo electrónico') }} <span class="text-err">*</span></label>
@@ -845,7 +845,7 @@
 
         {{-- Footer --}}
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>© 2026 MAKAI RESIDENCES</span>
+            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>

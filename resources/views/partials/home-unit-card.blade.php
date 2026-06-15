@@ -139,32 +139,32 @@
 
               <!-- Stats row (6 boxes) -->
               <div class="fg-stats" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
-                <div class="fg-stat" title="Bedrooms">
+                <div class="fg-stat" title="{{ __('Bedrooms') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg>
                   <span class="v">{{ $unit->bedrooms ?? 0 }}</span>
                 </div>
                 <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Bathrooms">
+                <div class="fg-stat" title="{{ __('Bathrooms') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4a2 2 0 0 1 4 0"/><path d="M2 11h20"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><line x1="6" y1="22" x2="6" y2="20"/><line x1="18" y1="22" x2="18" y2="20"/></svg>
                   <span class="v">{{ $unit->bathrooms ?? 0 }}</span>
                 </div>
                 <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Parking">
+                <div class="fg-stat" title="{{ __('Parking') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14"/><path d="M5 17V9l1.5-4h11L19 9v8"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
                   <span class="v">{{ $unit->parking_bays ?? 0 }}</span>
                 </div>
                 <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Internal area">
+                <div class="fg-stat" title="{{ __('Internal area') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="2 2"/></svg>
                   <span class="v">{{ number_format(($unit->internal_area ?? 0)) }}m<sup>2</sup></span>
                 </div>
                 <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="External area">
+                <div class="fg-stat" title="{{ __('External area') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 3 3 8 3"/><polyline points="16 3 21 3 21 8"/><polyline points="21 16 21 21 16 21"/><polyline points="8 21 3 21 3 16"/></svg>
                   <span class="v">{{ number_format(($unit->external_area ?? 0)) }}m<sup>2</sup></span>
                 </div>
                 <span class="fg-stat-divider"></span>
-                <div class="fg-stat" title="Total area">
+                <div class="fg-stat" title="{{ __('Total area') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg>
                   <span class="v">{{ number_format(($unit->total_area ?? 0)) }}m<sup>2</sup></span>
                 </div>

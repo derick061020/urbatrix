@@ -6,8 +6,8 @@
 <div class="w-full bg-[#f9f8f6] px-2 py-4 sm:p-10 overflow-auto min-h-screen">
     <div class="flex justify-between items-start flex-wrap gap-3">
         <div>
-            <h1 class="text-4xl font-semibold text-[#625441]">Postventa</h1>
-            <p class="text-[#625441] mt-1">Entregas, garantías y trámites notariales tras la firma.</p>
+            <h1 class="text-4xl font-semibold text-[#625441]">{{ __('Postventa') }}</h1>
+            <p class="text-[#625441] mt-1">{{ __('Entregas, garantías y trámites notariales tras la firma.') }}</p>
         </div>
         <button type="button" onclick="document.getElementById('newAftersaleModal').classList.remove('hidden')"
             class="bg-[#667b6a] text-white rounded-md px-4 py-2 text-sm font-semibold hover:bg-[#5a6d5e]">
@@ -52,11 +52,11 @@
             <table class="w-full border-spacing-0 border-separate">
                 <thead>
                     <tr>
-                        <th class="font-semibold text-left border-b py-2 px-3 bg-[rgba(102,123,106,0.1)] text-[#38433a] border-gray-200 whitespace-nowrap">Tipo</th>
-                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">Cliente</th>
-                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">Unidad</th>
-                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">Fecha</th>
-                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">Estado</th>
+                        <th class="font-semibold text-left border-b py-2 px-3 bg-[rgba(102,123,106,0.1)] text-[#38433a] border-gray-200 whitespace-nowrap">{{ __('Tipo') }}</th>
+                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">{{ __('Cliente') }}</th>
+                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">{{ __('Unidad') }}</th>
+                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">{{ __('Fecha') }}</th>
+                        <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap">{{ __('Estado') }}</th>
                         <th class="font-semibold text-left border-b py-2 px-3 bg-white text-gray-700 border-gray-200 whitespace-nowrap"></th>
                     </tr>
                 </thead>
@@ -92,27 +92,27 @@
                                 <form method="POST" action="{{ route('admin.crm.postventa.update', $p) }}" class="flex items-center gap-2">
                                     @csrf @method('PUT')
                                     <select name="status" onchange="this.form.submit()" class="text-xs px-2 py-1 border border-gray-300 rounded bg-white">
-                                        <option value="programada"  @selected($p->status === 'programada')>Programada</option>
-                                        <option value="en_atencion" @selected($p->status === 'en_atencion')>En atención</option>
-                                        <option value="en_tramite"  @selected($p->status === 'en_tramite')>En trámite</option>
-                                        <option value="resuelta"    @selected($p->status === 'resuelta')>Resuelta</option>
+                                        <option value="programada"  @selected($p->status === 'programada')>{{ __('Programada') }}</option>
+                                        <option value="en_atencion" @selected($p->status === 'en_atencion')>{{ __('En atención') }}</option>
+                                        <option value="en_tramite"  @selected($p->status === 'en_tramite')>{{ __('En trámite') }}</option>
+                                        <option value="resuelta"    @selected($p->status === 'resuelta')>{{ __('Resuelta') }}</option>
                                     </select>
                                 </form>
                             </td>
                             <td class="border-b border-gray-100 py-2.5 px-3">
                                 <div class="flex gap-2">
                                     @if($p->reservation_id)
-                                        <a href="/dashboard?reservation={{ $p->reservation_id }}" class="text-xs border border-[#cdd5cf] rounded px-2 py-1 text-[#667b6a] hover:bg-[rgba(102,123,106,0.05)]">Ver</a>
+                                        <a href="/dashboard?reservation={{ $p->reservation_id }}" class="text-xs border border-[#cdd5cf] rounded px-2 py-1 text-[#667b6a] hover:bg-[rgba(102,123,106,0.05)]">{{ __('Ver') }}</a>
                                     @endif
                                     <form method="POST" action="{{ route('admin.crm.postventa.delete', $p) }}" onsubmit="return confirm('¿Eliminar este caso?')">
                                         @csrf @method('DELETE')
-                                        <button class="text-xs border border-[#eebcbc] text-[#a83838] rounded px-2 py-1 hover:bg-[#fdf6f6]">Eliminar</button>
+                                        <button class="text-xs border border-[#eebcbc] text-[#a83838] rounded px-2 py-1 hover:bg-[#fdf6f6]">{{ __('Eliminar') }}</button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="py-8 text-center text-sm text-gray-500">No hay casos de postventa registrados.</td></tr>
+                        <tr><td colspan="6" class="py-8 text-center text-sm text-gray-500">{{ __('No hay casos de postventa registrados.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -125,7 +125,7 @@
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white rounded-lg max-w-2xl w-full">
             <div class="bg-[#667b6a] px-6 py-4 flex justify-between items-center rounded-t-lg">
-                <h3 class="text-xl font-bold text-white">Nuevo caso de postventa</h3>
+                <h3 class="text-xl font-bold text-white">{{ __('Nuevo caso de postventa') }}</h3>
                 <button type="button" onclick="document.getElementById('newAftersaleModal').classList.add('hidden')" class="text-white hover:text-gray-200">✕</button>
             </div>
             <form method="POST" action="{{ route('admin.crm.postventa.store') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -133,34 +133,34 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
                     <select name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
-                        <option value="Entrega">Entrega</option>
-                        <option value="Garantía">Garantía</option>
-                        <option value="Escritura">Escritura</option>
+                        <option value="Entrega">{{ __('Entrega') }}</option>
+                        <option value="Garantía">{{ __('Garantía') }}</option>
+                        <option value="Escritura">{{ __('Escritura') }}</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
                     <select name="status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
-                        <option value="programada">Programada</option>
-                        <option value="en_atencion">En atención</option>
-                        <option value="en_tramite">En trámite</option>
-                        <option value="resuelta">Resuelta</option>
+                        <option value="programada">{{ __('Programada') }}</option>
+                        <option value="en_atencion">{{ __('En atención') }}</option>
+                        <option value="en_tramite">{{ __('En trámite') }}</option>
+                        <option value="resuelta">{{ __('Resuelta') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Cliente') }}</label>
                     <input name="client_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Etiqueta unidad</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Etiqueta unidad') }}</label>
                     <input name="unit_label" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Fecha') }}</label>
                     <input type="date" name="scheduled_date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Expediente</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Expediente') }}</label>
                     <select name="reservation_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
                         <option value="">— Ninguno —</option>
                         @foreach($reservations as $r)
@@ -169,12 +169,12 @@
                     </select>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Notas') }}</label>
                     <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]"></textarea>
                 </div>
                 <div class="md:col-span-2 flex gap-3 justify-end">
-                    <button type="button" onclick="document.getElementById('newAftersaleModal').classList.add('hidden')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancelar</button>
-                    <button type="submit" class="bg-[#667b6a] text-white px-4 py-2 rounded-md hover:bg-[#5a6d5e]">Crear</button>
+                    <button type="button" onclick="document.getElementById('newAftersaleModal').classList.add('hidden')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">{{ __('Cancelar') }}</button>
+                    <button type="submit" class="bg-[#667b6a] text-white px-4 py-2 rounded-md hover:bg-[#5a6d5e]">{{ __('Crear') }}</button>
                 </div>
             </form>
         </div>

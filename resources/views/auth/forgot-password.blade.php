@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>MAKAI · Recuperar contraseña</title>
+    <title>{{ __('MAKAI · Recuperar contraseña') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -190,8 +190,8 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="hidden sm:inline text-[14px] text-ink-600">¿Lo recordaste?</span>
-                <a href="{{ route('login') }}" class="auth-btn auth-btn-ghost">Iniciar sesión</a>
+                <span class="hidden sm:inline text-[14px] text-ink-600">{{ __('¿Lo recordaste?') }}</span>
+                <a href="{{ route('login') }}" class="auth-btn auth-btn-ghost">{{ __('Iniciar sesión') }}</a>
             </div>
         </header>
 
@@ -209,8 +209,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-key text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Recuperar contraseña</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Introduce tu correo y te enviaremos un código de 6 dígitos para restablecer tu contraseña.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Recuperar contraseña') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Introduce tu correo y te enviaremos un código de 6 dígitos para restablecer tu contraseña.') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -218,16 +218,16 @@
 
                     <form id="form-step1" class="space-y-4" onsubmit="return submitStep1(event)">
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Dirección de correo electrónico <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Dirección de correo electrónico') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-envelope absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="fp-email" type="email" name="email" required placeholder="samuel@gmail.com" class="auth-input has-icon" autocomplete="email" autofocus>
                             </div>
                         </div>
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Enviar código</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Enviar código') }}</button>
                         <div class="text-center text-[13px] text-ink-600 mt-4">
                             ¿No tienes cuenta?
-                            <a href="{{ route('register') }}" class="auth-link ml-1">Regístrate</a>
+                            <a href="{{ route('register') }}" class="auth-link ml-1">{{ __('Regístrate') }}</a>
                         </div>
                     </form>
                 </div>
@@ -238,8 +238,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-shield text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Verifica tu identidad</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Enviamos un código de 6 dígitos a <span id="fp-email-echo" class="text-ink-950 font-medium"></span></p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Verifica tu identidad') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Enviamos un código de 6 dígitos a') }} <span id="fp-email-echo" class="text-ink-950 font-medium"></span></p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -258,12 +258,12 @@
                             <input class="code-input" data-pos="4" maxlength="1" inputmode="numeric" pattern="[0-9]*">
                             <input class="code-input" data-pos="5" maxlength="1" inputmode="numeric" pattern="[0-9]*">
                         </div>
-                        <button type="submit" class="auth-btn auth-btn-primary w-full">Verificar código</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full">{{ __('Verificar código') }}</button>
                         <div class="text-center mt-5 text-[13px] text-ink-500">
                             ¿No recibiste el código? Reenviar en <span class="resend-strong" id="resend-timer">58s</span>
                         </div>
                         <div class="text-center mt-3">
-                            <button type="button" onclick="resendCode()" id="resend-btn" disabled class="auth-link disabled:opacity-40 disabled:cursor-not-allowed">Volver a enviar el código</button>
+                            <button type="button" onclick="resendCode()" id="resend-btn" disabled class="auth-link disabled:opacity-40 disabled:cursor-not-allowed">{{ __('Volver a enviar el código') }}</button>
                         </div>
                     </form>
                 </div>
@@ -274,8 +274,8 @@
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-lock text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Nueva contraseña</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Crea una contraseña segura para tu cuenta.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Nueva contraseña') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Crea una contraseña segura para tu cuenta.') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -283,7 +283,7 @@
 
                     <form id="form-step3" class="space-y-4" onsubmit="return submitStep3(event)">
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Nueva contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Nueva contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="fp-pw1" type="password" name="password" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail" oninput="updatePwStrength()">
@@ -291,7 +291,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Confirmar contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Confirmar contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="fp-pw2" type="password" name="password_confirmation" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail">
@@ -305,15 +305,15 @@
                                 <div class="pw-bar" id="pw-bar-1"></div>
                                 <div class="pw-bar" id="pw-bar-2"></div>
                             </div>
-                            <div class="text-[12px] text-ink-500 mt-3 mb-1">Debe contener al menos:</div>
+                            <div class="text-[12px] text-ink-500 mt-3 mb-1">{{ __('Debe contener al menos:') }}</div>
                             <ul class="space-y-1 text-[12px]">
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 mayúscula</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 número</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> Al menos 8 caracteres</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 mayúscula') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 número') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 8 caracteres') }}</li>
                             </ul>
                         </div>
 
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Restablecer contraseña</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Restablecer contraseña') }}</button>
                     </form>
                 </div>
 
@@ -323,17 +323,17 @@
                         <div class="w-20 h-20 rounded-full bg-ok-soft mx-auto flex items-center justify-center mb-5">
                             <i class="pi pi-check text-ok text-[28px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Contraseña actualizada</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Tu contraseña fue restablecida correctamente. Ya puedes iniciar sesión con tus nuevos datos.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Contraseña actualizada') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Tu contraseña fue restablecida correctamente. Ya puedes iniciar sesión con tus nuevos datos.') }}</p>
                     </div>
-                    <a href="{{ route('login') }}" class="auth-btn auth-btn-primary w-full">Ir al inicio de sesión</a>
+                    <a href="{{ route('login') }}" class="auth-btn auth-btn-primary w-full">{{ __('Ir al inicio de sesión') }}</a>
                 </div>
 
             </div>
         </main>
 
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>© 2026 MAKAI RESIDENCES</span>
+            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>

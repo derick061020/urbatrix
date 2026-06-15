@@ -4,8 +4,8 @@
 <div class="flex-1 bg-gray-50 p-6">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Portal del Cliente</h1>
-        <p class="text-gray-600">Bienvenido a tu portal personal</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('Portal del Cliente') }}</h1>
+        <p class="text-gray-600">{{ __('Bienvenido a tu portal personal') }}</p>
     </div>
         <!-- Alerts -->
     <div class="space-y-3 mb-6">
@@ -14,7 +14,7 @@
                 <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"></path>
             </svg>
             <div class="flex-1">
-                <div class="text-sm font-medium text-red-900">2 documentos pendientes de tu firma</div>
+                <div class="text-sm font-medium text-red-900">{{ __('2 documentos pendientes de tu firma') }}</div>
             </div>
             <a href="/dashboard/documents" class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors">
                 Firmar ahora
@@ -25,7 +25,7 @@
                 <path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"></path>
             </svg>
             <div class="flex-1">
-                <div class="text-sm font-medium text-blue-900">Tu borrador de promesa de compraventa está en revisión legal</div>
+                <div class="text-sm font-medium text-blue-900">{{ __('Tu borrador de promesa de compraventa está en revisión legal') }}</div>
             </div>
             <a href="/dashboard/documents" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                 Ver documento
@@ -39,14 +39,14 @@
             <!-- Reservation Details with Photo -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900">Detalles de la Reserva</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Detalles de la Reserva') }}</h3>
                     <div class="flex items-center space-x-2">
                         @if($reservation->status == 'pending')
-                            <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Pendiente</span>
+                            <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">{{ __('Pendiente') }}</span>
                         @elseif($reservation->status == 'confirmed')
-                            <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Confirmada</span>
+                            <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ __('Confirmada') }}</span>
                         @else
-                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">Cancelada</span>
+                            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">{{ __('Cancelada') }}</span>
                         @endif
                         @if($reservation->id_document_path)
                             <svg class="material-design-icon__svg text-green-600" width="16" height="16" viewBox="0 0 24 24">
@@ -80,22 +80,22 @@
                         @endif
                         
                         <div class="bg-gray-50 rounded-lg p-4">
-                            <h4 class="font-medium text-gray-900 mb-3">Información de la Unidad</h4>
+                            <h4 class="font-medium text-gray-900 mb-3">{{ __('Información de la Unidad') }}</h4>
                             <div class="space-y-2">
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-600">Nombre:</span>
                                     <span class="text-sm font-medium">{{ $reservation->unit_name ?? $reservation->unit->name ?? 'Unit ' . $reservation->unit_id }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Código:</span>
+                                    <span class="text-sm text-gray-600">{{ __('Código:') }}</span>
                                     <span class="text-sm font-medium">{{ $reservation->reservation_code }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Precio Total:</span>
+                                    <span class="text-sm text-gray-600">{{ __('Precio Total:') }}</span>
                                     <span class="text-sm font-medium">{{ $reservation->formatted_price }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Plan de Pagos:</span>
+                                    <span class="text-sm text-gray-600">{{ __('Plan de Pagos:') }}</span>
                                     <span class="text-sm font-medium">{{ $reservation->payment_method ?? 'No definido' }}</span>
                                 </div>
                             </div>
@@ -105,7 +105,7 @@
                     <!-- Personal Information -->
                     <div class="space-y-4">
                         <div class="bg-gray-50 rounded-lg p-4">
-                            <h4 class="font-medium text-gray-900 mb-3">Información Personal</h4>
+                            <h4 class="font-medium text-gray-900 mb-3">{{ __('Información Personal') }}</h4>
                             <div class="space-y-2">
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-600">Nombre:</span>
@@ -116,16 +116,16 @@
                                     <span class="text-sm font-medium">{{ $reservation->email }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Teléfono:</span>
+                                    <span class="text-sm text-gray-600">{{ __('Teléfono:') }}</span>
                                     <span class="text-sm font-medium">{{ $reservation->phone }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">País:</span>
+                                    <span class="text-sm text-gray-600">{{ __('País:') }}</span>
                                     <span class="text-sm font-medium">{{ $reservation->country }}</span>
                                 </div>
                                 @if($reservation->profession)
                                     <div class="flex justify-between">
-                                        <span class="text-sm text-gray-600">Profesión:</span>
+                                        <span class="text-sm text-gray-600">{{ __('Profesión:') }}</span>
                                         <span class="text-sm font-medium">{{ $reservation->profession }}</span>
                                     </div>
                                 @endif
@@ -134,13 +134,13 @@
 
                         @if($reservation->id_document_path)
                             <div class="bg-blue-50 rounded-lg p-4">
-                                <h4 class="font-medium text-gray-900 mb-3">Documento de Identidad</h4>
+                                <h4 class="font-medium text-gray-900 mb-3">{{ __('Documento de Identidad') }}</h4>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-2">
                                         <svg class="material-design-icon__svg text-green-600" width="16" height="16" viewBox="0 0 24 24">
                                             <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path>
                                         </svg>
-                                        <span class="text-sm text-green-800">Documento subido</span>
+                                        <span class="text-sm text-green-800">{{ __('Documento subido') }}</span>
                                     </div>
                                     <a href="{{ asset($reservation->id_document_path) }}" 
                                        target="_blank" 
@@ -160,8 +160,8 @@
                 <svg class="material-design-icon__svg text-gray-400 mx-auto mb-4" width="48" height="48" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes reservas</h3>
-                <p class="text-gray-600 mb-4">Comienza reservando una unidad desde el home</p>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No tienes reservas') }}</h3>
+                <p class="text-gray-600 mb-4">{{ __('Comienza reservando una unidad desde el home') }}</p>
                 <a href="/" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                     Ver Unidades
                 </a>
@@ -176,7 +176,7 @@
     <!-- Mini Process -->
     <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Estado del proceso</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{{ __('Estado del proceso') }}</h3>
             <a href="/dashboard/progress" class="text-blue-600 text-sm hover:text-blue-700">
                 Ver completo →
             </a>

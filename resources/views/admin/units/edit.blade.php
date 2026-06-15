@@ -29,14 +29,14 @@
     <div class="crm-card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
         <a href="{{ route('admin.units') }}" class="w-10 h-10 rounded-full border border-ink-200 flex items-center justify-center text-ink-600 hover:bg-ink-50 shrink-0"><i class="pi pi-arrow-left text-[12px]"></i></a>
         <div class="flex-1 min-w-0">
-            <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">Unidad</div>
+            <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Unidad') }}</div>
             <div class="text-[20px] font-bold text-ink-950 leading-tight truncate">{{ $unit->custom_id ?? $unit->name }}</div>
             <div class="text-[12px] text-ink-500 mt-0.5">{{ ucfirst($unit->type ?? '—') }} · ${{ number_format($unit->price ?? 0) }}</div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <span class="crm-pill bg-{{ $sp[1] }}-soft text-{{ $sp[1] }}">{{ strtoupper($sp[0]) }}</span>
-            <button type="submit" form="unit-edit-form" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> Guardar cambios</button>
-            <button type="submit" form="unit-delete-form" onclick="return confirm('¿Eliminar esta unidad? Esta acción no se puede deshacer.');" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> Eliminar</button>
+            <button type="submit" form="unit-edit-form" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> {{ __('Guardar cambios') }}</button>
+            <button type="submit" form="unit-delete-form" onclick="return confirm('¿Eliminar esta unidad? Esta acción no se puede deshacer.');" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
         </div>
     </div>
 
@@ -53,7 +53,7 @@
     <div id="historial-vistas" class="crm-card scroll-mt-24">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-eye text-ink-500"></i>
-            <div class="text-[13px] font-bold text-ink-700">Historial de vistas</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Historial de vistas') }}</div>
             <span class="ml-auto text-[11px] text-ink-500">Última actualización: {{ now()->format('d/m/Y H:i') }}</span>
         </div>
 
@@ -84,10 +84,10 @@
                     <table class="crm-table w-full">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Usuario</th>
+                                <th>{{ __('Fecha') }}</th>
+                                <th>{{ __('Usuario') }}</th>
                                 <th>IP</th>
-                                <th class="text-right">User agent</th>
+                                <th class="text-right">{{ __('User agent') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,7 +120,7 @@
     <div class="crm-card">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-image text-ink-500"></i>
-            <div class="text-[13px] font-bold text-ink-700">Imágenes de la unidad</div>
+            <div class="text-[13px] font-bold text-ink-700">{{ __('Imágenes de la unidad') }}</div>
             <span class="ml-auto text-[11px] text-ink-500">{{ $unit->images->count() }} imágenes</span>
         </div>
 
@@ -131,10 +131,10 @@
                  data-csrf="{{ csrf_token() }}"
                  class="border-2 border-dashed border-ink-200 rounded-xl p-6 text-center hover:border-brand/40 transition-colors">
                 <i class="pi pi-cloud-upload text-[28px] text-ink-400"></i>
-                <p class="text-[13px] text-ink-700 mt-2">Arrastrá imágenes aquí o</p>
+                <p class="text-[13px] text-ink-700 mt-2">{{ __('Arrastrá imágenes aquí o') }}</p>
                 <input type="file" multiple accept="image/*" class="hidden" id="image-upload">
-                <label for="image-upload" class="crm-btn crm-btn-ghost mt-3 inline-flex"><i class="pi pi-plus text-[10px]"></i> Elegir archivos</label>
-                <p class="mt-3 text-[11px] text-ink-400">JPG, PNG, WEBP o GIF · máx. 5 MB · hasta 10 imágenes por carga</p>
+                <label for="image-upload" class="crm-btn crm-btn-ghost mt-3 inline-flex"><i class="pi pi-plus text-[10px]"></i> {{ __('Elegir archivos') }}</label>
+                <p class="mt-3 text-[11px] text-ink-400">{{ __('JPG, PNG, WEBP o GIF · máx. 5 MB · hasta 10 imágenes por carga') }}</p>
 
                 <div id="upload-progress" class="hidden mt-4 max-w-md mx-auto">
                     <div class="crm-progress"><span id="progress-bar" class="bg-brand" style="width:0%"></span></div>
@@ -149,9 +149,9 @@
                     <thead class="bg-ink-50">
                         <tr>
                             <th class="w-8"></th>
-                            <th>Preview</th>
-                            <th>Nombre</th>
-                            <th class="text-right">Acciones</th>
+                            <th>{{ __('Preview') }}</th>
+                            <th>{{ __('Nombre') }}</th>
+                            <th class="text-right">{{ __('Acciones') }}</th>
                         </tr>
                     </thead>
                     <tbody id="unit-images-tbody"
@@ -161,7 +161,7 @@
                         @forelse($unit->images as $image)
                             <tr data-image-id="{{ $image->id }}">
                                 <td>
-                                    <span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="Arrastrar para reordenar">
+                                    <span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="{{ __('Arrastrar para reordenar') }}">
                                         <i class="pi pi-bars"></i>
                                     </span>
                                 </td>
@@ -172,11 +172,11 @@
                                     <div class="max-w-xs truncate" title="{{ $image->name }}">{{ $image->name }}</div>
                                 </td>
                                 <td class="text-right">
-                                    <button type="button" class="image-delete-btn inline-flex items-center gap-1 px-2 py-1 rounded-md text-err hover:bg-err-soft text-[11px] font-semibold"><i class="pi pi-trash text-[10px]"></i> Eliminar</button>
+                                    <button type="button" class="image-delete-btn inline-flex items-center gap-1 px-2 py-1 rounded-md text-err hover:bg-err-soft text-[11px] font-semibold"><i class="pi pi-trash text-[10px]"></i> {{ __('Eliminar') }}</button>
                                 </td>
                             </tr>
                         @empty
-                            <tr id="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin imágenes todavía.</td></tr>
+                            <tr id="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin imágenes todavía.') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -191,13 +191,13 @@
         <div class="crm-card">
             <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
                 <i class="pi pi-history text-ink-500"></i>
-                <div class="text-[13px] font-bold text-ink-700">Historial de la unidad</div>
+                <div class="text-[13px] font-bold text-ink-700">{{ __('Historial de la unidad') }}</div>
                 <span class="ml-auto text-[11px] text-ink-500">{{ $unit->histories->count() }} eventos</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full crm-table">
                     <thead class="bg-white">
-                        <tr><th>Fecha</th><th>Acción</th><th>Autor</th><th>Rol</th></tr>
+                        <tr><th>{{ __('Fecha') }}</th><th>{{ __('Acción') }}</th><th>{{ __('Autor') }}</th><th>{{ __('Rol') }}</th></tr>
                     </thead>
                     <tbody>
                         @forelse($unit->histories as $row)
@@ -215,7 +215,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin historial.</td></tr>
+                            <tr><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin historial.') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -226,19 +226,19 @@
         <div class="crm-card">
             <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
                 <i class="pi pi-credit-card text-ink-500"></i>
-                <div class="text-[13px] font-bold text-ink-700">Historial de pagos</div>
+                <div class="text-[13px] font-bold text-ink-700">{{ __('Historial de pagos') }}</div>
                 <span class="ml-auto text-[11px] text-ink-500">{{ $unit->paymentHistories->count() }} eventos</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full crm-table">
                     <thead class="bg-white">
                         <tr>
-                            <th>Creado</th>
-                            <th>Por</th>
-                            <th>Modificado</th>
-                            <th>Por</th>
-                            <th>Monto (USD)</th>
-                            <th>Estado</th>
+                            <th>{{ __('Creado') }}</th>
+                            <th>{{ __('Por') }}</th>
+                            <th>{{ __('Modificado') }}</th>
+                            <th>{{ __('Por') }}</th>
+                            <th>{{ __('Monto (USD)') }}</th>
+                            <th>{{ __('Estado') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -258,7 +258,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">Sin pagos registrados.</td></tr>
+                            <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin pagos registrados.') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -267,14 +267,14 @@
     </div>
 
     <div class="flex items-center justify-end gap-2 pt-2">
-        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">Volver a unidades</a>
+        <a href="{{ route('admin.units') }}" class="crm-btn crm-btn-ghost">{{ __('Volver a unidades') }}</a>
     </div>
 </div>
 
 {{-- ===================== FLOATING AUTOSAVE BAR ===================== --}}
 <div id="unit-save-bar" class="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-white border border-ink-200 shadow-panel rounded-full pl-4 pr-2 py-2">
     <span id="unit-save-status" class="flex items-center gap-2 text-[12px] font-semibold text-ink-500 whitespace-nowrap">
-        <i class="pi pi-check-circle text-ok"></i> <span data-save-text>Guardado</span>
+        <i class="pi pi-check-circle text-ok"></i> <span data-save-text>{{ __('Guardado') }}</span>
     </span>
     <button type="button" id="unit-discard-btn" class="crm-btn crm-btn-ghost text-err text-[12px] py-1.5 px-3 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
         <i class="pi pi-undo text-[11px]"></i> Descartar cambios
@@ -325,7 +325,7 @@
         const tr = btn.closest('tr[data-image-id]');
         if (!tr) return;
         const id = tr.dataset.imageId;
-        if (!confirm('¿Eliminar esta imagen?')) return;
+        if (!confirm('{{ __("¿Eliminar esta imagen?") }}')) return;
 
         fetch(deleteUrlTpl.replace('__ID__', id), {
             method: 'DELETE',
@@ -337,7 +337,7 @@
                     '<tr id="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin imágenes todavía.</td></tr>');
             }
         })
-        .catch(err => { console.error('Delete failed', err); alert('No se pudo eliminar la imagen.'); });
+        .catch(err => { console.error('Delete failed', err); alert('{{ __("No se pudo eliminar la imagen.") }}'); });
     });
 })();
 

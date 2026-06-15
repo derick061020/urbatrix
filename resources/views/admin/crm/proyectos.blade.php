@@ -171,7 +171,7 @@
                         <i class="pi pi-map-marker text-[10px]"></i> {{ $locationTxt }}
                     </div>
                 </div>
-                <span class="pr-pill pr-pill-prep">En preparación</span>
+                <span class="pr-pill pr-pill-prep">{{ __('En preparación') }}</span>
             </div>
         @else
             {{-- EXPANDED CARD (ACTIVO) --}}
@@ -194,9 +194,9 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span class="pr-pill pr-pill-ok">Activo</span>
-                        <a href="{{ route('admin.units') }}?project={{ $p->id }}" class="pr-btn pr-btn-ghost">Ver unidades</a>
-                        <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="pr-btn pr-btn-primary">Ficha completa <i class="pi pi-arrow-right text-[10px]"></i></a>
+                        <span class="pr-pill pr-pill-ok">{{ __('Activo') }}</span>
+                        <a href="{{ route('admin.units') }}?project={{ $p->id }}" class="pr-btn pr-btn-ghost">{{ __('Ver unidades') }}</a>
+                        <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="pr-btn pr-btn-primary">{{ __('Ficha completa') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
                     </div>
                 </div>
 
@@ -204,23 +204,23 @@
                 <div class="px-5 sm:px-6 py-5 border-t border-ink-100">
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-5">
                         <div>
-                            <div class="pr-stat-label">Unidades totales</div>
+                            <div class="pr-stat-label">{{ __('Unidades totales') }}</div>
                             <div class="pr-stat-value text-ink-950">{{ $total }}</div>
                         </div>
                         <div>
-                            <div class="pr-stat-label">Vendidas</div>
+                            <div class="pr-stat-label">{{ __('Vendidas') }}</div>
                             <div class="pr-stat-value" style="color:#1daf61;">{{ $sold }}</div>
                         </div>
                         <div>
-                            <div class="pr-stat-label">Reservadas</div>
+                            <div class="pr-stat-label">{{ __('Reservadas') }}</div>
                             <div class="pr-stat-value" style="color:#e16614;">{{ $reserved }}</div>
                         </div>
                         <div>
-                            <div class="pr-stat-label">Disponibles</div>
+                            <div class="pr-stat-label">{{ __('Disponibles') }}</div>
                             <div class="pr-stat-value" style="color:#3559e9;">{{ $available }}</div>
                         </div>
                         <div>
-                            <div class="pr-stat-label">Valor total</div>
+                            <div class="pr-stat-label">{{ __('Valor total') }}</div>
                             <div class="pr-stat-value text-ink-950">{{ $valorM }}</div>
                         </div>
                     </div>
@@ -241,7 +241,7 @@
                     {{-- Left: progress bars --}}
                     <div class="space-y-4">
                         <div>
-                            <div class="pr-stat-label mb-2">Progreso de ventas</div>
+                            <div class="pr-stat-label mb-2">{{ __('Progreso de ventas') }}</div>
                             <div class="flex items-center gap-3">
                                 <div class="flex-1 pr-prog-track">
                                     <span style="background:#1fc16b;width:{{ $pctVentas }}%"></span>
@@ -250,7 +250,7 @@
                             </div>
                         </div>
                         <div>
-                            <div class="pr-stat-label mb-2">Avance de obra</div>
+                            <div class="pr-stat-label mb-2">{{ __('Avance de obra') }}</div>
                             <div class="flex items-center gap-3">
                                 <div class="flex-1 pr-prog-track">
                                     <span style="background:#335cff;width:{{ $pctObra }}%"></span>
@@ -300,14 +300,14 @@
                                     <span class="pr-pill {{ $estado[1] }}">{{ $estado[0] }}</span>
                                 </a>
                             @empty
-                                <div class="text-[12px] text-ink-500 py-1">Sin clientes activos.</div>
+                                <div class="text-[12px] text-ink-500 py-1">{{ __('Sin clientes activos.') }}</div>
                             @endforelse
                         </div>
 
                         @if($extra > 0 || $totalClientes > 0)
                             <div class="text-[11px] text-ink-500 mt-2 flex items-center gap-2">
                                 @if($extra > 0)<span>+{{ $extra }} más</span><span class="text-ink-300">·</span>@endif
-                                <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="text-ink-700 font-semibold hover:text-ink-950">Ver todos <i class="pi pi-arrow-right text-[10px]"></i></a>
+                                <a href="{{ route('admin.crm.proyecto.detalle', $p->id) }}" class="text-ink-700 font-semibold hover:text-ink-950">{{ __('Ver todos') }} <i class="pi pi-arrow-right text-[10px]"></i></a>
                             </div>
                         @endif
                     </div>
@@ -315,30 +315,30 @@
             </div>
         @endif
     @empty
-        <div class="pr-card p-6 text-center text-[12px] text-ink-500">No hay proyectos creados.</div>
+        <div class="pr-card p-6 text-center text-[12px] text-ink-500">{{ __('No hay proyectos creados.') }}</div>
     @endforelse
 </div>
 
 <dialog id="modal-nuevo-proyecto" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <form method="POST" action="{{ route('admin.crm.proyectos.store') }}" class="w-[520px] bg-white rounded-2xl overflow-hidden">@csrf
-        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">Nuevo proyecto</div>
+        <div class="px-6 py-4 border-b border-ink-100 text-[15px] font-bold text-ink-900">{{ __('Nuevo proyecto') }}</div>
         <div class="p-6 space-y-3">
-            <div><label class="text-[12px] font-semibold text-ink-700">Nombre</label><input type="text" name="name" required class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre') }}</label><input type="text" name="name" required class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="text-[12px] font-semibold text-ink-700">Tipo</label><input type="text" name="type" placeholder="Residencial" class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">Etapa</label><input type="text" name="stage" placeholder="En desarrollo" class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Tipo') }}</label><input type="text" name="type" placeholder="{{ __('Residencial') }}" class="crm-input pl-3 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Etapa') }}</label><input type="text" name="stage" placeholder="{{ __('En desarrollo') }}" class="crm-input pl-3 mt-1"></div>
             </div>
-            <div><label class="text-[12px] font-semibold text-ink-700">Ubicación</label><input type="text" name="location" placeholder="Cap Cana · Punta Cana" class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ubicación') }}</label><input type="text" name="location" placeholder="{{ __('Cap Cana · Punta Cana') }}" class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="text-[12px] font-semibold text-ink-700">Avance %</label><input type="number" name="progress" value="0" min="0" max="100" class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">Color</label><input type="color" name="color" value="#5c7c68" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Color') }}</label><input type="color" name="color" value="#5c7c68" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>
             </div>
-            <div><label class="text-[12px] font-semibold text-ink-700">Ícono (URL o ruta)</label><input type="text" name="icon_path" placeholder="/images/projects/proyecto.png" class="crm-input pl-3 mt-1"></div>
-            <div><label class="text-[12px] font-semibold text-ink-700">Descripción</label><textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ícono (URL o ruta)') }}</label><input type="text" name="icon_path" placeholder="/images/projects/proyecto.png" class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Descripción') }}</label><textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
-            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">Cancelar</button>
-            <button type="submit" class="crm-btn crm-btn-primary">Crear proyecto</button>
+            <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary">{{ __('Crear proyecto') }}</button>
         </div>
     </form>
 </dialog>

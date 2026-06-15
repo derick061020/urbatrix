@@ -5,22 +5,22 @@
     $readRoute  — route name string, POST endpoint that marks all as read
 --}}
 <div class="topbar-notif-wrap relative shrink-0">
-    <button type="button" id="notif-bell" class="topbar-icon-btn" title="Notificaciones" aria-haspopup="true" aria-expanded="false">
+    <button type="button" id="notif-bell" class="topbar-icon-btn" title="{{ __('Notificaciones') }}" aria-haspopup="true" aria-expanded="false">
         <i class="pi pi-bell"></i>
         <span id="notif-dot" class="dot-indicator" style="display:none;"></span>
         <span id="notif-count" class="notif-count" style="display:none;">0</span>
     </button>
 
-    <div id="notif-panel" class="notif-panel" role="dialog" aria-label="Notificaciones">
+    <div id="notif-panel" class="notif-panel" role="dialog" aria-label="{{ __('Notificaciones') }}">
         <div class="notif-head">
-            <div class="notif-head-title">Notificaciones</div>
-            <button type="button" id="notif-mark-read" class="notif-mark-read">Marcar todas como leídas</button>
+            <div class="notif-head-title">{{ __('Notificaciones') }}</div>
+            <button type="button" id="notif-mark-read" class="notif-mark-read">{{ __('Marcar todas como leídas') }}</button>
         </div>
         <div id="notif-list" class="notif-list">
             <div class="notif-loading"><i class="pi pi-spin pi-spinner"></i> Cargando…</div>
         </div>
         <div class="notif-foot">
-            <span class="text-[11px] text-ink-400">Actualizado automáticamente</span>
+            <span class="text-[11px] text-ink-400">{{ __('Actualizado automáticamente') }}</span>
         </div>
     </div>
 </div>

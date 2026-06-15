@@ -97,15 +97,15 @@
         <div class="logout-confirm-icon" aria-hidden="true">
             <i class="pi pi-sign-out"></i>
         </div>
-        <h2 id="logoutConfirmTitle" class="logout-confirm-title">¿Cerrar sesión?</h2>
+        <h2 id="logoutConfirmTitle" class="logout-confirm-title">{{ __('¿Cerrar sesión?') }}</h2>
         <p id="logoutConfirmText" class="logout-confirm-text">
             Vas a salir de tu cuenta actual. Podrás volver a ingresar cuando lo necesites.
         </p>
         <div class="logout-confirm-actions">
-            <button type="button" class="logout-confirm-btn logout-confirm-cancel" onclick="closeLogoutModal()">Cancelar</button>
+            <button type="button" class="logout-confirm-btn logout-confirm-cancel" onclick="closeLogoutModal()">{{ __('Cancelar') }}</button>
             <form method="POST" action="{{ route('logout') }}" class="m-0">
                 @csrf
-                <button type="submit" class="logout-confirm-btn logout-confirm-submit">Cerrar sesión</button>
+                <button type="submit" class="logout-confirm-btn logout-confirm-submit">{{ __('Cerrar sesión') }}</button>
             </form>
         </div>
     </div>

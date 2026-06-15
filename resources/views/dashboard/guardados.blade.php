@@ -552,7 +552,7 @@
     {{-- Header summary --}}
     <div class="sv-header">
         <div>
-            <div class="sv-header-title">Guardadas</div>
+            <div class="sv-header-title">{{ __('Guardadas') }}</div>
             <div class="sv-header-sub">{{ $units->count() }} {{ $units->count() === 1 ? 'propiedad' : 'propiedades' }} · {{ $projectName }}</div>
         </div>
         <a href="/" class="sv-cta-explore">
@@ -565,7 +565,7 @@
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto" style="background:#f3f4f6;color:#9ca3af;">
                 <i class="pi pi-heart text-[22px]"></i>
             </div>
-            <div class="mt-3 text-[15px] font-bold" style="color:#171717;">Aún no tenés propiedades guardadas</div>
+            <div class="mt-3 text-[15px] font-bold" style="color:#171717;">{{ __('Aún no tenés propiedades guardadas') }}</div>
             <p class="text-[12px] mt-1 max-w-md mx-auto" style="color:#717784;">
                 Tocá el corazón en cualquier unidad del listado para agregarla a tu lista de guardados y revisarla después.
             </p>
@@ -601,7 +601,7 @@
                             @if($unit->images && $unit->images->isNotEmpty())
                                 <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" onerror="this.style.display='none'">
                             @else
-                                <div class="fg-card-img-noimage">No Image Available</div>
+                                <div class="fg-card-img-noimage">{{ __('No Image Available') }}</div>
                             @endif
 
                             <div class="fg-chip-row">
@@ -626,23 +626,23 @@
 
                                 <button type="button"
                                         class="fg-add-to-list is-fav"
-                                        aria-label="Quitar de guardados"
+                                        aria-label="{{ __('Quitar de guardados') }}"
                                         aria-pressed="true"
                                         data-wishlist-toggle data-unit-id="{{ $unit->id }}"
-                                        title="Quitar de guardados">
+                                        title="{{ __('Quitar de guardados') }}">
                                     <span class="heart">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                         </svg>
                                     </span>
                                     <span class="text">
-                                        <span class="label">Saved</span>
-                                        <span class="meta">Shortlisted by <span data-unit-count="{{ $unit->id }}">{{ $shortlistedCount }}</span> other</span>
+                                        <span class="label">{{ __('Saved') }}</span>
+                                        <span class="meta">{{ __('Shortlisted by') }} <span data-unit-count="{{ $unit->id }}">{{ $shortlistedCount }}</span> {{ __('other') }}</span>
                                     </span>
                                 </button>
                             </div>
 
-                            <div class="fg-reserve-banner">Reserve from $5000</div>
+                            <div class="fg-reserve-banner">{{ __('Reserve from $5000') }}</div>
 
                             @if($isSold)
                                 <div class="fg-sold-badge"><span>SOLD</span></div>
@@ -670,37 +670,37 @@
                                     @endif
                                 </div>
                                 @if($hasDiscount)
-                                    <button type="button" class="fg-discount" title="Limited time offer">Unlock ${{ number_format($unit->discount, 0, ',', ',') }} Discount</button>
+                                    <button type="button" class="fg-discount" title="{{ __('Limited time offer') }}">Unlock ${{ number_format($unit->discount, 0, ',', ',') }} Discount</button>
                                 @endif
                             </div>
 
                             <div class="fg-stats">
-                                <div class="fg-stat" title="Bedrooms">
+                                <div class="fg-stat" title="{{ __('Bedrooms') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg>
                                     <span class="v">{{ $unit->bedrooms ?? 0 }}</span>
                                 </div>
                                 <span class="fg-stat-divider"></span>
-                                <div class="fg-stat" title="Bathrooms">
+                                <div class="fg-stat" title="{{ __('Bathrooms') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V4a2 2 0 0 1 4 0"/><path d="M2 11h20"/><path d="M5 11v6a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-6"/><line x1="6" y1="22" x2="6" y2="20"/><line x1="18" y1="22" x2="18" y2="20"/></svg>
                                     <span class="v">{{ $unit->bathrooms ?? 0 }}</span>
                                 </div>
                                 <span class="fg-stat-divider"></span>
-                                <div class="fg-stat" title="Parking">
+                                <div class="fg-stat" title="{{ __('Parking') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14"/><path d="M5 17V9l1.5-4h11L19 9v8"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
                                     <span class="v">{{ $unit->parking_bays ?? 0 }}</span>
                                 </div>
                                 <span class="fg-stat-divider"></span>
-                                <div class="fg-stat" title="Internal area">
+                                <div class="fg-stat" title="{{ __('Internal area') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="2 2"/></svg>
                                     <span class="v">{{ number_format(($unit->internal_area ?? 0)) }}m<sup>2</sup></span>
                                 </div>
                                 <span class="fg-stat-divider"></span>
-                                <div class="fg-stat" title="External area">
+                                <div class="fg-stat" title="{{ __('External area') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 3 3 8 3"/><polyline points="16 3 21 3 21 8"/><polyline points="21 16 21 21 16 21"/><polyline points="8 21 3 21 3 16"/></svg>
                                     <span class="v">{{ number_format(($unit->external_area ?? 0)) }}m<sup>2</sup></span>
                                 </div>
                                 <span class="fg-stat-divider"></span>
-                                <div class="fg-stat" title="Total area">
+                                <div class="fg-stat" title="{{ __('Total area') }}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg>
                                     <span class="v">{{ number_format(($unit->total_area ?? 0)) }}m<sup>2</sup></span>
                                 </div>
@@ -709,15 +709,15 @@
                             <div class="fg-card-actions">
                                 @if($isSold)
                                     <div class="fg-card-buttons">
-                                        <a class="fg-btn-info-similar" href="/?unit={{ $unitId }}">View Similar Units</a>
+                                        <a class="fg-btn-info-similar" href="/?unit={{ $unitId }}">{{ __('View Similar Units') }}</a>
                                     </div>
                                     <div class="fg-card-availability">
                                         <span class="dot"></span>
-                                        <span>This unit has been sold.</span>
+                                        <span>{{ __('This unit has been sold.') }}</span>
                                     </div>
                                 @elseif($isReserved)
                                     <div class="fg-card-buttons">
-                                        <a class="fg-btn-info" href="/?unit={{ $unitId }}">More Info</a>
+                                        <a class="fg-btn-info" href="/?unit={{ $unitId }}">{{ __('More Info') }}</a>
                                         <button class="fg-btn-cta" type="button" disabled style="cursor:not-allowed;opacity:.5;">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V5a3 3 0 1 1 6 0v3"/></svg>
                                             Reserved
@@ -725,11 +725,11 @@
                                     </div>
                                     <div class="fg-card-availability">
                                         <span class="dot"></span>
-                                        <span>Currently on hold by another buyer.</span>
+                                        <span>{{ __('Currently on hold by another buyer.') }}</span>
                                     </div>
                                 @else
                                     <div class="fg-card-buttons">
-                                        <a class="fg-btn-info" href="/?unit={{ $unitId }}">More Info</a>
+                                        <a class="fg-btn-info" href="/?unit={{ $unitId }}">{{ __('More Info') }}</a>
                                         <a class="fg-btn-cta" href="/?unit={{ $unitId }}&action=videocall">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
@@ -738,9 +738,9 @@
                                             Book Video Call
                                         </a>
                                     </div>
-                                    <div class="fg-card-availability" role="button" tabindex="0" title="Chatear ahora con el administrador" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
+                                    <div class="fg-card-availability" role="button" tabindex="0" title="{{ __('Chatear ahora con el administrador') }}" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
                                         <span class="dot"></span>
-                                        <span>An advisor is available right now.</span>
+                                        <span>{{ __('An advisor is available right now.') }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -757,7 +757,7 @@
                         <div class="fg-card-status-strip">
                             <span class="fg-card-status-dot"></span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            <span>Pending review · Hold expires soon</span>
+                            <span>{{ __('Pending review · Hold expires soon') }}</span>
                         </div>
                     @elseif($isSecond)
                         <div class="fg-card-status-strip">
@@ -774,9 +774,9 @@
                         <div class="fg-card-status-strip is-reserved-strip" @if($reservedFuture) data-reserved-until="{{ \Carbon\Carbon::parse($unit->reserved_until)->toIso8601String() }}" @endif>
                             <span class="fg-card-status-dot"></span>
                             @if($reservedFuture)
-                                <span>Reserved for <span class="fg-countdown" data-countdown>00:00:00</span> remaining</span>
+                                <span>{{ __('Reserved for') }} <span class="fg-countdown" data-countdown>00:00:00</span> {{ __('remaining') }}</span>
                             @else
-                                <span>Reserved · Awaiting deposit</span>
+                                <span>{{ __('Reserved · Awaiting deposit') }}</span>
                             @endif
                         </div>
                     @endif
@@ -800,8 +800,8 @@
         // Confirmación antes de quitar (línea gráfica de la web)
         if (typeof window.confirmDialog === 'function') {
             window.confirmDialog({
-                title: '¿Quitar de guardados?',
-                text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+                title: '{{ __("¿Quitar de guardados?") }}',
+                text: '{{ __("Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.") }}',
                 confirmLabel: 'Quitar',
                 icon: 'pi pi-heart',
                 onConfirm: () => doUnsave(unitId, card, btn),

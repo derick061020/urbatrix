@@ -46,7 +46,7 @@
         </div>
     @endforeach
     <div>
-        <div class="text-[10px] uppercase tracking-wider text-ink-400">Progreso</div>
+        <div class="text-[10px] uppercase tracking-wider text-ink-400">{{ __('Progreso') }}</div>
         <div class="text-[14px] font-semibold text-ink-950 mt-0.5">{{ $pct }}%</div>
         <div class="crm-progress mt-1.5"><span class="bg-brand" style="width:{{ $pct }}%"></span></div>
     </div>
@@ -65,7 +65,7 @@
     {{-- ===== INFORMACIÓN ===== --}}
     <div class="udt-panel grid grid-cols-1 md:grid-cols-2 gap-8" data-panel="info">
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">Contacto</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">{{ __('Contacto') }}</div>
             <div class="divide-y divide-ink-100">
                 @foreach([
                     ['Nombre', $fullName],
@@ -83,22 +83,22 @@
             </div>
         </div>
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">Estado del proceso</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">{{ __('Estado del proceso') }}</div>
             <div class="divide-y divide-ink-100">
                 <div class="py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Estado actual</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Estado actual') }}</span>
                     <span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }} uppercase">{{ $estado[0] }}</span>
                 </div>
                 <div class="py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Etapa</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Etapa') }}</span>
                     <span class="text-[13px] font-semibold text-ink-900">{{ $stage[0] }} — {{ $stage[1] }}</span>
                 </div>
                 <div class="py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Última acción</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Última acción') }}</span>
                     <span class="text-[13px] font-semibold text-ink-900">{{ $user->last_seen ? \Carbon\Carbon::parse($user->last_seen)->diffForHumans() : '—' }}</span>
                 </div>
                 <div class="py-2.5 flex items-center justify-between gap-2">
-                    <span class="text-[12px] text-ink-500">Alertas</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Alertas') }}</span>
                     <span class="flex items-center gap-1.5">
                         @forelse($alerts as $a)<span class="crm-pill bg-warn-soft text-warn-dark uppercase">{{ $a }}</span>@empty<span class="text-[12px] text-ink-400">—</span>@endforelse
                     </span>
@@ -126,7 +126,7 @@
                 @endforeach
             </div>
         @else
-            <div class="py-10 text-center text-[13px] text-ink-400">Este usuario aún no tiene una unidad asignada.</div>
+            <div class="py-10 text-center text-[13px] text-ink-400">{{ __('Este usuario aún no tiene una unidad asignada.') }}</div>
         @endif
     </div>
 
@@ -144,14 +144,14 @@
                 <span class="crm-pill bg-{{ $dc }}-soft text-{{ $dc }} uppercase">{{ $doc->status }}</span>
             </div>
         @empty
-            <div class="py-10 text-center text-[13px] text-ink-400">Sin documentos cargados.</div>
+            <div class="py-10 text-center text-[13px] text-ink-400">{{ __('Sin documentos cargados.') }}</div>
         @endforelse
     </div>
 
     {{-- ===== ACTIVIDAD ===== --}}
     <div class="udt-panel grid grid-cols-1 md:grid-cols-2 gap-8" data-panel="actividad" style="display:none">
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">Resumen de actividad</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">{{ __('Resumen de actividad') }}</div>
             <div class="divide-y divide-ink-100">
                 @foreach([
                     ['Sesiones este mes', $sessionsThisMonth],
@@ -166,12 +166,12 @@
                     </div>
                 @endforeach
                 <div class="py-2.5 flex items-center justify-between">
-                    <span class="text-[12px] text-ink-500">Plataforma</span>
+                    <span class="text-[12px] text-ink-500">{{ __('Plataforma') }}</span>
                     <span class="crm-pill bg-{{ $platform[1] }}-soft text-{{ $platform[1] === 'ok' ? 'ok-dark' : ($platform[1] === 'warn' ? 'warn-dark' : 'info') }}">{{ $platform[0] }}</span>
                 </div>
             </div>
 
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mt-6 mb-3">Últimas acciones en plataforma</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mt-6 mb-3">{{ __('Últimas acciones en plataforma') }}</div>
             <div class="space-y-2.5">
                 @forelse($recentActions as $action)
                     <div class="flex items-center gap-3">
@@ -180,13 +180,13 @@
                         <span class="text-[11px] text-ink-400 whitespace-nowrap">{{ $action->created_at->diffForHumans(null, true) }}</span>
                     </div>
                 @empty
-                    <div class="text-[12px] text-ink-400">Sin actividad registrada todavía.</div>
+                    <div class="text-[12px] text-ink-400">{{ __('Sin actividad registrada todavía.') }}</div>
                 @endforelse
             </div>
         </div>
 
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">Propiedades más vistas</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">{{ __('Propiedades más vistas') }}</div>
             @php $maxViews = max(1, optional($topViewed->first())->total ?? 1); @endphp
             <div class="space-y-3">
                 @forelse($topViewed as $tv)
@@ -199,7 +199,7 @@
                         <div class="text-[10px] text-ink-400 mt-1">Última visita: {{ \Carbon\Carbon::parse($tv->last_viewed)->diffForHumans() }}</div>
                     </div>
                 @empty
-                    <div class="text-[12px] text-ink-400">Este usuario aún no ha visto propiedades.</div>
+                    <div class="text-[12px] text-ink-400">{{ __('Este usuario aún no ha visto propiedades.') }}</div>
                 @endforelse
             </div>
         </div>
@@ -208,10 +208,10 @@
 
 {{-- ===== FOOTER ===== --}}
 <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
-    <button type="button" onclick="closeUserDetail()" class="crm-btn crm-btn-ghost">Cerrar</button>
-    <button type="button" onclick='closeUserDetail(); openEditUserObj({{ $editData }})' class="crm-btn crm-btn-ghost"><i class="pi pi-pencil"></i> Editar</button>
+    <button type="button" onclick="closeUserDetail()" class="crm-btn crm-btn-ghost">{{ __('Cerrar') }}</button>
+    <button type="button" onclick='closeUserDetail(); openEditUserObj({{ $editData }})' class="crm-btn crm-btn-ghost"><i class="pi pi-pencil"></i> {{ __('Editar') }}</button>
     @if($reservation)
-        <a href="{{ route('admin.crm.expediente.detalle', $reservation->id) }}" class="crm-btn crm-btn-ghost">Ver expediente →</a>
+        <a href="{{ route('admin.crm.expediente.detalle', $reservation->id) }}" class="crm-btn crm-btn-ghost">{{ __('Ver expediente →') }}</a>
     @endif
-    <a href="{{ route('admin.communication') }}" class="crm-btn crm-btn-primary"><i class="pi pi-comment"></i> Mensaje</a>
+    <a href="{{ route('admin.communication') }}" class="crm-btn crm-btn-primary"><i class="pi pi-comment"></i> {{ __('Mensaje') }}</a>
 </div>

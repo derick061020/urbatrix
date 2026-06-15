@@ -4,8 +4,8 @@
 <div class="flex-1 bg-gray-50 p-6">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Plan de Pagos</h1>
-        <p class="text-gray-600">Consulta tu calendario de pagos y montos</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('Plan de Pagos') }}</h1>
+        <p class="text-gray-600">{{ __('Consulta tu calendario de pagos y montos') }}</p>
     </div>
 
     <!-- Payments Section -->
@@ -20,11 +20,11 @@
                     <div class="text-right">
                         <div class="text-lg font-semibold text-gray-900">{{ $reservation->formatted_price }}</div>
                         @if($reservation->status == 'pending')
-                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">Pendiente</span>
+                            <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full font-medium">{{ __('Pendiente') }}</span>
                         @elseif($reservation->status == 'confirmed')
-                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">Confirmada</span>
+                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">{{ __('Confirmada') }}</span>
                         @else
-                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">Cancelada</span>
+                            <span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">{{ __('Cancelada') }}</span>
                         @endif
                     </div>
                 </div>
@@ -34,7 +34,7 @@
                         <svg class="material-design-icon__svg text-blue-500 mx-auto mb-3" width="40" height="40" viewBox="0 0 24 24">
                             <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"></path>
                         </svg>
-                        <h4 class="font-semibold text-blue-900 mb-1">Tu presupuesto se está preparando</h4>
+                        <h4 class="font-semibold text-blue-900 mb-1">{{ __('Tu presupuesto se está preparando') }}</h4>
                         <p class="text-sm text-blue-800">
                             Nuestro equipo está armando el plan de pagos para tu unidad.
                             En cuanto esté listo, lo verás acá con todas las cuotas y vencimientos.
@@ -48,7 +48,7 @@
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h4 class="font-medium text-blue-900 mb-1">Plan de Pagos Seleccionado</h4>
+                            <h4 class="font-medium text-blue-900 mb-1">{{ __('Plan de Pagos Seleccionado') }}</h4>
                             <div class="text-sm text-blue-800">
                                 @php
                                     $paymentMethod = $reservation->payment_method ?? 'A';
@@ -66,7 +66,7 @@
                         </div>
                         <div class="text-right">
                             <div class="text-2xl font-bold text-blue-900">{{ $paymentMethod }}</div>
-                            <div class="text-xs text-blue-600">Plan seleccionado</div>
+                            <div class="text-xs text-blue-600">{{ __('Plan seleccionado') }}</div>
                         </div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                             'payment_type' => 'initial',
                             'formatted_amount' => '$' . number_format($breakdown['pago_inicial'], 2, '.', ','),
                             'receipt_path' => null,
-                            'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Pendiente</span>'
+                            'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
                         ];
                         
                         // Pagos de construcción si hay
@@ -112,7 +112,7 @@
                                     'installment_number' => $i,
                                     'formatted_amount' => '$' . number_format($breakdown['cuota'], 2, '.', ','),
                                     'receipt_path' => null,
-                                    'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Pendiente</span>'
+                                    'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
                                 ];
                             }
                         } elseif ($breakdown['pago_construccion'] > 0) {
@@ -124,7 +124,7 @@
                                 'payment_type' => 'construction',
                                 'formatted_amount' => '$' . number_format($breakdown['pago_construccion'], 2, '.', ','),
                                 'receipt_path' => null,
-                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Pendiente</span>'
+                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
                             ];
                         }
                         
@@ -138,7 +138,7 @@
                                 'payment_type' => 'delivery',
                                 'formatted_amount' => '$' . number_format($breakdown['pago_entrega'], 2, '.', ','),
                                 'receipt_path' => null,
-                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Pendiente</span>'
+                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
                             ];
                         }
                     }
@@ -151,8 +151,8 @@
                                 <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"></path>
                             </svg>
                             <div>
-                                <div class="font-medium text-yellow-800">Documentos pendientes de firma</div>
-                                <div class="text-sm text-yellow-700">Los botones de pago se habilitarán después de firmar el Plan de Pagos y la Promesa de Compraventa</div>
+                                <div class="font-medium text-yellow-800">{{ __('Documentos pendientes de firma') }}</div>
+                                <div class="text-sm text-yellow-700">{{ __('Los botones de pago se habilitarán después de firmar el Plan de Pagos y la Promesa de Compraventa') }}</div>
                             </div>
                         </div>
                     </div>
@@ -185,7 +185,7 @@
                                 <div class="font-medium text-gray-900">{{ $payment->label }}</div>
                                 <div class="text-sm text-gray-600">Vencimiento: {{ $payment->due_date->format('d M Y') }}</div>
                                 @if($payment->receipt_path)
-                                    <div class="text-xs text-green-600">✓ Comprobante adjunto</div>
+                                    <div class="text-xs text-green-600">{{ __('✓ Comprobante adjunto') }}</div>
                                 @endif
                             </div>
                         </div>
@@ -214,15 +214,15 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <div class="text-sm text-gray-600 mb-1">Total Pagado/Pagar</div>
+                            <div class="text-sm text-gray-600 mb-1">{{ __('Total Pagado/Pagar') }}</div>
                             <div class="text-lg font-bold text-gray-900">${{ number_format($breakdown['pago_inicial'] + $breakdown['pago_construccion'] + $breakdown['pago_entrega'], 2, '.', ',') }}</div>
                         </div>
                         <div>
-                            <div class="text-sm text-gray-600 mb-1">Precio Propiedad</div>
+                            <div class="text-sm text-gray-600 mb-1">{{ __('Precio Propiedad') }}</div>
                             <div class="text-lg font-bold text-gray-900">${{ number_format($breakdown['total_sin_legales'], 2, '.', ',') }}</div>
                         </div>
                         <div>
-                            <div class="text-sm text-gray-600 mb-1">Total Final</div>
+                            <div class="text-sm text-gray-600 mb-1">{{ __('Total Final') }}</div>
                             <div class="text-lg font-bold text-gray-900">${{ number_format($breakdown['total_con_legales'], 2, '.', ',') }}</div>
                         </div>
                     </div>
@@ -237,8 +237,8 @@
                 <svg class="material-design-icon__svg text-gray-400 mx-auto mb-4" width="48" height="48" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes reservas</h3>
-                <p class="text-gray-600 mb-4">Comienza reservando una unidad desde el home</p>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('No tienes reservas') }}</h3>
+                <p class="text-gray-600 mb-4">{{ __('Comienza reservando una unidad desde el home') }}</p>
                 <a href="/" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                     Ver Unidades
                 </a>

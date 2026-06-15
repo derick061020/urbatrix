@@ -80,28 +80,28 @@
             </h2>
         </div>
 
-        <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-today">Hoy</button>
+        <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-today">{{ __('Hoy') }}</button>
         <div class="relative">
             <select class="cli-input pl-3 pr-9 text-[12px] !h-9 w-auto" id="select-range">
-                <option value="week"  @selected($range === 'week')>Semana completa</option>
-                <option value="work"  @selected($range === 'work')>Semana laboral</option>
-                <option value="last7" @selected($range === 'last7')>Últimos 7 días</option>
-                <option value="next7" @selected($range === 'next7')>Próximos 7 días</option>
+                <option value="week"  @selected($range === 'week')>{{ __('Semana completa') }}</option>
+                <option value="work"  @selected($range === 'work')>{{ __('Semana laboral') }}</option>
+                <option value="last7" @selected($range === 'last7')>{{ __('Últimos 7 días') }}</option>
+                <option value="next7" @selected($range === 'next7')>{{ __('Próximos 7 días') }}</option>
             </select>
         </div>
 
         <div class="ml-auto flex items-center gap-3">
             <div class="relative w-64">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400 text-[12px]"></i>
-                <input class="cli-input pr-3" id="search-events" placeholder="Buscar eventos…">
+                <input class="cli-input pr-3" id="search-events" placeholder="{{ __('Buscar eventos…') }}">
             </div>
             <div class="relative">
-                <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-filter"><i class="pi pi-sliders-h text-[11px]"></i> Filtrar</button>
+                <button class="cli-btn cli-btn-ghost text-[12px]" id="btn-filter"><i class="pi pi-sliders-h text-[11px]"></i> {{ __('Filtrar') }}</button>
                 <div id="filter-dropdown" class="absolute right-0 top-full mt-1 z-20 hidden" style="min-width:200px;">
                     <div class="cli-card p-3 space-y-2">
-                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-1">Tipo de evento</div>
-                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="task" checked> <span>Tareas</span></label>
-                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="payment" checked> <span>Pagos</span></label>
+                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-1">{{ __('Tipo de evento') }}</div>
+                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="task" checked> <span>{{ __('Tareas') }}</span></label>
+                        <label class="flex items-center gap-2 text-[12px] cursor-pointer"><input type="checkbox" class="filter-type" value="payment" checked> <span>{{ __('Pagos') }}</span></label>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                     <i class="pi pi-video text-[18px]"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="text-[13px] font-bold text-ink-950">¡Videollamada agendada!</div>
+                    <div class="text-[13px] font-bold text-ink-950">{{ __('¡Videollamada agendada!') }}</div>
                     <div class="text-[12px] text-ink-500">
                         {{ $highlightMeeting->start->locale('es')->isoFormat('ddd D [de] MMMM, HH:mm') }} hs · Este es tu link de Google Meet
                     </div>
@@ -130,7 +130,7 @@
                         <i class="pi pi-external-link text-[11px]"></i> Abrir Google Meet
                     </a>
                 @else
-                    <span class="text-[12px] text-ink-500 shrink-0">El link llegará a tu email</span>
+                    <span class="text-[12px] text-ink-500 shrink-0">{{ __('El link llegará a tu email') }}</span>
                 @endif
             </div>
         </div>
@@ -159,9 +159,9 @@
                             <span class="dot" style="background:{{ $statusColor }}"></span> {{ $whenLabel }}
                         </span>
                         @if($e->start->isToday() && $e->type === 'video')
-                            <a class="font-semibold text-ok-dark hover:underline">Unirse a la reunión</a>
+                            <a class="font-semibold text-ok-dark hover:underline">{{ __('Unirse a la reunión') }}</a>
                         @elseif($e->type === 'payment')
-                            <a href="{{ route('dashboard.payments') }}?pay=1" class="font-semibold text-warn-dark hover:underline">Pagar</a>
+                            <a href="{{ route('dashboard.payments') }}?pay=1" class="font-semibold text-warn-dark hover:underline">{{ __('Pagar') }}</a>
                         @else
                             <span class="text-ink-500">{{ $e->meta ?? '' }}</span>
                         @endif
@@ -174,8 +174,8 @@
     {{-- Week grid --}}
     <div class="cli-card overflow-hidden">
         <div class="px-3 py-2 flex items-center gap-2 border-b border-ink-100 bg-white">
-            <a href="?range={{ $range }}&start={{ $prevWeek }}" aria-label="Anterior" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[12px]"></i></a>
-            <a href="?range={{ $range }}&start={{ $nextWeek }}" aria-label="Siguiente" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[12px]"></i></a>
+            <a href="?range={{ $range }}&start={{ $prevWeek }}" aria-label="{{ __('Anterior') }}" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[12px]"></i></a>
+            <a href="?range={{ $range }}&start={{ $nextWeek }}" aria-label="{{ __('Siguiente') }}" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[12px]"></i></a>
 
             {{-- Spacer matching the time column --}}
             <div class="shrink-0" style="width:60px;"></div>
@@ -244,8 +244,8 @@
     @if($events->isEmpty())
         <div class="cli-card p-10 text-center" id="empty-state">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-calendar text-[22px]"></i></div>
-            <div class="mt-3 text-[15px] font-bold text-ink-950">Tu calendario está vacío</div>
-            <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">Cuando tu asesor agende una videollamada o cuando se cargue una nueva cuota, vas a verla acá.</p>
+            <div class="mt-3 text-[15px] font-bold text-ink-950">{{ __('Tu calendario está vacío') }}</div>
+            <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">{{ __('Cuando tu asesor agende una videollamada o cuando se cargue una nueva cuota, vas a verla acá.') }}</p>
         </div>
     @endif
 </div>

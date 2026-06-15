@@ -14,13 +14,13 @@
 @section('content')
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
-    <p class="text-[12px] text-ink-500 max-w-2xl">Material para compartir, enlaces que te dicen quién está interesado, y propuestas para tu cliente.</p>
+    <p class="text-[12px] text-ink-500 max-w-2xl">{{ __('Material para compartir, enlaces que te dicen quién está interesado, y propuestas para tu cliente.') }}</p>
 
     {{-- Material descargable --}}
     <div class="brk-card p-5">
         <div class="flex items-center justify-between mb-4">
-            <span class="text-[14px] font-bold text-ink-950">Material descargable</span>
-            <span class="brk-pill bg-brand text-white">Aprobado por Duna</span>
+            <span class="text-[14px] font-bold text-ink-950">{{ __('Material descargable') }}</span>
+            <span class="brk-pill bg-brand text-white">{{ __('Aprobado por Duna') }}</span>
         </div>
         @if($materials->count())
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -33,15 +33,15 @@
                         <div class="text-[13px] font-bold text-ink-950 leading-tight">{{ $m->title }}</div>
                         <div class="text-[10.5px] text-ink-400">{{ $m->file_size ?: '—' }}@if($m->category) · {{ $m->category }}@endif</div>
                         @if($m->downloadUrl())
-                            <a href="{{ $m->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost mt-auto">Descargar</a>
+                            <a href="{{ $m->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost mt-auto">{{ __('Descargar') }}</a>
                         @else
-                            <span class="text-[11px] text-ink-300 mt-auto">No disponible</span>
+                            <span class="text-[11px] text-ink-300 mt-auto">{{ __('No disponible') }}</span>
                         @endif
                     </div>
                 @endforeach
             </div>
         @else
-            <div class="text-[12px] text-ink-400 text-center py-8">Aún no hay material publicado. Duna lo cargará próximamente.</div>
+            <div class="text-[12px] text-ink-400 text-center py-8">{{ __('Aún no hay material publicado. Duna lo cargará próximamente.') }}</div>
         @endif
     </div>
 
@@ -49,23 +49,23 @@
 
         {{-- Enlace de referido --}}
         <div class="brk-card p-5">
-            <div class="text-[14px] font-bold text-ink-950 mb-1">Tu enlace de referido</div>
-            <p class="text-[12px] text-ink-500 mb-3">Compártelo con tus clientes: quienes entren por él quedan atribuidos a ti automáticamente.</p>
+            <div class="text-[14px] font-bold text-ink-950 mb-1">{{ __('Tu enlace de referido') }}</div>
+            <p class="text-[12px] text-ink-500 mb-3">{{ __('Compártelo con tus clientes: quienes entren por él quedan atribuidos a ti automáticamente.') }}</p>
             <div class="flex items-center gap-3 bg-brand-tint border border-brand/20 rounded-xl px-4 py-3">
                 <span class="flex-1 font-mono text-[12.5px] font-semibold text-brand-dark break-all" id="brkToolRef">{{ url('/r/'.$referral) }}</span>
-                <button type="button" class="brk-btn brk-btn-primary" onclick="brkCopyTool()">Copiar</button>
+                <button type="button" class="brk-btn brk-btn-primary" onclick="brkCopyTool()">{{ __('Copiar') }}</button>
             </div>
         </div>
 
         {{-- Generar propuesta --}}
         <div class="brk-card p-5">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-[14px] font-bold text-ink-950">Generar propuesta</span>
+                <span class="text-[14px] font-bold text-ink-950">{{ __('Generar propuesta') }}</span>
             </div>
-            <p class="text-[12px] text-ink-500 mb-3">Crea una propuesta con plan de pago para tu cliente. Tu comisión nunca aparece en el documento del cliente.</p>
+            <p class="text-[12px] text-ink-500 mb-3">{{ __('Crea una propuesta con plan de pago para tu cliente. Tu comisión nunca aparece en el documento del cliente.') }}</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="brk-field">
-                    <label>Cliente</label>
+                    <label>{{ __('Cliente') }}</label>
                     <select id="propClient">
                         <option value="">— Selecciona —</option>
                         @foreach($clients as $c)
@@ -74,7 +74,7 @@
                     </select>
                 </div>
                 <div class="brk-field">
-                    <label>Unidad</label>
+                    <label>{{ __('Unidad') }}</label>
                     <select id="propUnit" onchange="brkBuildProp()">
                         <option value="">— Selecciona —</option>
                         @foreach($units as $u)
@@ -83,18 +83,18 @@
                     </select>
                 </div>
             </div>
-            <button type="button" class="brk-btn brk-btn-primary mt-3" onclick="brkBuildProp(true)">Generar propuesta</button>
+            <button type="button" class="brk-btn brk-btn-primary mt-3" onclick="brkBuildProp(true)">{{ __('Generar propuesta') }}</button>
 
             <div id="propBox" class="mt-4 border border-ink-200 rounded-xl overflow-hidden" style="display:none">
                 <div class="bg-brand-tint border-b border-brand/20 px-4 py-3">
-                    <div class="text-[13px] font-bold text-ink-950" id="propTitle">Propuesta</div>
+                    <div class="text-[13px] font-bold text-ink-950" id="propTitle">{{ __('Propuesta') }}</div>
                     <div class="text-[11px] text-brand-dark" id="propFor">Preparada por {{ auth()->user()->name }}</div>
                 </div>
                 <div class="p-4 space-y-1">
-                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">Precio</span><span class="font-semibold text-ink-900" id="propPrice">—</span></div>
+                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Precio') }}</span><span class="font-semibold text-ink-900" id="propPrice">—</span></div>
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">Inicial 20%</span><span class="font-semibold text-ink-900" id="propIni">—</span></div>
-                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">Saldo (construcción + entrega)</span><span class="font-semibold text-ink-900" id="propRest">—</span></div>
-                    <p class="text-[10.5px] text-ink-400 mt-2">Simulación informativa, no vinculante. CONFOTUR aplica exención fiscal al comprador.</p>
+                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Saldo (construcción + entrega)') }}</span><span class="font-semibold text-ink-900" id="propRest">—</span></div>
+                    <p class="text-[10.5px] text-ink-400 mt-2">{{ __('Simulación informativa, no vinculante. CONFOTUR aplica exención fiscal al comprador.') }}</p>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
     function brkBuildProp(force){
         var sel=document.getElementById('propUnit');
         var price=parseFloat(sel.value)||0;
-        if(!price){ if(force) alert('Selecciona una unidad.'); return; }
+        if(!price){ if(force) alert('{{ __("Selecciona una unidad.") }}'); return; }
         var label=sel.options[sel.selectedIndex].getAttribute('data-label')||'';
         var client=document.getElementById('propClient').value||'tu cliente';
         document.getElementById('propTitle').textContent='Propuesta · '+label;

@@ -112,7 +112,7 @@
     @endphp
     <div class="rpt-overlay" id="rptModal-{{ $r->id }}" role="dialog" aria-modal="true" aria-label="Reporte de avance — {{ $r->period }}">
         <div class="rpt-card">
-            <button type="button" class="rpt-close" onclick="closeReportModal({{ $r->id }})" aria-label="Cerrar"><i class="pi pi-times"></i></button>
+            <button type="button" class="rpt-close" onclick="closeReportModal({{ $r->id }})" aria-label="{{ __('Cerrar') }}"><i class="pi pi-times"></i></button>
 
             {{-- Header --}}
             <div class="rpt-head">
@@ -120,14 +120,14 @@
                     <div class="rpt-brand">{{ $rc['brand'] }}</div>
                     <div class="rpt-group">{{ $rc['group'] }}</div>
                 </div>
-                <div class="rpt-doclabel">Avance · E-04</div>
+                <div class="rpt-doclabel">{{ __('Avance · E-04') }}</div>
             </div>
             <div class="rpt-goldbar">&nbsp;</div>
 
             {{-- Hero --}}
             <div class="rpt-hero">
-                <p class="rpt-eyebrow">Avance de obra · Reporte mensual</p>
-                <p class="rpt-title">Novedades de <strong>{{ $rProject }}</strong></p>
+                <p class="rpt-eyebrow">{{ __('Avance de obra · Reporte mensual') }}</p>
+                <p class="rpt-title">{{ __('Novedades de') }} <strong>{{ $rProject }}</strong></p>
             </div>
 
             {{-- Body --}}
@@ -135,8 +135,8 @@
                 <p class="rpt-period">{{ $r->period }} — {{ $r->title }}</p>
 
                 <div class="rpt-progress-block">
-                    <p class="rpt-progress-cap">Progreso actual de obra</p>
-                    <p class="rpt-progress-num">{{ (int) $r->overall_progress }}<span class="pct">%</span> <span class="lbl">completado</span></p>
+                    <p class="rpt-progress-cap">{{ __('Progreso actual de obra') }}</p>
+                    <p class="rpt-progress-num">{{ (int) $r->overall_progress }}<span class="pct">%</span> <span class="lbl">{{ __('completado') }}</span></p>
                     <div class="rpt-bar"><span style="width:{{ $rPct }}%"></span></div>
                 </div>
 
@@ -146,17 +146,17 @@
 
                 <div class="rpt-meta">
                     <div class="rpt-meta-cell">
-                        <p class="rpt-meta-cap">Período</p>
+                        <p class="rpt-meta-cap">{{ __('Período') }}</p>
                         <p class="rpt-meta-val">{{ $r->period }}</p>
                     </div>
                     <div class="rpt-meta-cell">
-                        <p class="rpt-meta-cap">Entrega estimada</p>
+                        <p class="rpt-meta-cap">{{ __('Entrega estimada') }}</p>
                         <p class="rpt-meta-val">{{ $r->estimated_delivery ?: 'Q4 2026' }}</p>
                     </div>
                 </div>
 
                 @if(!empty($rPhases))
-                    <p class="rpt-section-cap">Avance por etapa</p>
+                    <p class="rpt-section-cap">{{ __('Avance por etapa') }}</p>
                     @foreach($rPhases as $ph)
                         @php
                             $phStatus = $ph['status'] ?? 'pending';
@@ -174,11 +174,11 @@
                 @endif
 
                 @if($r->photos)
-                    <p class="rpt-section-cap">Galería del avance</p>
+                    <p class="rpt-section-cap">{{ __('Galería del avance') }}</p>
                     <div class="rpt-photos">
                         @foreach($r->photos as $photo)
                             <a href="{{ asset('storage/'.$photo) }}" target="_blank" rel="noopener">
-                                <img src="{{ asset('storage/'.$photo) }}" alt="Foto de avance">
+                                <img src="{{ asset('storage/'.$photo) }}" alt="{{ __('Foto de avance') }}">
                             </a>
                         @endforeach
                     </div>
@@ -187,7 +187,7 @@
 
             {{-- Signature --}}
             <div class="rpt-sign">
-                <p class="a">Un cordial saludo,</p>
+                <p class="a">{{ __('Un cordial saludo,') }}</p>
                 <p class="b">Equipo {{ $rc['group'] }}</p>
                 <p class="c">{{ $rc['support_email'] }} · {{ $rc['phone'] }}</p>
             </div>

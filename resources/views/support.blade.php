@@ -21,7 +21,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>MAKAI · Soporte</title>
+<title>{{ __('MAKAI · Soporte') }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -177,13 +177,13 @@
 
   <div class="topbar">
     <div class="in">
-      <a href="/" class="back" aria-label="Volver al inicio">
+      <a href="/" class="back" aria-label="{{ __('Volver al inicio') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </a>
       <a href="/" style="display:flex;align-items:center;text-decoration:none;flex:none;">
-        <img src="/images/makai-logo.png" alt="Makai" class="logo-img">
+        <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="logo-img">
       </a>
-      <span class="crumb"><b>Soporte</b></span>
+      <span class="crumb"><b>{{ __('Soporte') }}</b></span>
       <div class="tright">
         <!-- Toggle de idioma (real · persiste vía /locale) -->
         <div class="lang">
@@ -193,7 +193,7 @@
 
         <!-- Foto de perfil → abre el menú del home -->
         <div style="position:relative;">
-          <button type="button" class="profile-trigger" onclick="toggleProfileMenu()" aria-label="Menú de perfil">
+          <button type="button" class="profile-trigger" onclick="toggleProfileMenu()" aria-label="{{ __('Menú de perfil') }}">
             <span class="pinfo">
               <span class="pname">{{ $user ? explode(' ', $user->name)[0] : 'Cliente' }}</span>
               <span class="prole">{{ $isAdminUser ? __('Admin') : __('Cliente') }}</span>
@@ -294,12 +294,12 @@
 
     <!-- HERO -->
     <div class="hero">
-      <div class="eyebrow">Centro de soporte</div>
-      <h1>¿En qué podemos ayudarte?</h1>
-      <p>Resuelve dudas sobre tu compra, pagos y documentos — o habla con nosotros.</p>
+      <div class="eyebrow">{{ __('Centro de soporte') }}</div>
+      <h1>{{ __('¿En qué podemos ayudarte?') }}</h1>
+      <p>{{ __('Resuelve dudas sobre tu compra, pagos y documentos — o habla con nosotros.') }}</p>
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input placeholder="Busca en la ayuda: reserva, plan de pago, documentos…">
+        <input placeholder="{{ __('Busca en la ayuda: reserva, plan de pago, documentos…') }}">
       </div>
     </div>
 
@@ -307,53 +307,53 @@
     <section class="ctx">
       <div class="ctx-head">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13z"/><path d="M9 21v-7h6v7"/></svg></div>
-        <div><div class="t">Tu compra · Unit C-301</div><div class="s">Makai Residences · reserva activa</div></div>
-        <span class="badge">Ayuda sobre tu unidad</span>
+        <div><div class="t">{{ __('Tu compra · Unit C-301') }}</div><div class="s">{{ __('Makai Residences · reserva activa') }}</div></div>
+        <span class="badge">{{ __('Ayuda sobre tu unidad') }}</span>
       </div>
       <div class="qa">
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Dudas de mi plan de pago</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg><span>Estado de mis documentos</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Reprogramar una cuota</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>Hablar con mi asesor</span></a>
-        <a href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg><span>Ver progreso de obra</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>Otra cosa</span></a>
+        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>{{ __('Dudas de mi plan de pago') }}</span></a>
+        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg><span>{{ __('Estado de mis documentos') }}</span></a>
+        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>{{ __('Reprogramar una cuota') }}</span></a>
+        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>{{ __('Hablar con mi asesor') }}</span></a>
+        <a href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg><span>{{ __('Ver progreso de obra') }}</span></a>
+        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>{{ __('Otra cosa') }}</span></a>
       </div>
     </section>
 
     <!-- CANALES -->
     <div>
       <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:12px;">
-        <span class="sec-title">Contáctanos</span>
-        <span style="font-size:12px; color:var(--muted);">Elige el canal que prefieras</span>
+        <span class="sec-title">{{ __('Contáctanos') }}</span>
+        <span style="font-size:12px; color:var(--muted);">{{ __('Elige el canal que prefieras') }}</span>
       </div>
       <div class="channels">
         <div class="ch wa">
           <div class="ci"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2a.4.4 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11 11 0 0 0 4.3 3.8c1.7.7 2 .6 2.4.5a2.4 2.4 0 0 0 1.6-1.1 2 2 0 0 0 .1-1.1c0-.1-.2-.2-.4-.3z"/></svg></div>
           <div class="cn">WhatsApp</div>
-          <div class="cv">El más rápido</div>
-          <div class="sla">Atendido en horario laboral (GMT-4)</div>
-          <a class="cta" href="https://wa.me/18495854171" target="_blank" rel="noopener">Abrir WhatsApp</a>
+          <div class="cv">{{ __('El más rápido') }}</div>
+          <div class="sla">{{ __('Atendido en horario laboral (GMT-4)') }}</div>
+          <a class="cta" href="https://wa.me/18495854171" target="_blank" rel="noopener">{{ __('Abrir WhatsApp') }}</a>
         </div>
         <div class="ch mail">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
-          <div class="cn">Email</div>
+          <div class="cn">{{ __('Email') }}</div>
           <div class="cv"><b>soporte@urbatrix.com</b></div>
-          <div class="sla">Respondemos en hasta 48 h hábiles</div>
-          <a class="cta ghost" href="mailto:soporte@urbatrix.com">Escribir</a>
+          <div class="sla">{{ __('Respondemos en hasta 48 h hábiles') }}</div>
+          <a class="cta ghost" href="mailto:soporte@urbatrix.com">{{ __('Escribir') }}</a>
         </div>
         <div class="ch tel">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></div>
-          <div class="cn">Teléfono</div>
+          <div class="cn">{{ __('Teléfono') }}</div>
           <div class="cv"><b>+1 (849) 585-4171</b></div>
-          <div class="sla">Lun–Vie · horario AST</div>
-          <a class="cta ghost" href="tel:+18495854171">Llamar</a>
+          <div class="sla">{{ __('Lun–Vie · horario AST') }}</div>
+          <a class="cta ghost" href="tel:+18495854171">{{ __('Llamar') }}</a>
         </div>
         <div class="ch vid">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-          <div class="cn">Videollamada</div>
-          <div class="cv">Recorrido guiado con tu asesor</div>
-          <div class="sla">Eliges día y hora</div>
-          <a class="cta ghost">Agendar</a>
+          <div class="cn">{{ __('Videollamada') }}</div>
+          <div class="cv">{{ __('Recorrido guiado con tu asesor') }}</div>
+          <div class="sla">{{ __('Eliges día y hora') }}</div>
+          <a class="cta ghost">{{ __('Agendar') }}</a>
         </div>
       </div>
     </div>
@@ -364,59 +364,59 @@
       <!-- Centro de ayuda -->
       <section class="card">
         <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
-          <span class="sec-title">Centro de ayuda</span>
+          <span class="sec-title">{{ __('Centro de ayuda') }}</span>
         </div>
         <div class="cats">
-          <span class="cat on">Reservas y pagos</span>
-          <span class="cat">Documentos y KYC</span>
-          <span class="cat">Entrega y obra</span>
-          <span class="cat">Mi cuenta</span>
+          <span class="cat on">{{ __('Reservas y pagos') }}</span>
+          <span class="cat">{{ __('Documentos y KYC') }}</span>
+          <span class="cat">{{ __('Entrega y obra') }}</span>
+          <span class="cat">{{ __('Mi cuenta') }}</span>
         </div>
 
         <!-- FAQs (acordeón) -->
-        <div class="faq"><button class="faq-q">¿La reserva es reembolsable?<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">Sí. La reserva de US$2,500 es 100% reembolsable bajo las condiciones del contrato de reserva. Puedes consultar los detalles en tus documentos o escribirnos.</div></div>
-        <div class="faq"><button class="faq-q">¿Cómo pago el inicial y en qué plazos?<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">El pago inicial (mínimo 20% del valor) puede abonarse de una vez o fraccionado según tu plan de pago. Encuentras tu calendario exacto en “Plan de pagos” de tu portal.</div></div>
-        <div class="faq"><button class="faq-q">¿En qué moneda pago?<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">Los precios se fijan en USD durante el ciclo de venta. Puedes ver el equivalente referencial en DOP/EUR, pero la operación se liquida en USD.</div></div>
-        <div class="faq"><button class="faq-q">¿Cómo funciona la pasarela de pago internacional?<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">Aceptamos tarjeta internacional (con verificación 3D Secure) y pago asistido. Cada pago queda confirmado y reflejado en tu plan de pagos.</div></div>
+        <div class="faq"><button class="faq-q">{{ __('¿La reserva es reembolsable?') }}<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">{{ __('Sí. La reserva de US$2,500 es 100% reembolsable bajo las condiciones del contrato de reserva. Puedes consultar los detalles en tus documentos o escribirnos.') }}</div></div>
+        <div class="faq"><button class="faq-q">{{ __('¿Cómo pago el inicial y en qué plazos?') }}<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">{{ __('El pago inicial (mínimo 20% del valor) puede abonarse de una vez o fraccionado según tu plan de pago. Encuentras tu calendario exacto en “Plan de pagos” de tu portal.') }}</div></div>
+        <div class="faq"><button class="faq-q">{{ __('¿En qué moneda pago?') }}<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">{{ __('Los precios se fijan en USD durante el ciclo de venta. Puedes ver el equivalente referencial en DOP/EUR, pero la operación se liquida en USD.') }}</div></div>
+        <div class="faq"><button class="faq-q">{{ __('¿Cómo funciona la pasarela de pago internacional?') }}<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button><div class="faq-a">{{ __('Aceptamos tarjeta internacional (con verificación 3D Secure) y pago asistido. Cada pago queda confirmado y reflejado en tu plan de pagos.') }}</div></div>
 
         <div class="guias">
-          <div class="eyebrow" style="margin-bottom:6px;">Guías del proceso</div>
-          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Cómo reservar tu unidad, paso a paso</a>
-          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Qué documentos necesitas (KYC)</a>
-          <a class="guia" href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Cómo seguir el avance de tu obra</a>
+          <div class="eyebrow" style="margin-bottom:6px;">{{ __('Guías del proceso') }}</div>
+          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>{{ __('Cómo reservar tu unidad, paso a paso') }}</a>
+          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ __('Qué documentos necesitas (KYC)') }}</a>
+          <a class="guia" href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>{{ __('Cómo seguir el avance de tu obra') }}</a>
         </div>
       </section>
 
       <!-- Mis solicitudes -->
       <section class="card">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
-          <span class="sec-title">Mis solicitudes</span>
+          <span class="sec-title">{{ __('Mis solicitudes') }}</span>
         </div>
 
         <div class="ticket">
-          <div class="tt"><span class="tid">SOP-112</span><span class="ts proc">En proceso</span></div>
-          <div class="tq">Duda sobre la fecha de la cuota de mayo</div>
-          <div class="tm">Pago · creada hace 1 día · respondemos en hasta 48 h</div>
+          <div class="tt"><span class="tid">SOP-112</span><span class="ts proc">{{ __('En proceso') }}</span></div>
+          <div class="tq">{{ __('Duda sobre la fecha de la cuota de mayo') }}</div>
+          <div class="tm">{{ __('Pago · creada hace 1 día · respondemos en hasta 48 h') }}</div>
         </div>
         <div class="ticket">
-          <div class="tt"><span class="tid">SOP-108</span><span class="ts done">Resuelta</span></div>
-          <div class="tq">No podía descargar el plano de la unidad</div>
-          <div class="tm">Técnico · resuelta hace 4 días</div>
+          <div class="tt"><span class="tid">SOP-108</span><span class="ts done">{{ __('Resuelta') }}</span></div>
+          <div class="tq">{{ __('No podía descargar el plano de la unidad') }}</div>
+          <div class="tm">{{ __('Técnico · resuelta hace 4 días') }}</div>
         </div>
 
-        <button class="btn-primary" onclick="document.getElementById('nf').classList.toggle('show');">+ Nueva solicitud</button>
+        <button class="btn-primary" onclick="document.getElementById('nf').classList.toggle('show');">{{ __('+ Nueva solicitud') }}</button>
         <div class="newform" id="nf">
-          <label>Tema</label>
-          <select><option>Pago</option><option>Documentos</option><option>Reserva</option><option>Técnico / cuenta</option><option>Legal</option><option>Otro</option></select>
-          <label>Cuéntanos</label>
-          <textarea placeholder="Describe tu solicitud. Si es sobre tu unidad, ya la asociamos a Unit C-301."></textarea>
-          <button class="btn-primary">Enviar solicitud</button>
+          <label>{{ __('Tema') }}</label>
+          <select><option>{{ __('Pago') }}</option><option>{{ __('Documentos') }}</option><option>{{ __('Reserva') }}</option><option>{{ __('Técnico / cuenta') }}</option><option>{{ __('Legal') }}</option><option>{{ __('Otro') }}</option></select>
+          <label>{{ __('Cuéntanos') }}</label>
+          <textarea placeholder="{{ __('Describe tu solicitud. Si es sobre tu unidad, ya la asociamos a Unit C-301.') }}"></textarea>
+          <button class="btn-primary">{{ __('Enviar solicitud') }}</button>
         </div>
       </section>
     </div>
 
     <!-- estado + nota honesta -->
-    <div class="statusbar"><span class="dot"></span> Todos los sistemas operativos · estado en vivo</div>
+    <div class="statusbar"><span class="dot"></span> {{ __('Todos los sistemas operativos · estado en vivo') }}</div>
     <div class="note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
       <span>Los plazos de respuesta son reales según horario laboral; para temas legales o de privacidad se aplican los canales y plazos específicos (legal@ / privacidad@urbatrix.com). El estado del servicio refleja datos reales, no estimaciones.</span>
@@ -425,9 +425,9 @@
   </div>
 
   <!-- asistente IA (fase 2) -->
-  <div class="assistant" title="Próximamente">
+  <div class="assistant" title="{{ __('Próximamente') }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 13v2M15 13v2"/></svg>
-    Asistente <span class="soon">pronto</span>
+    Asistente <span class="soon">{{ __('pronto') }}</span>
   </div>
 
 <script>

@@ -79,7 +79,7 @@
         <!-- SIGNATURE -->
         <tr>
           <td style="background-color:#f7f6f3;padding:20px 36px;border-top:1px solid #e8e7e3;">
-            <p style="margin:0 0 2px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;color:#4a4a46;">Un cordial saludo,</p>
+            <p style="margin:0 0 2px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:11px;color:#4a4a46;">{{ __('Un cordial saludo,') }}</p>
             <p style="margin:0 0 2px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;color:#1a1a18;">Equipo {{ $group }}</p>
             <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:10px;color:#8a8a84;">{{ $email }} · {{ $phone }}</p>
           </td>

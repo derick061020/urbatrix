@@ -25,7 +25,7 @@
         <span class="ml-ring"></span>
         <span class="ml-core"></span>
       </div>
-      <img src="/images/makai-logo.png" alt="Makai" class="ml-logo">
+      <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="ml-logo">
       <div class="ml-bar"><span></span></div>
     </div>
   </div>
@@ -151,7 +151,7 @@
       <!-- HEADER -->
       <div class="mt-header">
         <div class="mt-header-left">
-          <img src="/images/makai-logo.png" alt="Makai" class="mt-header-logo">
+          <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="mt-header-logo">
           <span class="mt-header-dot"></span>
           <span class="mt-header-unit">{{ __('Unit') }} <span id="modalUnitNum">A-101</span></span>
           <span id="modalStatusBadge" class="mt-badge-available">
@@ -214,7 +214,7 @@
             </div>
 
             <!-- Description -->
-            <p class="mt-desc" id="modalDesc">1st Floor &nbsp;·&nbsp; 1 Bed &amp; Family Room &nbsp;·&nbsp; SE &nbsp;·&nbsp; Lake Facing</p>
+            <p class="mt-desc" id="modalDesc">{{ __('1st Floor &nbsp;·&nbsp; 1 Bed &amp; Family Room &nbsp;·&nbsp; SE &nbsp;·&nbsp; Lake Facing') }}</p>
 
             <!-- Stats — top row (4 boxes) + bottom row (3 boxes) -->
             <div class="mt-stats-rows">
@@ -452,7 +452,7 @@
 
           <!-- Image -->
           <div class="mt-gallery">
-            <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="Unit" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
+            <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="{{ __('Unit') }}" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
 
             <!-- Zoom hint -->
             <button class="mt-zoom-hint" type="button" onclick="openImgZoom()" aria-label="{{ __('Zoom') }}">
@@ -502,7 +502,7 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <div class="iz-stage" id="izStage">
-      <img id="izImg" src="" alt="Unit" draggable="false">
+      <img id="izImg" src="" alt="{{ __('Unit') }}" draggable="false">
     </div>
     <div class="iz-toolbar">
       <button type="button" onclick="izZoom(-1)" aria-label="{{ __('Zoom out') }}">&minus;</button>
@@ -835,14 +835,14 @@
     .mt-tab.mt-tab-download:hover { background:#eef2ef; }
   </style>
 
-  <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="Compartir propiedad">
+  <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Compartir propiedad') }}">
     <div class="sh-shell">
       <div class="sh-head">
         <div>
-          <div class="sh-head-title">Compartir esta unidad</div>
-          <div class="sh-head-sub">Envía el link a un colega, familiar o socio.</div>
+          <div class="sh-head-title">{{ __('Compartir esta unidad') }}</div>
+          <div class="sh-head-sub">{{ __('Envía el link a un colega, familiar o socio.') }}</div>
         </div>
-        <button type="button" class="sh-close" onclick="closeShareModal()" aria-label="Cerrar">
+        <button type="button" class="sh-close" onclick="closeShareModal()" aria-label="{{ __('Cerrar') }}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -875,10 +875,10 @@
       </div>
 
       <div class="sh-url-row">
-        <input type="text" id="shareUrlInput" readonly value="" aria-label="URL para compartir">
+        <input type="text" id="shareUrlInput" readonly value="" aria-label="{{ __('URL para compartir') }}">
         <button type="button" id="shareCopyBtn" class="sh-copy-btn" onclick="copyShareUrl()">
           <i class="pi pi-copy" style="font-size:12px;"></i>
-          <span id="shareCopyLabel">Copiar</span>
+          <span id="shareCopyLabel">{{ __('Copiar') }}</span>
         </button>
       </div>
 
@@ -889,8 +889,8 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
         </span>
         <span class="sh-download-body">
-          <span class="sh-download-title">Descargar ficha de la unidad</span>
-          <span class="sh-download-sub">PDF con galería, precio, plano y datos clave</span>
+          <span class="sh-download-title">{{ __('Descargar ficha de la unidad') }}</span>
+          <span class="sh-download-sub">{{ __('PDF con galería, precio, plano y datos clave') }}</span>
         </span>
         <span class="sh-download-arrow">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -900,20 +900,20 @@
   </div>
 
   <!-- DISCLAIMER MODAL (reuses the share modal styles) -->
-  <div id="disclaimerModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="Disclaimer" onclick="if(event.target===this)closeDisclaimer()">
+  <div id="disclaimerModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Disclaimer') }}" onclick="if(event.target===this)closeDisclaimer()">
     <div class="sh-shell" style="max-width:560px;">
       <div class="sh-head">
         <div>
-          <div class="sh-head-title">Disclaimer / Aviso legal</div>
-          <div class="sh-head-sub">Información importante sobre esta unidad</div>
+          <div class="sh-head-title">{{ __('Disclaimer / Aviso legal') }}</div>
+          <div class="sh-head-sub">{{ __('Información importante sobre esta unidad') }}</div>
         </div>
-        <button type="button" class="sh-close" onclick="closeDisclaimer()" aria-label="Cerrar">
+        <button type="button" class="sh-close" onclick="closeDisclaimer()" aria-label="{{ __('Cerrar') }}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div style="padding:8px 22px 22px;font-family:'Inter',system-ui,sans-serif;font-size:13px;line-height:1.65;color:#525866;max-height:62vh;overflow-y:auto;">
         <p style="margin:0 0 12px;">
-          <strong>Información de prueba.</strong> Las imágenes, planos, medidas, precios y disponibilidad
+          <strong>{{ __('Información de prueba.') }}</strong> Las imágenes, planos, medidas, precios y disponibilidad
           mostrados son meramente ilustrativos y pueden variar respecto del producto final.
         </p>
         <p style="margin:0 0 12px;">
@@ -1058,7 +1058,7 @@
     // Hooked to both the DOWNLOAD tab and the green CTA inside the share modal.
     window.downloadUnitSheet = function () {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
-        alert('Primero abrí los detalles de una unidad.');
+        alert('{{ __("Primero abrí los detalles de una unidad.") }}');
         return;
       }
       const url = '/property-pdf/' + encodeURIComponent(currentOpenUnit);
@@ -1429,7 +1429,7 @@
     }
   </style>
 
-  <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="Agendar Videollamada" onclick="if(event.target===this) closeAdvisorVideoCall()">
+  <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Agendar Videollamada') }}" onclick="if(event.target===this) closeAdvisorVideoCall()">
     <div class="vc-modal">
       <div class="vc-header">
         <div class="vc-header-icon">
@@ -1439,10 +1439,10 @@
           </svg>
         </div>
         <div class="vc-header-text">
-          <div class="vc-header-title">Agendar Videollamada</div>
-          <div class="vc-header-sub" id="advisorModalSub">Con tu asesor de Makai Residences</div>
+          <div class="vc-header-title">{{ __('Agendar Videollamada') }}</div>
+          <div class="vc-header-sub" id="advisorModalSub">{{ __('Con tu asesor de Makai Residences') }}</div>
         </div>
-        <button type="button" class="vc-close" onclick="closeAdvisorVideoCall()" aria-label="Cerrar">
+        <button type="button" class="vc-close" onclick="closeAdvisorVideoCall()" aria-label="{{ __('Cerrar') }}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1457,9 +1457,9 @@
         <input type="hidden" name="preferred_time" id="advisorPreferredTime" value="">
 
         <div class="vc-field">
-          <label class="vc-field-label" for="advisorUnitSelect">Propiedad de interés</label>
+          <label class="vc-field-label" for="advisorUnitSelect">{{ __('Propiedad de interés') }}</label>
           <select id="advisorUnitSelect" name="unit_label" class="vc-select" required>
-            <option value="" disabled selected>Selecciona una unidad</option>
+            <option value="" disabled selected>{{ __('Selecciona una unidad') }}</option>
             @foreach($units as $unitOpt)
               @php
                 $optId    = $unitOpt->custom_id ?? $unitOpt->id;
@@ -1472,7 +1472,7 @@
         </div>
 
         <div class="vc-field">
-          <label class="vc-field-label" for="advisorDate">Fecha preferida</label>
+          <label class="vc-field-label" for="advisorDate">{{ __('Fecha preferida') }}</label>
           <div class="vc-input-icon">
             <i class="pi pi-calendar"></i>
             <input type="date" id="advisorDate" name="preferred_date" class="vc-input" required>
@@ -1480,8 +1480,8 @@
         </div>
 
         <div class="vc-field">
-          <label class="vc-field-label">Horario disponible</label>
-          <div class="vc-slots" role="radiogroup" aria-label="Horario disponible">
+          <label class="vc-field-label">{{ __('Horario disponible') }}</label>
+          <div class="vc-slots" role="radiogroup" aria-label="{{ __('Horario disponible') }}">
             @foreach(['9:00 AM','10:00 AM','11:00 AM','2:00 PM','3:00 PM','4:00 PM'] as $slot)
               <button type="button" class="vc-slot" data-slot="{{ $slot }}" role="radio" aria-checked="false" onclick="selectAdvisorSlot(this)">{{ $slot }}</button>
             @endforeach
@@ -1489,17 +1489,17 @@
         </div>
 
         <div class="vc-field">
-          <label class="vc-field-label" for="advisorNote">Nota para el asesor <span class="opt">(Opcional)</span></label>
+          <label class="vc-field-label" for="advisorNote">{{ __('Nota para el asesor') }} <span class="opt">(Opcional)</span></label>
           <div class="vc-textarea-wrap">
-            <textarea id="advisorNote" name="note" class="vc-textarea" maxlength="200" placeholder="Referencia bancaria, número de comprobante" oninput="updateAdvisorNoteCount(this)"></textarea>
+            <textarea id="advisorNote" name="note" class="vc-textarea" maxlength="200" placeholder="{{ __('Referencia bancaria, número de comprobante') }}" oninput="updateAdvisorNoteCount(this)"></textarea>
             <span class="vc-textarea-count" id="advisorNoteCount">0/200</span>
           </div>
         </div>
       </form>
 
       <div class="vc-footer" id="advisorFooter">
-        <button type="button" class="vc-btn vc-btn-ghost" onclick="closeAdvisorVideoCall()">Cancelar</button>
-        <button type="submit" form="advisorForm" id="advisorSubmitBtn" class="vc-btn vc-btn-primary">Confirmar solicitud</button>
+        <button type="button" class="vc-btn vc-btn-ghost" onclick="closeAdvisorVideoCall()">{{ __('Cancelar') }}</button>
+        <button type="submit" form="advisorForm" id="advisorSubmitBtn" class="vc-btn vc-btn-primary">{{ __('Confirmar solicitud') }}</button>
       </div>
 
       <div class="vc-success" id="advisorSuccess" style="display:none;">
@@ -1508,15 +1508,15 @@
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
-        <div class="vc-success-title">¡Videollamada agendada!</div>
-        <div class="vc-success-sub" id="advisorSuccessSub">Te enviamos la invitación por email. También aparece en tu Google Calendar.</div>
+        <div class="vc-success-title">{{ __('¡Videollamada agendada!') }}</div>
+        <div class="vc-success-sub" id="advisorSuccessSub">{{ __('Te enviamos la invitación por email. También aparece en tu Google Calendar.') }}</div>
         <div class="vc-meet-link">
           <i class="pi pi-video" style="color:#1a73e8;"></i>
-          <a id="advisorMeetLink" href="#" target="_blank" rel="noopener">Abrir en Google Meet</a>
-          <button type="button" onclick="copyAdvisorMeetLink()">Copiar</button>
+          <a id="advisorMeetLink" href="#" target="_blank" rel="noopener">{{ __('Abrir en Google Meet') }}</a>
+          <button type="button" onclick="copyAdvisorMeetLink()">{{ __('Copiar') }}</button>
         </div>
-        <button type="button" class="vc-btn vc-btn-primary" style="width:100%;" onclick="goToCalendarMeet()">Ver en mi calendario</button>
-        <button type="button" class="vc-btn vc-btn-ghost" style="width:100%;margin-top:8px;" onclick="closeAdvisorVideoCall()">Cerrar</button>
+        <button type="button" class="vc-btn vc-btn-primary" style="width:100%;" onclick="goToCalendarMeet()">{{ __('Ver en mi calendario') }}</button>
+        <button type="button" class="vc-btn vc-btn-ghost" style="width:100%;margin-top:8px;" onclick="closeAdvisorVideoCall()">{{ __('Cerrar') }}</button>
       </div>
     </div>
   </div>
@@ -1532,25 +1532,25 @@
         <div class="logo-section" style="position:relative;display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:200px;max-width:300px;">
           <div class="logo-container" style="display:flex;align-items:center;">
             <a href="#" onclick="return false;" style="display:flex;align-items:center;text-decoration:none;height:44px;padding:0 4px;border-radius:9999px;">
-              <img src="/images/makai-logo.png" alt="logo" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
+              <img src="/images/makai-logo.png" alt="{{ __('logo') }}" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
             </a>
           </div>
-          <button type="button" id="projectsToggle" class="logo-trigger" onclick="toggleProjects()" aria-label="Switch project" aria-expanded="false">
+          <button type="button" id="projectsToggle" class="logo-trigger" onclick="toggleProjects()" aria-label="{{ __('Switch project') }}" aria-expanded="false">
             <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
 
           <!-- PROJECT SELECTOR DROPDOWN -->
-          <div class="project-selector" id="projectsDropdown" role="menu" aria-label="Projects">
-            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Makai')" aria-label="Makai Residences" role="menuitem">
-              <img src="/images/projects/makai.png" alt="Makai Residences">
+          <div class="project-selector" id="projectsDropdown" role="menu" aria-label="{{ __('Projects') }}">
+            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Makai')" aria-label="{{ __('Makai Residences') }}" role="menuitem">
+              <img src="/images/projects/makai.png" alt="{{ __('Makai Residences') }}">
             </button>
-            <button type="button" class="project-card" data-project="naviva" onclick="selectProject('Naviva')" aria-label="Naviva" role="menuitem">
-              <img src="/images/projects/naviva.png" alt="Naviva">
+            <button type="button" class="project-card" data-project="naviva" onclick="selectProject('Naviva')" aria-label="{{ __('Naviva') }}" role="menuitem">
+              <img src="/images/projects/naviva.png" alt="{{ __('Naviva') }}">
             </button>
-            <button type="button" class="project-card" data-project="liv" onclick="selectProject('Liv')" aria-label="Liv" role="menuitem">
-              <img src="/images/projects/liv.png" alt="Liv">
+            <button type="button" class="project-card" data-project="liv" onclick="selectProject('Liv')" aria-label="{{ __('Liv') }}" role="menuitem">
+              <img src="/images/projects/liv.png" alt="{{ __('Liv') }}">
             </button>
           </div>
         </div>
@@ -1606,14 +1606,14 @@
 
           @php $isAdminUser = auth()->check() && (auth()->user()->role ?? '') === 'admin'; @endphp
           @if($isAdminUser)
-          <span aria-label="Saved units" aria-disabled="true" title="No disponible para administradores" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:not-allowed;border-radius:9999px;text-decoration:none;opacity:0.4;pointer-events:none;">
+          <span aria-label="{{ __('Saved units') }}" aria-disabled="true" title="{{ __('No disponible para administradores') }}" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:not-allowed;border-radius:9999px;text-decoration:none;opacity:0.4;pointer-events:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
             <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;letter-spacing:-0.072px;white-space:nowrap;">{{ __('guardados') }}</span>
           </span>
           @else
-          <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="Saved units" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
+          <a href="{{ auth()->check() ? route('dashboard.guardados') : route('login') }}" aria-label="{{ __('Saved units') }}" class="nav-hide-mobile" style="display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;border:none;cursor:pointer;border-radius:9999px;text-decoration:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
@@ -1625,7 +1625,7 @@
 
           <!-- Profile container with dropdown -->
           <div style="position:relative;">
-            <button type="button" onclick="toggleProfileMenu()" aria-label="Profile" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
+            <button type="button" onclick="toggleProfileMenu()" aria-label="{{ __('Profile') }}" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
               <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
                 <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Samuel' }}</span>
                 <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? 'Admin' : 'Agente' }}</span>
@@ -1734,7 +1734,7 @@
               </div>
 
               @if($isAdminUser)
-              <div aria-disabled="true" title="No disponible para administradores" style="text-decoration:none;display:block;width:100%;cursor:not-allowed;opacity:0.4;pointer-events:none;">
+              <div aria-disabled="true" title="{{ __('No disponible para administradores') }}" style="text-decoration:none;display:block;width:100%;cursor:not-allowed;opacity:0.4;pointer-events:none;">
                 <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
                   <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
@@ -1906,7 +1906,7 @@
             </div>
           </div>
 
-          <button type="button" onclick="toggleMenu()" aria-label="Menu" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:transparent;border:none;border-radius:9999px;cursor:pointer;padding:0;">
+          <button type="button" onclick="toggleMenu()" aria-label="{{ __('Menu') }}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:transparent;border:none;border-radius:9999px;cursor:pointer;padding:0;">
             <span aria-hidden="true" style="position:relative;display:inline-block;width:20px;height:20px;">
               <span style="position:absolute;left:0;top:4px;width:20px;height:2px;border-radius:2px;background:var(--brand);"></span>
               <span style="position:absolute;right:0;top:9px;width:15px;height:2px;border-radius:2px;background:var(--brand);"></span>
@@ -1930,9 +1930,9 @@
       <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
       <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 
-      <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="Makai Residences">
-      <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="Naviva Residences">
-      <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="Liv Residences">
+      <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Makai Residences') }}">
+      <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
+      <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
 
     </div>
     <div class="fg-hero-spacer" aria-hidden="true"></div>
@@ -1956,7 +1956,7 @@
 
       <!-- Grid/List/Planta Toggle -->
       <div class="fg-toggle-bar">
-        <div class="fg-toggle-container" role="tablist" aria-label="View mode">
+        <div class="fg-toggle-container" role="tablist" aria-label="{{ __('View mode') }}">
           <div class="fg-toggle" data-node-id="171:10199">
             <button type="button" class="active" data-view="grid" role="tab" aria-selected="true">
               <div class="fg-icon-grid">
@@ -1987,7 +1987,7 @@
 
           <!-- Floating Map-Pin (Planta) Button -->
           <div class="fg-location-button">
-            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="Planta view">
+            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="{{ __('Planta view') }}">
               <div class="fg-icon-location">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -2048,7 +2048,7 @@
 
           <div style="position:relative;">
             <button class="fg-filter-btn" onclick="toggleFilterDropdown('floor')">
-              <span id="floorLabel">Piso</span>
+              <span id="floorLabel">{{ __('Piso') }}</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="floorDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:120px;padding:12px;">
@@ -2119,18 +2119,18 @@
             </button>
             <div id="sortDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:160px;padding:12px;">
               <div style="max-height:240px;overflow-y:auto;font-family:'Poppins',sans-serif;">
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="price-asc" onchange="applySortFilter()"> Price: Low to High</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="price-desc" onchange="applySortFilter()"> Price: High to Low</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="size-asc" onchange="applySortFilter()"> Size: Small to Large</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="size-desc" onchange="applySortFilter()"> Size: Large to Small</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="bedrooms-asc" onchange="applySortFilter()"> Bedrooms: Low to High</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="bedrooms-desc" onchange="applySortFilter()"> Bedrooms: High to Low</label>
-                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="custom_id" onchange="applySortFilter()" checked> Unit Number</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="price-asc" onchange="applySortFilter()"> {{ __('Price: Low to High') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="price-desc" onchange="applySortFilter()"> {{ __('Price: High to Low') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="size-asc" onchange="applySortFilter()"> {{ __('Size: Small to Large') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="size-desc" onchange="applySortFilter()"> {{ __('Size: Large to Small') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="bedrooms-asc" onchange="applySortFilter()"> {{ __('Bedrooms: Low to High') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="bedrooms-desc" onchange="applySortFilter()"> {{ __('Bedrooms: High to Low') }}</label>
+                <label style="display:block;font-size:13px;color:#5c5c5c;cursor:pointer;padding:4px 0;"><input type="radio" name="sort" value="custom_id" onchange="applySortFilter()" checked> {{ __('Unit Number') }}</label>
               </div>
             </div>
           </div>
 
-          <button class="fg-filter-icon" type="button" aria-label="Reset filters" title="Reset filters" onclick="if(typeof resetFilters==='function'){resetFilters();}">
+          <button class="fg-filter-icon" type="button" aria-label="{{ __('Reset filters') }}" title="{{ __('Reset filters') }}" onclick="if(typeof resetFilters==='function'){resetFilters();}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="1 4 1 10 7 10"></polyline>
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -2298,7 +2298,7 @@
 
           <!-- chips-filters bar (Figma 193:6017) -->
           <div class="fg-plan-topbar">
-            <div class="fg-plan-chips" role="tablist" aria-label="Floor filter">
+            <div class="fg-plan-chips" role="tablist" aria-label="{{ __('Floor filter') }}">
               @forelse($floorOrder as $floorLabel)
                 @php $isActive = ($floorLabel === $activeFloor); @endphp
                 <button type="button"
@@ -2336,7 +2336,7 @@
             <div class="fg-plan-stage" id="fgPlanStage">
             <!-- Planview image — labels, compass, and PHASE 1 are baked in -->
             <img src="/images/plan-view/makai-planview.png"
-                 alt="Plan view"
+                 alt="{{ __('Plan view') }}"
                  class="fg-plan-img"
                  draggable="false">
 
@@ -2417,7 +2417,7 @@
       <div class="fg-footer-content" data-node-id="124:3621">
         <!-- Logo -->
         <div class="fg-footer-logo" data-node-id="124:3656">
-          <img src="/images/makai-logo.png" alt="logo" class="logo-img" style="max-height:30px;max-width:160px;object-fit:contain;">
+          <img src="/images/makai-logo.png" alt="{{ __('logo') }}" class="logo-img" style="max-height:30px;max-width:160px;object-fit:contain;">
         </div>
         
         <!-- Copyright -->
@@ -3222,7 +3222,7 @@
       })
       .catch(err => {
         console.error('Error creando reserva:', err);
-        alert('Error de red. Intenta de nuevo.');
+        alert('{{ __("Error de red. Intenta de nuevo.") }}');
       });
     }
 
@@ -3280,7 +3280,7 @@
       // Check if unit_id is set
       const unitId = formData.get('unit_id');
       if (!unitId) {
-        alert('Unit ID is missing. Please try again.');
+        alert('{{ __("Unit ID is missing. Please try again.") }}');
         console.error('Unit ID not found in form');
         return;
       }
@@ -3288,7 +3288,7 @@
       // Check if terms checkbox is checked
       const termsCheckbox = form.querySelector('input[type="checkbox"]');
       if (!termsCheckbox.checked) {
-        alert('Please accept the Terms and Conditions to continue.');
+        alert('{{ __("Please accept the Terms and Conditions to continue.") }}');
         return;
       }
       
@@ -3344,7 +3344,7 @@
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('There was an error processing your reservation. Please try again.');
+        alert('{{ __("There was an error processing your reservation. Please try again.") }}');
         
         // Reset button state
         submitButton.textContent = originalText;
@@ -4265,7 +4265,7 @@
     // print dialog so the user can "Save as PDF" / download.
     function sharePropertyPdf() {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
-        alert('Primero abrí los detalles de una unidad.');
+        alert('{{ __("Primero abrí los detalles de una unidad.") }}');
         return;
       }
       const recipient = prompt('¿Para quién es esta ficha? (opcional)', '');
@@ -4277,7 +4277,7 @@
     }
 
     function toggleAlerts() {
-      alert('Alertas activadas. Te avisamos si baja de precio o quedan menos de 3 unidades.');
+      alert('{{ __("Alertas activadas. Te avisamos si baja de precio o quedan menos de 3 unidades.") }}');
     }
 
     // ============================
@@ -5168,8 +5168,8 @@
       // Al quitar de guardados, pedir confirmación (línea gráfica de la web)
       if (wasFav && typeof window.confirmDialog === 'function') {
         window.confirmDialog({
-          title: '¿Quitar de guardados?',
-          text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+          title: '{{ __("¿Quitar de guardados?") }}',
+          text: '{{ __("Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.") }}',
           confirmLabel: 'Quitar',
           icon: 'pi pi-heart',
           onConfirm: () => runModalWishlistToggle(unitId, wasFav),
@@ -5213,8 +5213,8 @@
         // Al quitar de guardados, pedir confirmación (línea gráfica de la web)
         if (wasFav && typeof window.confirmDialog === 'function') {
           window.confirmDialog({
-            title: '¿Quitar de guardados?',
-            text: 'Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.',
+            title: '{{ __("¿Quitar de guardados?") }}',
+            text: '{{ __("Esta unidad dejará de aparecer en tu lista de guardados. Podrás volver a guardarla cuando quieras.") }}',
             confirmLabel: 'Quitar',
             icon: 'pi pi-heart',
             onConfirm: () => runWishlistToggle(btn, unitId, wasFav),

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>MAKAI · Activar cuenta</title>
+    <title>{{ __('MAKAI · Activar cuenta') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -58,8 +58,8 @@
         <header class="relative z-10 flex items-center justify-between px-7 py-6 lg:px-11">
             <div class="relative">@include('auth._logo')</div>
             <div class="flex items-center gap-3">
-                <span class="hidden sm:inline text-[14px] text-ink-600">¿Ya tienes cuenta?</span>
-                <a href="{{ route('login') }}" class="auth-btn auth-btn-ghost">Iniciar sesión</a>
+                <span class="hidden sm:inline text-[14px] text-ink-600">{{ __('¿Ya tienes cuenta?') }}</span>
+                <a href="{{ route('login') }}" class="auth-btn auth-btn-ghost">{{ __('Iniciar sesión') }}</a>
             </div>
         </header>
 
@@ -72,16 +72,16 @@
                         <div class="w-20 h-20 rounded-full bg-err-soft mx-auto flex items-center justify-center mb-5">
                             <i class="pi pi-times text-err text-[28px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Enlace no válido</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">Esta invitación ha caducado o ya fue utilizada. Solicita un nuevo enlace al equipo o restablece tu contraseña.</p>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Enlace no válido') }}</h1>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Esta invitación ha caducado o ya fue utilizada. Solicita un nuevo enlace al equipo o restablece tu contraseña.') }}</p>
                     </div>
-                    <a href="{{ route('password.request') }}" class="auth-btn auth-btn-primary w-full">Restablecer contraseña</a>
+                    <a href="{{ route('password.request') }}" class="auth-btn auth-btn-primary w-full">{{ __('Restablecer contraseña') }}</a>
                 @else
                     <div class="text-center mb-7">
                         <div class="w-20 h-20 rounded-full border border-ink-200 mx-auto flex items-center justify-center mb-5 bg-white shadow-sm">
                             <i class="pi pi-user-plus text-ink-600 text-[26px]"></i>
                         </div>
-                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">Activa tu cuenta</h1>
+                        <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Activa tu cuenta') }}</h1>
                         <p class="text-[14px] text-ink-500 mt-2">Hola{{ $name ? ' '.$name : '' }}, crea una contraseña para acceder a tu portal y dar seguimiento a tu reserva.</p>
                         <p class="text-[12px] text-ink-400 mt-1">{{ $email }}</p>
                     </div>
@@ -91,7 +91,7 @@
 
                     <form id="form-activate" class="space-y-4" onsubmit="return submitActivate(event)">
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="pw1" type="password" name="password" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail" oninput="updatePwStrength()">
@@ -99,7 +99,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">Confirmar contraseña <span class="text-err">*</span></label>
+                            <label class="block text-[13px] font-medium text-ink-950 mb-1.5">{{ __('Confirmar contraseña') }} <span class="text-err">*</span></label>
                             <div class="relative">
                                 <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[14px]"></i>
                                 <input id="pw2" type="password" name="password_confirmation" required minlength="8" placeholder="••••••••••••" class="auth-input has-icon has-trail">
@@ -113,15 +113,15 @@
                                 <div class="pw-bar" id="pw-bar-1"></div>
                                 <div class="pw-bar" id="pw-bar-2"></div>
                             </div>
-                            <div class="text-[12px] text-ink-500 mt-3 mb-1">Debe contener al menos:</div>
+                            <div class="text-[12px] text-ink-500 mt-3 mb-1">{{ __('Debe contener al menos:') }}</div>
                             <ul class="space-y-1 text-[12px]">
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 mayúscula</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> Al menos 1 número</li>
-                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> Al menos 8 caracteres</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-upper"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 mayúscula') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-num"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 1 número') }}</li>
+                                <li class="flex items-center gap-2 text-ink-500" id="pw-rule-len"><i class="pi pi-times-circle text-ink-300"></i> {{ __('Al menos 8 caracteres') }}</li>
                             </ul>
                         </div>
 
-                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">Activar cuenta e ingresar</button>
+                        <button type="submit" class="auth-btn auth-btn-primary w-full mt-2">{{ __('Activar cuenta e ingresar') }}</button>
                     </form>
                 @endif
 
@@ -129,7 +129,7 @@
         </main>
 
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>© 2026 MAKAI RESIDENCES</span>
+            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>
