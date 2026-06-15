@@ -100,58 +100,60 @@
         }
 
         $stepsTotal = count($steps);
-        $stepsDone  = collect($steps)->where('done', true)->count();
-        // La etapa "activa" es la primera no completada.
-        $activeIdx  = collect($steps)->search(fn ($s) => ! $s['done']);
+
+        // --- Barra proporcional ---------------------------------------------
+        // Cada etapa ocupa un tramo de la barra proporcional a su monto sobre el
+        // total del plan. El relleno verde representa lo efectivamente pagado.
+        $planTotal = collect($steps)->sum('amount') ?: 1;
+        $paidTotal = collect($steps)->sum('paidAmt');
+        $barPct    = (int) round($paidTotal / $planTotal * 100);
+
+        $markers   = [];
+        $cumStart  = 0;
+        foreach ($steps as $s) {
+            $width  = $s['amount'] / $planTotal * 100;       // ancho del tramo
+            $center = $cumStart + $width / 2;                 // centro del tramo
+            $cumStart += $width;                             // límite acumulado
+            $markers[] = [
+                'label'  => $s['label'],
+                'center' => round($center, 2),
+                'end'    => round($cumStart, 2),
+                'done'   => $s['done'],
+            ];
+        }
     @endphp
 
     <div class="cli-card p-5">
-        <div class="flex items-center justify-between text-[13px] mb-6">
+        <div class="flex items-center justify-between text-[13px] mb-3">
             <span class="font-semibold text-ink-950">{{ __('Progreso del plan de pagos') }}</span>
-            <span class="font-bold text-ok-dark text-[15px]">
-                @if($stepsTotal > 0){{ $stepsDone }}/{{ $stepsTotal }} {{ __('etapas') }} · @endif{{ $pct }}%
-            </span>
+            <span class="font-bold text-ok-dark text-[16px]">{{ $barPct }}%</span>
         </div>
 
         @if($stepsTotal > 0)
-            <div class="flex items-start">
-                @foreach($steps as $i => $s)
+            <div class="relative h-2 rounded-full bg-ink-100 overflow-visible">
+                <div class="absolute inset-y-0 left-0 rounded-full bg-ok transition-all" style="width:{{ $barPct }}%"></div>
+                {{-- Marcadores de etapa en el límite de cada tramo --}}
+                @foreach($markers as $m)
+                    @php $clr = $m['done'] ? '#1fc16b' : '#cacfd8'; @endphp
+                    <div class="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border-2 border-white"
+                         style="left:calc({{ $m['end'] }}% - 5px); background:{{ $clr }}; box-shadow:0 0 0 1px {{ $clr }};"></div>
+                @endforeach
+            </div>
+            {{-- Etiquetas centradas bajo cada tramo (espaciado proporcional al monto) --}}
+            <div class="relative mt-3 text-[10px] uppercase tracking-wider font-semibold text-ink-400" style="height:14px;">
+                @foreach($markers as $m)
                     @php
-                        $isDone   = $s['done'];
-                        $isActive = ! $isDone && $i === $activeIdx;
-                        // El conector a la izquierda se rellena si la etapa anterior está completa.
-                        $prevDone = $i > 0 && $steps[$i - 1]['done'];
-                        $nodeClass = $isDone
-                            ? 'bg-ok text-white border-ok'
-                            : ($isActive ? 'bg-white text-ok-dark border-ok' : 'bg-white text-ink-400 border-ink-200');
+                        // Clamp en los extremos para que la etiqueta no se corte.
+                        if ($m['center'] <= 10) {
+                            $style = 'left:0;';
+                        } elseif ($m['center'] >= 90) {
+                            $style = 'right:0;';
+                        } else {
+                            $style = 'left:'.$m['center'].'%; transform:translateX(-50%);';
+                        }
                     @endphp
-                    <div class="flex-1 flex flex-col items-center relative min-w-0">
-                        {{-- Conector hacia la etapa anterior --}}
-                        @unless($loop->first)
-                            <div class="absolute top-[15px] h-0.5 {{ $prevDone ? 'bg-ok' : 'bg-ink-200' }}"
-                                 style="right:50%; left:-50%;"></div>
-                        @endunless
-
-                        {{-- Nodo --}}
-                        <div class="relative z-10 w-[30px] h-[30px] rounded-full border-2 flex items-center justify-center {{ $nodeClass }} {{ $isActive ? 'ring-4 ring-ok/15' : '' }} transition-colors">
-                            @if($isDone)
-                                <i class="pi pi-check text-[12px]"></i>
-                            @else
-                                <i class="pi {{ $s['icon'] }} text-[11px]"></i>
-                            @endif
-                        </div>
-
-                        {{-- Etiqueta --}}
-                        <div class="mt-2 text-center px-1">
-                            <div class="text-[11px] font-semibold leading-tight {{ $isDone ? 'text-ok-dark' : ($isActive ? 'text-ink-950' : 'text-ink-400') }}">{{ $s['label'] }}</div>
-                            <div class="text-[10px] text-ink-500 mt-0.5">${{ number_format($s['amount'], 0) }}</div>
-                            @if($s['total'] > 1)
-                                <div class="text-[9px] uppercase tracking-wider font-semibold {{ $isDone ? 'text-ok' : 'text-ink-400' }} mt-0.5">{{ $s['paidN'] }}/{{ $s['total'] }} {{ __('cuotas') }}</div>
-                            @elseif($isDone)
-                                <div class="text-[9px] uppercase tracking-wider font-semibold text-ok mt-0.5">{{ __('Pagado') }}</div>
-                            @endif
-                        </div>
-                    </div>
+                    <span class="absolute whitespace-nowrap {{ $m['done'] ? 'text-ok-dark' : '' }}"
+                          style="{{ $style }}">{{ $m['label'] }}</span>
                 @endforeach
             </div>
         @else
