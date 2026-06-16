@@ -2036,11 +2036,12 @@
             <div id="priceDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:170px;padding:12px;">
               <div style="margin-bottom:8px;">
                 <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">{{__('Min Price')}}</label>
-                <input type="number" id="minPrice" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
+                <input type="text" inputmode="numeric" id="minPrice" oninput="formatPriceInput(this)" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
               <div style="margin-bottom:8px;">
                 <label style="font-family:'Poppins',sans-serif;font-size:12px;color:#5c5c5c;font-weight:500;display:block;margin-bottom:4px;">{{__('Max Price')}}</label>
-                <input type="number" id="maxPrice" placeholder="1000000" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
+                @php $priceSep = \Illuminate\Support\Str::startsWith(app()->getLocale(), 'es') ? '.' : ','; @endphp
+                <input type="text" inputmode="numeric" id="maxPrice" oninput="formatPriceInput(this)" placeholder="1{{ $priceSep }}000{{ $priceSep }}000" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
               <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:var(--brand);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
             </div>
@@ -4406,13 +4407,26 @@
     }
 
     // Apply price filter
+    // Separador de miles según el idioma del usuario: español usa punto (40.000),
+    // inglés usa coma (40,000). Permite leer de un vistazo si es 40k, 400k o 4M.
+    const PRICE_THOUSANDS_SEP = @json(\Illuminate\Support\Str::startsWith(app()->getLocale(), 'es') ? '.' : ',');
+
+    // Inserta separadores de miles mientras el usuario escribe en el campo.
+    function formatPriceInput(el) {
+      const digits = el.value.replace(/\D/g, '');
+      el.value = digits ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, PRICE_THOUSANDS_SEP) : '';
+    }
+
+    // Devuelve el número crudo (solo dígitos) a partir del valor formateado.
+    function unformatPrice(val) {
+      const digits = String(val ?? '').replace(/\D/g, '');
+      return digits ? parseFloat(digits) : null;
+    }
+
     function applyPriceFilter() {
-      const minPrice = document.getElementById('minPrice').value;
-      const maxPrice = document.getElementById('maxPrice').value;
-      
-      currentFilters.minPrice = minPrice ? parseFloat(minPrice) : null;
-      currentFilters.maxPrice = maxPrice ? parseFloat(maxPrice) : null;
-      
+      currentFilters.minPrice = unformatPrice(document.getElementById('minPrice').value);
+      currentFilters.maxPrice = unformatPrice(document.getElementById('maxPrice').value);
+
       updatePriceLabel();
       toggleFilterDropdown('price');
       applyFilters();
@@ -4472,8 +4486,8 @@
       const label = document.getElementById('priceLabel');
       const active = !!(currentFilters.minPrice || currentFilters.maxPrice);
       if (active) {
-        const min = currentFilters.minPrice ? `$${number_format(currentFilters.minPrice, 0)}` : 'Any';
-        const max = currentFilters.maxPrice ? `$${number_format(currentFilters.maxPrice, 0)}` : 'Any';
+        const min = currentFilters.minPrice ? `$${number_format(currentFilters.minPrice, 0, '.', PRICE_THOUSANDS_SEP)}` : 'Any';
+        const max = currentFilters.maxPrice ? `$${number_format(currentFilters.maxPrice, 0, '.', PRICE_THOUSANDS_SEP)}` : 'Any';
         label.textContent = `${min} - ${max}`;
       } else {
         label.textContent = 'Price';
@@ -4832,8 +4846,8 @@
           cb.checked = values.includes(cb.value);
         });
       };
-      const minEl = document.getElementById('minPrice'); if (minEl) minEl.value = currentFilters.minPrice ?? '';
-      const maxEl = document.getElementById('maxPrice'); if (maxEl) maxEl.value = currentFilters.maxPrice ?? '';
+      const minEl = document.getElementById('minPrice'); if (minEl) { minEl.value = currentFilters.minPrice ?? ''; formatPriceInput(minEl); }
+      const maxEl = document.getElementById('maxPrice'); if (maxEl) { maxEl.value = currentFilters.maxPrice ?? ''; formatPriceInput(maxEl); }
       setCheckGroup('#typeDropdown input[type="checkbox"]',      currentFilters.types);
       setCheckGroup('#directionDropdown input[type="checkbox"]', currentFilters.directions);
       setCheckGroup('#outlookDropdown input[type="checkbox"]',   currentFilters.outlooks);
