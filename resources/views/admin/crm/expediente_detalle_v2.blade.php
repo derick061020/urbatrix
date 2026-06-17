@@ -264,6 +264,53 @@
                 @include('admin.crm._partials.plan_de_pagos', ['reservation' => $reservation])
 
                 @php
+                    $pendingApprovals = $reservation->payments
+                        ->where('approval_status', 'pending')
+                        ->whereNotNull('receipt_path')
+                        ->sortByDesc('created_at');
+                @endphp
+                @if($pendingApprovals->isNotEmpty())
+                <div class="crm-card overflow-hidden mt-5">
+                    <div class="px-4 py-3 bg-warn-soft/40 border-b border-warn/20 flex items-center gap-2">
+                        <i class="pi pi-clock text-warn"></i>
+                        <div class="text-[13px] font-bold text-ink-700">{{ __('Pagos pendientes de aprobación') }}</div>
+                        <span class="crm-pill bg-warn-soft text-warn ml-1">{{ $pendingApprovals->count() }}</span>
+                    </div>
+                    <div class="divide-y divide-ink-100">
+                        @foreach($pendingApprovals as $p)
+                            <div class="px-5 py-4 flex items-center gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-[13px] font-semibold text-ink-900">{{ $p->label ?? $p->payment_type }} · ${{ number_format((float) $p->amount, 2) }}</div>
+                                    <div class="text-[11px] text-ink-500 mt-0.5 truncate">
+                                        {{ __('Subido') }} {{ $p->created_at?->diffForHumans() }}
+                                        @if($p->payment_method) · {{ $p->payment_method_label }} @endif
+                                        @if($p->receipt_path) · <i class="pi pi-paperclip"></i> {{ __('comprobante') }} @endif
+                                    </div>
+                                </div>
+                                <span class="crm-pill bg-warn-soft text-warn">{{ __('PENDIENTE') }}</span>
+                                <div class="flex items-center gap-1">
+                                    @if($p->receipt_path)
+                                        @php
+                                            $receiptPreviewPayload = [
+                                                'url' => asset('storage/'.$p->receipt_path),
+                                                'title' => 'Comprobante de pago',
+                                                'filename' => basename((string) $p->receipt_path),
+                                            ];
+                                        @endphp
+                                        <button type="button" onclick="openDocumentPreview(@js($receiptPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver comprobante') }}"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                    @endif
+                                    <form method="POST" action="{{ route('admin.payments.approve', $p->id) }}" class="flex items-center gap-1 m-0">@csrf
+                                        <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3" title="{{ __('Aprobar pago') }}"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>
+                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm('¿Rechazar este pago?');"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                @php
                     $planDocPagos = $reservation->documents->firstWhere('document_type', 'payment_plan');
                     $planSignedPagos = $planDocPagos && in_array($planDocPagos->status, ['signed', 'approved']);
                     $showPaymentSchedule = $planSignedPagos
