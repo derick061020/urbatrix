@@ -67,7 +67,7 @@ class NotificationController extends Controller
                 'title'      => 'Pago pendiente de aprobación',
                 'body'       => 'RD$ '.number_format((float) $p->amount, 2).' · '.($p->label ?: $p->payment_type),
                 'created_at' => $p->updated_at ?: $p->created_at,
-                'url'        => $p->reservation_id ? route('admin.crm.pagos', $p->reservation_id) : route('admin.crm.expedientes'),
+                'url'        => $p->reservation_id ? route('admin.crm.expediente.detalle', ['id' => $p->reservation_id, 'tab' => 'pagos']) : route('admin.crm.expedientes'),
             ]);
         }
 
