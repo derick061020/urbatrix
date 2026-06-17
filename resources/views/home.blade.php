@@ -4049,12 +4049,12 @@
         if (opt) sel.value = opt.value;
       }
 
-      // Fecha default: mañana
+      // Fecha default: hoy
       const dateInput = document.getElementById('advisorDate');
       if (dateInput && !dateInput.value) {
-        const t = new Date(); t.setDate(t.getDate() + 1);
-        dateInput.min = new Date().toISOString().slice(0, 10);
-        dateInput.value = t.toISOString().slice(0, 10);
+        const today = new Date().toISOString().slice(0, 10);
+        dateInput.min = today;
+        dateInput.value = today;
       }
 
       // Reset slots y note
