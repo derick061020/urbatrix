@@ -116,6 +116,22 @@ class Payment extends Model
     }
 
     /**
+     * Get payment method label
+     */
+    public function getPaymentMethodLabelAttribute()
+    {
+        return match($this->payment_method) {
+            'cash' => 'Efectivo',
+            'transfer' => 'Transferencia',
+            'check' => 'Cheque',
+            'card' => 'Tarjeta',
+            'wire' => 'Transferencia bancaria',
+            'other' => 'Otro',
+            default => $this->payment_method ?: 'No especificado',
+        };
+    }
+
+    /**
      * Get approval status label
      */
     public function getApprovalStatusLabelAttribute()

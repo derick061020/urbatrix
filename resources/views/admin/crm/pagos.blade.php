@@ -372,7 +372,7 @@
                                                 @if($existingPayment->payment_method)
                                                     <div class="flex justify-between">
                                                         <span class="text-gray-600">{{ __('Método:') }}</span>
-                                                        <span class="font-medium">{{ $existingPayment->getPaymentMethodLabel() }}</span>
+                                                        <span class="font-medium">{{ $existingPayment->payment_method_label }}</span>
                                                     </div>
                                                 @endif
                                                 @if($existingPayment->paid_at)
