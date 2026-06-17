@@ -367,7 +367,7 @@
                                             <div class="space-y-2 text-sm">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-600">Estado:</span>
-                                                    <span class="font-medium">{{ $existingPayment->getStatusLabel() }}</span>
+                                                    <span class="font-medium">{!! $existingPayment->status_label !!}</span>
                                                 </div>
                                                 @if($existingPayment->payment_method)
                                                     <div class="flex justify-between">

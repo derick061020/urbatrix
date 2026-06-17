@@ -443,6 +443,26 @@
     </div>
 </dialog>
 
+{{-- Modal de agradecimiento tras enviar el comprobante --}}
+<dialog id="modal-thankyou" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
+    <div class="bg-white rounded-2xl overflow-hidden text-center" style="width:420px;max-width:92vw">
+        <div class="px-8 pt-8 pb-2">
+            <div class="w-16 h-16 rounded-full bg-ok-soft text-ok-dark flex items-center justify-center mx-auto">
+                <i class="pi pi-check text-[28px]"></i>
+            </div>
+            <div class="text-[18px] font-bold text-ink-900 mt-4">{{ __('¡Gracias!') }}</div>
+            <div id="thankyou-message" class="text-[13px] text-ink-600 mt-2 leading-relaxed">
+                {{ __('Comprobante enviado para aprobación. Te notificaremos cuando sea revisado.') }}
+            </div>
+        </div>
+        <div class="px-8 py-5">
+            <button type="button" onclick="document.getElementById('modal-thankyou').close()" class="cli-btn cli-btn-primary w-full inline-flex items-center justify-center gap-2 py-2.5">
+                <i class="pi pi-check text-[11px]"></i> {{ __('Entendido') }}
+            </button>
+        </div>
+    </div>
+</dialog>
+
 <script>
 const paymentSubmitUrl = "{{ route('dashboard.payments.submit', $reservation) }}";
 const wireTransferUrl = "{{ route('reservations.wire', $reservation) }}";
@@ -680,6 +700,11 @@ document.getElementById('receiptInput').addEventListener('change', function(e) {
     }
 });
 
+// Si el modal de agradecimiento se cierra de cualquier forma (Esc/backdrop), recargar
+document.getElementById('modal-thankyou')?.addEventListener('close', function() {
+    location.reload();
+});
+
 document.getElementById('paymentForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -702,17 +727,19 @@ document.getElementById('paymentForm').addEventListener('submit', async function
         const data = await response.json();
         
         if (data.success) {
-            alert(data.message);
             document.getElementById('modal-pagar').close();
             this.reset();
-            
+
             // Reset file display
             document.getElementById('receiptPlaceholder').classList.remove('hidden');
             document.getElementById('receiptFileName').classList.add('hidden');
             document.getElementById('receiptDropzone').classList.add('border-ink-200');
             document.getElementById('receiptDropzone').classList.remove('border-brand', 'bg-brand-soft/20');
-            
-            location.reload();
+
+            // Mostrar modal de agradecimiento; al cerrar, recargar
+            const tyMsg = document.getElementById('thankyou-message');
+            if (tyMsg && data.message) tyMsg.textContent = data.message;
+            document.getElementById('modal-thankyou').showModal();
         } else {
             alert(data.message || 'Error al enviar el pago');
         }
