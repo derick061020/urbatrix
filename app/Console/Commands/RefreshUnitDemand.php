@@ -27,8 +27,8 @@ use Illuminate\Console\Command;
 class RefreshUnitDemand extends Command
 {
     protected $signature = 'units:refresh-demand
-        {--min=2 : Mínimo de unidades en hot por corrida}
-        {--max=4 : Máximo de unidades en hot por corrida}
+        {--min-pct=40 : % mínimo de las disponibles que quedan en hot}
+        {--max-pct=50 : % máximo de las disponibles que quedan en hot}
         {--window=48 : Ventana en horas para contar vistas reales}
         {--threshold=5 : Vistas reales en la ventana para calificar como demanda real}
         {--views-min=8 : Piso de "vistas hoy" fake para una unidad hot}
@@ -38,14 +38,12 @@ class RefreshUnitDemand extends Command
 
     public function handle(): int
     {
-        $min       = max(0, (int) $this->option('min'));
-        $max       = max($min, (int) $this->option('max'));
+        $minPct    = min(100, max(0, (int) $this->option('min-pct')));
+        $maxPct    = min(100, max($minPct, (int) $this->option('max-pct')));
         $window    = max(1, (int) $this->option('window'));
         $threshold = max(1, (int) $this->option('threshold'));
         $viewsMin  = max(1, (int) $this->option('views-min'));
         $viewsMax  = max($viewsMin, (int) $this->option('views-max'));
-
-        $target = $min === $max ? $min : random_int($min, $max);
 
         // Unidades elegibles: públicas, disponibles y sin reserva activa.
         $eligible = Unit::query()
@@ -61,6 +59,10 @@ class RefreshUnitDemand extends Command
             $this->info('No hay unidades disponibles para marcar en alta demanda.');
             return self::SUCCESS;
         }
+
+        // Cupo: un % al azar (40–50% por defecto) de las disponibles, mínimo 1.
+        $pct = $minPct === $maxPct ? $minPct : random_int($minPct, $maxPct);
+        $target = max(1, (int) round($eligible->count() * $pct / 100));
 
         // 1) Señal real: vistas en la ventana reciente.
         $since = now()->subHours($window);
