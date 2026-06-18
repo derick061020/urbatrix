@@ -2228,6 +2228,22 @@ class AdminController extends Controller
                 ]);
         }
 
+        // Avisa al cliente: "Aprobado" o, si fue rechazado, que vuelva a subir sus documentos.
+        if ($user->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                    new \App\Mail\KycStatusMail(
+                        name: $user->first_name ?: \Illuminate\Support\Str::before((string) ($user->name ?? ''), ' ') ?: (string) $user->name,
+                        status: $data['decision'],
+                        reason: (string) $request->input('notes', ''),
+                        actionUrl: $data['decision'] === 'rejected' ? url('/form') : '',
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('No se pudo enviar el correo de estado de KYC: ' . $e->getMessage());
+            }
+        }
+
         return back()->with('success', "Usuario {$user->name} marcado como {$data['decision']}.");
     }
 

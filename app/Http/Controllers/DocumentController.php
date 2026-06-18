@@ -619,6 +619,7 @@ class DocumentController extends Controller
                 $document->markAsApproved(Auth::id(), $request->input('notes'));
                 if ($isKycReview) {
                     $this->maybeApproveUserFromKyc($document);
+                    $this->notifyClientKycStatus($document, 'approved');
                 }
             } else {
                 DocumentService::approveDocument($document, Auth::id(), $request->input('notes'));
@@ -666,11 +667,14 @@ class DocumentController extends Controller
             ]);
 
             // If a KYC doc was rejected, mark the user as rejected too
-            if (in_array($document->document_type, ['id_front', 'id_back'])) {
+            $isKyc = in_array($document->document_type, ['id_front', 'id_back', 'kyc']);
+            if ($isKyc) {
                 $userId = $document->reservation?->user_id ?? data_get($document->metadata, 'user_id');
                 if ($userId && \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) {
                     \App\Models\User::where('id', $userId)->update(['verification_status' => 'rejected']);
                 }
+                // Avisa al cliente que debe volver a subir sus documentos.
+                $this->notifyClientKycStatus($document, 'rejected', (string) $request->input('notes', ''));
             }
 
             if ($request->expectsJson()) {
@@ -705,6 +709,41 @@ class DocumentController extends Controller
             if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) {
                 \App\Models\User::where('id', $userId)->update(['verification_status' => 'approved']);
             }
+        }
+    }
+
+    /**
+     * Envía al cliente el correo de estado de su KYC:
+     *  - "approved": identidad verificada.
+     *  - "rejected": debe volver a subir sus documentos (con el motivo, si lo hay).
+     * No interrumpe el flujo de aprobación/rechazo si el correo falla.
+     */
+    private function notifyClientKycStatus(Document $document, string $status, string $reason = ''): void
+    {
+        try {
+            $reservation = $document->reservation;
+            $userId = $reservation?->user_id ?? data_get($document->metadata, 'user_id');
+            $user   = $userId ? \App\Models\User::find($userId) : null;
+
+            $email = $reservation?->email ?: $user?->email;
+            if (! $email) {
+                return;
+            }
+
+            $name = trim((string) ($reservation?->first_name ?? ''))
+                ?: ($user?->first_name ?: \Illuminate\Support\Str::before((string) ($user?->name ?? ''), ' '))
+                ?: (string) ($user?->name ?? '');
+
+            \Illuminate\Support\Facades\Mail::to($email)->send(
+                new \App\Mail\KycStatusMail(
+                    name: $name,
+                    status: $status,
+                    reason: $reason,
+                    actionUrl: $status === 'rejected' ? url('/form') : '',
+                )
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo enviar el correo de estado de KYC: ' . $e->getMessage());
         }
     }
     
