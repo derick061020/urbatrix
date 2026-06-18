@@ -13,12 +13,16 @@ use Illuminate\Console\Command;
  *   1) Señal REAL: las unidades con suficientes vistas reales (UnitView) dentro de
  *      una ventana reciente se marcan como hot, ordenadas por cantidad de vistas.
  *   2) FAKE de relleno: si las vistas reales no alcanzan para llenar el cupo, se
- *      completa con unidades disponibles elegidas al azar, para que la home siempre
- *      muestre algunas en "alta demanda".
+ *      completa con unidades disponibles que NO están hot ahora (rotación), para que
+ *      la home siempre muestre algunas en "alta demanda".
+ *   3) DEGRADACIÓN: cualquier unidad ya marcada que no quede seleccionada pierde el
+ *      flag —incluidas las que dejaron de ser elegibles (reservadas/vendidas/no
+ *      públicas) o las hot con pocas vistas que no se re-eligen— y recupera su
+ *      conteo real de "vistas hoy".
  *
- * Se ejecuta de forma periódica (ver routes/console.php). Maneja is_high_demand
- * directamente sobre las unidades disponibles, así que en cada corrida se reinicia
- * el flag de las que dejaron de calificar (incluye las marcadas a mano en el admin).
+ * Se ejecuta de forma periódica (ver routes/console.php). Maneja is_high_demand y
+ * views_today directamente, así que en cada corrida se reevalúa todo el set hot
+ * (incluye lo marcado a mano en el admin).
  */
 class RefreshUnitDemand extends Command
 {
@@ -75,30 +79,56 @@ class RefreshUnitDemand extends Command
 
         $selected = $realHot->pluck('id')->all();
 
-        // 2) Relleno fake: completar el cupo con unidades al azar.
+        // 2) Relleno fake: completar el cupo. Se prefieren unidades que NO están hot
+        //    ahora mismo, para forzar rotación y degradar las que ya estaban marcadas
+        //    con pocas vistas. Si no alcanza, se completa con cualquier elegible.
         if (count($selected) < $target) {
-            $fill = $eligible
-                ->whereNotIn('id', $selected)
-                ->shuffle()
-                ->take($target - count($selected));
+            $remaining = $target - count($selected);
 
+            $pool = $eligible->where('is_high_demand', false)->whereNotIn('id', $selected);
+            if ($pool->count() < $remaining) {
+                $pool = $eligible->whereNotIn('id', $selected);
+            }
+
+            $fill = $pool->shuffle()->take($remaining);
             $selected = array_merge($selected, $fill->pluck('id')->all());
         }
 
+        $selectedIds = array_flip($selected);
+
+        // Unidades hoy marcadas como hot (para degradar las que ya no califican, incluso
+        // si dejaron de ser elegibles: pasaron a reservadas/vendidas/no públicas).
+        $currentlyHot = Unit::where('is_high_demand', true)->get();
+
         // Conteo REAL de vistas de hoy por unidad (la card muestra views_today; el admin
         // calcula sus métricas desde la tabla UnitView, así que esto no afecta la analítica).
+        $countIds = $eligible->pluck('id')->merge($currentlyHot->pluck('id'))->unique();
         $realToday = UnitView::query()
-            ->whereIn('unit_id', $eligible->pluck('id'))
+            ->whereIn('unit_id', $countIds)
             ->where('viewed_at', '>=', today())
             ->selectRaw('unit_id, COUNT(*) as c')
             ->groupBy('unit_id')
             ->pluck('c', 'unit_id');
 
-        $selectedIds = array_flip($selected);
+        $eligibleIds = $eligible->pluck('id')->flip();
 
-        // Aplicar por unidad: las hot llevan el badge y un "vistas hoy" creíble
-        // (el real si ya supera el piso fake); las que se enfrían quedan con su
-        // conteo real de hoy, sin números fake colgados.
+        // a) Degradar unidades hot que ya NO son elegibles (reservadas/vendidas/no
+        //    públicas/stale): quitarles el flag y devolverles su conteo real de hoy.
+        $stale = 0;
+        foreach ($currentlyHot as $u) {
+            if ($eligibleIds->has($u->id)) {
+                continue; // las elegibles se resuelven abajo
+            }
+            $u->forceFill([
+                'is_high_demand' => false,
+                'views_today'    => (int) ($realToday[$u->id] ?? 0),
+            ])->save();
+            $stale++;
+        }
+
+        // b) Resolver las elegibles: las hot llevan el badge + un "vistas hoy" creíble
+        //    (el real si ya supera el piso fake); las frías quedan con su conteo real,
+        //    sin números fake colgados.
         foreach ($eligible as $u) {
             $real = (int) ($realToday[$u->id] ?? 0);
             $isHot = isset($selectedIds[$u->id]);
@@ -114,10 +144,11 @@ class RefreshUnitDemand extends Command
         }
 
         $this->info(sprintf(
-            'HIGH DEMAND actualizado: %d unidad(es) en hot (%d reales por vistas, %d fake) sobre %d disponibles.',
+            'HIGH DEMAND actualizado: %d en hot (%d reales / %d fake), %d degradadas por no calificar, sobre %d disponibles.',
             count($selected),
             $realHot->count(),
             count($selected) - $realHot->count(),
+            $stale,
             $eligible->count()
         ));
 
