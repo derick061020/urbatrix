@@ -18,6 +18,7 @@ use App\Http\Controllers\PaymentDocumentController;
 use App\Http\Controllers\BrokerController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\Admin\MaterialController;
+use App\Http\Controllers\Admin\DataImportController;
 
 // Auth routes
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -253,6 +254,13 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/communication/conversation/{id}', [AdminController::class, 'communicationConversation'])->name('admin.communication.conversation');
     Route::get('/extras', [AdminController::class, 'extras'])->name('admin.extras');
     Route::get('/data-export', [AdminController::class, 'dataExport'])->name('admin.data-export');
+
+    // Importador de datos (CSV) estilo WP All Import
+    Route::get ('/data-import',                    [DataImportController::class, 'index'])->name('admin.data-import');
+    Route::get ('/data-import/{resource}/sample',  [DataImportController::class, 'sample'])->name('admin.data-import.sample');
+    Route::post('/data-import/{resource}/upload',  [DataImportController::class, 'upload'])->name('admin.data-import.upload');
+    Route::post('/data-import/{resource}/run',     [DataImportController::class, 'run'])->name('admin.data-import.run');
+
     Route::get('/email-templates', [AdminController::class, 'emailTemplates'])->name('admin.email-templates');
     Route::get('/registration-fields', [AdminController::class, 'registrationFields'])->name('admin.registration-fields');
     Route::get('/menu', [AdminController::class, 'menu'])->name('admin.menu');

@@ -555,6 +555,32 @@
                                 </li>
                                 <li>
                                     <a
+                                        href="/admin/data-import"
+                                        class="lb-admin-main-nav-link {{ $activeRoute === 'data-import' ? 'bg-[rgba(155,172,158,0.2)] rounded shadow-sm' : '' }}"
+                                    >
+                                        <span
+                                            class="p-1 text-text-primary-inverse"
+                                        >
+                                            <svg
+                                                class="material-design-icon__svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z"
+                                                ></path>
+                                            </svg>
+                                        </span>
+                                        <p
+                                            class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
+                                        >
+                                            Importar datos
+                                        </p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
                                         href="/admin/email-templates"
                                         class="lb-admin-main-nav-link {{ $activeRoute === 'email-templates' ? 'bg-[rgba(155,172,158,0.2)] rounded shadow-sm' : '' }}"
                                     >
