@@ -53,4 +53,15 @@ class UnitImportResource extends ImportResource
     {
         return ['custom_id', 'name'];
     }
+
+    public function creationDefaults(): array
+    {
+        // `type` y `price` son NOT NULL en la tabla `units`; damos un fallback
+        // por si el CSV no mapea esas columnas al crear.
+        return [
+            'type'   => 'N/A',
+            'price'  => 0,
+            'status' => 'AVAILABLE',
+        ];
+    }
 }

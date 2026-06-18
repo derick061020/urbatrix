@@ -15,8 +15,9 @@ class CsvImporter
      */
     public function readHeaders(string $path): array
     {
+        $delimiter = ',';
         $handle = $this->open($path, $delimiter);
-        $headers = fgetcsv($handle, 0, $delimiter) ?: [];
+        $headers = fgetcsv($handle, 0, $delimiter, '"', '') ?: [];
         fclose($handle);
 
         return array_map(fn ($h) => $this->clean((string) $h), $headers);
@@ -29,11 +30,12 @@ class CsvImporter
      */
     public function previewRows(string $path, int $limit = 5): array
     {
+        $delimiter = ',';
         $handle = $this->open($path, $delimiter);
-        fgetcsv($handle, 0, $delimiter); // saltar cabecera
+        fgetcsv($handle, 0, $delimiter, '"', ''); // saltar cabecera
 
         $rows = [];
-        while (count($rows) < $limit && ($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+        while (count($rows) < $limit && ($row = fgetcsv($handle, 0, $delimiter, '"', '')) !== false) {
             if ($this->isEmptyRow($row)) {
                 continue;
             }
@@ -59,11 +61,12 @@ class CsvImporter
 
         $summary = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
 
+        $delimiter = ',';
         $handle = $this->open($path, $delimiter);
-        fgetcsv($handle, 0, $delimiter); // saltar cabecera
+        fgetcsv($handle, 0, $delimiter, '"', ''); // saltar cabecera
 
         $rowNumber = 1; // la cabecera es la fila 1
-        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiter, '"', '')) !== false) {
             $rowNumber++;
 
             if ($this->isEmptyRow($row)) {
@@ -84,7 +87,7 @@ class CsvImporter
                     continue;
                 }
 
-                $cast = $this->castValue($raw, $fields[$field], $field);
+                $cast = $this->castValue($raw, $fields[$field]);
                 if ($cast['error']) {
                     $rowError = $cast['error'];
                     break;
@@ -132,7 +135,7 @@ class CsvImporter
                         $summary['skipped']++;
                         continue;
                     }
-                    $model::create($attributes);
+                    $model::create(array_merge($resource->creationDefaults(), $attributes));
                     $summary['created']++;
                 }
             } catch (\Throwable $e) {
@@ -152,7 +155,7 @@ class CsvImporter
      * @param  array<string, mixed>  $def
      * @return array{value: mixed, error: ?string}
      */
-    protected function castValue(string $raw, array $def, string $field): array
+    protected function castValue(string $raw, array $def): array
     {
         $type = $def['type'] ?? 'string';
 

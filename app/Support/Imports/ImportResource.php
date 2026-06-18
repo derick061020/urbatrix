@@ -42,4 +42,15 @@ abstract class ImportResource
      * @return array<int, string>
      */
     abstract public function matchKeys(): array;
+
+    /**
+     * Valores por defecto aplicados SÓLO al crear, para columnas NOT NULL
+     * que la fila del CSV no haya provisto. No afecta a las actualizaciones.
+     *
+     * @return array<string, mixed>
+     */
+    public function creationDefaults(): array
+    {
+        return [];
+    }
 }
