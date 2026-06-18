@@ -26,7 +26,9 @@ class RefreshUnitDemand extends Command
         {--min=2 : Mínimo de unidades en hot por corrida}
         {--max=4 : Máximo de unidades en hot por corrida}
         {--window=48 : Ventana en horas para contar vistas reales}
-        {--threshold=5 : Vistas reales en la ventana para calificar como demanda real}';
+        {--threshold=5 : Vistas reales en la ventana para calificar como demanda real}
+        {--views-min=8 : Piso de "vistas hoy" fake para una unidad hot}
+        {--views-max=32 : Techo de "vistas hoy" fake para una unidad hot}';
 
     protected $description = 'Rota el estado HIGH DEMAND de las unidades disponibles (híbrido: vistas reales + relleno fake).';
 
@@ -36,6 +38,8 @@ class RefreshUnitDemand extends Command
         $max       = max($min, (int) $this->option('max'));
         $window    = max(1, (int) $this->option('window'));
         $threshold = max(1, (int) $this->option('threshold'));
+        $viewsMin  = max(1, (int) $this->option('views-min'));
+        $viewsMax  = max($viewsMin, (int) $this->option('views-max'));
 
         $target = $min === $max ? $min : random_int($min, $max);
 
@@ -81,11 +85,32 @@ class RefreshUnitDemand extends Command
             $selected = array_merge($selected, $fill->pluck('id')->all());
         }
 
-        // Aplicar: limpiar el flag en todas las elegibles y prenderlo en las seleccionadas.
-        Unit::whereIn('id', $eligible->pluck('id'))->update(['is_high_demand' => false]);
+        // Conteo REAL de vistas de hoy por unidad (la card muestra views_today; el admin
+        // calcula sus métricas desde la tabla UnitView, así que esto no afecta la analítica).
+        $realToday = UnitView::query()
+            ->whereIn('unit_id', $eligible->pluck('id'))
+            ->where('viewed_at', '>=', today())
+            ->selectRaw('unit_id, COUNT(*) as c')
+            ->groupBy('unit_id')
+            ->pluck('c', 'unit_id');
 
-        if (! empty($selected)) {
-            Unit::whereIn('id', $selected)->update(['is_high_demand' => true]);
+        $selectedIds = array_flip($selected);
+
+        // Aplicar por unidad: las hot llevan el badge y un "vistas hoy" creíble
+        // (el real si ya supera el piso fake); las que se enfrían quedan con su
+        // conteo real de hoy, sin números fake colgados.
+        foreach ($eligible as $u) {
+            $real = (int) ($realToday[$u->id] ?? 0);
+            $isHot = isset($selectedIds[$u->id]);
+
+            $views = $isHot
+                ? max($real, random_int($viewsMin, $viewsMax))
+                : $real;
+
+            $u->forceFill([
+                'is_high_demand' => $isHot,
+                'views_today'    => $views,
+            ])->save();
         }
 
         $this->info(sprintf(
