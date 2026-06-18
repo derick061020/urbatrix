@@ -3289,6 +3289,54 @@ class AdminController extends Controller
     }
 
     /**
+     * Guarda la firma del proyecto (imagen manuscrita + nombre y entidad del
+     * firmante). Esta firma se inyecta en el recuadro del Desarrollador /
+     * Vendedora de la promesa de compraventa y el plan de pagos, de modo que
+     * los contratos salgan ya firmados a nombre de Makai.
+     */
+    public function updateProjectSignature(Request $request)
+    {
+        $data = $request->validate([
+            'signer_name'      => ['nullable', 'string', 'max:160'],
+            'signer_entity'    => ['nullable', 'string', 'max:200'],
+            'signature_image'  => ['nullable', 'string'],
+            'remove_signature' => ['nullable', 'boolean'],
+        ]);
+
+        $current = \App\Models\Setting::get('project_signature', []);
+        $current = is_array($current) ? $current : [];
+
+        if ($request->boolean('remove_signature')) {
+            $current['signature_image'] = null;
+        } elseif (!empty($data['signature_image'])) {
+            if (!preg_match('#^data:image/(png|jpe?g);base64,#', $data['signature_image'])) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Formato de firma no válido.'], 422);
+                }
+                return back()->withErrors(['signature_image' => 'Formato de firma no válido.']);
+            }
+            $current['signature_image'] = $data['signature_image'];
+        }
+
+        $current['signer_name']   = trim((string) ($data['signer_name'] ?? ''));
+        $current['signer_entity'] = trim((string) ($data['signer_entity'] ?? ''));
+        $current['updated_by']    = auth()->id();
+        $current['updated_at']    = now()->toIso8601String();
+
+        \App\Models\Setting::put('project_signature', $current);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Firma del proyecto guardada correctamente.',
+                'has_image' => !empty($current['signature_image']),
+            ]);
+        }
+
+        return back()->with('settings_success', 'Firma del proyecto guardada correctamente.');
+    }
+
+    /**
      * Update another user's profile from the Usuarios (admin.profiles) page.
      * Mirrors the fields of editProfile() but targets an arbitrary user by id;
      * the admin can reset the password without knowing the current one.

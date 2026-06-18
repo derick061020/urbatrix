@@ -275,6 +275,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/profile',  [AdminController::class, 'editProfile'])->name('admin.profile.edit');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
+    // Firma del proyecto (usada para firmar los contratos a nombre de Makai)
+    Route::post('/project-signature', [AdminController::class, 'updateProjectSignature'])->name('admin.project-signature.update');
+
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');
     Route::get('/crm/expedientes',  [AdminController::class, 'crmExpedientes'])->name('admin.crm.expedientes');

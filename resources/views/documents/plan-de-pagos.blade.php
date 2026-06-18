@@ -286,9 +286,15 @@ body {
         </div>
         <div>
           <div class="sig-role">{{ __('Promitente Vendedora') }}</div>
-          <div class="sig-name">{{ __('Duna Development Group S.R.L.') }}</div>
-          <div class="sig-entity">{{ __('RNC: 1-31-12345-6 · Representante legal autorizado') }}</div>
-          <div class="sig-box"></div>
+          <div class="sig-name">{{ $vendedor_nombre ?? __('Duna Development Group S.R.L.') }}</div>
+          <div class="sig-entity">{{ $vendedor_entidad ?? __('RNC: 1-31-12345-6 · Representante legal autorizado') }}</div>
+          @if(!empty($vendedor_firma_img))
+            <div class="sig-box" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px;">
+              <img src="{{ $vendedor_firma_img }}" alt="Firma de la Vendedora" style="max-height:34px; max-width:180px; object-fit:contain; display:block;">
+            </div>
+          @else
+            <div class="sig-box"></div>
+          @endif
           <div class="sig-label">{{ __('Firma &nbsp;·&nbsp; Fecha: ____________________') }}</div>
         </div>
       </div>

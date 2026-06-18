@@ -18,6 +18,15 @@
 
     $stProfileRoute = $stProfileRoute ?? 'admin.profile.update';
     $stLogoutRoute  = $stLogoutRoute  ?? 'logout';
+
+    // Firma del proyecto — sólo para administradores. Se usa para firmar los
+    // contratos (promesa de compraventa / plan de pagos) a nombre de Makai.
+    $stIsAdmin = (bool) ($authUser?->is_admin);
+    $stProjSig    = $stIsAdmin ? (\App\Models\Setting::get('project_signature', []) ?: []) : [];
+    $stProjSig    = is_array($stProjSig) ? $stProjSig : [];
+    $stSigImage   = $stProjSig['signature_image'] ?? null;
+    $stSigName    = $stProjSig['signer_name'] ?? '';
+    $stSigEntity  = $stProjSig['signer_entity'] ?? '';
 @endphp
 
 <style>
@@ -270,6 +279,14 @@
                 <i class="pi pi-angle-right chev"></i>
             </button>
 
+            @if($stIsAdmin)
+            <div class="st-section-label" style="margin-top:14px;">{{ __('Configuración del proyecto') }}</div>
+            <button type="button" class="st-nav-item" data-st-pane="signature">
+                <i class="pi pi-pencil"></i> {{ __('Firma del proyecto') }}
+                <i class="pi pi-angle-right chev"></i>
+            </button>
+            @endif
+
             {{-- Cerrar sesión — anclado al fondo del sidebar --}}
             <button type="button" class="st-nav-item st-logout" onclick="(window.openLogoutModal ? openLogoutModal() : document.getElementById('stLogoutFallback')?.submit())">
                 <i class="pi pi-sign-out"></i> Cerrar sesión
@@ -311,6 +328,12 @@
             <div class="st-tabs" data-st-tabs="notifications" style="display:none;">
                 <button type="button" class="st-tab active" data-st-tab="notifications-main">{{ __('Notificaciones') }}</button>
             </div>
+            @if($stIsAdmin)
+            {{-- SIGNATURE TABS --}}
+            <div class="st-tabs" data-st-tabs="signature" style="display:none;">
+                <button type="button" class="st-tab active" data-st-tab="signature-main">{{ __('Firma del proyecto') }}</button>
+            </div>
+            @endif
 
             <div class="st-body">
 
@@ -618,6 +641,56 @@
                     @endforeach
                 </div>
 
+                @if($stIsAdmin)
+                {{-- =========== SIGNATURE PANE — FIRMA DEL PROYECTO =========== --}}
+                <div class="st-pane" data-st-pane="signature-main">
+                    <div class="st-row" style="display:block;">
+                        <div style="margin-bottom:14px;">
+                            <div class="st-row-label">{{ __('Firma del proyecto') }}</div>
+                            <div class="st-row-desc">
+                                {{ __('Esta firma se estampa automáticamente en el recuadro del Desarrollador/Vendedora de los contratos (promesa de compraventa y plan de pagos), para que salgan firmados a nombre de Makai.') }}
+                            </div>
+                        </div>
+
+                        {{-- Firma manuscrita actual --}}
+                        <div style="margin-bottom:16px;">
+                            <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Firma manuscrita') }}</div>
+                            <div id="psCurrentWrap" style="{{ $stSigImage ? '' : 'display:none;' }} margin-bottom:10px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div style="border:1px solid #eaecf0; border-radius:10px; background:#fff; padding:8px; width:220px; height:96px; display:flex; align-items:center; justify-content:center;">
+                                        <img id="psCurrentImg" src="{{ $stSigImage }}" alt="{{ __('Firma actual') }}" style="max-height:100%; max-width:100%; object-fit:contain;">
+                                    </div>
+                                    <button type="button" class="st-btn-link" style="color:#e93544;" onclick="psRemoveSignature()">{{ __('Eliminar firma') }}</button>
+                                </div>
+                            </div>
+
+                            <div class="ps-canvas-wrap" id="ps-canvas-wrap" style="position:relative; width:100%; max-width:420px;">
+                                <canvas id="ps-sig-canvas" style="width:100%; height:150px; border:1.5px dashed #cdd2da; border-radius:10px; background:#fff; touch-action:none; cursor:crosshair;"></canvas>
+                                <div class="ps-empty-canvas" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#99a0ae; font-size:12px; pointer-events:none;">{{ __('Dibujá la firma con el mouse o el dedo') }}</div>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <button type="button" class="st-btn-link" onclick="psClearSig()"><i class="pi pi-eraser"></i> {{ __('Limpiar') }}</button>
+                            </div>
+                        </div>
+
+                        {{-- Nombre del firmante --}}
+                        <div style="margin-bottom:14px;">
+                            <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Nombre del firmante') }}</div>
+                            <input type="text" id="psSignerName" value="{{ $stSigName }}" placeholder="Ej: JOSE ANTONIO GONZALEZ DIAZ"
+                                   style="width:100%; max-width:420px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
+                        </div>
+
+                        {{-- Entidad / cargo --}}
+                        <div style="margin-bottom:6px;">
+                            <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Entidad / representación') }}</div>
+                            <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="Ej: En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L."
+                                   style="width:100%; max-width:420px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
+                            <div class="st-row-desc" style="margin-top:6px;">{{ __('Si dejás estos campos vacíos, el contrato usa los datos por defecto del documento.') }}</div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -670,12 +743,18 @@
                 profile:       ['Configuración de la cuenta', 'Administra y colabora en la configuración de tu cuenta', 'Guardar cambios', true],
                 security:      ['Privacidad y Seguridad',    'Personaliza tus configuraciones de privacidad y seguridad', 'Guardar Cambios', false],
                 notifications: ['Configuración de la cuenta', 'Elige qué notificaciones quieres recibir', 'Guardar cambios', false],
+                signature:     ['Firma del proyecto',        'Esta firma se usa para firmar los contratos a nombre de Makai', 'Guardar firma', true],
             };
             const t = titles[activePane];
             document.querySelector('[data-st-title]').textContent = t[0];
             document.querySelector('[data-st-sub]').textContent   = t[1];
             document.getElementById('stSaveLabel').textContent    = t[2];
             document.getElementById('stSaveBtn').style.display    = t[3] || activePane === 'notifications' ? '' : 'none';
+
+            if (activePane === 'signature' && typeof window.psInitCanvas === 'function') {
+                // Esperar a que el pane sea visible para medir el canvas correctamente.
+                setTimeout(() => window.psInitCanvas(), 30);
+            }
         });
     });
 
@@ -886,6 +965,10 @@
             stShowAlert('Preferencias de notificaciones guardadas.', 'ok', 2200);
             return;
         }
+        if (activePane === 'signature') {
+            if (typeof window.psSaveSignature === 'function') window.psSaveSignature();
+            return;
+        }
         if (activePane === 'security') {
             stShowAlert('Usá los botones de cada apartado para aplicar cambios.', 'ok', 2200);
             return;
@@ -956,5 +1039,115 @@
 
     // Restore notifications on first paint
     stRestoreNoti();
+
+    @if($stIsAdmin)
+    /* ======================= Firma del proyecto ======================= */
+    let psCtx = null, psDrawing = false, psHasStroke = false, psRemove = false;
+
+    window.psInitCanvas = function(){
+        const canvas = document.getElementById('ps-sig-canvas');
+        if (!canvas) return;
+        const ratio = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width) return;
+        canvas.width  = Math.round(rect.width * ratio);
+        canvas.height = Math.round(rect.height * ratio);
+        psCtx = canvas.getContext('2d');
+        psCtx.scale(ratio, ratio);
+        psCtx.lineCap = 'round'; psCtx.lineJoin = 'round';
+        psCtx.strokeStyle = '#171717'; psCtx.lineWidth = 2;
+    };
+
+    function psPt(e, canvas){
+        const r = canvas.getBoundingClientRect();
+        const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+        const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+        return [cx, cy];
+    }
+    function psStart(e){
+        e.preventDefault();
+        const canvas = document.getElementById('ps-sig-canvas');
+        if (!psCtx) window.psInitCanvas();
+        psDrawing = true; psHasStroke = true; psRemove = false;
+        document.querySelector('#ps-canvas-wrap .ps-empty-canvas')?.style.setProperty('display', 'none');
+        const [x, y] = psPt(e, canvas);
+        psCtx.beginPath(); psCtx.moveTo(x, y);
+    }
+    function psMove(e){
+        if (!psDrawing) return;
+        e.preventDefault();
+        const canvas = document.getElementById('ps-sig-canvas');
+        const [x, y] = psPt(e, canvas);
+        psCtx.lineTo(x, y); psCtx.stroke();
+    }
+    function psEnd(){ psDrawing = false; }
+
+    (function bindPsCanvas(){
+        const canvas = document.getElementById('ps-sig-canvas');
+        if (!canvas) return;
+        canvas.addEventListener('mousedown', psStart);
+        canvas.addEventListener('mousemove', psMove);
+        window.addEventListener('mouseup', psEnd);
+        canvas.addEventListener('touchstart', psStart, { passive: false });
+        canvas.addEventListener('touchmove', psMove, { passive: false });
+        window.addEventListener('touchend', psEnd);
+    })();
+
+    window.psClearSig = function(){
+        const canvas = document.getElementById('ps-sig-canvas');
+        if (canvas && psCtx) psCtx.clearRect(0, 0, canvas.width, canvas.height);
+        psHasStroke = false;
+        document.querySelector('#ps-canvas-wrap .ps-empty-canvas')?.style.setProperty('display', 'flex');
+    };
+
+    window.psRemoveSignature = function(){
+        psRemove = true;
+        psHasStroke = false;
+        window.psClearSig();
+        document.getElementById('psCurrentWrap').style.display = 'none';
+        stShowAlert('La firma se eliminará al guardar.', 'ok', 2200);
+    };
+
+    window.psSaveSignature = function(){
+        const name   = document.getElementById('psSignerName').value.trim();
+        const entity = document.getElementById('psSignerEntity').value.trim();
+
+        let sigData = '';
+        if (psHasStroke) {
+            const canvas = document.getElementById('ps-sig-canvas');
+            sigData = canvas.toDataURL('image/png');
+        }
+
+        const btn = document.getElementById('stSaveBtn');
+        btn.disabled = true;
+
+        const fd = new FormData();
+        fd.append('signer_name', name);
+        fd.append('signer_entity', entity);
+        if (sigData)  fd.append('signature_image', sigData);
+        if (psRemove) fd.append('remove_signature', '1');
+        fd.append('_token', st2faCsrf());
+
+        fetch('{{ route('admin.project-signature.update') }}', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: fd,
+            credentials: 'same-origin',
+        })
+        .then(r => r.json().catch(() => ({})))
+        .then(d => {
+            btn.disabled = false;
+            if (d.success === false) { stShowAlert(d.message || 'No se pudo guardar la firma.', 'err'); return; }
+            stShowAlert(d.message || 'Firma del proyecto guardada.', 'ok', 2600);
+            // Reflejar la firma recién dibujada en la vista previa.
+            if (sigData) {
+                document.getElementById('psCurrentImg').src = sigData;
+                document.getElementById('psCurrentWrap').style.display = '';
+            }
+            psHasStroke = false; psRemove = false;
+        })
+        .catch(() => { btn.disabled = false; stShowAlert('Error de red al guardar la firma.', 'err'); });
+    };
+    @endif
 })();
 </script>

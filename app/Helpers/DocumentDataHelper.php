@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Reservation;
+use App\Models\Setting;
 use App\Services\DocumentService;
 use DateInterval;
 use DateTime;
@@ -50,9 +51,16 @@ class DocumentDataHelper
         $fechaEntrega = (clone $inicio)->add(new DateInterval('P' . $mesesEntrega . 'M'));
         $entregaTexto = self::MESES[(int) $fechaEntrega->format('n')] . ' ' . $fechaEntrega->format('Y');
 
+        $firma = self::projectSignature();
+
         return [
             'referencia'        => $reservation->reservation_code,
             'fecha'             => date('d/m/Y'),
+
+            // Firma del proyecto (Promitente Vendedora)
+            'vendedor_nombre'   => $firma['name'] ?: 'Duna Development Group S.R.L.',
+            'vendedor_entidad'  => $firma['entity'] ?: 'RNC: 1-31-12345-6 · Representante legal autorizado',
+            'vendedor_firma_img' => $firma['image'],
             'comprador_nombre'  => trim($reservation->first_name . ' ' . $reservation->last_name),
             'comprador_email'   => $reservation->email,
             'comprador_id'      => $reservation->document_number ?: 'N/A',
@@ -88,9 +96,16 @@ class DocumentDataHelper
         $unit = $reservation->unit;
         $price = (float) $reservation->unit_price;
 
+        $firma = self::projectSignature();
+
         return [
             'referencia'       => $reservation->reservation_code,
             'fecha'            => date('d/m/Y'),
+
+            // Firma del proyecto (El Desarrollador)
+            'vendedor_nombre'   => $firma['name'] ?: 'JOSE ANTONIO GONZALEZ DIAZ',
+            'vendedor_entidad'  => $firma['entity'] ?: 'En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L.',
+            'vendedor_firma_img' => $firma['image'],
 
             // Comprador
             'comprador_nombre'   => trim($reservation->first_name . ' ' . $reservation->last_name),
@@ -253,6 +268,29 @@ class DocumentDataHelper
     }
 
     /* ───────────────── helpers ───────────────── */
+
+    /**
+     * Firma del proyecto configurada en Configuración (modal de ajustes).
+     * Alimenta el recuadro de firma del Desarrollador/Vendedora en los
+     * documentos imprimibles, para que el contrato salga ya firmado a nombre
+     * de Makai. Devuelve image (data URI o null), name y entity.
+     */
+    public static function projectSignature(): array
+    {
+        $sig = Setting::get('project_signature', []);
+        $sig = is_array($sig) ? $sig : [];
+
+        $img = $sig['signature_image'] ?? null;
+        if ($img && ! preg_match('#^data:image/(png|jpe?g);base64,#', (string) $img)) {
+            $img = null;
+        }
+
+        return [
+            'image'  => $img,
+            'name'   => trim((string) ($sig['signer_name'] ?? '')),
+            'entity' => trim((string) ($sig['signer_entity'] ?? '')),
+        ];
+    }
 
     private static function unidadNombre(Reservation $reservation): string
     {

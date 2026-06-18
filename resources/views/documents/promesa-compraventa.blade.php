@@ -561,9 +561,15 @@ body {
       <div class="sig-grid">
         <div class="sig-block">
           <div class="sig-role">Por El Desarrollador</div>
-          <div class="sig-name">JOSE ANTONIO GONZALEZ DIAZ</div>
-          <div class="sig-entity">En Rep. De IGUANAS LAKE CONDO &amp; RESIDENCES, S.R.L.</div>
-          <div class="sig-box"></div>
+          <div class="sig-name">{{ $vendedor_nombre ?? 'JOSE ANTONIO GONZALEZ DIAZ' }}</div>
+          <div class="sig-entity">{{ $vendedor_entidad ?? 'En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L.' }}</div>
+          @if(!empty($vendedor_firma_img))
+            <div class="sig-box" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px;">
+              <img src="{{ $vendedor_firma_img }}" alt="Firma del Desarrollador" style="max-height:46px; max-width:200px; object-fit:contain; display:block;">
+            </div>
+          @else
+            <div class="sig-box"></div>
+          @endif
           <div class="sig-label">Firma &nbsp;·&nbsp; Fecha: ____________________</div>
         </div>
         <div class="sig-block">
