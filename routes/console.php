@@ -26,3 +26,9 @@ Schedule::command('crm:send-overdue-alerts')
     ->dailyAt('08:00')
     ->withoutOverlapping()
     ->onOneServer();
+
+// Rotación de "HIGH DEMAND" (híbrido vistas reales + fake) — cada hora.
+Schedule::command('units:refresh-demand')
+    ->hourly()
+    ->withoutOverlapping()
+    ->onOneServer();
