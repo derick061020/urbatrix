@@ -215,6 +215,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/units/options', [AdminController::class, 'updateUnitOptions'])->name('admin.units.options');
     Route::get('/units/create', [AdminController::class, 'createUnit'])->name('admin.units.create');
     Route::post('/units', [AdminController::class, 'storeUnit'])->name('admin.units.store');
+    Route::post('/units/bulk-discount', [AdminController::class, 'bulkDiscount'])->name('admin.units.bulk-discount');
     Route::get('/units/{unit}', [AdminController::class, 'editUnit'])->name('admin.units.edit');
     Route::put('/units/{unit}', [AdminController::class, 'updateUnit'])->name('admin.units.update');
     Route::delete('/units/{unit}', [AdminController::class, 'deleteUnit'])->name('admin.units.delete');

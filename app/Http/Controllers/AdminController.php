@@ -282,6 +282,71 @@ class AdminController extends Controller
         return response()->json(['ok' => true, 'public' => (bool) $unit->public]);
     }
 
+    /**
+     * Descuentos masivos (bulk actions) sobre unidades.
+     *
+     * Alcance ($scope):
+     *   - all       → todas las unidades.
+     *   - group     → un grupo (por estado o por tipo) definido en $group_by/$group_value.
+     *   - selected  → solo las unidades marcadas ($unit_ids).
+     *
+     * Modo ($mode):
+     *   - amount   → fija el descuento (monto en USD) = $value.
+     *   - percent  → descuento = precio × ($value / 100), por unidad.
+     *
+     * Con $clear = true se elimina el descuento (lo pone en 0) ignorando el monto.
+     */
+    public function bulkDiscount(Request $request)
+    {
+        $data = $request->validate([
+            'scope'       => 'required|in:all,group,selected',
+            'group_by'    => 'required_if:scope,group|nullable|in:status,type',
+            'group_value' => 'required_if:scope,group|nullable|string|max:100',
+            'unit_ids'    => 'required_if:scope,selected|nullable|array',
+            'unit_ids.*'  => 'integer|exists:units,id',
+            'mode'        => 'required|in:amount,percent',
+            'value'       => 'required_unless:clear,1|nullable|numeric|min:0',
+            'clear'       => 'nullable|boolean',
+        ]);
+
+        $clear = $request->boolean('clear');
+        $value = (float) ($data['value'] ?? 0);
+
+        if ($data['mode'] === 'percent' && $value > 100) {
+            return back()->with('error', 'El porcentaje de descuento no puede superar 100%.');
+        }
+
+        $query = Unit::query();
+        if ($data['scope'] === 'group') {
+            $query->where($data['group_by'], $data['group_value']);
+        } elseif ($data['scope'] === 'selected') {
+            $query->whereIn('id', $data['unit_ids'] ?? []);
+        }
+
+        if ($clear) {
+            $affected = (clone $query)->update(['discount' => 0]);
+        } elseif ($data['mode'] === 'amount') {
+            $affected = (clone $query)->update(['discount' => round($value, 2)]);
+        } else {
+            // Porcentaje: depende del precio de cada unidad, se calcula por fila.
+            $affected = 0;
+            (clone $query)->select('id', 'price')->chunkById(200, function ($units) use ($value, &$affected) {
+                foreach ($units as $u) {
+                    $u->update(['discount' => round(((float) $u->price) * $value / 100, 2)]);
+                    $affected++;
+                }
+            });
+        }
+
+        $msg = $clear
+            ? "Descuento eliminado en {$affected} unidad(es)."
+            : ($data['mode'] === 'amount'
+                ? 'Descuento de $' . number_format($value, 2) . " aplicado a {$affected} unidad(es)."
+                : "Descuento de {$value}% aplicado a {$affected} unidad(es).");
+
+        return redirect()->route('admin.units')->with('success', $msg);
+    }
+
     public function deleteUnitImage(Unit $unit, UnitImage $image)
     {
         abort_if($image->unit_id !== $unit->id, 404);
