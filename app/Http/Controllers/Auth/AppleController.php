@@ -67,7 +67,7 @@ class AppleController extends Controller
 
             Auth::login($user);
 
-            return redirect($user->postAuthRedirectPath());
+            return redirect()->intended($user->postAuthRedirectPath());
         } catch (\Throwable $e) {
             Log::error('Apple OAuth Error: ' . $e->getMessage());
 

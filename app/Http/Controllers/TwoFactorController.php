@@ -173,6 +173,7 @@ class TwoFactorController extends Controller
         $request->session()->regenerate();
         $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
 
-        return redirect($user->postAuthRedirectPath());
+        // Honra el link que el usuario intentaba ver antes de pasar por el 2FA.
+        return redirect()->intended($user->postAuthRedirectPath());
     }
 }

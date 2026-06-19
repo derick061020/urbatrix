@@ -5163,7 +5163,7 @@
         const icon = document.getElementById('modalAddToListIcon');
         if (icon) icon.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
         const lbl = document.getElementById('modalAddToListLabel');
-        if (lbl) lbl.textContent = wishlisted ? 'SAVED' : 'ADD TO LIST';
+        if (lbl) lbl.textContent = wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
       }
       if (typeof unitCount !== 'undefined' && !modalPeopleViewIsViews) {
         const sl = document.getElementById('modalShortlistedCount');
@@ -5180,7 +5180,7 @@
         const svg = b.querySelector('svg');
         if (svg) svg.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
         const label = b.querySelector('.label');
-        if (label) label.textContent = wishlisted ? 'Saved' : 'Add to list';
+        if (label) label.textContent = wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
       });
       if (typeof unitCount !== 'undefined') {
         document.querySelectorAll(`[data-unit-count="${unitId}"]`).forEach(el => el.textContent = unitCount);
@@ -5265,7 +5265,7 @@
         const svg = btn.querySelector('svg');
         if (svg) svg.setAttribute('fill', !wasFav ? 'currentColor' : 'none');
         const label = btn.querySelector('.label');
-        if (label) label.textContent = !wasFav ? 'Saved' : 'Add to list';
+        if (label) label.textContent = !wasFav ? "__('SAVED')" : "__('ADD TO LIST')";
         // Re-trigger heart pop animation on every toggle
         const heartSpan = btn.querySelector('.heart');
         if (heartSpan) {
@@ -5284,7 +5284,7 @@
               // Sync to authoritative state in case of race
               btn.classList.toggle('is-fav', !!data.wishlisted);
               if (svg) svg.setAttribute('fill', data.wishlisted ? 'currentColor' : 'none');
-              if (label) label.textContent = data.wishlisted ? 'Saved' : 'Add to list';
+              if (label) label.textContent = data.wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
               const heartSpan = btn.querySelector('.heart');
               if (heartSpan) {
                 heartSpan.style.animation = 'none';
@@ -5304,7 +5304,7 @@
             // Revert optimistic UI
             btn.classList.toggle('is-fav', wasFav);
             if (svg) svg.setAttribute('fill', wasFav ? 'currentColor' : 'none');
-            if (label) label.textContent = wasFav ? 'Saved' : 'Add to list';
+            if (label) label.textContent = wasFav ? "__('SAVED')" : "__('ADD TO LIST')";
             const heartSpan = btn.querySelector('.heart');
             if (heartSpan) {
               heartSpan.style.animation = 'none';

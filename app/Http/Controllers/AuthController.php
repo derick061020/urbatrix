@@ -57,7 +57,9 @@ class AuthController extends Controller
         Auth::login($user, (bool) $request->boolean('remember'));
         $request->session()->regenerate();
         $request->session()->put('activity_login_id', \App\Support\ActivityLogger::startSession($user->id));
-        return redirect($user->postAuthRedirectPath());
+        // Honra la URL que el usuario intentaba ver (p. ej. un link compartido /?unit=123);
+        // si no hay ninguna, cae a la ruta por defecto según el rol.
+        return redirect()->intended($user->postAuthRedirectPath());
     }
 
     public function logout(Request $request)
@@ -224,7 +226,8 @@ class AuthController extends Controller
         return response()->json([
             'ok'       => true,
             'pending'  => $user->isPendingVerification(),
-            'redirect' => $user->postAuthRedirectPath(),
+            // Honra la URL guardada (link compartido /?unit=123) o cae a la ruta por rol.
+            'redirect' => $request->session()->pull('url.intended', $user->postAuthRedirectPath()),
         ]);
     }
 
@@ -404,7 +407,7 @@ class AuthController extends Controller
 
         return response()->json([
             'ok'       => true,
-            'redirect' => $user->postAuthRedirectPath(),
+            'redirect' => $request->session()->pull('url.intended', $user->postAuthRedirectPath()),
         ]);
     }
 

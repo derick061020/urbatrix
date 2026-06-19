@@ -62,7 +62,7 @@ class GoogleController extends Controller
 
             Auth::login($user);
 
-            return redirect($user->postAuthRedirectPath());
+            return redirect()->intended($user->postAuthRedirectPath());
 
         } catch (\Exception $e) {
             // Log the error for debugging
