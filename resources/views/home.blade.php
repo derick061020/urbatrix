@@ -1491,7 +1491,7 @@
         <div class="vc-field">
           <label class="vc-field-label" for="advisorNote">{{ __('Nota para el asesor') }} <span class="opt">(Opcional)</span></label>
           <div class="vc-textarea-wrap">
-            <textarea id="advisorNote" name="note" class="vc-textarea" maxlength="200" placeholder="{{ __('Referencia bancaria, número de comprobante') }}" oninput="updateAdvisorNoteCount(this)"></textarea>
+            <textarea id="advisorNote" name="note" class="vc-textarea" maxlength="200" placeholder="{{ __('¿En qué podemos ayudarte?') }}" oninput="updateAdvisorNoteCount(this)"></textarea>
             <span class="vc-textarea-count" id="advisorNoteCount">0/200</span>
           </div>
         </div>
