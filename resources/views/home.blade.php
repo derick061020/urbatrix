@@ -434,7 +434,7 @@
           <div class="mt-tabs">
             <button type="button" class="mt-tab" id="modalAddToListBtn" onclick="toggleModalWishlist()">
               <svg id="modalAddToListIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span id="modalAddToListLabel">{{ __('ADD TO LIST') }}</span>
+              <span id="modalAddToListLabel">{{ {{ __('ADD TO LIST') }} }}</span>
             </button>
             <button type="button" class="mt-tab mt-tab-middle" onclick="openDisclaimer()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -5163,7 +5163,7 @@
         const icon = document.getElementById('modalAddToListIcon');
         if (icon) icon.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
         const lbl = document.getElementById('modalAddToListLabel');
-        if (lbl) lbl.textContent = wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
+        if (lbl) lbl.textContent = wishlisted ? "{{ __('SAVED') }}"  : "{{ __('ADD TO LIST') }}";
       }
       if (typeof unitCount !== 'undefined' && !modalPeopleViewIsViews) {
         const sl = document.getElementById('modalShortlistedCount');
@@ -5180,7 +5180,7 @@
         const svg = b.querySelector('svg');
         if (svg) svg.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
         const label = b.querySelector('.label');
-        if (label) label.textContent = wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
+        if (label) label.textContent = wishlisted ? "{{ __('SAVED') }}"  : "{{ __('ADD TO LIST') }}";
       });
       if (typeof unitCount !== 'undefined') {
         document.querySelectorAll(`[data-unit-count="${unitId}"]`).forEach(el => el.textContent = unitCount);
@@ -5265,7 +5265,7 @@
         const svg = btn.querySelector('svg');
         if (svg) svg.setAttribute('fill', !wasFav ? 'currentColor' : 'none');
         const label = btn.querySelector('.label');
-        if (label) label.textContent = !wasFav ? "__('SAVED')" : "__('ADD TO LIST')";
+        if (label) label.textContent = !wasFav ? "{{ __('SAVED') }}" : "{{ __('ADD TO LIST') }}";
         // Re-trigger heart pop animation on every toggle
         const heartSpan = btn.querySelector('.heart');
         if (heartSpan) {
@@ -5284,7 +5284,7 @@
               // Sync to authoritative state in case of race
               btn.classList.toggle('is-fav', !!data.wishlisted);
               if (svg) svg.setAttribute('fill', data.wishlisted ? 'currentColor' : 'none');
-              if (label) label.textContent = data.wishlisted ? "__('SAVED')"  : "__('ADD TO LIST')";
+              if (label) label.textContent = data.wishlisted ? "{{ __('SAVED') }}"  : "{{ __('ADD TO LIST') }}";
               const heartSpan = btn.querySelector('.heart');
               if (heartSpan) {
                 heartSpan.style.animation = 'none';
@@ -5304,7 +5304,7 @@
             // Revert optimistic UI
             btn.classList.toggle('is-fav', wasFav);
             if (svg) svg.setAttribute('fill', wasFav ? 'currentColor' : 'none');
-            if (label) label.textContent = wasFav ? "__('SAVED')" : "__('ADD TO LIST')";
+            if (label) label.textContent = wasFav ? "{{ __('SAVED') }}" : "{{ __('ADD TO LIST') }}";
             const heartSpan = btn.querySelector('.heart');
             if (heartSpan) {
               heartSpan.style.animation = 'none';
