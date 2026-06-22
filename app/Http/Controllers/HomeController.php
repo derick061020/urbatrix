@@ -71,20 +71,24 @@ class HomeController extends Controller
     }
 
     /**
-     * Stream the next page (or all remaining) public units as rendered HTML
-     * for the grid cards and list rows. Keeps the initial home DOM small while
-     * preserving the exact Blade markup (no client-side template duplication).
+     * Stream a page of public units as rendered HTML for the grid cards and
+     * list rows. Filtering happens HERE (server-side) so the browser only ever
+     * receives the units that match the active filters — the DOM stays light no
+     * matter how large the catalog is. The exact Blade markup is preserved (no
+     * client-side template duplication).
      */
     public function homeUnits(Request $request)
     {
         $offset = max(0, (int) $request->query('offset', 0));
-        $all    = $request->boolean('all');
 
-        $total = $this->publicUnitsQuery()->count();
+        $query = $this->publicUnitsQuery();
+        $this->applyHomeFilters($query, $request);
 
-        $units = $this->publicUnitsQuery()
+        $total = (clone $query)->count();
+
+        $units = $query
             ->skip($offset)
-            ->take($all ? PHP_INT_MAX : self::HOME_PAGE_SIZE)
+            ->take(self::HOME_PAGE_SIZE)
             ->get();
 
         $outlookLabels = \App\Support\UnitOptions::map('outlooks');
@@ -106,6 +110,88 @@ class HomeController extends Controller
             'hasMore' => ($offset + $units->count()) < $total,
             'total'   => $total,
         ]);
+    }
+
+    /**
+     * Apply the home filter-bar filters + sort to a units query. The values
+     * mirror the data-filter-* attributes the front-end stamps on each card so
+     * the server-side result matches what the old client-side engine produced.
+     */
+    private function applyHomeFilters($query, Request $request): void
+    {
+        // Unit number / name search (the "Unit No." box).
+        $q = trim((string) $request->query('q', ''));
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $w->where('name', 'like', '%' . $q . '%')
+                  ->orWhere('custom_id', 'like', '%' . $q . '%');
+            });
+        }
+
+        // Price range.
+        $min = $request->query('min');
+        if ($min !== null && $min !== '') {
+            $query->where('price', '>=', (float) $min);
+        }
+        $max = $request->query('max');
+        if ($max !== null && $max !== '') {
+            $query->where('price', '<=', (float) $max);
+        }
+
+        // Multi-select filters — exact match on the stored value (the checkbox
+        // values come from the global Unit options, same as data-filter-*).
+        if ($types = $this->csvParam($request, 'type')) {
+            $query->whereIn('type', $types);
+        }
+        if ($dirs = $this->csvParam($request, 'dir')) {
+            $query->whereIn(DB::raw('UPPER(direction)'), array_map('strtoupper', $dirs));
+        }
+        if ($outs = $this->csvParam($request, 'out')) {
+            $query->whereIn('outlook', $outs);
+        }
+        if ($floors = $this->csvParam($request, 'floor')) {
+            $query->whereIn('floor', $floors);
+        }
+
+        // "View similar units" helpers (sold-card → other matching units).
+        $beds = $request->query('beds');
+        if ($beds !== null && $beds !== '') {
+            $query->where('bedrooms', (int) $beds);
+        }
+        if ($request->boolean('available')) {
+            $query->whereRaw("LOWER(COALESCE(status, '')) NOT IN ('sold', 'reserved', 'pending')");
+        }
+        $exclude = trim((string) $request->query('exclude', ''));
+        if ($exclude !== '') {
+            $query->where('custom_id', '!=', $exclude)->where('id', '!=', $exclude);
+        }
+
+        // Sort — overrides the default catalog ordering when a non-default sort
+        // is chosen (area uses internal_area to match the card's data-filter-area).
+        switch ($request->query('sort', 'custom_id')) {
+            case 'price-asc':     $query->reorder('price', 'asc');         break;
+            case 'price-desc':    $query->reorder('price', 'desc');        break;
+            case 'size-asc':      $query->reorder('internal_area', 'asc'); break;
+            case 'size-desc':     $query->reorder('internal_area', 'desc');break;
+            case 'bedrooms-asc':  $query->reorder('bedrooms', 'asc');      break;
+            case 'bedrooms-desc': $query->reorder('bedrooms', 'desc');     break;
+            // 'custom_id' (default) keeps publicUnitsQuery()'s global ordering.
+        }
+    }
+
+    /**
+     * Read a multi-value query param that may arrive comma-joined (type=a,b)
+     * or as an array (type[]=a&type[]=b). Returns a clean list of non-empty
+     * trimmed values.
+     */
+    private function csvParam(Request $request, string $key): array
+    {
+        $raw = $request->query($key);
+        $vals = is_array($raw)
+            ? $raw
+            : ($raw === null || $raw === '' ? [] : explode(',', $raw));
+
+        return array_values(array_filter(array_map('trim', $vals), fn ($v) => $v !== ''));
     }
 
     /**

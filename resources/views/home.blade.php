@@ -4560,149 +4560,29 @@
       setFilterActive('sortLabel', !!currentFilters.sort && currentFilters.sort !== 'custom_id');
     }
 
-    // Animate a card/row in or out. Uses CSS keyframes (.is-fading-in /
-    // .is-fading-out) and only flips display:none after the exit anim completes
-    // so the element actually leaves the grid flow.
-    function animateToggle(el, visible, opts) {
-      opts = opts || {};
-      const isHidden = el.style.display === 'none';
-      if (visible) {
-        if (isHidden || el.classList.contains('is-fading-out')) {
-          el.style.display = '';
-          el.classList.remove('is-fading-out');
-          // Re-trigger entry animation
-          el.classList.remove('is-fading-in');
-          // Force reflow so the keyframe replays
-          void el.offsetWidth;
-          el.classList.add('is-fading-in');
-          setTimeout(() => el.classList.remove('is-fading-in'), 400);
-        }
-      } else if (!isHidden) {
-        if (opts.kind === 'row') {
-          el.classList.add('is-fading-out');
-          setTimeout(() => {
-            if (el.classList.contains('is-fading-out')) el.style.display = 'none';
-          }, 240);
-        } else {
-          el.classList.add('is-fading-out');
-          setTimeout(() => {
-            if (el.classList.contains('is-fading-out')) el.style.display = 'none';
-          }, 220);
-        }
-      }
-    }
-
-    // Apply all filters — pure client-side. Toggles visibility on the
-    // already-rendered grid cards (.fg-card) and list rows (tr[data-filter-unit]),
-    // sorts the grid in place, and updates the match counters + URL params.
-    function applyFilters(options) {
-      options = options || {};
-      const unitNumberInput = document.getElementById('gridUnitSearch');
-      if (unitNumberInput) {
-        currentFilters.unitNumber = (unitNumberInput.value || '').trim();
-        const searchBox = unitNumberInput.closest('.fg-search');
-        if (searchBox) searchBox.classList.toggle('is-active', currentFilters.unitNumber.length > 0);
-      }
-
-      const f = currentFilters;
-      const q = f.unitNumber ? f.unitNumber.toLowerCase() : '';
-
-      function matches(el) {
-        const status   = (el.dataset.filterStatus   || '').toLowerCase();
-        const floor    = (el.dataset.filterFloor    || '');
-        const type     = (el.dataset.filterType     || '');
-        const beds     = parseInt(el.dataset.filterBedrooms || '0', 10);
-        const dir      = (el.dataset.filterDirection|| '').toUpperCase();
-        const outlook  = (el.dataset.filterOutlook  || '');
-        const price    = parseFloat(el.dataset.filterPrice  || '0');
-        const area     = parseFloat(el.dataset.filterArea   || '0');
-        const name     = (el.dataset.filterName     || '').toLowerCase();
-
-        // El buscador de texto coincide SOLO por el nombre de la unidad
-        // (columna UNIDAD / nombre de la tarjeta), no por id interno, piso o tipo.
-        if (q && !name.includes(q)) return false;
-        if (f.minPrice != null && price < f.minPrice) return false;
-        if (f.maxPrice != null && price > f.maxPrice) return false;
-
-        // Los tipos provienen de la configuración global (Unidades →
-        // Configuraciones); el valor del checkbox coincide con data-filter-type
-        // (el campo `type` guardado en la unidad), por lo que basta match exacto.
-        if (f.types && f.types.length && !f.types.includes(type)) return false;
-        if (f.directions && f.directions.length && !f.directions.includes(dir)) return false;
-        if (f.outlooks   && f.outlooks.length   && !f.outlooks.includes(outlook)) return false;
-        if (f.floors     && f.floors.length     && !f.floors.includes(floor))    return false;
-        return true;
-      }
-
-      // Filtering is purely client-side over the cards currently in the DOM.
-      // We intentionally do NOT pull every remaining unit in one shot when a
-      // filter turns active — that produced a jarring "all units load at once"
-      // jump. Instead the infinite-scroll observer keeps streaming pages
-      // progressively and re-applies the active filter to each new page (see
-      // initLazyScroll), so results fill in smoothly as the user scrolls.
-
-      const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
-      let visibleGrid = 0;
-      cards.forEach(c => {
-        const ok = matches(c);
-        animateToggle(c, ok);
-        if (ok) visibleGrid++;
-      });
-
-      const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
-      let visibleList = 0;
-      const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
-      rows.forEach(r => {
-        const ok = matches(r);
-        const tabOk = (activeTab === 'all')
-          || (activeTab === 'hot' ? r.dataset.hot === '1' : r.dataset.tab === activeTab);
-        const show = ok && tabOk;
-        animateToggle(r, show, { kind: 'row' });
-        if (show) visibleList++;
-      });
-
-      // Sort cards in place when a sort is selected
-      const grid = document.querySelector('.fg-units-grid');
-      if (grid && f.sort) {
-        const sortFns = {
-          'price-asc':     (a,b) => parseFloat(a.dataset.filterPrice||0) - parseFloat(b.dataset.filterPrice||0),
-          'price-desc':    (a,b) => parseFloat(b.dataset.filterPrice||0) - parseFloat(a.dataset.filterPrice||0),
-          'size-asc':      (a,b) => parseFloat(a.dataset.filterArea||0)  - parseFloat(b.dataset.filterArea||0),
-          'size-desc':     (a,b) => parseFloat(b.dataset.filterArea||0)  - parseFloat(a.dataset.filterArea||0),
-          'bedrooms-asc':  (a,b) => parseInt(a.dataset.filterBedrooms||0)- parseInt(b.dataset.filterBedrooms||0),
-          'bedrooms-desc': (a,b) => parseInt(b.dataset.filterBedrooms||0)- parseInt(a.dataset.filterBedrooms||0),
-          // Default order: follow the server's global ordering (display_on_home_page,
-          // status grouping, custom_id, id) via the stamped index — not a naive
-          // string compare, which scrambled featured/sold grouping across pages.
-          'custom_id':     (a,b) => (parseInt(a.dataset.order)||0) - (parseInt(b.dataset.order)||0)
-        };
-        const fn = sortFns[f.sort];
-        if (fn) {
-          // Sort all cards (visible + hidden). Skip the inline CTA card which
-          // has no dataset.filterUnit and lives mid-grid — keep its DOM order.
-          const sortable = cards.slice().sort(fn);
-          sortable.forEach(c => grid.appendChild(c));
-        }
-      }
-
-      // With no active filter and more units still streaming in, the real
-      // total is the catalog size — not just what's painted so far.
-      const showingAll = !hasActiveFilters();
-      updateMatchCount((showingAll && !allUnitsLoaded) ? TOTAL_UNITS : visibleGrid);
-      updateListMatchCount((showingAll && !allUnitsLoaded) ? TOTAL_UNITS : visibleList);
-      if (!options.skipUrl) syncFiltersToUrl();
-    }
-
-    // ── Infinite scroll: stream additional unit pages from the API ──────────
-    // The server renders only the first page (HOME_PAGE_SIZE) of heavy cards /
-    // rows; the rest arrive as rendered HTML on scroll, keeping the DOM light.
+    // ── Server-side filtering ───────────────────────────────────────────────
+    // Filtering runs on the SERVER (see HomeController::homeUnits): the active
+    // filters travel as query params and only the matching units come back as
+    // rendered HTML, paginated. This keeps the DOM light no matter how big the
+    // catalog is — applying or clearing a filter never dumps the whole catalog
+    // into the page (which used to freeze the browser). The list status tabs
+    // stay client-side; they only refine the already-loaded matching rows.
     const HOME_PAGE_SIZE = {{ \App\Http\Controllers\HomeController::HOME_PAGE_SIZE }};
-    let lazyOffset = 0;          // how many units are currently in the DOM
-    let serverOrderSeq = 0;      // monotonic index = each card's position in the server's global order
-    let allUnitsLoaded = false;  // true once every public unit is painted
-    let lazyBusy = false;        // a page fetch is in flight
-    let allLoadPromise = null;   // de-dupes concurrent "load everything" calls
+    let lazyOffset = 0;              // matching units currently in the DOM
+    let serverOrderSeq = 0;          // running index for the lazy entrance stagger
+    let allUnitsLoaded = false;      // true once every matching unit is painted
+    let lazyBusy = false;            // a page fetch is in flight
+    let reloadSeq = 0;               // guards against out-of-order filter responses
+    let lastServerTotal = 0;         // server count for the active filter set
 
+    // List pill count: when the "All" status tab is active the list mirrors the
+    // grid (use the real server total); a specific tab counts the loaded rows.
+    function listMatchCount() {
+      const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
+      return activeTab === 'all' ? lastServerTotal : visibleListCount();
+    }
+
+    // True when the user has narrowed the catalog with the filter bar.
     function hasActiveFilters() {
       const f = currentFilters;
       if (f.unitNumber) return true;
@@ -4710,8 +4590,28 @@
       if ((f.types && f.types.length) || (f.directions && f.directions.length)
           || (f.outlooks && f.outlooks.length) || (f.floors && f.floors.length)) return true;
       if (f.sort && f.sort !== 'custom_id') return true;
-      const tab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
-      return tab !== 'all';
+      if (f._beds != null) return true;
+      return false;
+    }
+
+    // Build the /api/home-units query string from the current filter state.
+    function buildUnitParams(offset) {
+      const f = currentFilters;
+      const p = new URLSearchParams();
+      p.set('offset', offset);
+      if (f.unitNumber)        p.set('q', f.unitNumber);
+      if (f.minPrice != null)  p.set('min', f.minPrice);
+      if (f.maxPrice != null)  p.set('max', f.maxPrice);
+      if (f.types && f.types.length)           p.set('type',  f.types.join(','));
+      if (f.directions && f.directions.length) p.set('dir',   f.directions.join(','));
+      if (f.outlooks && f.outlooks.length)     p.set('out',   f.outlooks.join(','));
+      if (f.floors && f.floors.length)         p.set('floor', f.floors.join(','));
+      if (f.sort && f.sort !== 'custom_id')    p.set('sort',  f.sort);
+      // "View similar units" transient criteria (cleared on the next filter change).
+      if (f._beds != null)     p.set('beds', f._beds);
+      if (f._available)        p.set('available', '1');
+      if (f._exclude)          p.set('exclude', f._exclude);
+      return p;
     }
 
     function updateLazyLoaders() {
@@ -4725,8 +4625,8 @@
       document.getElementById('listLazyMore')?.classList.add('is-active');
     }
 
-    // Insert a page of server-rendered HTML into the grid + list, optionally
-    // with the staggered entrance animation (skipped for the bulk "load all").
+    // Insert a page of server-rendered HTML into the grid + list with the
+    // staggered entrance animation.
     function appendUnits(cardsHtml, rowsHtml, animate) {
       const grid  = document.querySelector('.fg-units-grid');
       const tbody = document.querySelector('#fgListTable tbody');
@@ -4735,9 +4635,6 @@
         tmp.innerHTML = cardsHtml;
         let i = 0;
         Array.from(tmp.children).forEach(node => {
-          // Stamp the card's place in the server's global order so the default
-          // (custom_id) sort can keep it slotted correctly instead of dumping
-          // every freshly loaded card at the bottom of the grid.
           node.dataset.order = serverOrderSeq++;
           if (animate) {
             node.style.setProperty('--lazy-i', i++ % HOME_PAGE_SIZE);
@@ -4764,32 +4661,87 @@
       try { updateCurrencyDisplay(localStorage.getItem('selectedCurrency') || 'USD'); } catch (e) {}
     }
 
-    function fetchLazyPage(all) {
-      const url = '/api/home-units?offset=' + lazyOffset + (all ? '&all=1' : '');
-      return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
-        .then(r => r.json())
+    // Status tabs (list view) are applied client-side over the loaded rows.
+    function applyListTab() {
+      const activeTab = document.querySelector('.fg-list-tab.active')?.dataset.tab || 'all';
+      document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]').forEach(r => {
+        const tabOk = (activeTab === 'all')
+          || (activeTab === 'hot' ? r.dataset.hot === '1' : r.dataset.tab === activeTab);
+        r.style.display = tabOk ? '' : 'none';
+      });
+    }
+    function visibleListCount() {
+      let n = 0;
+      document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]').forEach(r => {
+        if (r.style.display !== 'none') n++;
+      });
+      return n;
+    }
+
+    // Remove every loaded unit card/row (keeps headers, sentinels, etc).
+    function clearLoadedUnits() {
+      document.querySelectorAll('.fg-units-grid > .fg-card[data-filter-unit]').forEach(n => n.remove());
+      document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]').forEach(n => n.remove());
+    }
+
+    // Fetch one page for the current filter set.
+    function fetchUnitsPage(offset) {
+      return fetch('/api/home-units?' + buildUnitParams(offset).toString(),
+                   { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(r => r.json());
+    }
+
+    // Run the active filters from scratch: clear the grid/list and load page 0
+    // of the matching units from the server.
+    function reloadUnits(options) {
+      options = options || {};
+      const seq = ++reloadSeq;
+      lazyBusy = true;
+      allUnitsLoaded = false;
+      setLazyLoading(true);
+      fetchUnitsPage(0)
         .then(data => {
-          appendUnits(data.cards, data.rows, !all);
+          if (seq !== reloadSeq) return;        // a newer filter superseded this one
+          clearLoadedUnits();
+          serverOrderSeq = 0;
+          appendUnits(data.cards, data.rows, true);
           lazyOffset = data.offset;
           allUnitsLoaded = !data.hasMore;
+          lastServerTotal = data.total;
+          applyListTab();
+          updateMatchCount(data.total);
+          updateListMatchCount(listMatchCount());
           updateLazyLoaders();
-          return data;
+          if (options.onDone) options.onDone(data);
         })
-        .catch(() => { /* network hiccup — the observer will retry on next scroll */ });
+        .catch(() => {})
+        .finally(() => { if (seq === reloadSeq) { lazyBusy = false; updateLazyLoaders(); } });
+      if (!options.skipUrl) syncFiltersToUrl();
     }
 
-    // Pull every remaining unit in one shot (used right before a filter runs).
-    function ensureAllLoaded() {
-      if (allUnitsLoaded) return Promise.resolve();
-      if (allLoadPromise) return allLoadPromise;
-      allLoadPromise = fetchLazyPage(true).finally(() => { allLoadPromise = null; });
-      return allLoadPromise;
+    // Apply filters — debounced so typing in the unit search doesn't fire a
+    // request per keystroke. The actual filtering happens on the server.
+    let _filterDebounce = null;
+    function applyFilters(options) {
+      options = options || {};
+      const unitNumberInput = document.getElementById('gridUnitSearch');
+      if (unitNumberInput) {
+        currentFilters.unitNumber = (unitNumberInput.value || '').trim();
+        const searchBox = unitNumberInput.closest('.fg-search');
+        if (searchBox) searchBox.classList.toggle('is-active', currentFilters.unitNumber.length > 0);
+      }
+      // Any normal filter change clears the transient "view similar" criteria.
+      delete currentFilters._beds;
+      currentFilters._available = false;
+      currentFilters._exclude = null;
+      clearTimeout(_filterDebounce);
+      _filterDebounce = setTimeout(() => reloadUnits(options), 250);
     }
 
+    // ── Infinite scroll: stream the next page of matching units ─────────────
     function initLazyScroll() {
       const initialCards = document.querySelectorAll('.fg-units-grid > .fg-card');
-      // Seed the server-order index on the first page (server-rendered) so later
-      // pages continue the same sequence and the grid stays globally ordered.
+      // Seed the running order index on the first (server-rendered) page.
       initialCards.forEach((c, idx) => { c.dataset.order = idx; });
       serverOrderSeq = initialCards.length;
       lazyOffset = initialCards.length;
@@ -4803,13 +4755,21 @@
         const hit = entries.some(e => e.isIntersecting && e.target.classList.contains('is-active'));
         if (!hit) return;
         lazyBusy = true;
-        fetchLazyPage(false)
-          .then(() => {
-            // Re-apply the default sort so the freshly appended page slots into
-            // the grid's global order (and refresh the counters).
-            applyFilters({ skipUrl: true });
+        const seq = reloadSeq;
+        fetchUnitsPage(lazyOffset)
+          .then(data => {
+            if (seq !== reloadSeq) return;       // a filter reload happened mid-fetch
+            appendUnits(data.cards, data.rows, true);
+            lazyOffset = data.offset;
+            allUnitsLoaded = !data.hasMore;
+            lastServerTotal = data.total;
+            applyListTab();
+            updateMatchCount(data.total);
+            updateListMatchCount(listMatchCount());
+            updateLazyLoaders();
           })
-          .finally(() => { lazyBusy = false; });
+          .catch(() => {})
+          .finally(() => { if (seq === reloadSeq) lazyBusy = false; });
       }, { rootMargin: '0px 0px 300px 0px' });
       if (grid) obs.observe(grid);
       if (list) obs.observe(list);
@@ -4840,9 +4800,13 @@
     function applyFiltersFromUrl() {
       const p = new URLSearchParams(window.location.search);
       if (!p.toString()) {
-        // No URL params — still compute the initial match counts from the
-        // server-rendered DOM so the pill doesn't show a stale placeholder.
-        applyFilters({ skipUrl: true });
+        // No URL params — keep the fast server-rendered first page as-is and
+        // just initialise the tab + counters (the full catalog count). The rest
+        // streams in via infinite scroll. No refetch, no flash.
+        lastServerTotal = TOTAL_UNITS;
+        applyListTab();
+        updateMatchCount(TOTAL_UNITS);
+        updateListMatchCount(TOTAL_UNITS);
         return;
       }
       currentFilters.unitNumber = p.get('q') || '';
@@ -5038,8 +5002,8 @@
       }
     }
 
-    // Reset filters
-    function resetFilters() {
+    // Reset the filter state + UI controls WITHOUT triggering a reload.
+    function resetFiltersState() {
       currentFilters = {
         unitNumber: '',
         minPrice: null,
@@ -5059,11 +5023,15 @@
       document.querySelectorAll('#outlookDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.querySelectorAll('#floorDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.getElementById('gridUnitSearch').value = '';
+      const gridBox = document.getElementById('gridUnitSearch')?.closest('.fg-search');
+      if (gridBox) gridBox.classList.remove('is-active');
       const listInput = document.getElementById('fgListSearchInput');
       if (listInput) listInput.value = '';
       const listBox = document.getElementById('fgListSearchBox');
       if (listBox) listBox.classList.remove('has-value');
       document.querySelector('#sortDropdown input[value="custom_id"]').checked = true;
+      // Back to the "All" status tab.
+      document.querySelectorAll('.fg-list-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
 
       // Update labels
       updatePriceLabel();
@@ -5072,9 +5040,12 @@
       updateOutlookLabel();
       updateFloorLabel();
       updateSortLabel();
+    }
 
-      // Apply filters
-      applyFilters();
+    // Reset filters and reload the (now unfiltered) catalog from the server.
+    function resetFilters() {
+      resetFiltersState();
+      reloadUnits();
     }
 
     // Helper function
@@ -5398,11 +5369,13 @@
     window.addEventListener('load', positionToggleBg);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionToggleBg);
 
-    // List view tabs — delegate to the unified filter so status tab + filters compose.
+    // List view tabs — purely client-side refinement over the rows already
+    // loaded for the active filter set (no server round-trip needed).
     function setListTab(btn) {
       document.querySelectorAll('.fg-list-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      if (typeof applyFilters === 'function') applyFilters();
+      applyListTab();
+      updateListMatchCount(listMatchCount());
     }
     function filterListRows(q) {
       currentFilters.unitNumber = (q || '').trim();
@@ -5424,67 +5397,29 @@
       if (input) input.focus();
     }
 
-    // "View Similar Units" — on a sold card, filter the grid to other available
-    // units that match the sold one's profile (same bedrooms; same floor or
-    // direction when present). Hides the sold/reserved/pending ones.
+    // "View Similar Units" — on a sold card, ask the server for other available
+    // units with the same bedroom count, excluding sold/reserved/pending and the
+    // reference unit itself.
     window.viewSimilarUnits = function (btn) {
       const card = btn.closest('.fg-card');
       if (!card) return;
-      const beds   = parseInt(card.dataset.filterBedrooms || '0', 10);
-      const dir    = (card.dataset.filterDirection || '').toUpperCase();
-      const floor  = (card.dataset.filterFloor || '');
-      const type   = (card.dataset.filterType || '');
-      const refUnit= (card.dataset.filterUnit || '');
+      const beds    = parseInt(card.dataset.filterBedrooms || '0', 10);
+      const refUnit = (card.dataset.filterUnit || '');
 
-      // Reset to a clean state, then apply the similarity criteria.
-      resetFilters();
-      const typeLbl = (type === 'Studio' || type === 'Penthouse')
-        ? type
-        : (beds >= 1 && beds <= 3 ? beds + ' Bed' : null);
-      if (typeLbl) {
-        currentFilters.types = [typeLbl];
-        document.querySelectorAll('#typeDropdown input[type="checkbox"]').forEach(cb => {
-          cb.checked = (cb.value === typeLbl);
-        });
-        updateTypeLabel();
-      }
+      // Clean filter state (no reload yet), then load the similarity criteria.
+      resetFiltersState();
+      currentFilters._beds = beds;
+      currentFilters._available = true;
+      currentFilters._exclude = refUnit;
 
-      // Finding *every* similar unit needs the full catalog painted first.
-      ensureAllLoaded().then(() => {
-        // Custom matcher: bedrooms must match; exclude sold/reserved/pending and
-        // exclude the reference unit itself.
-        const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
-        let visible = 0;
-        cards.forEach(c => {
-          const cBeds   = parseInt(c.dataset.filterBedrooms || '0', 10);
-          const cStatus = (c.dataset.filterStatus || '').toLowerCase();
-          const cUnit   = (c.dataset.filterUnit || '');
-          const show = (cBeds === beds) && !['sold','reserved','pending'].includes(cStatus) && cUnit !== refUnit;
-          animateToggle(c, show);
-          if (show) visible++;
-        });
-        // Also apply on the list view in case the user toggles.
-        const rows = Array.from(document.querySelectorAll('#fgListTable tbody tr[data-filter-unit]'));
-        let listVisible = 0;
-        rows.forEach(r => {
-          const rBeds   = parseInt(r.dataset.filterBedrooms || '0', 10);
-          const rStatus = (r.dataset.filterStatus || '').toLowerCase();
-          const rUnit   = (r.dataset.filterUnit || '');
-          const show = (rBeds === beds) && !['sold','reserved','pending'].includes(rStatus) && rUnit !== refUnit;
-          animateToggle(r, show, { kind: 'row' });
-          if (show) listVisible++;
-        });
-        updateMatchCount(visible);
-        updateListMatchCount(listVisible);
-
+      reloadUnits({ skipUrl: true, onDone: (data) => {
         // Smooth scroll to the grid so the user sees the result.
         const grid = document.querySelector('.fg-units-grid');
         if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
         // No matches → fall back to opening the original unit modal so the user
         // can still see why it was sold.
-        if (visible === 0 && typeof openMoreInfo === 'function') openMoreInfo(refUnit);
-      });
+        if ((data.total || 0) === 0 && typeof openMoreInfo === 'function') openMoreInfo(refUnit);
+      }});
     };
   </script>
 
