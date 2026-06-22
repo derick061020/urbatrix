@@ -45,7 +45,7 @@
                         <div style="font-size:10px;color:#92400e;margin-top:2px;">{{ __('Expira') }} {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</div>
                     @endif
                 </td>
-                <td>{{ $unit->floor ? ucfirst($unit->floor) : __('Ground') }}</td>
+                <td>{{ isset($floorDisplay) ? $floorDisplay($unit->floor) : ($unit->floor ? ucfirst($unit->floor) : __('Ground')) }}</td>
                 <td>{{ ($unit->bedrooms ?? 0) }} {{ __('Bed') }}</td>
                 <td>
                     {{ strtoupper($unit->direction ?? '—') }}

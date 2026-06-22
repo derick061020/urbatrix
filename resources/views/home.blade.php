@@ -141,6 +141,18 @@
     $outlookLabels = \App\Support\UnitOptions::map('outlooks');
     $floorLabels   = \App\Support\UnitOptions::map('floors');
     $typeLabels    = \App\Support\UnitOptions::map('types');
+
+    // Etiqueta legible y traducible para un valor de piso. Las plantas baja se
+    // muestran traducidas (Planta baja / Ground Floor); el resto usa la etiqueta
+    // configurada en el admin (1°, 2°, …) y, como fallback, el valor capitalizado.
+    // Se usa en grid, list y plan para que el piso se vea igual en todas las vistas.
+    $floorDisplay = function ($value) use ($floorLabels) {
+        $v = trim((string) $value);
+        if ($v === '' || strcasecmp($v, 'ground') === 0 || strcasecmp($v, 'pb') === 0) {
+            return __('Ground Floor');
+        }
+        return $floorLabels[$v] ?? $floorLabels[strtolower($v)] ?? ucfirst($v);
+    };
   @endphp
 
   <!-- MORE INFO MODAL — Figma 220:20041 (modal-tipologia) -->
@@ -2309,24 +2321,36 @@
                         data-floor="{{ $floorLabel }}">
                   <span class="fg-chip-left">
                     <span class="fg-chip-dot"></span>
-                    <span class="fg-chip-text">{{ $floorLabel }}</span>
+                    <span class="fg-chip-text">{{ $floorDisplay($floorLabel) }}</span>
                   </span>
                   <span class="fg-chip-count">{{ $floorBuckets[$floorLabel]->count() }}</span>
                 </button>
               @empty
                 <div class="fg-plan-empty-chips" style="color:#9aa3a0;font-size:13px;padding:8px 12px;">
-                  Sin unidades publicadas.
+                  {{ __('Sin unidades publicadas.') }}
                 </div>
               @endforelse
             </div>
 
+            {{-- Mobile-only floor selector: en teléfonos los chips se ocultan y se
+                 elige el piso desde este <select>, ubicado junto a la etiqueta PISO. --}}
+            @if($floorOrder->isNotEmpty())
+              <select id="fgFloorSelect" class="fg-plan-floor-select" aria-label="{{ __('Floor filter') }}">
+                @foreach($floorOrder as $floorLabel)
+                  <option value="{{ $floorLabel }}" {{ $floorLabel === $activeFloor ? 'selected' : '' }}>
+                    {{ $floorDisplay($floorLabel) }} · {{ $availableByFloor[$floorLabel] ?? 0 }} {{ __('Disponibles') }}
+                  </option>
+                @endforeach
+              </select>
+            @endif
+
             <!-- Active floor label · N UNIDADES DISPONIBLES -->
             <div class="fg-plan-piso">
               <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
-                {{ strtoupper($activeFloor === 'Ground' ? 'PLANTA BAJA' : 'PISO '.$activeFloor) }}
+                {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
               </div>
               <div class="fg-plan-piso-right" id="fgPlanPisoCount">
-                {{ $availableByFloor[$activeFloor] ?? 0 }} UNIDADES DISPONIBLES
+                {{ $availableByFloor[$activeFloor] ?? 0 }} {{ strtoupper(__('Unidades disponibles')) }}
               </div>
             </div>
           </div>
@@ -2992,13 +3016,23 @@
           applyBuyerMode(this.dataset.buyer || 'investment');
         });
       });
-      // Plan floor chips → filter markers + update floor label
+      // Plan floor chips / mobile select → filter markers + update floor label
       (function () {
         const chips     = document.querySelectorAll('.fg-chip-floor');
+        const select    = document.getElementById('fgFloorSelect');
         const canvas    = document.getElementById('fgPlanCanvas');
         const labelEl   = document.getElementById('fgPlanPisoLabel');
         const countEl   = document.getElementById('fgPlanPisoCount');
-        if (!chips.length || !canvas) return;
+        if ((!chips.length && !select) || !canvas) return;
+
+        // Cadenas traducidas (Blade → JS) para que la etiqueta PISO y el contador
+        // se rerendericen en el idioma activo al cambiar de piso.
+        const I18N = {
+          piso:      @json(__('Piso')),
+          ground:    @json(__('Ground Floor')),
+          available: @json(__('Unidades disponibles')),
+          names:     @json($floorOrder->mapWithKeys(fn($f) => [$f => $floorDisplay($f)])->all()),
+        };
 
         function activate(floor) {
           chips.forEach(x => {
@@ -3006,6 +3040,7 @@
             x.classList.toggle('is-active', on);
             x.setAttribute('aria-selected', on ? 'true' : 'false');
           });
+          if (select && select.value !== floor) select.value = floor;
 
           // Cross-fade the whole canvas while markers swap.
           canvas.classList.remove('is-switching');
@@ -3050,11 +3085,11 @@
           }
           if (labelEl) {
             labelEl.textContent = (floor === 'Ground')
-              ? 'PLANTA BAJA'
-              : 'PISO ' + floor.toUpperCase();
+              ? I18N.ground.toUpperCase()
+              : (I18N.piso + ' ' + (I18N.names[floor] || floor)).toUpperCase();
           }
           if (countEl) {
-            countEl.textContent = available + ' UNIDADES DISPONIBLES';
+            countEl.textContent = available + ' ' + I18N.available.toUpperCase();
           }
         }
 
@@ -3063,6 +3098,11 @@
             activate(this.dataset.floor);
           });
         });
+        if (select) {
+          select.addEventListener('change', function () {
+            activate(this.value);
+          });
+        }
       })();
 
       // =====================================================
