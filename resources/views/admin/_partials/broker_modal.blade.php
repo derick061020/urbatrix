@@ -3,7 +3,7 @@
     <div class="bg-white rounded-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
         {{-- Hero --}}
-        <div class="px-6 pt-5 pb-0 border-b border-ink-100" style="border-top:3px solid #5c7c68">
+        <div class="px-6 pt-5 pb-0 border-b border-ink-100" >
             <div class="flex items-start gap-4">
                 <div class="crm-avatar" style="background:{{ $bg }};width:48px;height:48px;font-size:16px">{{ $init }}</div>
                 <div class="flex-1 min-w-0">

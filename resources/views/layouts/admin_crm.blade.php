@@ -83,11 +83,13 @@
       .crm-tab {
           padding: 8px 16px; border-radius: 999px; font-size:12px; font-weight:600;
           color:#525866; cursor:pointer;
+          white-space:nowrap; flex-shrink:0;
       }
       .crm-tab.active { background:#5c7c68; color:#fff; }
       .crm-tab-line {
           padding: 14px 4px; font-size:14px; font-weight:500; color:#717784;
           border-bottom:2px solid transparent; cursor:pointer;
+          white-space:nowrap; flex-shrink:0;
       }
       .crm-tab-line.active { color:#222530; border-color:#5c7c68; font-weight:600; }
       .crm-btn {
@@ -111,6 +113,11 @@
       }
       .crm-table tr:last-child td { border-bottom: 0; }
       .crm-table tbody tr:hover td { background:#fafbfc; }
+      /* Keep wide tables from cramming on narrow screens: scroll inside their
+         overflow-x-auto wrapper instead of squeezing columns. */
+      .crm-table { min-width: 720px; }
+      .table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .table-scroll > table { min-width: 640px; }
       .crm-input {
           height: 36px; padding: 0 14px 0 38px;
           border:1px solid #eaecf0; border-radius:8px;
@@ -448,6 +455,26 @@
 @endif
 
 @include('partials.global-search', ['endpoint' => route('admin.search')])
+
+{{-- Make any data table horizontally scrollable on narrow screens (no overflow/cram) --}}
+<script>
+  (function () {
+    function wrapTables () {
+      document.querySelectorAll('main table').forEach(function (t) {
+        var p = t.parentElement;
+        if (!p || p.classList.contains('table-scroll')) return;
+        var ox = getComputedStyle(p).overflowX;
+        if (ox === 'auto' || ox === 'scroll') return; // already in a scroll container
+        var w = document.createElement('div');
+        w.className = 'table-scroll';
+        p.insertBefore(w, t);
+        w.appendChild(t);
+      });
+    }
+    if (document.readyState !== 'loading') wrapTables();
+    else document.addEventListener('DOMContentLoaded', wrapTables);
+  })();
+</script>
 
 @stack('scripts')
 </body>

@@ -125,7 +125,7 @@
                         <th>{{ __('Usuario') }}</th>
                         <th>{{ __('Rol') }}</th>
                         <th>{{ __('Unidad') }}</th>
-                        <th>{{ __('Progreso KYC') }}</th>
+                        <th>{{ __('Progreso de compra') }}</th>
                         <th>{{ __('Estado') }}</th>
                         <th>{{ __('Registrado') }}</th>
                         <th></th>

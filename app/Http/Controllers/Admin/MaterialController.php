@@ -82,6 +82,7 @@ class MaterialController extends Controller
             'title'        => 'required|string|max:160',
             'description'  => 'nullable|string|max:1000',
             'category'     => 'nullable|string|max:80',
+            'icon'         => 'nullable|string|max:60',
             'external_url' => 'nullable|url|max:500',
             'file'         => 'nullable|file|max:2097152', // 2 GB
             'sort_order'   => 'nullable|integer|min:0',

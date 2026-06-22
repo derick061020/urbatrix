@@ -14,6 +14,7 @@ class BrokerMaterial extends Model
         'description',
         'category',
         'format',
+        'icon',
         'file_path',
         'external_url',
         'file_size',
@@ -32,9 +33,14 @@ class BrokerMaterial extends Model
         return $query->where('visible', true);
     }
 
-    /** primeicon para el formato del recurso. */
+    /** primeicon del recurso: el elegido manualmente, o uno derivado del formato. */
     public function getIconAttribute(): string
     {
+        $chosen = $this->attributes['icon'] ?? null;
+        if (! empty($chosen)) {
+            return $chosen;
+        }
+
         return match (strtoupper($this->format)) {
             'PDF'         => 'pi-file-pdf',
             'ZIP', 'IMG'  => 'pi-images',

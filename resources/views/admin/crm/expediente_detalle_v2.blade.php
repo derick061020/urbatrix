@@ -59,7 +59,7 @@
 
     {{-- Tabs --}}
     <div class="crm-card">
-        <div class="px-6 border-b border-ink-200 flex items-center gap-8">
+        <div class="px-6 border-b border-ink-200 flex items-center gap-8 overflow-x-auto">
             @php
                 $tabs = [
                     ['resumen','Resumen'],

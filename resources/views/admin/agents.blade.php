@@ -117,7 +117,7 @@
                             </td>
                             <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                             <td class="text-[12px] text-ink-500">{{ $b->created_at?->diffForHumans() }}</td>
-                            <td>
+                            <td class="text-right">
                                 <button type="button"
                                         onclick="document.getElementById('modal-broker-{{ $b->id }}').showModal()"
                                         class="crm-btn crm-btn-ghost text-[11px]">

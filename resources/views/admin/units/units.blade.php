@@ -194,7 +194,7 @@
             @endforeach
         </div>
 
-        <div class="p-6 overflow-y-auto flex-1">
+        <div class="p-6 overflow-y-auto flex-1 h-[55vh]">
             @foreach($cfgSections as $cat => $meta)
                 <section data-cfg-section="{{ $cat }}" class="{{ $loop->first ? '' : 'hidden' }}">
                     <p class="text-[12px] text-ink-500 mb-3">{{ $meta['hint'] }}</p>

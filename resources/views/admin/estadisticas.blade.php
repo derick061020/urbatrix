@@ -8,7 +8,7 @@
 <div class="p-4 sm:p-6 lg:p-8">
 
     {{-- Tabs --}}
-    <div class="flex items-center gap-5 border-b border-ink-100 mb-5">
+    <div class="flex items-center gap-5 border-b border-ink-100 mb-5 overflow-x-auto">
         <button type="button" class="crm-tab-line active" data-stat-tab="comportamiento">{{ __('User behavior') }}</button>
         <button type="button" class="crm-tab-line" data-stat-tab="ventas">{{ __('Sales & platform') }}</button>
     </div>

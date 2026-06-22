@@ -25,6 +25,15 @@
     }
     .mat-drop:hover { border-color:#5c7c68; background:#f5f8f6; }
     .mat-drop input[type=file] { display:none; }
+    /* Selector de icono */
+    .mat-icons { display:grid; grid-template-columns:repeat(8, 1fr); gap:6px; }
+    .mat-icon-btn {
+        height:38px; display:flex; align-items:center; justify-content:center;
+        border:1px solid #eaecf0; border-radius:8px; background:#fff; color:#3a4150;
+        font-size:15px; cursor:pointer; transition:border-color .15s, background-color .15s, color .15s;
+    }
+    .mat-icon-btn:hover { border-color:#5c7c68; background:#f5f8f6; }
+    .mat-icon-btn.is-active { border-color:#5c7c68; background:#5c7c68; color:#fff; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
 </style>
 @endpush
 
@@ -87,7 +96,7 @@
                                 <button type="button" class="text-ink-500 hover:text-brand mr-3" title="{{ __('Ver') }}"
                                     onclick="openPreviewMaterial({{ $previewJson }})"><i class="pi pi-eye"></i></button>
                             @endif
-                            @php $matJson = \Illuminate\Support\Js::from($m->only(['id','title','description','category','external_url','sort_order','visible'])); @endphp
+                            @php $matJson = \Illuminate\Support\Js::from($m->only(['id','title','description','category','icon','external_url','sort_order','visible'])); @endphp
                             <button type="button" class="text-ink-500 hover:text-brand mr-3" title="{{ __('Editar') }}"
                                 onclick="openEditMaterial({{ $matJson }})"><i class="pi pi-pencil"></i></button>
                             <button type="button" class="text-ink-400 hover:text-err" title="{{ __('Eliminar') }}"
@@ -124,6 +133,46 @@
             <div>
                 <label class="mat-label">{{ __('Categoría') }}</label>
                 <input type="text" name="category" id="matInputCat" placeholder="{{ __('Renders, Brochure, Contrato…') }}" class="mat-field">
+            </div>
+
+            <div>
+                <label class="mat-label">{{ __('Icono') }}</label>
+                <input type="hidden" name="icon" id="matInputIcon" value="">
+                <div class="mat-icons" id="matIconGrid">
+                    @php $matIcons = [
+                        ['val' => '',                'show' => 'pi-sparkles'],
+                        ['val' => 'pi-file',         'show' => 'pi-file'],
+                        ['val' => 'pi-file-pdf',     'show' => 'pi-file-pdf'],
+                        ['val' => 'pi-file-word',    'show' => 'pi-file-word'],
+                        ['val' => 'pi-file-excel',   'show' => 'pi-file-excel'],
+                        ['val' => 'pi-images',       'show' => 'pi-images'],
+                        ['val' => 'pi-image',        'show' => 'pi-image'],
+                        ['val' => 'pi-video',        'show' => 'pi-video'],
+                        ['val' => 'pi-volume-up',    'show' => 'pi-volume-up'],
+                        ['val' => 'pi-map',          'show' => 'pi-map'],
+                        ['val' => 'pi-map-marker',   'show' => 'pi-map-marker'],
+                        ['val' => 'pi-home',         'show' => 'pi-home'],
+                        ['val' => 'pi-building',     'show' => 'pi-building'],
+                        ['val' => 'pi-book',         'show' => 'pi-book'],
+                        ['val' => 'pi-bookmark',     'show' => 'pi-bookmark'],
+                        ['val' => 'pi-folder',       'show' => 'pi-folder'],
+                        ['val' => 'pi-link',         'show' => 'pi-link'],
+                        ['val' => 'pi-globe',        'show' => 'pi-globe'],
+                        ['val' => 'pi-megaphone',    'show' => 'pi-megaphone'],
+                        ['val' => 'pi-star',         'show' => 'pi-star'],
+                        ['val' => 'pi-dollar',       'show' => 'pi-dollar'],
+                        ['val' => 'pi-chart-bar',    'show' => 'pi-chart-bar'],
+                        ['val' => 'pi-calendar',     'show' => 'pi-calendar'],
+                        ['val' => 'pi-cog',          'show' => 'pi-cog'],
+                    ]; @endphp
+                    @foreach($matIcons as $ic)
+                        <button type="button" class="mat-icon-btn" data-icon="{{ $ic['val'] }}"
+                            title="{{ $ic['val'] === '' ? __('Automático (según formato)') : $ic['val'] }}">
+                            <i class="pi {{ $ic['show'] }}"></i>
+                        </button>
+                    @endforeach
+                </div>
+                <span class="block text-[11px] text-ink-400 mt-1.5">{{ __('Dejalo en “automático” para detectarlo según el formato del archivo.') }}</span>
             </div>
 
             <div class="pt-1">
@@ -206,6 +255,23 @@
         matDropName.textContent = matFileInput.files.length ? matFileInput.files[0].name : 'Subir un archivo';
     });
 
+    // Selector de icono
+    const matIconInput = document.getElementById('matInputIcon');
+    const matIconGrid = document.getElementById('matIconGrid');
+
+    function setMaterialIcon(value) {
+        const val = value || '';
+        matIconInput.value = val;
+        matIconGrid.querySelectorAll('.mat-icon-btn').forEach(btn => {
+            btn.classList.toggle('is-active', (btn.dataset.icon || '') === val);
+        });
+    }
+
+    matIconGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mat-icon-btn');
+        if (btn) setMaterialIcon(btn.dataset.icon || '');
+    });
+
     function openEditMaterial(m) {
         document.getElementById('matTitle').textContent = 'Editar material';
         document.getElementById('matMethod').value = 'PUT';
@@ -213,6 +279,7 @@
         document.getElementById('matInputTitle').value = m.title || '';
         document.getElementById('matInputDesc').value = m.description || '';
         document.getElementById('matInputCat').value = m.category || '';
+        setMaterialIcon(m.icon || '');
         document.getElementById('matInputUrl').value = m.external_url || '';
         document.getElementById('matInputOrder').value = m.sort_order ?? 0;
         document.getElementById('matInputVisible').checked = !!m.visible;
@@ -227,6 +294,7 @@
         matForm.action = storeAction;
         matForm.reset();
         matDropName.textContent = 'Subir un archivo';
+        setMaterialIcon('');
         document.getElementById('matInputVisible').checked = true;
         document.getElementById('matModal').showModal();
     });

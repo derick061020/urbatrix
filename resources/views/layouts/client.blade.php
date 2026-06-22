@@ -96,6 +96,9 @@
       .cli-progress { height:6px; border-radius:999px; background:#f2f5f8; overflow:hidden; }
       .cli-progress > span { display:block; height:100%; border-radius:999px; }
       .dot { width:8px; height:8px; border-radius:999px; display:inline-block; }
+      /* Horizontal scroll wrapper for data tables on narrow screens. */
+      .table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .table-scroll > table { min-width:640px; }
 
       .topbar-icon-btn {
           width:38px; height:38px;
@@ -370,6 +373,26 @@
 @endif
 
 @include('partials.global-search', ['endpoint' => route('dashboard.search')])
+
+{{-- Make any data table horizontally scrollable on narrow screens (no overflow/cram) --}}
+<script>
+  (function () {
+    function wrapTables () {
+      document.querySelectorAll('main table').forEach(function (t) {
+        var p = t.parentElement;
+        if (!p || p.classList.contains('table-scroll')) return;
+        var ox = getComputedStyle(p).overflowX;
+        if (ox === 'auto' || ox === 'scroll') return; // already in a scroll container
+        var w = document.createElement('div');
+        w.className = 'table-scroll';
+        p.insertBefore(w, t);
+        w.appendChild(t);
+      });
+    }
+    if (document.readyState !== 'loading') wrapTables();
+    else document.addEventListener('DOMContentLoaded', wrapTables);
+  })();
+</script>
 
 @stack('scripts')
 </body>

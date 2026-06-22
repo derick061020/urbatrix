@@ -101,7 +101,7 @@
 
     {{-- Tabs --}}
     <div class="crm-card">
-        <div class="px-4 border-b border-ink-100 flex items-center gap-6">
+        <div class="px-4 border-b border-ink-100 flex items-center gap-6 overflow-x-auto">
             <button type="button" class="crm-tab-line flex items-center gap-2 {{ $tab === 'plantillas' ? 'active' : '' }}" data-pa-tab="plantillas" onclick="paSwitchTab('plantillas')">
                 Plantillas <span class="crm-pill bg-err-soft text-err">{{ $counts['templates'] }}</span>
             </button>
