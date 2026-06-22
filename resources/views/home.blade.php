@@ -2007,7 +2007,7 @@
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="{{ __('Unit No.') }}">
+            <input type="text" id="gridUnitSearch" placeholder="{{ __('Unit No.') }}">
           </label>
 
           <!-- Mobile-only trigger that opens the filters bottom-sheet -->
@@ -4597,7 +4597,7 @@
     // sorts the grid in place, and updates the match counters + URL params.
     function applyFilters(options) {
       options = options || {};
-      const unitNumberInput = document.querySelector('input[placeholder="Unit No."]');
+      const unitNumberInput = document.getElementById('gridUnitSearch');
       if (unitNumberInput) {
         currentFilters.unitNumber = (unitNumberInput.value || '').trim();
         const searchBox = unitNumberInput.closest('.fg-search');
@@ -4634,19 +4634,12 @@
         return true;
       }
 
-      // Server pagination gate: the client filter engine works on the cards
-      // currently in the DOM. While not everything is loaded yet, any *active*
-      // filter first pulls the remaining units in (one shot) so the results are
-      // complete; an unfiltered view just shows what's painted and lets the
-      // infinite-scroll observer stream the rest.
-      if (!allUnitsLoaded && !options._afterLoad && hasActiveFilters()) {
-        setLazyLoading(true);
-        ensureAllLoaded().then(() => {
-          setLazyLoading(false);
-          applyFilters(Object.assign({}, options, { _afterLoad: true }));
-        });
-        return;
-      }
+      // Filtering is purely client-side over the cards currently in the DOM.
+      // We intentionally do NOT pull every remaining unit in one shot when a
+      // filter turns active — that produced a jarring "all units load at once"
+      // jump. Instead the infinite-scroll observer keeps streaming pages
+      // progressively and re-applies the active filter to each new page (see
+      // initLazyScroll), so results fill in smoothly as the user scrolls.
 
       const cards = Array.from(document.querySelectorAll('.fg-units-grid > .fg-card'));
       let visibleGrid = 0;
@@ -4875,7 +4868,7 @@
       setCheckGroup('#floorDropdown input[type="checkbox"]',     currentFilters.floors);
       const sortRadio = document.querySelector('#sortDropdown input[value="'+currentFilters.sort+'"]');
       if (sortRadio) sortRadio.checked = true;
-      const unitInput = document.querySelector('input[placeholder="Unit No."]');
+      const unitInput = document.getElementById('gridUnitSearch');
       if (unitInput) unitInput.value = currentFilters.unitNumber;
 
       updatePriceLabel();
@@ -5065,7 +5058,7 @@
       document.querySelectorAll('#directionDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.querySelectorAll('#outlookDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.querySelectorAll('#floorDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
-      document.querySelector('input[placeholder="Unit No."]').value = '';
+      document.getElementById('gridUnitSearch').value = '';
       const listInput = document.getElementById('fgListSearchInput');
       if (listInput) listInput.value = '';
       const listBox = document.getElementById('fgListSearchBox');
@@ -5106,7 +5099,7 @@
       }
 
       // Unit-number search (grid) — typing filters in real time
-      const unitNumberInput = document.querySelector('input[placeholder="Unit No."]');
+      const unitNumberInput = document.getElementById('gridUnitSearch');
       if (unitNumberInput) {
         unitNumberInput.addEventListener('input', function() {
           currentFilters.unitNumber = this.value;
@@ -5414,7 +5407,7 @@
     function filterListRows(q) {
       currentFilters.unitNumber = (q || '').trim();
       // Also reflect into the grid search input so both stay in sync.
-      const gridInput = document.querySelector('input[placeholder="Unit No."]');
+      const gridInput = document.getElementById('gridUnitSearch');
       if (gridInput) gridInput.value = currentFilters.unitNumber;
       // Show/hide the inline clear (X) button.
       const box = document.getElementById('fgListSearchBox');
