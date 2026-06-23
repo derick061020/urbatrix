@@ -4035,7 +4035,7 @@
       /* CTA row — buttons stack so labels never clip, and stay pinned to the
          bottom of the modal while the content scrolls behind them. */
       .mt-cta-row {
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
         padding: 12px 14px;
         position: sticky;
@@ -4044,7 +4044,7 @@
         box-shadow: 0 -4px 12px rgba(14, 18, 27, 0.06);
       }
       .mt-btn-secondary,
-      .mt-btn-primary { width: 100%; flex: none; padding: 11px 14px; }
+      .mt-btn-primary { flex: 1 1 0; width: auto; min-width: 0; padding: 11px 10px; }
 
       /* Gallery / tabs / thumbs */
       .mt-right {     min-height: auto; }
@@ -4057,3 +4057,15 @@
       .mt-thumb { width: 56px; height: 40px; }
     }
 
+
+/* ── Evitar auto-zoom de iOS al enfocar inputs en móvil ──
+   iOS Safari hace zoom cuando el campo enfocado tiene font-size < 16px.
+   Forzar 16px en los campos en pantallas táctiles lo desactiva sin
+   bloquear el pinch-zoom del usuario. */
+@media (max-width: 1024px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
