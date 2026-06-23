@@ -1338,7 +1338,9 @@
     async function cmUploadFile(row, file){
         const nameEl  = row.querySelector('.cm-file-name');
         const saveBtn = document.getElementById('stSaveBtn');
-        const chunkSize = 1024 * 1024; // 1 MB
+        // 512 KB por chunk: queda por debajo del client_max_body_size por defecto
+        // de nginx (1 MB), contando el overhead del multipart, para evitar el 413.
+        const chunkSize = 512 * 1024;
         const total = Math.ceil(file.size / chunkSize) || 1;
         const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
