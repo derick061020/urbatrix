@@ -2217,7 +2217,7 @@
     .fg-list-table tr.row-sold      .fg-list-cta { background: #c7cdd6; cursor: not-allowed; }
 
     /* ============================================
-       LIST VIEW — MOBILE (compact, no horizontal scroll)
+       LIST VIEW — MOBILE (all columns, horizontal scroll, sticky CTA)
        ============================================ */
     @media (max-width: 768px) {
       .fg-list-wrap { padding: 0 12px 48px; }
@@ -2238,25 +2238,44 @@
       .fg-list-tab { flex: 0 0 auto; white-space: nowrap; }
       .fg-list-toolbar .fg-pill-matches { order: 3; width: 100%; margin-left: 0; justify-content: center; }
 
-      /* Compact table: drop the secondary columns so the essentials fit without
-         a horizontal scroll. Keep Unit, Status, Price and the action button. */
-      .fg-list-table { border-radius: 12px; }
-      .fg-list-table th:nth-child(3),  .fg-list-table td:nth-child(3),   /* Floor */
-      .fg-list-table th:nth-child(4),  .fg-list-table td:nth-child(4),   /* Type */
-      .fg-list-table th:nth-child(5),  .fg-list-table td:nth-child(5),   /* Direction */
-      .fg-list-table th:nth-child(6),  .fg-list-table td:nth-child(6),   /* Bed/Bath */
-      .fg-list-table th:nth-child(7),  .fg-list-table td:nth-child(7),   /* Int sqft */
-      .fg-list-table th:nth-child(8),  .fg-list-table td:nth-child(8) {  /* Ext sqft */
-        display: none;
+      /* Show every column and let the table scroll sideways inside its wrapper. */
+      .fg-list-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #eaecf0;
+        border-radius: 12px;
+        background: #fff;
       }
-      .fg-list-table th, .fg-list-table td { padding: 12px 8px; }
+      .fg-list-table {
+        border: 0;
+        border-radius: 0;
+        overflow: visible;  /* must NOT be hidden, or the sticky CTA cell loses its scroll context */
+        min-width: 720px;   /* keeps columns at a readable width while scrolling */
+      }
+      .fg-list-table th, .fg-list-table td {
+        padding: 12px 10px;
+        white-space: nowrap;
+      }
       .fg-list-table th { font-size: 10px; }
       .fg-list-table td { font-size: 12px; }
-      /* The action cell: hide the "info" and "save" buttons, keep the primary CTA compact */
-      .fg-list-actions { gap: 6px; }
-      .fg-list-info-btn { display: none; }
-      .fg-list-icon-btn { display: none; }
       .fg-list-cta { padding: 6px 10px; font-size: 11px; }
+
+      /* Pin the action column (Book Video Call) so it stays in view while the
+         rest of the row scrolls horizontally. */
+      .fg-list-table th:last-child,
+      .fg-list-table td:last-child {
+        position: sticky;
+        right: 0;
+        z-index: 2;
+        background: #fff;
+        box-shadow: -8px 0 12px -8px rgba(16, 24, 40, 0.18);
+      }
+      .fg-list-table tbody tr:hover td:last-child { background: #fafbfc; }
+      .fg-list-table tr.is-sold td:last-child     { background: #fbfbfc; }
+      /* Keep only the "Book Video Call" CTA in the pinned column. */
+      .fg-list-actions { gap: 6px; justify-content: flex-end; }
+      .fg-list-info-btn,
+      .fg-list-icon-btn { display: none; }
 
       .fg-list-pagination { padding: 14px 4px; flex-wrap: wrap; gap: 8px; }
     }
@@ -2445,9 +2464,79 @@
       color: #ffffff;
     }
 
-    /* Selector de piso para mobile — oculto en desktop (se usan los chips). */
-    .fg-plan-floor-select {
+    /* Selector de piso (dropdown propio HTML/CSS) — solo el pill "PISO X" es el
+       disparador. En desktop se usan los chips, así que la flechita y el menú
+       quedan ocultos y el pill se ve como banda normal. */
+    .fg-plan-piso-picker {
+      position: relative;
+      display: inline-flex;
+    }
+    .fg-plan-piso-trigger {
+      gap: 6px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    .fg-plan-piso-caret {
+      display: none;             /* solo mobile */
+      transition: transform 0.2s ease;
+    }
+    .fg-plan-piso-picker.is-open .fg-plan-piso-caret {
+      transform: rotate(180deg);
+    }
+    /* Menú desplegable — oculto por defecto, se muestra en mobile al abrir. */
+    .fg-plan-piso-menu {
       display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 210px;
+      margin: 0;
+      padding: 6px;
+      list-style: none;
+      background: #ffffff;
+      border: 1px solid #e7eee9;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(16,24,40,0.16);
+      z-index: 40;
+    }
+    .fg-plan-piso-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.15s ease;
+    }
+    .fg-plan-piso-option:hover { background: #f2f5f8; }
+    .fg-plan-piso-option-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #2b303b;
+      letter-spacing: -0.06px;
+      white-space: nowrap;
+    }
+    .fg-plan-piso-option-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eef1f5;
+      font-weight: 700;
+      font-size: 11px;
+      color: #5c5c5c;
+    }
+    .fg-plan-piso-option.is-active { background: #f1f6f1; }
+    .fg-plan-piso-option.is-active .fg-plan-piso-option-name { color: #5c7c68; }
+    .fg-plan-piso-option.is-active .fg-plan-piso-option-count {
+      background: #5c7c68;
+      color: #ffffff;
     }
 
     /* PISO 1 · 6 UNIDADES DISPONIBLES (Figma 193:6028) */
@@ -2691,31 +2780,23 @@
       .fg-plan-chips {
         display: none;
       }
-      .fg-plan-floor-select {
-        display: block;
-        width: 100%;
-        appearance: none;
-        -webkit-appearance: none;
-        box-sizing: border-box;
-        padding: 12px 40px 12px 16px;
-        border-radius: 100px;
-        border: 1px solid #e7eee9;
-        background-color: #f6f8f5;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235c7c68' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 13px;
-        color: #2b303b;
-        letter-spacing: -0.06px;
-        cursor: pointer;
-        box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+      /* En mobile el pill "PISO X" es el disparador: muestra la flechita y, al
+         abrir, despliega el menú propio. */
+      .fg-plan-piso-caret {
+        display: inline-flex;
+        align-items: center;
       }
-      .fg-plan-floor-select:focus {
-        outline: none;
-        border-color: #5c7c68;
-        box-shadow: 0 0 0 3px rgba(92,124,104,0.18);
+      .fg-plan-piso-picker.is-open .fg-plan-piso-menu {
+        display: block;
+        animation: fgPisoMenuIn 0.16s ease;
+      }
+      .fg-plan-piso-picker.is-open .fg-plan-piso-trigger {
+        border-color: #cfe0d4;
+        box-shadow: 0 0 0 3px rgba(92,124,104,0.14);
+      }
+      @keyframes fgPisoMenuIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
       .fg-chip-floor {
         justify-content: space-between;
@@ -2733,7 +2814,8 @@
       }
       .fg-chip-count { flex-shrink: 0; }
 
-      /* PISO label spans full width as a clean banner */
+      /* PISO label spans full width as a clean banner. Solo el pill izquierdo
+         (el trigger) es interactivo; el contador derecho es texto normal. */
       .fg-plan-piso {
         align-self: stretch;
         justify-content: space-between;

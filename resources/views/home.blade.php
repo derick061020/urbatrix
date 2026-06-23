@@ -2205,6 +2205,7 @@
             {{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $units->count()]) }}
           </button>
         </div>
+        <div class="fg-list-scroll">
         <table class="fg-list-table" id="fgListTable">
           <thead>
             <tr>
@@ -2226,6 +2227,7 @@
             @endforeach
           </tbody>
         </table>
+        </div>
         <!-- Infinite-scroll sentinel for the list (revealed batch by batch). -->
         <div class="fg-lazy-more" id="listLazyMore" aria-hidden="true">
           <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
@@ -2332,23 +2334,36 @@
               @endforelse
             </div>
 
-            {{-- Mobile-only floor selector: en teléfonos los chips se ocultan y se
-                 elige el piso desde este <select>, ubicado junto a la etiqueta PISO. --}}
-            @if($floorOrder->isNotEmpty())
-              <select id="fgFloorSelect" class="fg-plan-floor-select" aria-label="{{ __('Floor filter') }}">
-                @foreach($floorOrder as $floorLabel)
-                  <option value="{{ $floorLabel }}" {{ $floorLabel === $activeFloor ? 'selected' : '' }}>
-                    {{ $floorDisplay($floorLabel) }} · {{ $availableByFloor[$floorLabel] ?? 0 }} {{ __('Disponibles') }}
-                  </option>
-                @endforeach
-              </select>
-            @endif
-
-            <!-- Active floor label · N UNIDADES DISPONIBLES -->
-            <div class="fg-plan-piso">
-              <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
-                {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
-              </div>
+            <!-- Active floor label · N UNIDADES DISPONIBLES.
+                 En mobile solo el pill "PISO X" (izquierda) es el selector:
+                 abre un menú propio (HTML/CSS) con los pisos. El contador de la
+                 derecha queda como texto normal. -->
+            <div class="fg-plan-piso" style="overflow: visible;">
+              @if($floorOrder->isNotEmpty())
+                <div class="fg-plan-piso-picker" id="fgFloorPicker">
+                  <button type="button" class="fg-plan-piso-left fg-plan-piso-trigger"
+                          id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
+                    <span class="fg-plan-piso-caret" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5c7c68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                  </button>
+                  <ul class="fg-plan-piso-menu" id="fgFloorMenu" role="listbox" aria-label="{{ __('Floor filter') }}">
+                    @foreach($floorOrder as $floorLabel)
+                      <li class="fg-plan-piso-option{{ $floorLabel === $activeFloor ? ' is-active' : '' }}"
+                          role="option" aria-selected="{{ $floorLabel === $activeFloor ? 'true' : 'false' }}"
+                          data-floor="{{ $floorLabel }}">
+                        <span class="fg-plan-piso-option-name">{{ $floorDisplay($floorLabel) }}</span>
+                        <span class="fg-plan-piso-option-count">{{ $availableByFloor[$floorLabel] ?? 0 }}</span>
+                      </li>
+                    @endforeach
+                  </ul>
+                </div>
+              @else
+                <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
+                  {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
+                </div>
+              @endif
               <div class="fg-plan-piso-right" id="fgPlanPisoCount">
                 {{ $availableByFloor[$activeFloor] ?? 0 }} {{ strtoupper(__('Unidades disponibles')) }}
               </div>
@@ -3019,11 +3034,14 @@
       // Plan floor chips / mobile select → filter markers + update floor label
       (function () {
         const chips     = document.querySelectorAll('.fg-chip-floor');
-        const select    = document.getElementById('fgFloorSelect');
+        const picker    = document.getElementById('fgFloorPicker');
+        const trigger   = document.getElementById('fgFloorTrigger');
+        const menu      = document.getElementById('fgFloorMenu');
+        const options   = menu ? Array.from(menu.querySelectorAll('.fg-plan-piso-option')) : [];
         const canvas    = document.getElementById('fgPlanCanvas');
         const labelEl   = document.getElementById('fgPlanPisoLabel');
         const countEl   = document.getElementById('fgPlanPisoCount');
-        if ((!chips.length && !select) || !canvas) return;
+        if ((!chips.length && !menu) || !canvas) return;
 
         // Cadenas traducidas (Blade → JS) para que la etiqueta PISO y el contador
         // se rerendericen en el idioma activo al cambiar de piso.
@@ -3040,7 +3058,11 @@
             x.classList.toggle('is-active', on);
             x.setAttribute('aria-selected', on ? 'true' : 'false');
           });
-          if (select && select.value !== floor) select.value = floor;
+          options.forEach(o => {
+            const on = o.dataset.floor === floor;
+            o.classList.toggle('is-active', on);
+            o.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
 
           // Cross-fade the whole canvas while markers swap.
           canvas.classList.remove('is-switching');
@@ -3098,9 +3120,40 @@
             activate(this.dataset.floor);
           });
         });
-        if (select) {
-          select.addEventListener('change', function () {
-            activate(this.value);
+
+        // --- Custom dropdown (menú propio, no <select> nativo) ---
+        if (trigger && menu) {
+          const openMenu = () => {
+            picker.classList.add('is-open');
+            trigger.setAttribute('aria-expanded', 'true');
+          };
+          const closeMenu = () => {
+            picker.classList.remove('is-open');
+            trigger.setAttribute('aria-expanded', 'false');
+          };
+          const toggleMenu = () => {
+            picker.classList.contains('is-open') ? closeMenu() : openMenu();
+          };
+
+          trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleMenu();
+          });
+
+          options.forEach(o => {
+            o.addEventListener('click', function (e) {
+              e.stopPropagation();
+              activate(this.dataset.floor);
+              closeMenu();
+            });
+          });
+
+          // Cerrar al tocar fuera o con Escape.
+          document.addEventListener('click', function (e) {
+            if (!picker.contains(e.target)) closeMenu();
+          });
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
           });
         }
       })();
