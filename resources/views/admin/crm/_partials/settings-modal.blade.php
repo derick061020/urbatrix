@@ -715,7 +715,6 @@
                             <label class="st-row-label" style="font-size:12px; display:block; margin-bottom:6px;">{{ __('URL del sitio web') }}</label>
                             <input type="url" id="cmSiteUrl" value="{{ \App\Models\Setting::get('site_url', '') }}" placeholder="https://makairesidences.com"
                                    style="width:100%; max-width:480px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
-                            <div class="st-row-desc" style="margin-top:6px;">{{ __('Es el enlace que abre el botón "Sitio web". FAQs es interno y queda en blanco por ahora.') }}</div>
                         </div>
                     </div>
 
