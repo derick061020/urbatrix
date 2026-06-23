@@ -3750,7 +3750,6 @@
       flex-direction: column;
       background: #f2f5f8;
       min-height: 0;
-      overflow: hidden;
     }
     .mt-tabs {
       display: flex;
@@ -3907,15 +3906,16 @@
       .mt-thumb { width: 64px; height: 44px; }
     }
 
-    /* === Phones: full-screen unit modal === */
+    /* === Phones: unit modal === */
     @media (max-width: 600px) {
-      .mt-overlay { padding: 0; }
+      /* Looks like a modal (margins + rounded corners), not a full-screen page */
+      .mt-overlay { padding: 12px; align-items: center; }
       .mt-shell {
-        height: 100dvh;
-        max-height: 100dvh;
+        height: auto;
+        max-height: calc(100dvh - 24px);
         max-width: none;
-        border: none;
-        border-radius: 0;
+        border: 1px solid #eaecf0;
+        border-radius: 16px;
       }
       /* Header — keep it tight and let the unit label truncate */
       .mt-header { padding: 8px 12px; gap: 8px; }
@@ -3933,9 +3933,22 @@
       .mt-pill-wa span { display: none; }
       .mt-close { flex-shrink: 0; }
 
-      /* Body scrolls as a whole; panels stack */
-      .mt-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-      .mt-left-inner { padding: 14px 14px 12px; }
+      /* Body scrolls as ONE unit — no nested scroll, so the image scrolls
+         away with the content instead of staying pinned ("sticky"). */
+      .mt-body {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mt-left-inner {
+        padding: 14px 14px 12px;
+        overflow: visible;
+        flex: none;
+      }
+      /* Image/gallery panel sits at the TOP and scrolls with the page */
+      .mt-right { order: -1; }
+      .mt-gallery-img { width: 100%; height: auto; max-height: none; object-fit: contain; }
 
       /* CTA row — buttons stack so labels never clip */
       .mt-cta-row { flex-direction: column; gap: 8px; padding: 12px 14px; }
@@ -3943,8 +3956,9 @@
       .mt-btn-primary { width: 100%; flex: none; padding: 11px 14px; }
 
       /* Gallery / tabs / thumbs */
-      .mt-right { min-height: 0; }
-      .mt-gallery { min-height: 240px; }
+      .mt-right {     min-height: auto; }
+      /* height auto + no clipping so the whole image shows (never cropped) */
+      .mt-gallery { flex: none; min-height: 0; height: auto; overflow: visible; }
       .mt-tab { padding: 9px 6px; font-size: 9px; }
       .mt-tab span,
       .mt-tab { letter-spacing: 0.03em; }
