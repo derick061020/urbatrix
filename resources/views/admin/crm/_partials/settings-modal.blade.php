@@ -741,36 +741,41 @@
 
 @if($stIsAdmin)
 <style>
-    /* ===== Selector de íconos (menú del cliente) ===== */
-    .cm-icon-picker { position: relative; }
-    .cm-icon-trigger {
+    /* ===== Dropdown de tipo (menú del cliente) ===== */
+    .cm-select { position: relative; }
+    .cm-select-trigger {
         width: 100%; height: 36px;
-        display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        display: flex; align-items: center; gap: 8px;
         border: 1px solid #eaecf0; border-radius: 9px; background: #fff;
-        padding: 0 10px; cursor: pointer; color: #5c5c5c;
+        padding: 0 10px; cursor: pointer; color: #222530; font-size: 13px;
         transition: border-color .15s ease, box-shadow .15s ease;
     }
-    .cm-icon-trigger:hover { border-color: #d6dae1; }
-    .cm-icon-picker.open .cm-icon-trigger { border-color: #c7ccd4; box-shadow: 0 0 0 3px rgba(199,204,212,.25); }
-    .cm-icon-current { display: inline-flex; align-items: center; justify-content: center; color: #475160; }
-    .cm-icon-caret { color: #99a0ae; flex-shrink: 0; }
+    .cm-select-trigger:hover { border-color: #d6dae1; }
+    .cm-select.open .cm-select-trigger { border-color: #c7ccd4; box-shadow: 0 0 0 3px rgba(199,204,212,.25); }
+    .cm-select-current { flex: 1; display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+    .cm-select-current svg { color: #475160; flex-shrink: 0; }
+    .cm-select-current span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-select-caret { color: #99a0ae; flex-shrink: 0; transition: transform .15s ease; }
+    .cm-select.open .cm-select-caret { transform: rotate(180deg); }
 
-    .cm-icon-menu {
-        position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
-        display: none; grid-template-columns: repeat(3, 1fr); gap: 4px;
-        padding: 6px; width: 148px;
+    .cm-select-menu {
+        position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; right: 0;
+        display: none; flex-direction: column; gap: 2px; padding: 6px;
         background: #fff; border: 1px solid #eaecf0; border-radius: 12px;
         box-shadow: 0 16px 40px -12px rgba(10,13,20,.28);
     }
-    .cm-icon-picker.open .cm-icon-menu { display: grid; }
-    .cm-icon-opt {
-        display: flex; align-items: center; justify-content: center;
-        width: 42px; height: 38px; border: 1px solid transparent; border-radius: 9px;
-        background: #fff; cursor: pointer; color: #5c5c5c;
-        transition: background .12s ease, color .12s ease, border-color .12s ease;
+    .cm-select.open .cm-select-menu { display: flex; }
+    .cm-select-opt {
+        display: flex; align-items: center; gap: 8px;
+        width: 100%; border: 1px solid transparent; border-radius: 8px;
+        background: #fff; cursor: pointer; color: #5c5c5c; font-size: 13px;
+        padding: 8px 9px; text-align: left;
+        transition: background .12s ease, color .12s ease;
     }
-    .cm-icon-opt:hover { background: #f4f5f7; color: #222530; }
-    .cm-icon-opt.active { background: #eef2ef; border-color: #d8e3da; color: #222530; }
+    .cm-select-opt svg { color: #707a8a; flex-shrink: 0; }
+    .cm-select-opt:hover { background: #f4f5f7; color: #222530; }
+    .cm-select-opt.active { background: #eef2ef; color: #222530; }
+    .cm-select-opt.active svg { color: #3f6a52; }
 </style>
 
 {{-- Plantilla de fila para el editor del menú del cliente --}}
@@ -783,21 +788,23 @@
                         <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Nombre') }}</label>
                         <input type="text" class="cm-label" placeholder="Ej: Brochure" style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px;">
                     </div>
-                    <div style="width:140px;">
+                    <div style="width:170px;">
                         <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Tipo') }}</label>
-                        <select class="cm-type" onchange="cmSyncType(this)" style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px; background:#fff;">
-                            <option value="link">{{ __('Enlace') }}</option>
-                            <option value="document">{{ __('Documento') }}</option>
-                        </select>
-                    </div>
-                    <div style="width:88px;">
-                        <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Ícono') }}</label>
-                        <div class="cm-icon-picker" data-icon="file">
-                            <button type="button" class="cm-icon-trigger" onclick="cmToggleIconMenu(this)">
-                                <span class="cm-icon-current"></span>
-                                <svg class="cm-icon-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <div class="cm-type-picker cm-select" data-type="link">
+                            <button type="button" class="cm-select-trigger" onclick="cmToggleTypeMenu(this)">
+                                <span class="cm-select-current"></span>
+                                <svg class="cm-select-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
-                            <div class="cm-icon-menu"></div>
+                            <div class="cm-select-menu">
+                                <button type="button" class="cm-select-opt" data-type="link">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    <span>{{ __('Enlace') }}</span>
+                                </button>
+                                <button type="button" class="cm-select-opt" data-type="document">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    <span>{{ __('Documento') }}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1298,53 +1305,8 @@
     if (!Array.isArray(cmData)) cmData = [];
     let cmRendered = false;
 
-    // Íconos disponibles (mismo set que el navbar del cliente). Sólo el ícono,
-    // sin texto: es exactamente el que se mostrará en el menú.
-    const cmIconSvgs = {
-        globe:    '<circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
-        file:     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
-        image:    '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>',
-        chart:    '<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>',
-        list:     '<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>',
-        help:     '<circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>',
-        book:     '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>',
-        building: '<rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="6" x2="9.01" y2="6"></line><line x1="15" y1="6" x2="15.01" y2="6"></line><line x1="9" y1="10" x2="9.01" y2="10"></line><line x1="15" y1="10" x2="15.01" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line>',
-        map:      '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
-    };
-    function cmIconSvg(key){
-        const inner = cmIconSvgs[key] || cmIconSvgs.file;
-        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
-    }
-    function cmSetIcon(picker, key){
-        picker.dataset.icon = (key in cmIconSvgs) ? key : 'file';
-        picker.querySelector('.cm-icon-current').innerHTML = cmIconSvg(picker.dataset.icon);
-        picker.querySelectorAll('.cm-icon-opt').forEach(o => o.classList.toggle('active', o.dataset.icon === picker.dataset.icon));
-    }
-    function cmFillIconMenu(picker){
-        const menu = picker.querySelector('.cm-icon-menu');
-        menu.innerHTML = '';
-        Object.keys(cmIconSvgs).forEach(key => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'cm-icon-opt';
-            b.dataset.icon = key;
-            b.innerHTML = cmIconSvg(key);
-            b.addEventListener('click', () => { cmSetIcon(picker, key); cmCloseIconMenus(); });
-            menu.appendChild(b);
-        });
-    }
-    window.cmToggleIconMenu = function(btn){
-        const picker = btn.closest('.cm-icon-picker');
-        const wasOpen = picker.classList.contains('open');
-        cmCloseIconMenus();
-        if (!wasOpen) picker.classList.add('open');
-    };
-    function cmCloseIconMenus(){
-        document.querySelectorAll('.cm-icon-picker.open').forEach(p => p.classList.remove('open'));
-    }
-    document.addEventListener('click', function(e){
-        if (!e.target.closest('.cm-icon-picker')) cmCloseIconMenus();
-    });
+    // El ícono se asigna solo según el tipo: documento → archivo, enlace → mundo.
+    function cmIconForType(type){ return type === 'document' ? 'file' : 'globe'; }
 
     // Render del editor (sólo la primera vez que se abre el pane).
     window.cmRender = function(){
@@ -1364,16 +1326,12 @@
         node.dataset.file = item.file || '';
         node.dataset.format = item.format || '';
         node.querySelector('.cm-label').value = item.label || '';
-        node.querySelector('.cm-type').value  = (item.type === 'document') ? 'document' : 'link';
-        const picker = node.querySelector('.cm-icon-picker');
-        cmFillIconMenu(picker);
-        cmSetIcon(picker, item.icon || 'file');
         node.querySelector('.cm-url').value   = item.url || '';
         if (item.type === 'document' && item.file) {
             const parts = item.file.split('/');
             node.querySelector('.cm-file-name').textContent = parts[parts.length - 1];
         }
-        cmSyncType(node.querySelector('.cm-type'));
+        cmSetType(node.querySelector('.cm-type-picker'), item.type === 'document' ? 'document' : 'link');
         return node;
     }
 
@@ -1394,12 +1352,38 @@
         if (dir > 0 && row.nextElementSibling)     row.parentNode.insertBefore(row.nextElementSibling, row);
     };
 
-    window.cmSyncType = function(sel){
-        const row = sel.closest('.cm-row');
-        const isDoc = sel.value === 'document';
+    // Aplica el tipo elegido: actualiza el dropdown y muestra el campo correcto.
+    function cmSetType(picker, type){
+        type = type === 'document' ? 'document' : 'link';
+        picker.dataset.type = type;
+        const opt = picker.querySelector('.cm-select-opt[data-type="' + type + '"]');
+        picker.querySelector('.cm-select-current').innerHTML = opt.innerHTML;
+        picker.querySelectorAll('.cm-select-opt').forEach(o => o.classList.toggle('active', o.dataset.type === type));
+
+        const row = picker.closest('.cm-row');
+        const isDoc = type === 'document';
         row.querySelector('.cm-link-wrap').style.display = isDoc ? 'none' : '';
         row.querySelector('.cm-doc-wrap').style.display  = isDoc ? '' : 'none';
+    }
+
+    window.cmToggleTypeMenu = function(btn){
+        const picker = btn.closest('.cm-select');
+        const wasOpen = picker.classList.contains('open');
+        cmCloseSelectMenus();
+        if (!wasOpen) picker.classList.add('open');
     };
+    function cmCloseSelectMenus(){
+        document.querySelectorAll('.cm-select.open').forEach(p => p.classList.remove('open'));
+    }
+    document.addEventListener('click', function(e){
+        const opt = e.target.closest('.cm-select-opt');
+        if (opt) {
+            cmSetType(opt.closest('.cm-type-picker'), opt.dataset.type);
+            cmCloseSelectMenus();
+            return;
+        }
+        if (!e.target.closest('.cm-select')) cmCloseSelectMenus();
+    });
 
     window.cmFilePicked = function(input){
         const row = input.closest('.cm-row');
@@ -1483,8 +1467,8 @@
 
         for (const row of rows) {
             const label = row.querySelector('.cm-label').value.trim();
-            const type  = row.querySelector('.cm-type').value;
-            const icon  = row.querySelector('.cm-icon-picker').dataset.icon || 'file';
+            const type  = row.querySelector('.cm-type-picker').dataset.type || 'link';
+            const icon  = cmIconForType(type);
             const id    = row.dataset.id;
             if (!label) { stShowAlert('Cada ítem necesita un nombre.', 'err'); return; }
 

@@ -3421,15 +3421,14 @@ class AdminController extends Controller
      * Guarda el menú del cliente: la lista de ítems configurables que se muestran
      * en el desplegable del navbar (enlaces externos y documentos descargables).
      *
-     * El front envía `items` como JSON (label, type, icon, url y la ruta del
-     * archivo existente) más un archivo por ítem nuevo bajo la clave `file_<id>`.
+     * El front envía `items` como JSON (label, type, url y la ruta del archivo
+     * ya subido por chunks) más `site_url`. El ícono se deriva del tipo.
      */
     public function updateClientMenu(Request $request)
     {
         $incoming = json_decode($request->input('items', '[]'), true);
         $incoming = is_array($incoming) ? $incoming : [];
 
-        $allowedIcons = ['globe', 'file', 'image', 'chart', 'list', 'help', 'book', 'building', 'map'];
         $clean = [];
 
         foreach ($incoming as $idx => $it) {
@@ -3439,7 +3438,8 @@ class AdminController extends Controller
             }
 
             $type = in_array(($it['type'] ?? 'link'), ['link', 'document'], true) ? $it['type'] : 'link';
-            $icon = in_array(($it['icon'] ?? 'file'), $allowedIcons, true) ? $it['icon'] : 'file';
+            // El ícono se deriva del tipo: documento → archivo, enlace → mundo.
+            $icon = $type === 'document' ? 'file' : 'globe';
             $id   = preg_replace('/[^a-z0-9\-]/', '', strtolower((string) ($it['id'] ?? ''))) ?: ('item' . $idx);
 
             $row = [
