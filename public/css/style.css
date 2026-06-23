@@ -610,7 +610,7 @@
     @media (max-width: 768px) {
       .fg-hero {
         aspect-ratio: auto;
-        height: 62vh;
+        height: 52vh;
         min-height: 380px;
         max-height: 560px;
       }
@@ -630,7 +630,7 @@
         bottom: 0;
       }
       .fg-hero-text {
-        top: 40%;
+        top: 30%;
         font-size: clamp(64px, 28vw, 200px);
         /* Compensate the trailing letter-spacing so the word reads centered */
         text-indent: 0.2em;
