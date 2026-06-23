@@ -704,11 +704,26 @@
 
                 {{-- =========== CLIENT MENU PANE — MENÚ DEL CLIENTE =========== --}}
                 <div class="st-pane" data-st-pane="menu-main">
+
+                    {{-- Ítems fijos: Sitio web (URL configurable) y FAQs --}}
+                    <div class="st-row" style="display:block; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid #eaecf0;">
+                        <div style="margin-bottom:12px;">
+                            <div class="st-row-label">{{ __('Ítems fijos') }}</div>
+                            <div class="st-row-desc">{{ __('Sitio web y FAQs aparecen siempre en el menú del cliente.') }}</div>
+                        </div>
+                        <div>
+                            <label class="st-row-label" style="font-size:12px; display:block; margin-bottom:6px;">{{ __('URL del sitio web') }}</label>
+                            <input type="url" id="cmSiteUrl" value="{{ \App\Models\Setting::get('site_url', '') }}" placeholder="https://makairesidences.com"
+                                   style="width:100%; max-width:480px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
+                            <div class="st-row-desc" style="margin-top:6px;">{{ __('Es el enlace que abre el botón "Sitio web". FAQs es interno y queda en blanco por ahora.') }}</div>
+                        </div>
+                    </div>
+
                     <div class="st-row" style="display:block;">
                         <div style="margin-bottom:14px;">
                             <div class="st-row-label">{{ __('Ítems del menú del cliente') }}</div>
                             <div class="st-row-desc">
-                                {{ __('Estos ítems aparecen en el menú desplegable del cliente (Sitio web, Brochure, Plantas, etc.). Vos decidís cuáles mostrar: cada ítem puede ser un enlace externo o un documento que se abre en una ventana.') }}
+                                {{ __('Estos ítems aparecen en el menú desplegable del cliente (Brochure, Plantas, ROIs, etc.). Vos decidís cuáles mostrar: cada ítem puede ser un enlace externo o un documento que se abre en una ventana.') }}
                             </div>
                         </div>
 
@@ -1354,6 +1369,7 @@
         }
 
         fd.append('items', JSON.stringify(meta));
+        fd.append('site_url', (document.getElementById('cmSiteUrl')?.value || '').trim());
         fd.append('_token', st2faCsrf());
 
         const btn = document.getElementById('stSaveBtn');

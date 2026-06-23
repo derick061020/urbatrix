@@ -1811,6 +1811,7 @@
               @php
                 // ── Menú del cliente configurable (Configuración → Menú del cliente).
                 //    Cada ítem es un enlace externo o un documento que se abre en modal.
+                $cmSiteUrl = trim((string) \App\Models\Setting::get('site_url', ''));
                 $cmItems = \App\Models\Setting::get('client_menu', null);
                 if (!is_array($cmItems)) { $cmItems = []; }
                 // Sólo se muestran los ítems que tienen contenido real.
@@ -1832,6 +1833,37 @@
                     'map'      => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
                 ];
               @endphp
+
+              <!-- Divider -->
+              <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
+                <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
+              </div>
+
+              {{-- Ítems fijos: Sitio web y FAQs (siempre presentes) --}}
+              <div class="menu-item" role="button" tabindex="0"
+                   @if($cmSiteUrl) onclick="window.open(@js($cmSiteUrl), '_blank')" @endif
+                   style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Sitio web') }}</div>
+              </div>
+
+              <div class="menu-item" role="button" tabindex="0"
+                   style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('FAQs') }}</div>
+              </div>
 
               @if(count($cmItems))
               <!-- Divider -->

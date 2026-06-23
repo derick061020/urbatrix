@@ -3486,6 +3486,9 @@ class AdminController extends Controller
 
         \App\Models\Setting::put('client_menu', $clean);
 
+        // URL del ítem fijo "Sitio web".
+        \App\Models\Setting::put('site_url', trim((string) $request->input('site_url', '')));
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
