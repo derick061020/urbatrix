@@ -5139,6 +5139,7 @@
     function resetFilters() {
       resetFiltersState();
       reloadUnits();
+      showToast('{{ __('Se han restablecido los resultados') }}');
     }
 
     // Helper function
