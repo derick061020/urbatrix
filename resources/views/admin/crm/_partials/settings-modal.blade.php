@@ -1325,8 +1325,64 @@
     window.cmFilePicked = function(input){
         const row = input.closest('.cm-row');
         const f = input.files && input.files[0];
-        row.querySelector('.cm-file-name').textContent = f ? f.name : '';
+        if (!f) return;
+        if (f.size > 50 * 1024 * 1024) {
+            stShowAlert('El archivo supera los 50 MB.', 'err');
+            input.value = '';
+            return;
+        }
+        cmUploadFile(row, f);
     };
+
+    // Sube el archivo en trozos de ~1 MB para evitar el límite de post_max_size.
+    async function cmUploadFile(row, file){
+        const nameEl  = row.querySelector('.cm-file-name');
+        const saveBtn = document.getElementById('stSaveBtn');
+        const chunkSize = 1024 * 1024; // 1 MB
+        const total = Math.ceil(file.size / chunkSize) || 1;
+        const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+        row.dataset.uploading = '1';
+        saveBtn.disabled = true;
+
+        try {
+            for (let i = 0; i < total; i++) {
+                const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
+                const fd = new FormData();
+                fd.append('chunk', chunk);
+                fd.append('upload_id', uploadId);
+                fd.append('index', i);
+                fd.append('total', total);
+                fd.append('name', file.name);
+                fd.append('_token', st2faCsrf());
+
+                const res = await fetch('{{ route('admin.client-menu.upload') }}', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd,
+                    credentials: 'same-origin',
+                });
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el archivo.');
+
+                nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
+
+                if (d.done) {
+                    row.dataset.file   = d.path || '';
+                    row.dataset.format = d.format || '';
+                    nameEl.textContent = file.name;
+                }
+            }
+        } catch (e) {
+            row.dataset.file = '';
+            row.dataset.format = '';
+            nameEl.textContent = '';
+            stShowAlert(e.message || 'No se pudo subir el archivo.', 'err');
+        } finally {
+            row.dataset.uploading = '';
+            saveBtn.disabled = false;
+        }
+    }
 
     function cmUpdateEmpty(){
         const hasRows = document.querySelectorAll('#cmList .cm-row').length > 0;
@@ -1337,6 +1393,11 @@
         const rows = Array.from(document.querySelectorAll('#cmList .cm-row'));
         const meta = [];
         const fd = new FormData();
+
+        if (rows.some(r => r.dataset.uploading === '1')) {
+            stShowAlert('Esperá a que termine la subida del archivo.', 'err');
+            return;
+        }
 
         for (const row of rows) {
             const label = row.querySelector('.cm-label').value.trim();
@@ -1351,11 +1412,8 @@
                 if (!url) { stShowAlert('El enlace "' + label + '" necesita una URL.', 'err'); return; }
                 entry.url = url;
             } else {
-                const fileInput = row.querySelector('.cm-file');
-                const newFile = fileInput.files && fileInput.files[0];
-                if (newFile) {
-                    fd.append('file_' + id, newFile);
-                } else if (!row.dataset.file) {
+                // El archivo ya se subió por chunks; aquí sólo viaja su ruta.
+                if (!row.dataset.file) {
                     stShowAlert('El documento "' + label + '" necesita un archivo.', 'err'); return;
                 }
                 entry.file   = row.dataset.file || null;

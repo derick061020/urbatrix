@@ -3453,20 +3453,11 @@ class AdminController extends Controller
                 $row['url']  = trim((string) ($it['url'] ?? ''));
                 $row['file'] = null;
             } else {
-                $fileKey = 'file_' . $id;
-                if ($request->hasFile($fileKey)) {
-                    $file = $request->file($fileKey);
-                    $request->validate([
-                        $fileKey => ['file', 'max:51200', 'mimes:pdf,jpg,jpeg,png,webp,doc,docx,xls,xlsx,ppt,pptx'],
-                    ]);
-                    $row['file']   = $file->store('client-menu', 'public');
-                    $row['format'] = strtoupper($file->getClientOriginalExtension());
-                } else {
-                    // Mantener el archivo previamente subido si no se reemplaza.
-                    $row['file']   = $it['file'] ?? null;
-                    $row['format'] = $it['format'] ?? null;
-                }
-                $row['url'] = null;
+                // El archivo ya se subió por chunks (admin.client-menu.upload); aquí
+                // sólo se recibe la ruta resultante.
+                $row['file']   = $it['file'] ?? null;
+                $row['format'] = $it['format'] ?? null;
+                $row['url']    = null;
             }
 
             $clean[] = $row;
@@ -3498,6 +3489,84 @@ class AdminController extends Controller
         }
 
         return back()->with('settings_success', 'Menú del cliente guardado correctamente.');
+    }
+
+    /**
+     * Recibe un documento del menú del cliente subido por trozos (chunks).
+     *
+     * El front envía el archivo en partes de ~1 MB para no superar el
+     * post_max_size de PHP en archivos grandes. Cada chunk se anexa a un
+     * archivo temporal; en el último se mueve al disco público y se devuelve
+     * la ruta final para guardarla luego junto al resto del menú.
+     */
+    public function uploadClientMenuChunk(Request $request)
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:1000'],
+            'name'      => ['required', 'string', 'max:255'],
+        ]);
+
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+        }
+
+        $tmpDir  = storage_path('app/tmp-client-menu');
+        if (!is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return response()->json(['success' => false, 'message' => 'No se pudo procesar el archivo.'], 500);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope de 50 MB acumulado.
+        if (filesize($tmpPath) > 52428800) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'El archivo supera los 50 MB.'], 422);
+        }
+
+        // Chunks intermedios: confirmar y esperar el siguiente.
+        if ($index + 1 < $total) {
+            return response()->json(['success' => true, 'done' => false]);
+        }
+
+        // Último chunk: validar extensión y mover al disco público.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+        if (!in_array($ext, $allowed, true)) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'Formato de archivo no permitido.'], 422);
+        }
+
+        $finalRel = 'client-menu/' . $uploadId . '.' . $ext;
+        $stream   = fopen($tmpPath, 'rb');
+        \Illuminate\Support\Facades\Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'path'    => $finalRel,
+            'format'  => strtoupper($ext),
+            'name'    => $request->input('name'),
+        ]);
     }
 
     /**

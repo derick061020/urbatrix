@@ -281,6 +281,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // Menú del cliente (ítems configurables del navbar: enlaces y documentos)
     Route::post('/client-menu', [AdminController::class, 'updateClientMenu'])->name('admin.client-menu.update');
+    // Subida de documentos por chunks (evita el límite de post_max_size en archivos grandes)
+    Route::post('/client-menu/upload', [AdminController::class, 'uploadClientMenuChunk'])->name('admin.client-menu.upload');
 
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');
