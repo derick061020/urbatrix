@@ -707,10 +707,7 @@
 
                     {{-- Ítems fijos: Sitio web (URL configurable) y FAQs --}}
                     <div class="st-row" style="display:block; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid #eaecf0;">
-                        <div style="margin-bottom:12px;">
-                            <div class="st-row-label">{{ __('Ítems fijos') }}</div>
-                            <div class="st-row-desc">{{ __('Sitio web y FAQs aparecen siempre en el menú del cliente.') }}</div>
-                        </div>
+                       
                         <div>
                             <label class="st-row-label" style="font-size:12px; display:block; margin-bottom:6px;">{{ __('URL del sitio web') }}</label>
                             <input type="url" id="cmSiteUrl" value="{{ \App\Models\Setting::get('site_url', '') }}" placeholder="https://makairesidences.com"
