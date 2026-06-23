@@ -4032,8 +4032,17 @@
       .mt-right { order: -1; }
       .mt-gallery-img { width: 100%; height: auto; max-height: none; object-fit: contain; }
 
-      /* CTA row — buttons stack so labels never clip */
-      .mt-cta-row { flex-direction: column; gap: 8px; padding: 12px 14px; }
+      /* CTA row — buttons stack so labels never clip, and stay pinned to the
+         bottom of the modal while the content scrolls behind them. */
+      .mt-cta-row {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 14px;
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        box-shadow: 0 -4px 12px rgba(14, 18, 27, 0.06);
+      }
       .mt-btn-secondary,
       .mt-btn-primary { width: 100%; flex: none; padding: 11px 14px; }
 
