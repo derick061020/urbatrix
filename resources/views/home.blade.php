@@ -1808,85 +1808,60 @@
                 </div>
               </a>
 
+              @php
+                // ── Menú del cliente configurable (Configuración → Menú del cliente).
+                //    Cada ítem es un enlace externo o un documento que se abre en modal.
+                $cmItems = \App\Models\Setting::get('client_menu', null);
+                if (!is_array($cmItems)) { $cmItems = []; }
+                // Sólo se muestran los ítems que tienen contenido real.
+                $cmItems = array_values(array_filter($cmItems, function ($it) {
+                    if (($it['type'] ?? 'link') === 'document') return !empty($it['file']);
+                    return !empty($it['url']);
+                }));
+
+                // Mapa de íconos disponibles (contenido interno del <svg>).
+                $cmIcons = [
+                    'globe'    => '<circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
+                    'file'     => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
+                    'image'    => '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>',
+                    'chart'    => '<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>',
+                    'list'     => '<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>',
+                    'help'     => '<circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>',
+                    'book'     => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>',
+                    'building' => '<rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="6" x2="9.01" y2="6"></line><line x1="15" y1="6" x2="15.01" y2="6"></line><line x1="9" y1="10" x2="9.01" y2="10"></line><line x1="15" y1="10" x2="15.01" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line>',
+                    'map'      => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
+                ];
+              @endphp
+
+              @if(count($cmItems))
               <!-- Divider -->
               <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
                 <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
               </div>
 
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                  </svg>
+              @foreach($cmItems as $cmItem)
+                @php
+                  $cmIcon  = $cmIcons[$cmItem['icon'] ?? 'file'] ?? $cmIcons['file'];
+                  $cmIsDoc = ($cmItem['type'] ?? 'link') === 'document';
+                  $cmHref  = $cmIsDoc ? asset('storage/'.$cmItem['file']) : ($cmItem['url'] ?? '#');
+                  $cmLabel = $cmItem['label'] ?? '';
+                @endphp
+                <div class="menu-item" role="button" tabindex="0"
+                     @if($cmIsDoc)
+                       onclick="openClientDoc('{{ $cmHref }}', @js($cmLabel))"
+                     @else
+                       onclick="window.open(@js($cmHref), '_blank')"
+                     @endif
+                     style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      {!! $cmIcon !!}
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ $cmLabel }}</div>
                 </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Sitio web') }}</div>
-              </div>
-
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('FAQs') }}</div>
-              </div>
-
-              <!-- Divider -->
-              <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
-                <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
-              </div>
-
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
-                </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Presentación comercial') }}</div>
-              </div>
-
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
-                </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Plantas') }}</div>
-              </div>
-
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
-                </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('ROIs') }}</div>
-              </div>
-
-              <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;">
-                <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
-                </div>
-                <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Especificaciones') }}</div>
-              </div>
+              @endforeach
+              @endif
 
               <!-- Divider -->
               <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
@@ -5520,6 +5495,45 @@
 @include('partials.logout-modal')
 @include('partials.confirm-dialog')
 @include('partials.profile-modal')
+
+{{-- Modal para visualizar documentos del menú del cliente --}}
+<div id="clientDocModal" style="position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(15,17,24,.55);padding:20px;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(10,13,20,.45);">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #ebebeb;">
+      <div id="clientDocTitle" style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;color:#222530;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Documento</div>
+      <a id="clientDocDownload" href="#" target="_blank" rel="noopener" style="text-decoration:none;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:#2563eb;display:inline-flex;align-items:center;gap:6px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Descargar
+      </a>
+      <button type="button" onclick="closeClientDoc()" aria-label="Cerrar" style="background:none;border:none;cursor:pointer;color:#5c5c5c;padding:4px;display:flex;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <iframe id="clientDocFrame" src="" title="Documento" style="flex:1;width:100%;border:none;background:#f4f5f7;"></iframe>
+  </div>
+</div>
+<script>
+  window.openClientDoc = function(url, title){
+    var modal = document.getElementById('clientDocModal');
+    document.getElementById('clientDocTitle').textContent = title || 'Documento';
+    document.getElementById('clientDocFrame').src = url;
+    document.getElementById('clientDocDownload').href = url;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeClientDoc = function(){
+    var modal = document.getElementById('clientDocModal');
+    modal.style.display = 'none';
+    document.getElementById('clientDocFrame').src = '';
+    document.body.style.overflow = '';
+  };
+  document.getElementById('clientDocModal').addEventListener('click', function(e){
+    if (e.target === this) closeClientDoc();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && document.getElementById('clientDocModal').style.display === 'flex') closeClientDoc();
+  });
+</script>
 </body>
 
 </html>

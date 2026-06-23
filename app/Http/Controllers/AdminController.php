@@ -3418,6 +3418,86 @@ class AdminController extends Controller
     }
 
     /**
+     * Guarda el menú del cliente: la lista de ítems configurables que se muestran
+     * en el desplegable del navbar (enlaces externos y documentos descargables).
+     *
+     * El front envía `items` como JSON (label, type, icon, url y la ruta del
+     * archivo existente) más un archivo por ítem nuevo bajo la clave `file_<id>`.
+     */
+    public function updateClientMenu(Request $request)
+    {
+        $incoming = json_decode($request->input('items', '[]'), true);
+        $incoming = is_array($incoming) ? $incoming : [];
+
+        $allowedIcons = ['globe', 'file', 'image', 'chart', 'list', 'help', 'book', 'building', 'map'];
+        $clean = [];
+
+        foreach ($incoming as $idx => $it) {
+            $label = trim((string) ($it['label'] ?? ''));
+            if ($label === '') {
+                continue; // un ítem sin nombre no se guarda
+            }
+
+            $type = in_array(($it['type'] ?? 'link'), ['link', 'document'], true) ? $it['type'] : 'link';
+            $icon = in_array(($it['icon'] ?? 'file'), $allowedIcons, true) ? $it['icon'] : 'file';
+            $id   = preg_replace('/[^a-z0-9\-]/', '', strtolower((string) ($it['id'] ?? ''))) ?: ('item' . $idx);
+
+            $row = [
+                'id'    => $id,
+                'label' => mb_substr($label, 0, 120),
+                'type'  => $type,
+                'icon'  => $icon,
+            ];
+
+            if ($type === 'link') {
+                $row['url']  = trim((string) ($it['url'] ?? ''));
+                $row['file'] = null;
+            } else {
+                $fileKey = 'file_' . $id;
+                if ($request->hasFile($fileKey)) {
+                    $file = $request->file($fileKey);
+                    $request->validate([
+                        $fileKey => ['file', 'max:51200', 'mimes:pdf,jpg,jpeg,png,webp,doc,docx,xls,xlsx,ppt,pptx'],
+                    ]);
+                    $row['file']   = $file->store('client-menu', 'public');
+                    $row['format'] = strtoupper($file->getClientOriginalExtension());
+                } else {
+                    // Mantener el archivo previamente subido si no se reemplaza.
+                    $row['file']   = $it['file'] ?? null;
+                    $row['format'] = $it['format'] ?? null;
+                }
+                $row['url'] = null;
+            }
+
+            $clean[] = $row;
+        }
+
+        // Borrar archivos de documentos que ya no están referenciados.
+        $previous = \App\Models\Setting::get('client_menu', []);
+        if (is_array($previous)) {
+            $stillUsed = array_filter(array_column($clean, 'file'));
+            foreach ($previous as $old) {
+                $oldFile = $old['file'] ?? null;
+                if ($oldFile && !in_array($oldFile, $stillUsed, true)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFile);
+                }
+            }
+        }
+
+        \App\Models\Setting::put('client_menu', $clean);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Menú del cliente guardado correctamente.',
+                'items'   => $clean,
+            ]);
+        }
+
+        return back()->with('settings_success', 'Menú del cliente guardado correctamente.');
+    }
+
+    /**
      * Update another user's profile from the Usuarios (admin.profiles) page.
      * Mirrors the fields of editProfile() but targets an arbitrary user by id;
      * the admin can reset the password without knowing the current one.

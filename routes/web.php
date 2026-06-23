@@ -279,6 +279,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Firma del proyecto (usada para firmar los contratos a nombre de Makai)
     Route::post('/project-signature', [AdminController::class, 'updateProjectSignature'])->name('admin.project-signature.update');
 
+    // Menú del cliente (ítems configurables del navbar: enlaces y documentos)
+    Route::post('/client-menu', [AdminController::class, 'updateClientMenu'])->name('admin.client-menu.update');
+
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');
     Route::get('/crm/expedientes',  [AdminController::class, 'crmExpedientes'])->name('admin.crm.expedientes');

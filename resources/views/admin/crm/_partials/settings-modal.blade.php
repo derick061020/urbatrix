@@ -27,6 +27,10 @@
     $stSigImage   = $stProjSig['signature_image'] ?? null;
     $stSigName    = $stProjSig['signer_name'] ?? '';
     $stSigEntity  = $stProjSig['signer_entity'] ?? '';
+
+    // Menú del cliente — ítems configurables del navbar (enlaces / documentos).
+    $stClientMenu = $stIsAdmin ? (\App\Models\Setting::get('client_menu', []) ?: []) : [];
+    $stClientMenu = is_array($stClientMenu) ? array_values($stClientMenu) : [];
 @endphp
 
 <style>
@@ -285,6 +289,10 @@
                 <i class="pi pi-pencil"></i> {{ __('Firma del proyecto') }}
                 <i class="pi pi-angle-right chev"></i>
             </button>
+            <button type="button" class="st-nav-item" data-st-pane="menu">
+                <i class="pi pi-bars"></i> {{ __('Menú del cliente') }}
+                <i class="pi pi-angle-right chev"></i>
+            </button>
             @endif
 
             {{-- Cerrar sesión — anclado al fondo del sidebar --}}
@@ -332,6 +340,10 @@
             {{-- SIGNATURE TABS --}}
             <div class="st-tabs" data-st-tabs="signature" style="display:none;">
                 <button type="button" class="st-tab active" data-st-tab="signature-main">{{ __('Firma del proyecto') }}</button>
+            </div>
+            {{-- CLIENT MENU TABS --}}
+            <div class="st-tabs" data-st-tabs="menu" style="display:none;">
+                <button type="button" class="st-tab active" data-st-tab="menu-main">{{ __('Menú del cliente') }}</button>
             </div>
             @endif
 
@@ -689,12 +701,95 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- =========== CLIENT MENU PANE — MENÚ DEL CLIENTE =========== --}}
+                <div class="st-pane" data-st-pane="menu-main">
+                    <div class="st-row" style="display:block;">
+                        <div style="margin-bottom:14px;">
+                            <div class="st-row-label">{{ __('Ítems del menú del cliente') }}</div>
+                            <div class="st-row-desc">
+                                {{ __('Estos ítems aparecen en el menú desplegable del cliente (Sitio web, Brochure, Plantas, etc.). Vos decidís cuáles mostrar: cada ítem puede ser un enlace externo o un documento que se abre en una ventana.') }}
+                            </div>
+                        </div>
+
+                        <div id="cmList" style="display:flex; flex-direction:column; gap:12px;"></div>
+
+                        <button type="button" class="st-btn st-btn-ghost" style="margin-top:14px;" onclick="cmAddItem()">
+                            <i class="pi pi-plus"></i> {{ __('Agregar ítem') }}
+                        </button>
+
+                        <div id="cmEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay ítems. Agregá el primero para que aparezca en el menú del cliente.') }}</div>
+                    </div>
+                </div>
                 @endif
 
             </div>
         </div>
     </div>
 </div>
+
+@if($stIsAdmin)
+{{-- Plantilla de fila para el editor del menú del cliente --}}
+<template id="cmRowTemplate">
+    <div class="cm-row" style="border:1px solid #eaecf0; border-radius:12px; padding:14px; background:#fff;">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:160px;">
+                        <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Nombre') }}</label>
+                        <input type="text" class="cm-label" placeholder="Ej: Brochure" style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px;">
+                    </div>
+                    <div style="width:140px;">
+                        <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Tipo') }}</label>
+                        <select class="cm-type" onchange="cmSyncType(this)" style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px; background:#fff;">
+                            <option value="link">{{ __('Enlace') }}</option>
+                            <option value="document">{{ __('Documento') }}</option>
+                        </select>
+                    </div>
+                    <div style="width:140px;">
+                        <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Ícono') }}</label>
+                        <select class="cm-icon" style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px; background:#fff;">
+                            <option value="globe">🌐 {{ __('Sitio web') }}</option>
+                            <option value="file">📄 {{ __('Documento') }}</option>
+                            <option value="image">🖼️ {{ __('Imagen / Plano') }}</option>
+                            <option value="chart">📊 {{ __('Gráfico / ROI') }}</option>
+                            <option value="list">📋 {{ __('Lista') }}</option>
+                            <option value="help">❓ {{ __('Ayuda / FAQ') }}</option>
+                            <option value="book">📖 {{ __('Presentación') }}</option>
+                            <option value="building">🏢 {{ __('Edificio') }}</option>
+                            <option value="map">📍 {{ __('Ubicación') }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Enlace --}}
+                <div class="cm-link-wrap">
+                    <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('URL') }}</label>
+                    <input type="url" class="cm-url" placeholder="https://..." style="width:100%; border:1px solid #eaecf0; border-radius:9px; padding:8px 11px; font-size:13px;">
+                </div>
+
+                {{-- Documento --}}
+                <div class="cm-doc-wrap" style="display:none;">
+                    <label class="st-row-label" style="font-size:11px; display:block; margin-bottom:4px;">{{ __('Archivo') }} <span style="color:#99a0ae; font-weight:400;">(PDF, imagen, Office · máx 50&nbsp;MB)</span></label>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <label class="st-btn st-btn-ghost" style="cursor:pointer;">
+                            <i class="pi pi-upload"></i> {{ __('Subir archivo') }}
+                            <input type="file" class="cm-file" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:none;" onchange="cmFilePicked(this)">
+                        </label>
+                        <span class="cm-file-name" style="font-size:12px; color:#5c5c5c;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <button type="button" class="cm-mv" title="{{ __('Subir') }}" onclick="cmMove(this,-1)" style="background:#f4f5f7; border:none; border-radius:7px; width:30px; height:28px; cursor:pointer; color:#5c5c5c;"><i class="pi pi-chevron-up"></i></button>
+                <button type="button" class="cm-mv" title="{{ __('Bajar') }}" onclick="cmMove(this,1)" style="background:#f4f5f7; border:none; border-radius:7px; width:30px; height:28px; cursor:pointer; color:#5c5c5c;"><i class="pi pi-chevron-down"></i></button>
+                <button type="button" title="{{ __('Eliminar') }}" onclick="cmRemove(this)" style="background:#fff0f1; border:none; border-radius:7px; width:30px; height:28px; cursor:pointer; color:#e93544;"><i class="pi pi-trash"></i></button>
+            </div>
+        </div>
+    </div>
+</template>
+@endif
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
@@ -744,6 +839,7 @@
                 security:      ['Privacidad y Seguridad',    'Personaliza tus configuraciones de privacidad y seguridad', 'Guardar Cambios', false],
                 notifications: ['Configuración de la cuenta', 'Elige qué notificaciones quieres recibir', 'Guardar cambios', false],
                 signature:     ['Firma del proyecto',        'Esta firma se usa para firmar los contratos a nombre de Makai', 'Guardar firma', true],
+                menu:          ['Menú del cliente',          'Configurá los ítems (enlaces y documentos) que ve el cliente en su menú', 'Guardar menú', true],
             };
             const t = titles[activePane];
             document.querySelector('[data-st-title]').textContent = t[0];
@@ -754,6 +850,9 @@
             if (activePane === 'signature' && typeof window.psInitCanvas === 'function') {
                 // Esperar a que el pane sea visible para medir el canvas correctamente.
                 setTimeout(() => window.psInitCanvas(), 30);
+            }
+            if (activePane === 'menu' && typeof window.cmRender === 'function') {
+                window.cmRender();
             }
         });
     });
@@ -969,6 +1068,10 @@
             if (typeof window.psSaveSignature === 'function') window.psSaveSignature();
             return;
         }
+        if (activePane === 'menu') {
+            if (typeof window.cmSave === 'function') window.cmSave();
+            return;
+        }
         if (activePane === 'security') {
             stShowAlert('Usá los botones de cada apartado para aplicar cambios.', 'ok', 2200);
             return;
@@ -1147,6 +1250,135 @@
             psHasStroke = false; psRemove = false;
         })
         .catch(() => { btn.disabled = false; stShowAlert('Error de red al guardar la firma.', 'err'); });
+    };
+
+    /* ======================= Menú del cliente ======================= */
+    // Estado inicial cargado desde el backend.
+    let cmData = @json($stClientMenu);
+    if (!Array.isArray(cmData)) cmData = [];
+    let cmRendered = false;
+
+    // Render del editor (sólo la primera vez que se abre el pane).
+    window.cmRender = function(){
+        if (cmRendered) return;
+        cmRendered = true;
+        const list = document.getElementById('cmList');
+        list.innerHTML = '';
+        cmData.forEach(item => list.appendChild(cmBuildRow(item)));
+        cmUpdateEmpty();
+    };
+
+    function cmBuildRow(item){
+        item = item || {};
+        const tpl  = document.getElementById('cmRowTemplate');
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        node.dataset.id   = item.id || ('item' + Math.random().toString(36).slice(2, 8));
+        node.dataset.file = item.file || '';
+        node.dataset.format = item.format || '';
+        node.querySelector('.cm-label').value = item.label || '';
+        node.querySelector('.cm-type').value  = (item.type === 'document') ? 'document' : 'link';
+        node.querySelector('.cm-icon').value  = item.icon || 'file';
+        node.querySelector('.cm-url').value   = item.url || '';
+        if (item.type === 'document' && item.file) {
+            const parts = item.file.split('/');
+            node.querySelector('.cm-file-name').textContent = parts[parts.length - 1];
+        }
+        cmSyncType(node.querySelector('.cm-type'));
+        return node;
+    }
+
+    window.cmAddItem = function(){
+        const list = document.getElementById('cmList');
+        list.appendChild(cmBuildRow({ type: 'link', icon: 'globe' }));
+        cmUpdateEmpty();
+    };
+
+    window.cmRemove = function(btn){
+        btn.closest('.cm-row').remove();
+        cmUpdateEmpty();
+    };
+
+    window.cmMove = function(btn, dir){
+        const row = btn.closest('.cm-row');
+        if (dir < 0 && row.previousElementSibling) row.parentNode.insertBefore(row, row.previousElementSibling);
+        if (dir > 0 && row.nextElementSibling)     row.parentNode.insertBefore(row.nextElementSibling, row);
+    };
+
+    window.cmSyncType = function(sel){
+        const row = sel.closest('.cm-row');
+        const isDoc = sel.value === 'document';
+        row.querySelector('.cm-link-wrap').style.display = isDoc ? 'none' : '';
+        row.querySelector('.cm-doc-wrap').style.display  = isDoc ? '' : 'none';
+    };
+
+    window.cmFilePicked = function(input){
+        const row = input.closest('.cm-row');
+        const f = input.files && input.files[0];
+        row.querySelector('.cm-file-name').textContent = f ? f.name : '';
+    };
+
+    function cmUpdateEmpty(){
+        const hasRows = document.querySelectorAll('#cmList .cm-row').length > 0;
+        document.getElementById('cmEmpty').style.display = hasRows ? 'none' : '';
+    }
+
+    window.cmSave = function(){
+        const rows = Array.from(document.querySelectorAll('#cmList .cm-row'));
+        const meta = [];
+        const fd = new FormData();
+
+        for (const row of rows) {
+            const label = row.querySelector('.cm-label').value.trim();
+            const type  = row.querySelector('.cm-type').value;
+            const icon  = row.querySelector('.cm-icon').value;
+            const id    = row.dataset.id;
+            if (!label) { stShowAlert('Cada ítem necesita un nombre.', 'err'); return; }
+
+            const entry = { id, label, type, icon };
+            if (type === 'link') {
+                const url = row.querySelector('.cm-url').value.trim();
+                if (!url) { stShowAlert('El enlace "' + label + '" necesita una URL.', 'err'); return; }
+                entry.url = url;
+            } else {
+                const fileInput = row.querySelector('.cm-file');
+                const newFile = fileInput.files && fileInput.files[0];
+                if (newFile) {
+                    fd.append('file_' + id, newFile);
+                } else if (!row.dataset.file) {
+                    stShowAlert('El documento "' + label + '" necesita un archivo.', 'err'); return;
+                }
+                entry.file   = row.dataset.file || null;
+                entry.format = row.dataset.format || null;
+            }
+            meta.push(entry);
+        }
+
+        fd.append('items', JSON.stringify(meta));
+        fd.append('_token', st2faCsrf());
+
+        const btn = document.getElementById('stSaveBtn');
+        btn.disabled = true;
+
+        fetch('{{ route('admin.client-menu.update') }}', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: fd,
+            credentials: 'same-origin',
+        })
+        .then(r => r.json().catch(() => ({})))
+        .then(d => {
+            btn.disabled = false;
+            if (d.success === false) { stShowAlert(d.message || 'No se pudo guardar el menú.', 'err'); return; }
+            // Refrescar el estado local con las rutas de archivo devueltas.
+            if (Array.isArray(d.items)) {
+                cmData = d.items;
+                cmRendered = false;
+                document.getElementById('cmList').innerHTML = '';
+                window.cmRender();
+            }
+            stShowAlert(d.message || 'Menú del cliente guardado.', 'ok', 2600);
+        })
+        .catch(() => { btn.disabled = false; stShowAlert('Error de red al guardar el menú.', 'err'); });
     };
     @endif
 })();
