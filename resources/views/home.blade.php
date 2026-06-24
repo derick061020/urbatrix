@@ -1543,7 +1543,7 @@
         <!-- LEFT: Logo + animated project selector -->
         <div class="logo-section" style="position:relative;display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:200px;max-width:300px;">
           <div class="logo-container" style="display:flex;align-items:center;">
-            <a href="#" onclick="return false;" style="display:flex;align-items:center;text-decoration:none;height:44px;padding:0 4px;border-radius:9999px;">
+            <a href="{{trim((string) \App\Models\Setting::get('site_url', ''))}}" onclick="return false;" style="display:flex;align-items:center;text-decoration:none;height:44px;padding:0 4px;border-radius:9999px;">
               <img src="/images/makai-logo.png" alt="{{ __('logo') }}" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
             </a>
           </div>
