@@ -1890,7 +1890,7 @@
                       {!! $cmIcon !!}
                     </svg>
                   </div>
-                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ $cmLabel }}</div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __($cmLabel) }}</div>
                 </div>
               @endforeach
               @endif
