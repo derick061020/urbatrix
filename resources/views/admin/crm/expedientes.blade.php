@@ -71,7 +71,7 @@
                 @if($hasFilters)
                     <a href="{{ route('admin.crm.expedientes', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> {{ __('Limpiar') }}</a>
                 @endif
-                <button type="button" class="crm-btn crm-btn-ghost">{{ __('Acciones en lote') }} <i class="pi pi-angle-down text-[10px]"></i></button>
+                <button type="button" id="exp-bulk-delete" class="crm-btn crm-btn-ghost text-err disabled:opacity-40 disabled:cursor-not-allowed" disabled><i class="pi pi-trash"></i> {{ __('Eliminar') }} (<span id="exp-selected-count">0</span>)</button>
             </form>
         </div>
 
@@ -79,7 +79,7 @@
             <table class="w-full crm-table">
                 <thead class="bg-ink-50">
                     <tr>
-                        <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
+                        <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand" id="exp-select-all" title="{{ __('Seleccionar todo') }}"></th>
                         <th>{{ __('Cliente') }}</th>
                         <th>{{ __('Unidad') }}</th>
                         <th>{{ __('Paso') }}</th>
@@ -103,7 +103,7 @@
                             $bg = $avBg[$r->id % count($avBg)];
                         @endphp
                         <tr>
-                            <td><input type="checkbox" class="w-4 h-4 accent-brand"></td>
+                            <td><input type="checkbox" class="w-4 h-4 accent-brand exp-select" value="{{ $r->id }}"></td>
                             <td>
                                 <div class="flex items-center gap-3">
                                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $bg }}">{{ $init }}</div>
@@ -135,8 +135,13 @@
                                 <div class="text-[11px] text-ink-500">{{ $pct }}% de ${{ number_format($total) }}</div>
                             </td>
                             <td><span class="text-[12px] text-ink-500">{{ $r->updated_at?->diffForHumans() }}</span></td>
-                            <td class="text-right">
+                            <td class="text-right whitespace-nowrap">
                                 <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-brand hover:border-brand hover:bg-brand-tint transition-colors" title="{{ __('Ver') }}" aria-label="{{ __('Ver') }}"><i class="pi pi-eye text-[14px]"></i></a>
+                                <form method="POST" action="{{ route('admin.crm.expediente.delete', $r->id) }}" class="inline js-confirm-delete" data-confirm="{{ __('¿Eliminar el expediente de :name? Esta acción no se puede deshacer.', ['name' => trim($r->first_name.' '.$r->last_name) ?: 'este cliente']) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-err hover:border-err hover:bg-err-soft transition-colors" title="{{ __('Eliminar') }}" aria-label="{{ __('Eliminar') }}"><i class="pi pi-trash text-[14px]"></i></button>
+                                </form>
                             </td>
                         </tr>
                     @empty
@@ -151,6 +156,11 @@
         </div>
     </div>
 </div>
+
+{{-- Formulario oculto para el borrado en lote de expedientes --}}
+<form id="exp-bulk-delete-form" method="POST" action="{{ route('admin.crm.expedientes.bulk-delete') }}" class="hidden">
+    @csrf
+</form>
 
 @include('admin.crm._partials.modal_nueva_reserva', ['units' => $units, 'clients' => $clients])
 @include('admin.crm._partials.modal_exportar', ['name' => 'Expedientes', 'id' => 'modal-exportar-expedientes'])
@@ -184,6 +194,55 @@
     });
     // Hide while scrolling so the fixed tooltip doesn't float over stale spots.
     window.addEventListener('scroll', hide, true);
+})();
+</script>
+
+{{-- Selección + borrado (individual y en lote) de expedientes --}}
+<script>
+(function () {
+    // Confirmación para los borrados individuales
+    document.querySelectorAll('form.js-confirm-delete').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm(form.dataset.confirm || '¿Eliminar este registro?')) e.preventDefault();
+        });
+    });
+
+    // Borrado en lote
+    const selectAll = document.getElementById('exp-select-all');
+    const countEl   = document.getElementById('exp-selected-count');
+    const bulkBtn   = document.getElementById('exp-bulk-delete');
+    const bulkForm  = document.getElementById('exp-bulk-delete-form');
+    const rowBoxes  = () => Array.from(document.querySelectorAll('.exp-select'));
+
+    function selectedIds() { return rowBoxes().filter(c => c.checked).map(c => c.value); }
+    function refresh() {
+        const n = selectedIds().length;
+        if (countEl) countEl.textContent = n;
+        if (bulkBtn) bulkBtn.disabled = n === 0;
+    }
+
+    selectAll?.addEventListener('change', function () {
+        rowBoxes().forEach(c => { c.checked = selectAll.checked; });
+        refresh();
+    });
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('exp-select')) refresh();
+    });
+
+    bulkBtn?.addEventListener('click', function () {
+        const ids = selectedIds();
+        if (ids.length === 0) return;
+        if (!confirm('¿Eliminar ' + ids.length + ' expediente(s) seleccionado(s)? Esta acción no se puede deshacer.')) return;
+        bulkForm.querySelectorAll('input[name="ids[]"]').forEach(n => n.remove());
+        ids.forEach(id => {
+            const h = document.createElement('input');
+            h.type = 'hidden'; h.name = 'ids[]'; h.value = id;
+            bulkForm.appendChild(h);
+        });
+        bulkForm.submit();
+    });
+
+    refresh();
 })();
 </script>
 @endpush

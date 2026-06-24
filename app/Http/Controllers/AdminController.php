@@ -276,6 +276,22 @@ class AdminController extends Controller
             ->with('success', 'Unit deleted successfully!');
     }
 
+    /**
+     * Borrado en lote de unidades seleccionadas en la tabla.
+     */
+    public function bulkDeleteUnits(Request $request)
+    {
+        $data = $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:units,id',
+        ]);
+
+        $count = Unit::whereIn('id', $data['ids'])->delete();
+
+        return redirect()->route('admin.units')
+            ->with('success', "{$count} unidad(es) eliminada(s) correctamente.");
+    }
+
     public function togglePublicUnit(Unit $unit)
     {
         $unit->update(['public' => ! (bool) $unit->public]);
@@ -1279,6 +1295,34 @@ class AdminController extends Controller
             'clients',
             'advisors'
         ));
+    }
+
+    /**
+     * Elimina un expediente (reserva). Pagos, documentos y mensajes se borran
+     * en cascada por las claves foráneas de sus tablas.
+     */
+    public function deleteExpediente(Reservation $reservation)
+    {
+        $reservation->delete();
+
+        return redirect()->route('admin.crm.expedientes')
+            ->with('success', 'Expediente eliminado correctamente.');
+    }
+
+    /**
+     * Borrado en lote de expedientes seleccionados en la tabla.
+     */
+    public function bulkDeleteExpedientes(Request $request)
+    {
+        $data = $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:reservations,id',
+        ]);
+
+        $count = Reservation::whereIn('id', $data['ids'])->delete();
+
+        return redirect()->route('admin.crm.expedientes')
+            ->with('success', "{$count} expediente(s) eliminado(s) correctamente.");
     }
 
     public function crmDocumentos(Request $request)

@@ -72,6 +72,7 @@
                     <input type="text" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pr-3">
                 </div>
                 <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
+                <button type="button" id="units-bulk-delete" class="crm-btn crm-btn-ghost text-err disabled:opacity-40 disabled:cursor-not-allowed" disabled><i class="pi pi-trash"></i> {{ __('Eliminar') }} (<span id="units-selected-count">0</span>)</button>
             </div>
         </div>
 
@@ -150,6 +151,11 @@
                             </td>
                             <td class="text-right whitespace-nowrap">
                                 <a href="{{ route('admin.units.edit', $u->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-brand hover:border-brand hover:bg-brand-tint transition-colors" title="{{ __('Editar') }}" aria-label="{{ __('Editar') }}"><i class="pi pi-pencil text-[14px]"></i></a>
+                                <form method="POST" action="{{ route('admin.units.delete', $u->id) }}" class="inline js-confirm-delete" data-confirm="{{ __('¿Eliminar la unidad :name? Esta acción no se puede deshacer.', ['name' => $u->custom_id ?? $u->name ?? '']) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-err hover:border-err hover:bg-err-soft transition-colors" title="{{ __('Eliminar') }}" aria-label="{{ __('Eliminar') }}"><i class="pi pi-trash text-[14px]"></i></button>
+                                </form>
                             </td>
                         </tr>
                     @empty
@@ -163,6 +169,11 @@
 </div>
 
 @include('admin.crm._partials.modal_exportar', ['name' => 'Unidades', 'id' => 'modal-exportar-unidades'])
+
+{{-- Formulario oculto para el borrado en lote de unidades --}}
+<form id="units-bulk-delete-form" method="POST" action="{{ route('admin.units.bulk-delete') }}" class="hidden">
+    @csrf
+</form>
 
 {{-- ===================== MODAL: CONFIGURACIÓN DE OPCIONES ===================== --}}
 @php
@@ -319,6 +330,50 @@
 </dialog>
 
 @push('scripts')
+{{-- Borrado de unidades: confirmación individual + acción en lote --}}
+<script>
+(function () {
+    document.querySelectorAll('form.js-confirm-delete').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm(form.dataset.confirm || '¿Eliminar este registro?')) e.preventDefault();
+        });
+    });
+
+    const selectAll = document.getElementById('units-select-all');
+    const countEl   = document.getElementById('units-selected-count');
+    const bulkBtn   = document.getElementById('units-bulk-delete');
+    const bulkForm  = document.getElementById('units-bulk-delete-form');
+    const rowBoxes  = () => Array.from(document.querySelectorAll('.unit-select'));
+
+    function selectedIds() { return rowBoxes().filter(c => c.checked).map(c => c.value); }
+    function refresh() {
+        const n = selectedIds().length;
+        if (countEl) countEl.textContent = n;
+        if (bulkBtn) bulkBtn.disabled = n === 0;
+    }
+
+    selectAll?.addEventListener('change', refresh);
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('unit-select')) refresh();
+    });
+
+    bulkBtn?.addEventListener('click', function () {
+        const ids = selectedIds();
+        if (ids.length === 0) return;
+        if (!confirm('¿Eliminar ' + ids.length + ' unidad(es) seleccionada(s)? Esta acción no se puede deshacer.')) return;
+        bulkForm.querySelectorAll('input[name="ids[]"]').forEach(n => n.remove());
+        ids.forEach(id => {
+            const h = document.createElement('input');
+            h.type = 'hidden'; h.name = 'ids[]'; h.value = id;
+            bulkForm.appendChild(h);
+        });
+        bulkForm.submit();
+    });
+
+    refresh();
+})();
+</script>
+
 {{-- Descuentos masivos: selección de filas + lógica del modal --}}
 <script>
 (function () {

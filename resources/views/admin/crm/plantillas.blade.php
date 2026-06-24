@@ -55,6 +55,16 @@
     .pa-step-remove { color:#fb3748; background:none; border:none; cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:4px; }
     .pa-step-remove:hover { text-decoration:underline; }
     .pa-step .pa-conn { font-size:11px; color:#9aa1ad; }
+    /* Grupo de acciones de cada fila */
+    .crm-pa-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    @media (max-width: 639px){
+        .crm-pa-row { flex-wrap:wrap; padding-left:16px; padding-right:16px; gap:12px; }
+        .crm-pa-row .crm-pa-icon { width:32px; height:32px; }
+        .crm-pa-actions { width:100%; justify-content:flex-end; flex-wrap:wrap; gap:6px; }
+        .crm-pa-modal { padding:0; align-items:flex-end; }
+        .crm-pa-dialog { max-height:96vh; border-bottom-left-radius:0; border-bottom-right-radius:0; }
+        .pa-test-row { flex-direction:column; align-items:stretch; }
+    }
 </style>
 @endpush
 
@@ -88,7 +98,7 @@
         <div class="text-[14px] font-semibold text-ink-700">
             {{ $counts['templates'] }} {{ $counts['templates'] === 1 ? 'plantilla' : 'plantillas' }} · {{ $counts['automations'] }} {{ $counts['automations'] === 1 ? 'flujo activo' : 'flujos activos' }}
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <button type="button" class="crm-btn crm-btn-ghost" onclick="paOpenModal('pa-modal-channels')">
                 <i class="pi pi-sliders-h"></i> Config. canales
             </button>
@@ -147,19 +157,20 @@
                                 @endif
                             </div>
                         </div>
-                        <button type="button" class="pa-icon-btn" title="{{ __('Vista previa') }}" onclick="paOpenPreview({{ $tpl->id }})">
-                            <i class="pi pi-eye"></i>
-                        </button>
-                        <button type="button" class="pa-icon-btn" title="{{ __('Duplicar') }}" onclick="paDuplicate({{ $tpl->id }})">
-                            <i class="pi pi-copy"></i>
-                        </button>
-                        <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteTemplate({{ $tpl->id }}, @js($tpl->name))">
-                            <i class="pi pi-trash"></i>
-                        </button>
-                        <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditTemplate({{ $tpl->id }})">
-                            Editar
-                        </button>
-                        <a href="#" class="text-[12px] text-brand font-semibold hover:underline" onclick="event.preventDefault(); paOpenPreview({{ $tpl->id }});">{{ __('Ver &rarr;') }}</a>
+                        <div class="crm-pa-actions">
+                            <button type="button" class="pa-icon-btn" title="{{ __('Vista previa') }}" onclick="paOpenPreview({{ $tpl->id }})">
+                                <i class="pi pi-eye"></i>
+                            </button>
+                            <button type="button" class="pa-icon-btn" title="{{ __('Duplicar') }}" onclick="paDuplicate({{ $tpl->id }})">
+                                <i class="pi pi-copy"></i>
+                            </button>
+                            <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteTemplate({{ $tpl->id }}, @js($tpl->name))">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                            <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditTemplate({{ $tpl->id }})">
+                                Editar
+                            </button>
+                        </div>
                     </div>
                 @empty
                     <div class="pa-empty">
@@ -214,17 +225,19 @@
                                 </div>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('admin.crm.automatizaciones.toggle', $auto) }}" class="inline-flex items-center" onclick="event.stopPropagation();">
-                            @csrf
-                            <button type="submit" class="pa-toggle {{ $auto->is_active ? 'on' : '' }}" title="{{ $auto->is_active ? 'Pausar' : 'Activar' }}"></button>
-                        </form>
-                        <button type="button" class="pa-icon-btn" title="{{ __('Ejecutar ahora') }}" onclick="paRunAutomation({{ $auto->id }})">
-                            <i class="pi pi-play"></i>
-                        </button>
-                        <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteAutomation({{ $auto->id }}, @js($auto->name))">
-                            <i class="pi pi-trash"></i>
-                        </button>
-                        <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditAutomation({{ $auto->id }})">{{ __('Editar') }}</button>
+                        <div class="crm-pa-actions">
+                            <form method="POST" action="{{ route('admin.crm.automatizaciones.toggle', $auto) }}" class="inline-flex items-center" onclick="event.stopPropagation();">
+                                @csrf
+                                <button type="submit" class="pa-toggle {{ $auto->is_active ? 'on' : '' }}" title="{{ $auto->is_active ? 'Pausar' : 'Activar' }}"></button>
+                            </form>
+                            <button type="button" class="pa-icon-btn" title="{{ __('Ejecutar ahora') }}" onclick="paRunAutomation({{ $auto->id }})">
+                                <i class="pi pi-play"></i>
+                            </button>
+                            <button type="button" class="pa-icon-btn danger" title="{{ __('Eliminar') }}" onclick="paDeleteAutomation({{ $auto->id }}, @js($auto->name))">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                            <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" onclick="paEditAutomation({{ $auto->id }})">{{ __('Editar') }}</button>
+                        </div>
                     </div>
                 @empty
                     <div class="pa-empty">
@@ -363,7 +376,7 @@
             <form id="pa-test-form" method="POST" class="border-t border-ink-100 pt-3">
                 @csrf
                 <label class="block text-[11px] uppercase font-semibold text-ink-500 mb-1">{{ __('Enviar prueba a') }}</label>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 pa-test-row">
                     <input type="text" name="to" class="pa-input" required placeholder="{{ __('correo@ejemplo.com o +1 809 555 0100') }}">
                     <button type="submit" class="crm-btn crm-btn-primary whitespace-nowrap"><i class="pi pi-send"></i> {{ __('Enviar') }}</button>
                 </div>

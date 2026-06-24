@@ -216,6 +216,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/units/create', [AdminController::class, 'createUnit'])->name('admin.units.create');
     Route::post('/units', [AdminController::class, 'storeUnit'])->name('admin.units.store');
     Route::post('/units/bulk-discount', [AdminController::class, 'bulkDiscount'])->name('admin.units.bulk-discount');
+    Route::post('/units/bulk-delete', [AdminController::class, 'bulkDeleteUnits'])->name('admin.units.bulk-delete');
     Route::get('/units/{unit}', [AdminController::class, 'editUnit'])->name('admin.units.edit');
     Route::put('/units/{unit}', [AdminController::class, 'updateUnit'])->name('admin.units.update');
     Route::delete('/units/{unit}', [AdminController::class, 'deleteUnit'])->name('admin.units.delete');
@@ -287,6 +288,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');
     Route::get('/crm/expedientes',  [AdminController::class, 'crmExpedientes'])->name('admin.crm.expedientes');
+    Route::post('/crm/expedientes/bulk-delete', [AdminController::class, 'bulkDeleteExpedientes'])->name('admin.crm.expedientes.bulk-delete');
+    Route::delete('/crm/expedientes/{reservation}', [AdminController::class, 'deleteExpediente'])->name('admin.crm.expediente.delete');
     Route::post('/crm/expedientes/{reservation}/budget',        [AdminController::class, 'saveBudget'])->name('admin.crm.budget.save');
     Route::post('/crm/expedientes/{reservation}/budget/revert', [AdminController::class, 'revertBudget'])->name('admin.crm.budget.revert');
     // Admin contract management (upload new version, reply observations)

@@ -28,10 +28,15 @@
 
     .cc-grid { display:grid; grid-template-columns: 1fr 92px 92px 92px 116px 120px; gap:8px; align-items:center; }
     .cc-dash { color:#cacfd8; }
+    .cc-h-ico { display:none; }
     @media (max-width: 767px){
-        .cc-head { display:none; }
-        .cc-grid { grid-template-columns: 1fr 60px 60px 60px; row-gap:6px; }
+        .cc-grid { grid-template-columns: 1fr 52px 52px 52px; row-gap:6px; column-gap:6px; }
         .cc-tpl-cell, .cc-since-cell { grid-column: 1 / -1; padding-left:0; }
+        /* Mantener visible el encabezado de canales, pegado arriba y con íconos */
+        .cc-head { position:sticky; top:0; z-index:5; background:#fff; }
+        .cc-head .cc-head-tpl, .cc-head .cc-head-since { display:none; }
+        .cc-h-lbl { display:none; }
+        .cc-h-ico { display:inline-block; font-size:15px; }
     }
 </style>
 @endpush
@@ -90,11 +95,11 @@
     <div class="crm-card overflow-hidden">
         <div class="cc-grid cc-head px-4 py-2.5 border-b border-ink-100 text-[11px] uppercase tracking-wider font-semibold text-ink-400">
             <div>{{ __('Comunicación') }}</div>
-            <div class="text-center">{{ __('Email') }}</div>
-            <div class="text-center">WhatsApp</div>
-            <div class="text-center">In-app</div>
-            <div>{{ __('Plantilla') }}</div>
-            <div>{{ __('Activa desde') }}</div>
+            <div class="text-center"><span class="cc-h-lbl">{{ __('Email') }}</span><i class="pi pi-envelope cc-h-ico" title="Email"></i></div>
+            <div class="text-center"><span class="cc-h-lbl">WhatsApp</span><i class="pi pi-whatsapp cc-h-ico" title="WhatsApp"></i></div>
+            <div class="text-center"><span class="cc-h-lbl">In-app</span><i class="pi pi-bell cc-h-ico" title="In-app"></i></div>
+            <div class="cc-head-tpl">{{ __('Plantilla') }}</div>
+            <div class="cc-head-since">{{ __('Activa desde') }}</div>
         </div>
         <div id="ccCatalog"></div>
     </div>
