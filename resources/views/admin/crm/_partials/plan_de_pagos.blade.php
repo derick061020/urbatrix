@@ -163,5 +163,29 @@
             @endif
         </div>
     </form>
+
+    {{-- Skip client confirmation: upload the signed payment plan manually --}}
+    <div class="px-5 pb-5 -mt-1">
+        <div class="rounded-lg border border-ink-200 bg-ink-50/60 p-4">
+            <label class="flex items-start gap-2 cursor-pointer select-none">
+                <input type="checkbox" class="mt-0.5" onchange="document.getElementById('manual-plan-{{ $r->id }}').classList.toggle('hidden', !this.checked)">
+                <span>
+                    <span class="text-[12px] font-semibold text-ink-700">{{ __('Saltar la confirmación del cliente') }}</span>
+                    <span class="block text-[11px] text-ink-500">{{ __('Subí el plan de pagos ya firmado como archivo. Quedará aprobado sin esperar al cliente.') }}</span>
+                </span>
+            </label>
+            <form id="manual-plan-{{ $r->id }}" data-signed-upload data-url="{{ route('admin.crm.payment-plan.manual-sign', $r->id) }}" class="hidden mt-3 space-y-3 m-0">
+                @csrf
+                <div>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Plan de pagos firmado') }}</label>
+                    <input type="file" name="file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                    <span class="signed-upload-progress text-[11px] text-ink-500"></span>
+                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-upload"></i> {{ __('Subir y aprobar') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
     @endif
 </div>

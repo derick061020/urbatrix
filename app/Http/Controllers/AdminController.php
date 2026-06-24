@@ -1837,6 +1837,212 @@ class AdminController extends Controller
         return back()->with('success', 'Mensaje enviado al cliente.');
     }
 
+    /**
+     * Accumulate one chunk of a manually-uploaded signed document into a temp file.
+     * The front sends the file in ~512 KB parts to stay under nginx/PHP body limits
+     * (avoids 413 / "Too Large"). Returns:
+     *   ['status' => 'partial']                       → more chunks expected
+     *   ['status' => 'error', 'message' => ...]       → validation/IO failure
+     *   ['status' => 'complete', 'tmpPath','ext','name'] → last chunk assembled
+     */
+    private function receiveSignedDocChunk(Request $request): array
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:2000'],
+            'name'      => ['required', 'string', 'max:255'],
+        ]);
+
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return ['status' => 'error', 'message' => 'Identificador de subida inválido.'];
+        }
+
+        $tmpDir = storage_path('app/tmp-signed-docs');
+        if (! is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return ['status' => 'error', 'message' => 'No se pudo procesar el archivo.'];
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope de 50 MB acumulado.
+        if (filesize($tmpPath) > 52428800) {
+            @unlink($tmpPath);
+            return ['status' => 'error', 'message' => 'El archivo supera los 50 MB.'];
+        }
+
+        // Chunks intermedios: esperar el siguiente.
+        if ($index + 1 < $total) {
+            return ['status' => 'partial'];
+        }
+
+        // Último chunk: validar extensión.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+        if (! in_array($ext, $allowed, true)) {
+            @unlink($tmpPath);
+            return ['status' => 'error', 'message' => 'Formato de archivo no permitido.'];
+        }
+
+        return ['status' => 'complete', 'tmpPath' => $tmpPath, 'ext' => $ext, 'name' => (string) $request->input('name')];
+    }
+
+    /**
+     * Move the assembled temp file to the public "contracts" disk and return its path.
+     */
+    private function storeSignedDocFromTmp(string $tmpPath, string $finalRel): string
+    {
+        $stream = fopen($tmpPath, 'rb');
+        \Illuminate\Support\Facades\Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        return $finalRel;
+    }
+
+    /**
+     * Admin uploads the signed payment plan manually (by chunks), skipping the client
+     * confirmation flow. Creates the payment_plan document if needed, marks it signed,
+     * and unlocks the rest of the pipeline (payment schedule, budget locked as approved).
+     */
+    public function uploadSignedPaymentPlan(Request $request, Reservation $reservation)
+    {
+        $res = $this->receiveSignedDocChunk($request);
+        if ($res['status'] === 'error')   return response()->json(['success' => false, 'message' => $res['message']], 422);
+        if ($res['status'] === 'partial') return response()->json(['success' => true, 'done' => false]);
+
+        $finalRel = $this->storeSignedDocFromTmp(
+            $res['tmpPath'],
+            'contracts/payment_plan_'.$reservation->id.'_'.time().'.'.$res['ext'],
+        );
+
+        // Get or create the payment_plan document for this reservation.
+        $document = \App\Services\DocumentService::generatePaymentPlan($reservation);
+
+        $document->update([
+            'file_path'    => $finalRel,
+            'filename'     => $res['name'],
+            'generated_at' => $document->generated_at ?? now(),
+            'notes'        => json_encode([
+                'signer_name'      => 'Subido manualmente por el asesor',
+                'manual_upload'    => true,
+                'uploaded_by'      => Auth::user()?->name ?? 'Asesor',
+                'signed_server_at' => now()->toIso8601String(),
+            ]),
+        ]);
+
+        // Mark as signed → triggers payment schedule generation and status promotion.
+        \App\Services\DocumentService::signDocument($document, Auth::id(), $document->notes);
+
+        // Ensure the purchase promise document exists so the contract card becomes available.
+        \App\Services\DocumentService::generatePurchasePromise($reservation);
+
+        // Lock the budget as accepted so the admin form closes and the client flow is bypassed.
+        $observations = $reservation->budget_observations ?? [];
+        $observations[] = [
+            'from'    => 'admin',
+            'author'  => Auth::user()?->name ?? 'Asesor',
+            'message' => 'Subió el plan de pagos firmado manualmente (se saltó la confirmación del cliente).',
+            'kind'    => 'accept',
+            'at'      => now()->toIso8601String(),
+        ];
+        $reservation->update([
+            'budget_status'        => 'approved',
+            'budget_sent_at'       => $reservation->budget_sent_at ?? now(),
+            'budget_observations'  => $observations,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'message' => 'Plan de pagos firmado subido y aprobado.',
+        ]);
+    }
+
+    /**
+     * Admin uploads the signed contract / purchase promise manually (by chunks),
+     * skipping the client confirmation flow, and marks it as approved.
+     */
+    public function uploadSignedContract(Request $request, Document $document)
+    {
+        if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
+            return response()->json(['success' => false, 'message' => 'Tipo de documento inválido.'], 422);
+        }
+
+        $res = $this->receiveSignedDocChunk($request);
+        if ($res['status'] === 'error')   return response()->json(['success' => false, 'message' => $res['message']], 422);
+        if ($res['status'] === 'partial') return response()->json(['success' => true, 'done' => false]);
+
+        $finalRel = $this->storeSignedDocFromTmp(
+            $res['tmpPath'],
+            'contracts/'.$document->document_type.'_'.$document->reservation_id.'_'.time().'.'.$res['ext'],
+        );
+
+        $meta = $document->metadata ?? [];
+        $obs  = $meta['observations'] ?? [];
+        $obs[] = [
+            'from'    => 'admin',
+            'author'  => Auth::user()?->name ?? 'Asesor',
+            'message' => 'Subió la versión firmada manualmente (se saltó la confirmación del cliente): '.$res['name'],
+            'kind'    => 'upload',
+            'at'      => now()->toIso8601String(),
+        ];
+        $meta['observations'] = $obs;
+        $meta['accepted_at']  = now()->toIso8601String();
+
+        $document->update([
+            'file_path'    => $finalRel,
+            'filename'     => $res['name'],
+            'generated_at' => $document->generated_at ?? now(),
+            'status'       => 'approved',
+            'signed_at'    => now(),
+            'signed_by'    => Auth::id(),
+            'approved_at'  => now(),
+            'approved_by'  => Auth::id(),
+            'metadata'     => $meta,
+            'notes'        => json_encode([
+                'signer_name'      => 'Subido manualmente por el asesor',
+                'manual_upload'    => true,
+                'uploaded_by'      => Auth::user()?->name ?? 'Asesor',
+                'signed_server_at' => now()->toIso8601String(),
+            ]),
+        ]);
+
+        // Promote the reservation once payment plan and purchase promise are both finalized.
+        $reservation = $document->reservation;
+        $planDone = (bool) $reservation->documents()
+            ->where('document_type', 'payment_plan')
+            ->whereIn('status', ['signed', 'approved'])->first();
+        $promiseDone = (bool) $reservation->documents()
+            ->where('document_type', 'purchase_promise')
+            ->whereIn('status', ['signed', 'approved'])->first();
+        if ($planDone && $promiseDone && ! in_array($reservation->status, ['contract_signed', 'signed'])) {
+            $reservation->update(['status' => 'contract_signed']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'message' => 'Documento firmado subido y aprobado.',
+        ]);
+    }
+
     public function revertBudget(Reservation $reservation)
     {
         $reservation->update([

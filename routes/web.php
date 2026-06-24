@@ -297,6 +297,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Admin contract management (upload new version, reply observations)
     Route::post('/crm/contract/{document}/upload', [AdminController::class, 'uploadModifiedContract'])->name('admin.crm.contract.upload');
     Route::post('/crm/contract/{document}/reply',  [AdminController::class, 'replyContractObservation'])->name('admin.crm.contract.reply');
+    // Admin manual signing — skip client confirmation, upload signed file directly
+    Route::post('/crm/expedientes/{reservation}/payment-plan/manual-sign', [AdminController::class, 'uploadSignedPaymentPlan'])->name('admin.crm.payment-plan.manual-sign');
+    Route::post('/crm/contract/{document}/manual-sign', [AdminController::class, 'uploadSignedContract'])->name('admin.crm.contract.manual-sign');
     Route::get('/crm/documentos',   [AdminController::class, 'crmDocumentos'])->name('admin.crm.documentos');
     Route::get('/crm/contratos',    [AdminController::class, 'crmContratos'])->name('admin.crm.contratos');
     Route::get('/crm/proyectos',    [AdminController::class, 'crmProyectos'])->name('admin.crm.proyectos');
