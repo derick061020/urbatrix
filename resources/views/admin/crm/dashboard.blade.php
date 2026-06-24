@@ -104,7 +104,7 @@
     @endif
 
     {{-- KPI cards (cada número = suma de su desglose) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php
             $kpis = [
                 ['n' => $expedientesActivos, 'label' => __('Expedientes activos'),   'sub' => __(':a incompletos · :b sin asesor', ['a' => $expedientesIncompletos, 'b' => $sinAsesorCount]), 'dot' => '#1fc16b', 'href' => route('admin.crm.expedientes')],
@@ -200,7 +200,7 @@
                     <a href="{{ route('admin.crm.proyectos') }}" class="text-[11px] text-brand font-semibold hover:underline">{{ __('Ver todos') }} &rarr;</a>
                 </div>
                 <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full min-w-[680px]">
                     <thead class="bg-ink-50/60">
                         <tr>
                             <th class="text-left px-5 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-ink-500">{{ __('Proyecto') }}</th>

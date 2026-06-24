@@ -5538,9 +5538,7 @@
     transition:transform .26s cubic-bezier(.16,1,.3,1), opacity .26s ease;
   }
   #clientDocModal.is-open .client-doc-card{transform:translateY(0) scale(1);opacity:1;}
-  @media (prefers-reduced-motion: reduce){
-    #clientDocModal,#clientDocModal .client-doc-card{transition:none;}
-  }
+  
 </style>
 <div id="clientDocModal" style="position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(15,17,24,.55);padding:20px;">
   <div class="client-doc-card" style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(10,13,20,.45);">
