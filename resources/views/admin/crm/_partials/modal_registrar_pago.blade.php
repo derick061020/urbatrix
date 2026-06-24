@@ -1,7 +1,11 @@
 {{-- ====== Modal: Registrar pago ====== --}}
 <dialog id="modal-registrar-pago" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
-    <form method="POST" action="{{ $action ?? route('admin.crm.payment.create') }}" enctype="multipart/form-data" class="w-[824px] max-w-[95vw] bg-white rounded-2xl overflow-hidden">
+    <form method="POST" action="{{ $action ?? route('admin.crm.payment.create') }}" enctype="multipart/form-data" class="w-[824px] max-w-[95vw] bg-white rounded-2xl overflow-hidden" onsubmit="return rpBeforeSubmit(this);">
         @csrf
+        {{-- El comprobante se sube por chunks (evita 413); aquí sólo viaja su ruta. --}}
+        <input type="hidden" name="receipt_path" id="rp-receipt-path" value="">
+        <input type="hidden" name="_uploading" id="rp-uploading" value="">
+
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-ink-600"><i class="pi pi-credit-card"></i></div>
             <div class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Registrar pago') }}</div>
@@ -67,12 +71,13 @@
             </div>
 
             <div class="border-2 border-dashed border-ink-200 rounded-xl py-7 px-4 text-center cursor-pointer hover:border-brand transition-colors"
-                 onclick="this.querySelector('input').click()">
+                 onclick="this.querySelector('input[type=file]').click()">
                 <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
                 <div class="text-[13px] font-semibold text-ink-700 mt-2">{{ __('Arrastra aquí o haz clic para seleccionar') }}</div>
-                <div class="text-[11px] text-ink-500 mt-1">{{ __('PDF, JPG o PNG · máx. 4 MB') }}</div>
-                <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); this.previousElementSibling.click()">{{ __('Buscar archivo') }}</button>
-                <input type="file" name="receipt" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="this.parentNode.querySelector('button[type=button]').textContent = this.files[0]?.name || 'Buscar archivo'">
+                <div class="text-[11px] text-ink-500 mt-1">{{ __('PDF, JPG o PNG · máx. 50 MB') }}</div>
+                <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); this.parentNode.querySelector('input[type=file]').click()"><span id="rp-receipt-name">{{ __('Buscar archivo') }}</span></button>
+                {{-- Sin name: el archivo NO se postea entero; se sube por chunks. --}}
+                <input type="file" id="rp-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="rpReceiptSelected(this)">
             </div>
 
             <div>
@@ -99,6 +104,74 @@
         if (target) target.value = paymentId || '';
         if (amount) amount.value = remaining || '0.00';
         if (lbl && label) lbl.value = label;
+        // Limpia el comprobante de una apertura anterior.
+        var rp = document.getElementById('rp-receipt-path');
+        var rn = document.getElementById('rp-receipt-name');
+        if (rp) rp.value = '';
+        if (rn) rn.textContent = 'Buscar archivo';
         document.getElementById('modal-registrar-pago').showModal();
+    }
+
+    // Sube el comprobante en trozos de ~512 KB para evitar el 413 ("Too Large").
+    async function rpReceiptSelected(input) {
+        var file = input.files && input.files[0];
+        if (!file) return;
+
+        var nameEl   = document.getElementById('rp-receipt-name');
+        var pathEl   = document.getElementById('rp-receipt-path');
+        var upEl     = document.getElementById('rp-uploading');
+        var csrf     = document.querySelector('#modal-registrar-pago input[name=_token]')?.value || '';
+        var chunkSize = 512 * 1024;
+        var total    = Math.ceil(file.size / chunkSize) || 1;
+        var uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+        if (pathEl) pathEl.value = '';
+        if (upEl)   upEl.value = '1';
+
+        try {
+            for (var i = 0; i < total; i++) {
+                var chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
+                var fd = new FormData();
+                fd.append('chunk', chunk);
+                fd.append('upload_id', uploadId);
+                fd.append('index', i);
+                fd.append('total', total);
+                fd.append('name', file.name);
+                fd.append('_token', csrf);
+
+                var res = await fetch('{{ route('admin.crm.payment.receipt') }}', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd,
+                    credentials: 'same-origin',
+                });
+                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño. Subí client_max_body_size en nginx.');
+                var d = await res.json().catch(function () { return {}; });
+                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante.');
+
+                if (nameEl) nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
+
+                if (d.done) {
+                    if (pathEl) pathEl.value = d.path || '';
+                    if (nameEl) nameEl.textContent = file.name;
+                }
+            }
+        } catch (e) {
+            if (pathEl) pathEl.value = '';
+            if (nameEl) nameEl.textContent = 'Buscar archivo';
+            alert(e.message || 'No se pudo subir el comprobante.');
+        } finally {
+            if (upEl) upEl.value = '';
+        }
+    }
+
+    // Evita enviar el pago mientras el comprobante aún se está subiendo.
+    function rpBeforeSubmit(form) {
+        var upEl = document.getElementById('rp-uploading');
+        if (upEl && upEl.value === '1') {
+            alert('Esperá a que termine la subida del comprobante.');
+            return false;
+        }
+        return true;
     }
 </script>

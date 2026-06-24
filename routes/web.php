@@ -330,6 +330,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/expedientes/{reservation}/document/request', [AdminController::class, 'requestDocument'])->name('admin.crm.document.request');
     Route::post('/crm/document/{document}/delete', [AdminController::class, 'deleteDocumentQuick'])->name('admin.crm.document.delete');
     Route::post('/crm/payment/create',     [AdminController::class, 'createPaymentQuick'])->name('admin.crm.payment.create');
+    Route::post('/crm/payment/receipt',    [AdminController::class, 'uploadReceiptChunk'])->name('admin.crm.payment.receipt');
     Route::get('/crm/export',              [AdminController::class, 'exportResource'])->name('admin.crm.export');
     Route::post('/crm/export/request-code', [AdminController::class, 'requestExportCode'])->name('admin.crm.export.request');
     Route::post('/crm/export/resend-code',  [AdminController::class, 'resendExportCode'])->name('admin.crm.export.resend');
