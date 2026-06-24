@@ -158,14 +158,14 @@
                     <button class="text-[11.5px] font-bold rounded-lg px-3 py-1.5 bg-white/15" type="button">{{ __('Posponer') }}</button>
                 </div>
 
-                <div id="esc-inbox" class="py-1.5">
+                <div id="esc-inbox" class="py-1.5 overflow-x-auto">
                     @forelse($bandeja as $i)
                         @php
                             $hrs       = $i->date ? $i->date->diffInHours(now()) : 0;
                             $ageClass  = $hrs >= 48 ? 'hot' : ($hrs >= 12 ? 'warn' : 'ok');
                             $ageLabel  = $i->date ? $i->date->diffForHumans(['short' => true, 'parts' => 1]) : '—';
                         @endphp
-                        <div class="esc-item flex items-center gap-3 px-5 py-2.5 border-b border-ink-100 last:border-b-0 cursor-pointer"
+                        <div class="esc-item flex items-center gap-3 px-5 py-2.5 border-b border-ink-100 last:border-b-0 cursor-pointer min-w-[560px]"
                              data-cat="{{ $i->cat }}"
                              data-ty="{{ $i->ty }}"
                              data-title="{{ $i->title }}"

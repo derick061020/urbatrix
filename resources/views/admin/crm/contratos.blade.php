@@ -125,7 +125,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-4 py-3 border-t border-ink-100">{{ $reservations->withQueryString()->links() }}</div>
+        <div class="px-4 py-3 border-t border-ink-100">{{ $reservations->withQueryString()->links('pagination::crm') }}</div>
     </div>
 </div>
 
