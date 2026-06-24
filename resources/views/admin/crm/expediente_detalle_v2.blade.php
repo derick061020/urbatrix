@@ -14,7 +14,7 @@
     $unidad  = $reservation->unit?->custom_id ?? $reservation->unit?->name ?? '—';
     $proyecto= 'Makai Residences';
     $precio  = (float)($reservation->unit?->price ?? 0);
-    $paid    = (float)($reservation->payments?->where('status', 'paid')->sum('amount') ?? 0);
+    $paid    = (float)($reservation->payments?->sum('paid_amount') ?? 0);
     $pct     = $precio > 0 ? round(($paid / $precio) * 100) : 0;
 
     [$estado, $estadoColor, $stage] = $reservation->pipelineStage();
@@ -353,22 +353,40 @@
                     </div>
                     <table class="w-full crm-table">
                         <thead class="bg-white">
-                            <tr><th>{{ __('Cuota') }}</th><th>{{ __('Fecha') }}</th><th>{{ __('Monto programado') }}</th><th>{{ __('Pagado') }}</th><th>{{ __('Estado') }}</th><th>{{ __('Método') }}</th></tr>
+                            <tr><th>{{ __('Cuota') }}</th><th>{{ __('Fecha') }}</th><th>{{ __('Monto programado') }}</th><th>{{ __('Pagado') }}</th><th>{{ __('Estado') }}</th><th>{{ __('Método') }}</th><th class="text-right">{{ __('Acción') }}</th></tr>
                         </thead>
                         <tbody>
                             @php $statusPay = ['paid' => ['Pagado','ok'],'pending' => ['Pendiente','warn'],'overdue' => ['Vencido','err']]; @endphp
                             @forelse($reservation->payments->sortBy('due_date') as $p)
-                                @php $st = $statusPay[$p->status] ?? ['—','ink-500']; @endphp
+                                @php
+                                    $st = $p->isPartial() ? ['Parcial','warn'] : ($statusPay[$p->status] ?? ['—','ink-500']);
+                                @endphp
                                 <tr>
                                     <td class="text-[13px] font-semibold text-ink-900">{{ $p->label ?? $p->payment_type }}</td>
                                     <td class="text-[12px] text-ink-700">{{ optional($p->due_date)->format('Y-m-d') }}</td>
                                     <td class="text-[13px] text-ink-700">${{ number_format($p->amount) }}</td>
-                                    <td class="text-[13px] font-bold {{ $p->status === 'paid' ? 'text-ok-dark' : 'text-ink-400' }}">${{ number_format($p->status === 'paid' ? $p->amount : 0) }}</td>
+                                    <td class="text-[13px] font-bold {{ $p->paid_amount > 0 ? 'text-ok-dark' : 'text-ink-400' }}">
+                                        ${{ number_format($p->paid_amount) }}
+                                        @if($p->isPartial())
+                                            <span class="block text-[11px] font-normal text-err">{{ __('Saldo') }}: ${{ number_format($p->remaining) }}</span>
+                                        @endif
+                                    </td>
                                     <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                                     <td class="text-[12px] text-ink-500">{{ $p->payment_method ?? '—' }}</td>
+                                    <td class="text-right">
+                                        @if($p->status !== 'paid')
+                                            <form method="POST" action="{{ route('admin.payments.pay', $p->id) }}" class="inline m-0"
+                                                  onsubmit="var m=prompt('Monto recibido para esta cuota (saldo: ${{ number_format($p->remaining, 2) }}). El excedente se aplica a las cuotas siguientes; si es menor, queda saldo pendiente.', '{{ number_format($p->remaining, 2, '.', '') }}'); if(m===null){return false;} this.amount.value=m; return true;">@csrf
+                                                <input type="hidden" name="amount" value="">
+                                                <button type="submit" class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
+                                            </form>
+                                        @else
+                                            <span class="text-[11px] text-ink-400">—</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin cuotas registradas.') }} <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">{{ __('Registrar pago') }}</button></td></tr>
+                                <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin cuotas registradas.') }} <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">{{ __('Registrar pago') }}</button></td></tr>
                             @endforelse
                         </tbody>
                     </table>

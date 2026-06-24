@@ -3000,6 +3000,7 @@ class AdminController extends Controller
             'payment_type'   => 'installment',
             'label'          => $data['label'],
             'amount'         => $data['amount'],
+            'paid_amount'    => $data['amount'],
             'due_date'       => $data['paid_at'],
             'paid_at'        => $data['paid_at'],
             'status'         => 'paid',
@@ -3327,6 +3328,98 @@ class AdminController extends Controller
             return response()->json(['message' => 'Payment marked as paid successfully', 'payment' => $payment]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error marking payment as paid: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Registra un abono sobre una cuota desde el calendario de pagos del
+     * expediente (sin requerir aprobación). Acepta un monto recibido que puede
+     * ser mayor o menor que la cuota:
+     *  - si es menor, deja saldo (deuda) en la cuota,
+     *  - si es mayor, cubre la cuota y el excedente se aplica a las cuotas
+     *    siguientes que aún tengan saldo.
+     * Redirige de vuelta con mensaje flash.
+     */
+    public function payPaymentDirect(Request $request, Payment $payment)
+    {
+        if ($payment->status === 'paid') {
+            return back()->with('error', 'Esta cuota ya está pagada.');
+        }
+
+        // Si no se envía monto, se asume el saldo completo de la cuota.
+        $data = $request->validate([
+            'amount' => 'nullable|numeric|min:0.01',
+        ]);
+        $received = (float) ($data['amount'] ?? $payment->remaining);
+
+        try {
+            // La cuota seleccionada primero, luego las siguientes con saldo
+            // ordenadas por fecha de vencimiento.
+            $cuotas = Payment::where('reservation_id', $payment->reservation_id)
+                ->whereIn('status', ['pending', 'overdue'])
+                ->where('id', '!=', $payment->id)
+                ->orderBy('due_date')
+                ->get()
+                ->prepend($payment);
+
+            $applied = 0.0;
+            foreach ($cuotas as $cuota) {
+                if ($received <= 0) {
+                    break;
+                }
+
+                $remaining = max(0, (float) $cuota->amount - (float) $cuota->paid_amount);
+                if ($remaining <= 0) {
+                    continue;
+                }
+
+                $apply = min($received, $remaining);
+                $cuota->paid_amount = (float) $cuota->paid_amount + $apply;
+                $received -= $apply;
+                $applied  += $apply;
+
+                if ((float) $cuota->paid_amount + 0.001 >= (float) $cuota->amount) {
+                    $cuota->status          = 'paid';
+                    $cuota->paid_at         = now();
+                    $cuota->approval_status = 'approved';
+                    $cuota->approved_by     = Auth::id();
+                    $cuota->approved_at     = now();
+                }
+                $cuota->save();
+
+                if ($cuota->status === 'paid') {
+                    $this->sendPaymentReceipt($cuota);
+                }
+            }
+
+            // Excedente que no cabe en ninguna cuota: se guarda como saldo a favor.
+            if ($received > 0.001) {
+                Payment::create([
+                    'reservation_id' => $payment->reservation_id,
+                    'payment_type'   => 'credit',
+                    'label'          => 'Saldo a favor',
+                    'amount'         => $received,
+                    'paid_amount'    => $received,
+                    'due_date'       => now(),
+                    'paid_at'        => now(),
+                    'status'         => 'paid',
+                    'approval_status'=> 'approved',
+                    'approved_by'    => Auth::id(),
+                    'approved_at'    => now(),
+                ]);
+                $applied += $received;
+            }
+
+            $payment->refresh();
+            if ($payment->status === 'paid') {
+                $msg = 'Cuota pagada' . ($applied > 0 ? ' ($' . number_format($applied) . ' aplicados).' : '.');
+            } else {
+                $msg = 'Abono registrado. Saldo pendiente de la cuota: $' . number_format($payment->remaining) . '.';
+            }
+
+            return back()->with('success', $msg);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al registrar el pago: ' . $e->getMessage());
         }
     }
 

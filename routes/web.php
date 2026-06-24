@@ -399,6 +399,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     
     // Payment approval routes
     Route::post('/payments/{payment}/approve', [AdminController::class, 'approvePayment'])->name('admin.payments.approve');
+    Route::post('/payments/{payment}/pay', [AdminController::class, 'payPaymentDirect'])->name('admin.payments.pay');
 });
 
 

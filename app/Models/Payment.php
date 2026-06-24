@@ -15,6 +15,7 @@ class Payment extends Model
         'installment_number',
         'label',
         'amount',
+        'paid_amount',
         'due_date',
         'status',
         'paid_at',
@@ -37,6 +38,7 @@ class Payment extends Model
         'overdue_notified_at' => 'datetime',
         'receipt_signed_at' => 'datetime',
         'amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
     ];
 
     /**
@@ -78,6 +80,22 @@ class Payment extends Model
     {
         return $this->status === 'overdue' || 
                ($this->status === 'pending' && $this->due_date < now());
+    }
+
+    /**
+     * Saldo pendiente de la cuota (monto programado menos lo abonado).
+     */
+    public function getRemainingAttribute(): float
+    {
+        return max(0, (float) $this->amount - (float) $this->paid_amount);
+    }
+
+    /**
+     * Hay un abono parcial: se pagó algo pero queda saldo (deuda).
+     */
+    public function isPartial(): bool
+    {
+        return $this->status !== 'paid' && (float) $this->paid_amount > 0;
     }
 
     /**
