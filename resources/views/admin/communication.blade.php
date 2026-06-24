@@ -26,14 +26,17 @@
     }
 
     $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3'];
+
+    // En móvil: si hay conversación seleccionada (?r=) mostramos el chat, si no, la bandeja (estilo WhatsApp).
+    $mobileShowChat = request()->filled('r');
 @endphp
 <div class="p-6">
     @if(session('success'))<div class="px-4 py-2 mb-3 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
 
-    <div class="crm-card overflow-hidden h-[calc(100vh-152px)] grid grid-cols-12">
+    <div class="crm-card overflow-hidden h-[calc(100vh-152px)] grid grid-cols-1 md:grid-cols-12">
 
         {{-- Inbox list --}}
-        <aside class="col-span-3 border-r border-ink-100 flex flex-col">
+        <aside class="col-span-1 md:col-span-3 border-r border-ink-100 flex-col {{ $mobileShowChat ? 'hidden md:flex' : 'flex' }}">
             <div class="p-3 border-b border-ink-100 flex items-center gap-2">
                 <button class="crm-tab active">{{ __('Bandeja') }}</button>
                 <span class="crm-pill bg-err-soft text-err">{{ $conversations->count() }}</span>
@@ -76,13 +79,16 @@
         </aside>
 
         {{-- Conversation --}}
-        <section id="conversation-section" class="col-span-6 flex flex-col bg-ink-50">
+        <section id="conversation-section" class="col-span-1 md:col-span-6 flex-col bg-ink-50 {{ $mobileShowChat ? 'flex' : 'hidden md:flex' }}">
             @if($active)
                 @php
                     $aInit = strtoupper(substr($active->first_name ?? 'C',0,1).substr($active->last_name ?? 'M',0,1));
                     $aBg   = $avBg[$active->id % count($avBg)];
                 @endphp
                 <div class="px-5 py-3 border-b border-ink-100 bg-white flex items-center gap-3">
+                    <a href="{{ route('admin.communication') }}" class="md:hidden -ml-1 mr-1 text-ink-500 hover:text-ink-900" title="{{ __('Volver') }}">
+                        <i class="pi pi-arrow-left text-[16px]"></i>
+                    </a>
                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $aBg }}">{{ $aInit }}</div>
                     <div class="flex-1">
                         <div class="text-[14px] font-semibold text-ink-900">{{ $active->first_name }} {{ $active->last_name }}</div>
@@ -132,7 +138,7 @@
         </section>
 
         {{-- Right rail --}}
-        <aside id="right-rail" class="col-span-3 border-l border-ink-100 flex flex-col overflow-y-auto hidden">
+        <aside id="right-rail" class="col-span-1 md:col-span-3 border-l border-ink-100 flex flex-col overflow-y-auto hidden">
             <div class="p-4 border-b border-ink-100">
                 <div class="text-[11px] uppercase font-semibold text-ink-400 mb-2">{{ __('Enviar por canal') }}</div>
                 @if($active)
@@ -186,12 +192,12 @@
             
             if (rightRail.classList.contains('hidden')) {
                 // Menú oculto: conversación ocupa más espacio
-                conversationSection.classList.remove('col-span-6');
-                conversationSection.classList.add('col-span-9');
+                conversationSection.classList.remove('md:col-span-6');
+                conversationSection.classList.add('md:col-span-9');
             } else {
                 // Menú visible: conversación ocupa espacio normal
-                conversationSection.classList.remove('col-span-9');
-                conversationSection.classList.add('col-span-6');
+                conversationSection.classList.remove('md:col-span-9');
+                conversationSection.classList.add('md:col-span-6');
             }
         }
     }
@@ -202,8 +208,8 @@
         const conversationSection = document.getElementById('conversation-section');
         
         if (rightRail && conversationSection && rightRail.classList.contains('hidden')) {
-            conversationSection.classList.remove('col-span-6');
-            conversationSection.classList.add('col-span-9');
+            conversationSection.classList.remove('md:col-span-6');
+            conversationSection.classList.add('md:col-span-9');
         }
     });
 </script>

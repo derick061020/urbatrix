@@ -254,11 +254,42 @@
     }
     .st-2fa-codes span.used { text-decoration:line-through; opacity:.45; }
 
+    /* Botón "Volver" — sólo visible en el paso de detalle en mobile */
+    .st-back-btn {
+        display: none; align-items: center; gap: 6px;
+        background: transparent; border: none; cursor: pointer;
+        color: #525866; font-size: 13px; font-weight: 600; padding: 4px 0;
+        width: 100%; order: -1;
+    }
+    .st-back-btn:hover { color: #222530; }
+    .st-back-btn .pi { font-size: 14px; }
+
     @media (max-width: 860px) {
-        .st-shell { grid-template-columns: 1fr; height: calc(100vh - 24px); max-height: calc(100vh - 24px); }
-        .st-sidebar { display: flex; flex-direction: row; gap: 4px; overflow-x: auto; padding: 12px; }
-        .st-sidebar .st-section-label { display: none; }
-        .st-nav-item .chev { display: none; }
+        .st-shell {
+            grid-template-columns: 1fr; grid-template-rows: 1fr;
+            height: calc(100vh - 24px); max-height: calc(100vh - 24px);
+        }
+
+        /* ── Paso 1: lista de apartados (la sidebar ocupa todo el modal) ── */
+        .st-sidebar {
+            grid-column: 1; grid-row: 1;
+            display: flex; flex-direction: column; gap: 4px;
+            overflow-y: auto; padding: 18px 14px; border-right: 0;
+        }
+        .st-sidebar .st-section-label { display: block; }
+        .st-nav-item { padding: 14px 14px; font-size: 14px; }
+        /* La flecha pasa a ser indicador de "entrar" en cada apartado */
+        .st-nav-item .chev { display: inline-block; opacity: .45; }
+
+        /* El panel de detalle queda oculto hasta elegir un apartado */
+        .st-main { grid-column: 1; grid-row: 1; display: none; }
+
+        /* ── Paso 2: apartado seleccionado ── */
+        .st-shell.st-mobile-detail .st-sidebar { display: none; }
+        .st-shell.st-mobile-detail .st-main { display: flex; }
+
+        .st-back-btn { display: inline-flex; }
+
         .st-row { grid-template-columns: 1fr; }
         .st-row-right { justify-content: flex-start; }
     }
@@ -307,6 +338,9 @@
 
             {{-- Header --}}
             <div class="st-head">
+                <button type="button" class="st-back-btn" onclick="stMobileBack()">
+                    <i class="pi pi-arrow-left"></i> {{ __('Volver') }}
+                </button>
                 <div>
                     <div class="st-head-title" data-st-title>{{ __('Configuración de la cuenta') }}</div>
                     <div class="st-head-sub"   data-st-sub>{{ __('Administra y colabora en la configuración de tu cuenta') }}</div>
@@ -842,11 +876,19 @@
 <script>
 (function(){
     let activePane = 'profile';
+    const stIsMobile = () => window.matchMedia('(max-width: 860px)').matches;
 
     window.openSettingsModal = function() {
         document.getElementById('settingsModal').classList.add('open');
         document.body.style.overflow = 'hidden';
+        // En mobile siempre arrancamos en la lista de apartados (paso 1).
+        document.getElementById('settingsShell').classList.remove('st-mobile-detail');
         stRestoreNoti();
+    };
+
+    // Volver del detalle a la lista de apartados (paso 1, sólo mobile)
+    window.stMobileBack = function() {
+        document.getElementById('settingsShell').classList.remove('st-mobile-detail');
     };
     window.closeSettingsModal = function() {
         document.getElementById('settingsModal').classList.remove('open');
@@ -900,6 +942,11 @@
             }
             if (activePane === 'menu' && typeof window.cmRender === 'function') {
                 window.cmRender();
+            }
+
+            // En mobile, al elegir un apartado pasamos al detalle (paso 2).
+            if (stIsMobile()) {
+                document.getElementById('settingsShell').classList.add('st-mobile-detail');
             }
         });
     });
