@@ -122,13 +122,13 @@
 
         {{-- ============ TAB 1: PLANTILLAS ============ --}}
         <div data-pa-panel="plantillas" class="{{ $tab === 'plantillas' ? '' : 'hidden' }}">
-            <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
-                <button type="button" class="crm-tab pa-filter {{ $filter === 'todas' ? 'active' : '' }}" data-cat="todas">{{ __('Todas') }}</button>
+            <div class="p-4 flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto pa-filter-bar">
+                <button type="button" class="crm-tab pa-filter flex-shrink-0 {{ $filter === 'todas' ? 'active' : '' }}" data-cat="todas">{{ __('Todas') }}</button>
                 @foreach($allCategories as $key => $label)
                     @if($key === 'otro' && empty($counts['by_category'][$key]))
                         @continue
                     @endif
-                    <button type="button" class="crm-tab pa-filter {{ $filter === $key ? 'active' : '' }}" data-cat="{{ $key }}">
+                    <button type="button" class="crm-tab pa-filter flex-shrink-0 {{ $filter === $key ? 'active' : '' }}" data-cat="{{ $key }}">
                         {{ $label }}
                         @if(!empty($counts['by_category'][$key]))
                             <span class="ml-1 text-[10px] opacity-70">({{ $counts['by_category'][$key] }})</span>
