@@ -36,7 +36,7 @@
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="text-[14px] font-semibold text-ink-700">{{ $units->total() }} unidades totales</div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-descuentos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-tag"></i> {{ __('Descuentos') }}</button>
             <button type="button" onclick="document.getElementById('modal-exportar-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
             <button type="button" onclick="document.getElementById('modal-config-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-cog"></i> {{ __('Configuraciones') }}</button>
@@ -149,7 +149,7 @@
                                         aria-pressed="{{ $u->public ? 'true' : 'false' }}"></button>
                             </td>
                             <td class="text-right whitespace-nowrap">
-                                <a href="{{ route('admin.units.edit', $u->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Editar &rarr;') }}</a>
+                                <a href="{{ route('admin.units.edit', $u->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition-colors" title="{{ __('Editar') }}" aria-label="{{ __('Editar') }}"><i class="pi pi-pencil text-[14px]"></i></a>
                             </td>
                         </tr>
                     @empty
@@ -158,7 +158,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-4 py-3 border-t border-ink-100">{{ $units->withQueryString()->links() }}</div>
+        <div class="px-4 py-3 border-t border-ink-100">{{ $units->withQueryString()->links('pagination::crm') }}</div>
     </div>
 </div>
 

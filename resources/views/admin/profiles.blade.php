@@ -218,7 +218,7 @@
                                         <i class="pi pi-pencil text-[11px]"></i> Editar
                                     </button>
                                     @if($r)
-                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Exp. &rarr;') }}</a>
+                                        <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition-colors" title="{{ __('Ver expediente') }}" aria-label="{{ __('Ver expediente') }}"><i class="pi pi-folder-open text-[14px]"></i></a>
                                     @endif
                                 </div>
                             </td>

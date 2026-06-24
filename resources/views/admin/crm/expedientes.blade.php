@@ -136,7 +136,7 @@
                             </td>
                             <td><span class="text-[12px] text-ink-500">{{ $r->updated_at?->diffForHumans() }}</span></td>
                             <td class="text-right">
-                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="text-[12px] text-brand font-semibold hover:underline">{{ __('Ver &rarr;') }}</a>
+                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition-colors" title="{{ __('Ver') }}" aria-label="{{ __('Ver') }}"><i class="pi pi-eye text-[14px]"></i></a>
                             </td>
                         </tr>
                     @empty
