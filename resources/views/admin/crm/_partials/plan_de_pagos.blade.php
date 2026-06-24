@@ -95,7 +95,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Plan base') }}</label>
-                <select name="payment_method" class="crm-input pl-3 mt-1" {{ $isLocked ? 'disabled' : '' }}>
+                <select name="payment_method" onchange="planAutofill(this)" class="crm-input pl-3 mt-1" {{ $isLocked ? 'disabled' : '' }}>
                     @foreach(['A' => 'Plan A — 30/40/30', 'B' => 'Plan B — 40/30/30 + cuotas', 'C' => 'Plan C — 50/20/30 + cuotas', 'custom' => 'Personalizado'] as $val => $label)
                         <option value="{{ $val }}" {{ ($r->payment_method ?? 'A') === $val ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
@@ -189,3 +189,24 @@
     </div>
     @endif
 </div>
+
+<script>
+// Autocompleta porcentajes y cuotas al elegir un plan base (A/B/C).
+// "Personalizado" no toca los valores para permitir edición manual.
+window.planAutofill = function (sel) {
+    const plans = {
+        A: { initial: 30, construction: 40, delivery: 30, installments: 0 },
+        B: { initial: 40, construction: 30, delivery: 30, installments: 5 },
+        C: { initial: 50, construction: 20, delivery: 30, installments: 8 },
+    };
+    const p = plans[sel.value];
+    if (!p) return; // custom: no modificar
+    const form = sel.closest('form');
+    if (!form) return;
+    const set = (name, val) => { const el = form.querySelector('[name=' + name + ']'); if (el) el.value = val; };
+    set('payment_initial_percentage', p.initial);
+    set('payment_construction_percentage', p.construction);
+    set('payment_delivery_percentage', p.delivery);
+    set('payment_installments', p.installments);
+};
+</script>
