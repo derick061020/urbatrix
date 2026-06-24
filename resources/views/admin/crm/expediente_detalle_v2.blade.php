@@ -349,7 +349,7 @@
                 <div class="crm-card overflow-hidden">
                     <div class="px-4 py-3 bg-ink-50 border-b border-ink-100 flex items-center justify-between">
                         <div class="text-[13px] font-bold text-ink-700">{{ __('Calendario de pagos') }}</div>
-                        <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> {{ __('Registrar pago') }}</button>
+                        <button type="button" onclick="var t=document.getElementById('rp-target'); if(t)t.value=''; document.getElementById('modal-registrar-pago').showModal()" class="crm-btn crm-btn-primary text-[11px] py-1.5 px-3"><i class="pi pi-plus text-[10px]"></i> {{ __('Registrar pago') }}</button>
                     </div>
                     <table class="w-full crm-table">
                         <thead class="bg-white">
@@ -375,18 +375,16 @@
                                     <td class="text-[12px] text-ink-500">{{ $p->payment_method ?? '—' }}</td>
                                     <td class="text-right">
                                         @if($p->status !== 'paid')
-                                            <form method="POST" action="{{ route('admin.payments.pay', $p->id) }}" class="inline m-0"
-                                                  onsubmit="var m=prompt('Monto recibido para esta cuota (saldo: ${{ number_format($p->remaining, 2) }}). El excedente se aplica a las cuotas siguientes; si es menor, queda saldo pendiente.', '{{ number_format($p->remaining, 2, '.', '') }}'); if(m===null){return false;} this.amount.value=m; return true;">@csrf
-                                                <input type="hidden" name="amount" value="">
-                                                <button type="submit" class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
-                                            </form>
+                                            <button type="button"
+                                                    onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->label ?? $p->payment_type))"
+                                                    class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
                                         @else
                                             <span class="text-[11px] text-ink-400">—</span>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin cuotas registradas.') }} <button type="button" onclick="document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">{{ __('Registrar pago') }}</button></td></tr>
+                                <tr><td colspan="7" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin cuotas registradas.') }} <button type="button" onclick="var t=document.getElementById('rp-target'); if(t)t.value=''; document.getElementById('modal-registrar-pago').showModal()" class="text-brand font-semibold hover:underline">{{ __('Registrar pago') }}</button></td></tr>
                             @endforelse
                         </tbody>
                     </table>

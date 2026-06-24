@@ -23,13 +23,19 @@
                 <input type="hidden" name="reservation_id" value="{{ $reservationId }}">
             @endif
 
+            {{-- Cuota objetivo: el reparto del monto recibido arranca por ella. --}}
+            <input type="hidden" name="target_payment_id" id="rp-target" value="">
+
+
+
+
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Monto recibido') }}</label>
                     <div class="flex gap-2 mt-1">
                         <div class="relative flex-1">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-ink-500">$</span>
-                            <input type="number" step="0.01" name="amount" required value="0.00" class="crm-input pl-7">
+                            <input type="number" step="0.01" name="amount" id="rp-amount" required value="0.00" class="crm-input pl-7">
                         </div>
                         <select name="currency" class="crm-input pl-3 w-24 mt-0">
                             <option value="USD">🇺🇸 USD</option>
@@ -56,7 +62,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Concepto') }}</label>
-                    <input type="text" name="label" required value="Cuota 1/24 - Plan de Pagos" class="crm-input pl-3 mt-1">
+                    <input type="text" name="label" id="rp-label" required value="Cuota 1/24 - Plan de Pagos" class="crm-input pl-3 mt-1">
                 </div>
             </div>
 
@@ -82,3 +88,17 @@
         </div>
     </form>
 </dialog>
+
+<script>
+    // Abre el modal de pago precargado con el saldo de una cuota concreta.
+    // El reparto del monto recibido arrancará por esa cuota (target_payment_id).
+    function abrirModalPago(paymentId, remaining, label) {
+        var target = document.getElementById('rp-target');
+        var amount = document.getElementById('rp-amount');
+        var lbl    = document.getElementById('rp-label');
+        if (target) target.value = paymentId || '';
+        if (amount) amount.value = remaining || '0.00';
+        if (lbl && label) lbl.value = label;
+        document.getElementById('modal-registrar-pago').showModal();
+    }
+</script>
