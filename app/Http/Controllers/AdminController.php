@@ -104,49 +104,128 @@ class AdminController extends Controller
     }
 
     /**
-     * Guarda las imágenes de plano (planta) por piso. Cada piso de
+     * Guarda el mapa de imágenes de plano (planta) por piso. Cada piso de
      * UnitOptions('floors') puede tener su propia foto del plano, que se
      * muestra en la vista "plan" de la home al seleccionar ese piso.
-     * Las imágenes se guardan en Setting('floor_plan_images') como un mapa
-     * valorDelPiso => ruta pública.
+     *
+     * Los archivos ya se subieron por chunks (uploadFloorPlanChunk); aquí sólo
+     * llega el mapa valorDelPiso => ruta pública (/storage/...). Se guarda en
+     * Setting('floor_plan_images') y se borran los archivos que dejaron de usarse.
      */
     public function updateFloorPlans(Request $request)
     {
-        $floors = collect(UnitOptions::get('floors'))->pluck('value')->filter()->values()->all();
+        $floors = collect(UnitOptions::get('floors'))
+            ->pluck('value')->filter()->map(fn ($v) => (string) $v)->all();
 
-        $request->validate([
-            'plans'   => 'nullable|array',
-            'plans.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:8192',
+        $data = $request->validate([
+            'plans'   => ['nullable', 'array'],
+            'plans.*' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $images = \App\Models\Setting::get('floor_plan_images', []) ?: [];
+        $previous = \App\Models\Setting::get('floor_plan_images', []) ?: [];
 
-        // Eliminaciones marcadas desde el modal.
-        foreach ((array) $request->input('remove', []) as $floorKey => $flag) {
-            if ($flag && isset($images[$floorKey])) {
-                $this->deleteFloorPlanFile($images[$floorKey]);
-                unset($images[$floorKey]);
-            }
-        }
-
-        // Subidas nuevas (reemplazan la imagen anterior del piso).
-        foreach ((array) $request->file('plans', []) as $floorKey => $file) {
-            if (!in_array($floorKey, $floors, true) || !$file || !$file->isValid()) {
+        $clean = [];
+        foreach ($data['plans'] ?? [] as $floorKey => $path) {
+            $floorKey = (string) $floorKey;
+            $path     = trim((string) $path);
+            // Sólo aceptamos pisos conocidos y rutas que nosotros generamos.
+            if (!in_array($floorKey, $floors, true)) {
                 continue;
             }
-
-            if (!empty($images[$floorKey])) {
-                $this->deleteFloorPlanFile($images[$floorKey]);
+            if ($path === '' || !str_starts_with($path, '/storage/units/floor-plans/')) {
+                continue;
             }
-
-            $filename = \Illuminate\Support\Str::slug($floorKey) . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('units/floor-plans', $filename, 'public');
-            $images[$floorKey] = '/storage/' . $path;
+            $clean[$floorKey] = $path;
         }
 
-        \App\Models\Setting::put('floor_plan_images', $images);
+        // Borrar archivos que ya no se usan (reemplazados o quitados).
+        foreach ($previous as $floorKey => $oldPath) {
+            if (($clean[$floorKey] ?? null) !== $oldPath) {
+                $this->deleteFloorPlanFile((string) $oldPath);
+            }
+        }
 
-        return redirect()->route('admin.units')->with('success', 'Planos de pisos actualizados.');
+        \App\Models\Setting::put('floor_plan_images', $clean);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Planos de pisos actualizados.',
+            'plans'   => $clean,
+        ]);
+    }
+
+    /**
+     * Recibe la imagen de un plano en trozos (~512 KB) para esquivar el límite
+     * client_max_body_size de nginx (413). Mismo patrón que el menú del cliente.
+     * Devuelve la ruta pública /storage/... cuando recibe el último chunk.
+     */
+    public function uploadFloorPlanChunk(Request $request)
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:1000'],
+            'name'      => ['required', 'string', 'max:255'],
+        ]);
+
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+        }
+
+        $tmpDir = storage_path('app/tmp-floor-plans');
+        if (!is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope de 20 MB acumulado.
+        if (filesize($tmpPath) > 20971520) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'La imagen supera los 20 MB.'], 422);
+        }
+
+        // Chunks intermedios: confirmar y esperar el siguiente.
+        if ($index + 1 < $total) {
+            return response()->json(['success' => true, 'done' => false]);
+        }
+
+        // Último chunk: validar extensión de imagen y mover al disco público.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array($ext, $allowed, true)) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'Formato de imagen no permitido.'], 422);
+        }
+
+        $finalRel = 'units/floor-plans/' . $uploadId . '.' . $ext;
+        $stream   = fopen($tmpPath, 'rb');
+        Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'path'    => '/storage/' . $finalRel,
+            'name'    => $request->input('name'),
+        ]);
     }
 
     /** Borra el archivo físico de un plano (best-effort). */

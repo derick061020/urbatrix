@@ -177,8 +177,7 @@
     $floorPlanImages  = \App\Models\Setting::get('floor_plan_images', []) ?: [];
 @endphp
 <dialog id="modal-pisos" class="rounded-2xl p-0 w-full max-w-3xl backdrop:bg-black/40">
-    <form method="POST" action="{{ route('admin.units.floor-plans') }}" enctype="multipart/form-data" class="flex flex-col max-h-[88vh]">
-        @csrf
+    <div class="flex flex-col max-h-[88vh]">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="pi pi-building text-brand"></i>
@@ -188,18 +187,21 @@
         </div>
 
         <div class="px-6 py-3 border-b border-ink-100">
-            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso.') }}</p>
+            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso. Cada imagen se sube por partes (en %), así no la rechaza el servidor por tamaño.') }}</p>
         </div>
 
-        <div class="p-6 overflow-y-auto flex-1 space-y-3">
+        <div id="fp-alert" class="hidden mx-6 mt-3 px-4 py-2 rounded-lg text-[12px]"></div>
+
+        <div id="fp-list" class="p-6 overflow-y-auto flex-1 space-y-3">
             @forelse($floorOptionsList as $floor)
                 @php
                     $fval = $floor['value'] ?? '';
                     $flab = $floor['label'] ?? $fval;
                     $img  = $floorPlanImages[$fval] ?? null;
                 @endphp
-                <div class="flex items-center gap-4 p-3 rounded-xl border border-ink-100">
-                    <div class="w-24 h-16 rounded-lg bg-ink-50 border border-ink-100 overflow-hidden flex items-center justify-center shrink-0">
+                <div class="fp-row flex items-center gap-4 p-3 rounded-xl border border-ink-100"
+                     data-floor="{{ $fval }}" data-file="{{ $img ?? '' }}">
+                    <div class="fp-preview w-24 h-16 rounded-lg bg-ink-50 border border-ink-100 overflow-hidden flex items-center justify-center shrink-0">
                         @if($img)
                             <img src="{{ $img }}" alt="{{ $flab }}" class="w-full h-full object-cover">
                         @else
@@ -208,16 +210,13 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[13px] font-semibold text-ink-900">{{ $flab }}</div>
-                        <div class="text-[11px] text-ink-400 mb-1">{{ $img ? __('Plano cargado') : __('Sin plano') }}</div>
-                        <input type="file" name="plans[{{ $fval }}]" accept="image/*"
+                        <div class="fp-status text-[11px] mb-1 {{ $img ? 'text-ok-dark' : 'text-ink-400' }}">{{ $img ? __('Plano cargado') : __('Sin plano') }}</div>
+                        <input type="file" accept="image/*" onchange="fpPick(this)"
                                class="block w-full text-[12px] text-ink-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[12px] file:font-semibold file:bg-brand-tint file:text-brand hover:file:bg-brand/10 file:cursor-pointer">
                     </div>
-                    @if($img)
-                        <label class="flex items-center gap-1.5 text-[11px] text-err cursor-pointer shrink-0">
-                            <input type="checkbox" name="remove[{{ $fval }}]" value="1" class="w-4 h-4 accent-err">
-                            {{ __('Quitar') }}
-                        </label>
-                    @endif
+                    <button type="button" onclick="fpRemove(this)"
+                            class="fp-remove inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-err hover:border-err hover:bg-err-soft transition-colors shrink-0 {{ $img ? '' : 'hidden' }}"
+                            title="{{ __('Quitar plano') }}"><i class="pi pi-trash text-[14px]"></i></button>
                 </div>
             @empty
                 <p class="text-[12px] text-ink-500 text-center py-6">{{ __('No hay pisos configurados. Agregalos en "Configuraciones · Plantas / Pisos".') }}</p>
@@ -226,10 +225,137 @@
 
         <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
             <button type="button" onclick="document.getElementById('modal-pisos').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
-            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar planos') }}</button>
+            <button type="button" id="fp-save" onclick="fpSave()" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar planos') }}</button>
         </div>
-    </form>
+    </div>
 </dialog>
+
+<script>
+(function () {
+    const csrf = document.querySelector('meta[name=csrf-token]')?.content;
+    const UPLOAD_URL = @json(route('admin.units.floor-plans.upload'));
+    const SAVE_URL   = @json(route('admin.units.floor-plans'));
+
+    function fpAlert(msg, type) {
+        const el = document.getElementById('fp-alert');
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'mx-6 mt-3 px-4 py-2 rounded-lg text-[12px] ' +
+            (type === 'err' ? 'bg-err-soft text-err' : 'bg-ok-soft text-ok-dark');
+        el.classList.remove('hidden');
+        if (type !== 'err') setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    function fpSetStatus(row, text, cls) {
+        const s = row.querySelector('.fp-status');
+        if (s) { s.textContent = text; s.className = 'fp-status text-[11px] mb-1 ' + cls; }
+    }
+
+    window.fpPick = function (input) {
+        const row = input.closest('.fp-row');
+        const f = input.files && input.files[0];
+        if (!f) return;
+        if (!/^image\//.test(f.type)) { fpAlert('El archivo debe ser una imagen.', 'err'); input.value = ''; return; }
+        if (f.size > 20 * 1024 * 1024) { fpAlert('La imagen supera los 20 MB.', 'err'); input.value = ''; return; }
+        fpUpload(row, f);
+    };
+
+    // Sube la imagen en trozos de 512 KB (por debajo del límite de nginx) y
+    // muestra el progreso en %.
+    async function fpUpload(row, file) {
+        const saveBtn = document.getElementById('fp-save');
+        const chunkSize = 512 * 1024;
+        const total = Math.ceil(file.size / chunkSize) || 1;
+        const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+        row.dataset.uploading = '1';
+        saveBtn.disabled = true;
+        fpSetStatus(row, 'Subiendo… 0%', 'text-ink-500');
+
+        try {
+            for (let i = 0; i < total; i++) {
+                const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
+                const fd = new FormData();
+                fd.append('chunk', chunk);
+                fd.append('upload_id', uploadId);
+                fd.append('index', i);
+                fd.append('total', total);
+                fd.append('name', file.name);
+                fd.append('_token', csrf);
+
+                const res = await fetch(UPLOAD_URL, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd,
+                    credentials: 'same-origin',
+                });
+                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (subí client_max_body_size en nginx).');
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir la imagen.');
+
+                fpSetStatus(row, 'Subiendo… ' + Math.round(((i + 1) / total) * 100) + '%', 'text-ink-500');
+
+                if (d.done) {
+                    row.dataset.file = d.path || '';
+                    const prev = row.querySelector('.fp-preview');
+                    if (prev) prev.innerHTML = '<img src="' + d.path + '" class="w-full h-full object-cover" alt="">';
+                    row.querySelector('.fp-remove')?.classList.remove('hidden');
+                    fpSetStatus(row, 'Plano cargado', 'text-ok-dark');
+                }
+            }
+        } catch (e) {
+            fpSetStatus(row, e.message || 'Error al subir.', 'text-err');
+        } finally {
+            row.dataset.uploading = '';
+            saveBtn.disabled = false;
+        }
+    }
+
+    window.fpRemove = function (btn) {
+        const row = btn.closest('.fp-row');
+        row.dataset.file = '';
+        const prev = row.querySelector('.fp-preview');
+        if (prev) prev.innerHTML = '<i class="pi pi-image text-ink-300 text-[20px]"></i>';
+        const inp = row.querySelector('input[type=file]');
+        if (inp) inp.value = '';
+        btn.classList.add('hidden');
+        fpSetStatus(row, 'Sin plano', 'text-ink-400');
+    };
+
+    window.fpSave = function () {
+        const rows = Array.from(document.querySelectorAll('#fp-list .fp-row'));
+        if (rows.some(r => r.dataset.uploading === '1')) {
+            fpAlert('Esperá a que termine la subida de la imagen.', 'err');
+            return;
+        }
+
+        const fd = new FormData();
+        rows.forEach(r => {
+            const floor = r.dataset.floor;
+            const file  = r.dataset.file || '';
+            if (floor && file) fd.append('plans[' + floor + ']', file);
+        });
+        fd.append('_token', csrf);
+
+        const btn = document.getElementById('fp-save');
+        btn.disabled = true;
+
+        fetch(SAVE_URL, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: fd,
+            credentials: 'same-origin',
+        })
+        .then(r => r.json().catch(() => ({})))
+        .then(d => {
+            btn.disabled = false;
+            if (d.success === false) { fpAlert(d.message || 'No se pudieron guardar los planos.', 'err'); return; }
+            fpAlert(d.message || 'Planos guardados.', 'ok');
+        })
+        .catch(() => { btn.disabled = false; fpAlert('Error de red al guardar.', 'err'); });
+    };
+})();
+</script>
 
 {{-- Formulario oculto para el borrado en lote de unidades --}}
 <form id="units-bulk-delete-form" method="POST" action="{{ route('admin.units.bulk-delete') }}" class="hidden">
