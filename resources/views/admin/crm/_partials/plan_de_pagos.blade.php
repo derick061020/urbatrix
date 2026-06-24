@@ -152,9 +152,28 @@
             </div>
         @endif
 
+        {{-- Saltar confirmación del cliente: el archivo firmado es un campo más de
+             este mismo formulario. Al subirlo se guarda la configuración actual
+             (porcentajes, cuotas, etc.) junto con el documento aprobado. --}}
+        <div class="rounded-lg border border-ink-200 bg-ink-50/60 p-4">
+            <label class="flex items-start gap-2 cursor-pointer select-none">
+                <input type="checkbox" class="mt-0.5" onchange="document.getElementById('manual-plan-fields-{{ $r->id }}').classList.toggle('hidden', !this.checked)">
+                <span>
+                    <span class="text-[12px] font-semibold text-ink-700">{{ __('Saltar la confirmación del cliente') }}</span>
+                    <span class="block text-[11px] text-ink-500">{{ __('Subí el plan de pagos ya firmado. Se guardará con esta misma configuración (porcentajes y cuotas) y quedará aprobado sin esperar al cliente.') }}</span>
+                </span>
+            </label>
+            <div id="manual-plan-fields-{{ $r->id }}" class="hidden mt-3">
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Plan de pagos firmado') }}</label>
+                <input type="file" name="signed_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
+                <span class="signed-upload-progress block text-[11px] text-ink-500 mt-1"></span>
+            </div>
+        </div>
+
         <div class="flex flex-wrap items-center gap-2 justify-end pt-2 border-t border-ink-100">
             <button type="submit" name="action" value="save" class="crm-btn crm-btn-ghost"><i class="pi pi-save"></i> {{ __('Guardar borrador') }}</button>
             <button type="submit" name="action" value="send" class="crm-btn crm-btn-primary"><i class="pi pi-send"></i> {{ $isSent ? 'Reenviar al cliente' : 'Enviar al cliente' }}</button>
+            <button type="button" onclick="submitSignedPlan(this)" data-url="{{ route('admin.crm.payment-plan.manual-sign', $r->id) }}" class="crm-btn crm-btn-primary"><i class="pi pi-upload"></i> {{ __('Subir firmado y aprobar') }}</button>
             @if($isSent)
                 <form method="POST" action="{{ route('admin.crm.budget.revert', $r->id) }}" class="m-0" onclick="event.stopPropagation();">
                     @csrf
@@ -163,30 +182,6 @@
             @endif
         </div>
     </form>
-
-    {{-- Skip client confirmation: upload the signed payment plan manually --}}
-    <div class="px-5 pb-5 -mt-1">
-        <div class="rounded-lg border border-ink-200 bg-ink-50/60 p-4">
-            <label class="flex items-start gap-2 cursor-pointer select-none">
-                <input type="checkbox" class="mt-0.5" onchange="document.getElementById('manual-plan-{{ $r->id }}').classList.toggle('hidden', !this.checked)">
-                <span>
-                    <span class="text-[12px] font-semibold text-ink-700">{{ __('Saltar la confirmación del cliente') }}</span>
-                    <span class="block text-[11px] text-ink-500">{{ __('Subí el plan de pagos ya firmado como archivo. Quedará aprobado sin esperar al cliente.') }}</span>
-                </span>
-            </label>
-            <form id="manual-plan-{{ $r->id }}" data-signed-upload data-url="{{ route('admin.crm.payment-plan.manual-sign', $r->id) }}" class="hidden mt-3 space-y-3 m-0">
-                @csrf
-                <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Plan de pagos firmado') }}</label>
-                    <input type="file" name="file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
-                </div>
-                <div class="flex items-center justify-end gap-3">
-                    <span class="signed-upload-progress text-[11px] text-ink-500"></span>
-                    <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-upload"></i> {{ __('Subir y aprobar') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
     @endif
 </div>
 
@@ -208,5 +203,68 @@ window.planAutofill = function (sel) {
     set('payment_construction_percentage', p.construction);
     set('payment_delivery_percentage', p.delivery);
     set('payment_installments', p.installments);
+};
+
+// Sube el plan de pagos firmado por chunks (evita el 413) ENVIANDO TAMBIÉN la
+// configuración actual del formulario (plan, porcentajes, cuotas, fecha, legales,
+// notas) para que se persista junto con el documento aprobado.
+window.submitSignedPlan = async function (btn) {
+    const form      = btn.closest('form');
+    const fileInput = form.querySelector('[name=signed_file]');
+    const progress  = form.querySelector('.signed-upload-progress');
+    const file      = fileInput && fileInput.files ? fileInput.files[0] : null;
+    const url       = btn.dataset.url;
+    const token     = form.querySelector('input[name=_token]')?.value
+                      || document.querySelector('meta[name=csrf-token]')?.content;
+
+    if (!file) {
+        document.getElementById('manual-plan-fields-' + '{{ $r->id }}')?.classList.remove('hidden');
+        if (progress) progress.textContent = 'Seleccioná el archivo firmado.';
+        return;
+    }
+    if (!confirm('¿Subir el plan de pagos firmado con esta configuración y aprobarlo sin la confirmación del cliente?')) return;
+
+    // Campos de configuración que deben guardarse junto al archivo.
+    const cfgNames = ['payment_method', 'payment_initial_percentage', 'payment_construction_percentage',
+                      'payment_delivery_percentage', 'payment_installments', 'payment_start_date',
+                      'legal_costs', 'budget_notes'];
+    const cfg = {};
+    cfgNames.forEach(n => { const el = form.querySelector('[name=' + n + ']'); cfg[n] = el ? el.value : ''; });
+
+    const chunkSize = 512 * 1024;
+    const total     = Math.ceil(file.size / chunkSize) || 1;
+    const uploadId  = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const original  = btn.innerHTML;
+    btn.disabled = true;
+
+    try {
+        for (let i = 0; i < total; i++) {
+            const fd = new FormData();
+            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
+            fd.append('upload_id', uploadId);
+            fd.append('index', i);
+            fd.append('total', total);
+            fd.append('name', file.name);
+            fd.append('_token', token);
+            Object.keys(cfg).forEach(k => fd.append(k, cfg[k]));
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: fd,
+                credentials: 'same-origin',
+            });
+            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413). Subí client_max_body_size en nginx.');
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el archivo.');
+
+            if (progress) progress.textContent = 'Subiendo… ' + Math.round(((i + 1) / total) * 100) + '%';
+            if (d.done) { if (progress) progress.textContent = 'Listo, recargando…'; window.location.reload(); return; }
+        }
+    } catch (e) {
+        if (progress) progress.textContent = e.message || 'No se pudo subir el archivo.';
+        btn.disabled = false;
+        btn.innerHTML = original;
+    }
 };
 </script>

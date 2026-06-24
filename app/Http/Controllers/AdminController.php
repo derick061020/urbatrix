@@ -1923,9 +1923,51 @@ class AdminController extends Controller
      */
     public function uploadSignedPaymentPlan(Request $request, Reservation $reservation)
     {
+        // The plan configuration travels with every chunk (same form as "Guardar
+        // borrador") so it is persisted together with the signed file. Validate it
+        // up-front to fail fast on the first chunk.
+        $cfg = $request->validate([
+            'payment_method' => 'required|string|in:A,B,C,custom',
+            'payment_initial_percentage' => 'required|numeric|min:0|max:100',
+            'payment_construction_percentage' => 'required|numeric|min:0|max:100',
+            'payment_delivery_percentage' => 'required|numeric|min:0|max:100',
+            'payment_installments' => 'required|integer|min:0|max:120',
+            'payment_start_date' => 'nullable|date',
+            'legal_costs' => 'required|numeric|min:0',
+            'budget_notes' => 'nullable|string|max:2000',
+        ]);
+
+        try {
+            PaymentPlanHelper::validatePercentages(
+                $cfg['payment_initial_percentage'],
+                $cfg['payment_construction_percentage'],
+                $cfg['payment_delivery_percentage'],
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
+        if ($cfg['payment_construction_percentage'] == 0 && $cfg['payment_installments'] > 0) {
+            return response()->json(['success' => false, 'message' => 'No puede haber cuotas si el porcentaje de construcción es 0%.'], 422);
+        }
+
         $res = $this->receiveSignedDocChunk($request);
         if ($res['status'] === 'error')   return response()->json(['success' => false, 'message' => $res['message']], 422);
         if ($res['status'] === 'partial') return response()->json(['success' => true, 'done' => false]);
+
+        // Persist the plan configuration (same fields as saveBudget) BEFORE signing,
+        // so the installment schedule is generated from the values shown in the form.
+        $reservation->update([
+            'payment_method' => $cfg['payment_method'],
+            'payment_initial_percentage' => $cfg['payment_initial_percentage'],
+            'payment_construction_percentage' => $cfg['payment_construction_percentage'],
+            'payment_delivery_percentage' => $cfg['payment_delivery_percentage'],
+            'payment_installments' => $cfg['payment_installments'],
+            'payment_start_date' => $cfg['payment_start_date'] ?? null,
+            'legal_costs' => $cfg['legal_costs'],
+            'budget_notes' => $cfg['budget_notes'] ?? null,
+            'budget_configured_by' => Auth::id(),
+        ]);
 
         $finalRel = $this->storeSignedDocFromTmp(
             $res['tmpPath'],
