@@ -187,7 +187,7 @@
         </div>
 
         <div class="px-6 py-3 border-b border-ink-100">
-            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso. Cada imagen se sube por partes (en %), así no la rechaza el servidor por tamaño.') }}</p>
+            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso.') }}</p>
         </div>
 
         <div id="fp-alert" class="hidden mx-6 mt-3 px-4 py-2 rounded-lg text-[12px]"></div>
