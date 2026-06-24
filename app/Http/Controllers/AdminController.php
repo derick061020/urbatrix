@@ -103,6 +103,61 @@ class AdminController extends Controller
         return redirect()->route('admin.units')->with('success', 'Configuración de opciones guardada.');
     }
 
+    /**
+     * Guarda las imágenes de plano (planta) por piso. Cada piso de
+     * UnitOptions('floors') puede tener su propia foto del plano, que se
+     * muestra en la vista "plan" de la home al seleccionar ese piso.
+     * Las imágenes se guardan en Setting('floor_plan_images') como un mapa
+     * valorDelPiso => ruta pública.
+     */
+    public function updateFloorPlans(Request $request)
+    {
+        $floors = collect(UnitOptions::get('floors'))->pluck('value')->filter()->values()->all();
+
+        $request->validate([
+            'plans'   => 'nullable|array',
+            'plans.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:8192',
+        ]);
+
+        $images = \App\Models\Setting::get('floor_plan_images', []) ?: [];
+
+        // Eliminaciones marcadas desde el modal.
+        foreach ((array) $request->input('remove', []) as $floorKey => $flag) {
+            if ($flag && isset($images[$floorKey])) {
+                $this->deleteFloorPlanFile($images[$floorKey]);
+                unset($images[$floorKey]);
+            }
+        }
+
+        // Subidas nuevas (reemplazan la imagen anterior del piso).
+        foreach ((array) $request->file('plans', []) as $floorKey => $file) {
+            if (!in_array($floorKey, $floors, true) || !$file || !$file->isValid()) {
+                continue;
+            }
+
+            if (!empty($images[$floorKey])) {
+                $this->deleteFloorPlanFile($images[$floorKey]);
+            }
+
+            $filename = \Illuminate\Support\Str::slug($floorKey) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('units/floor-plans', $filename, 'public');
+            $images[$floorKey] = '/storage/' . $path;
+        }
+
+        \App\Models\Setting::put('floor_plan_images', $images);
+
+        return redirect()->route('admin.units')->with('success', 'Planos de pisos actualizados.');
+    }
+
+    /** Borra el archivo físico de un plano (best-effort). */
+    private function deleteFloorPlanFile(string $publicPath): void
+    {
+        $relative = ltrim(str_replace('/storage/', '', $publicPath), '/');
+        if ($relative !== '' && Storage::disk('public')->exists($relative)) {
+            Storage::disk('public')->delete($relative);
+        }
+    }
+
     public function editUnit(Unit $unit)
     {
         $unit->load(['images', 'histories', 'dealHistories', 'paymentHistories']);

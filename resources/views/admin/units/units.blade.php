@@ -39,6 +39,7 @@
         <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-descuentos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-tag"></i> {{ __('Descuentos') }}</button>
             <button type="button" onclick="document.getElementById('modal-exportar-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
+            <button type="button" onclick="document.getElementById('modal-pisos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-building"></i> {{ __('Pisos') }}</button>
             <button type="button" onclick="document.getElementById('modal-config-unidades').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-cog"></i> {{ __('Configuraciones') }}</button>
             <a href="{{ route('admin.units.create') }}" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva unidad') }}</a>
         </div>
@@ -169,6 +170,66 @@
 </div>
 
 @include('admin.crm._partials.modal_exportar', ['name' => 'Unidades', 'id' => 'modal-exportar-unidades'])
+
+{{-- ===================== MODAL: PISOS / PLANOS ===================== --}}
+@php
+    $floorOptionsList = \App\Support\UnitOptions::get('floors');
+    $floorPlanImages  = \App\Models\Setting::get('floor_plan_images', []) ?: [];
+@endphp
+<dialog id="modal-pisos" class="rounded-2xl p-0 w-full max-w-3xl backdrop:bg-black/40">
+    <form method="POST" action="{{ route('admin.units.floor-plans') }}" enctype="multipart/form-data" class="flex flex-col max-h-[88vh]">
+        @csrf
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-building text-brand"></i>
+                <h2 class="text-[15px] font-bold text-ink-900">{{ __('Pisos · Plano por piso') }}</h2>
+            </div>
+            <button type="button" onclick="document.getElementById('modal-pisos').close()" class="text-ink-400 hover:text-ink-700"><i class="pi pi-times"></i></button>
+        </div>
+
+        <div class="px-6 py-3 border-b border-ink-100">
+            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso.') }}</p>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 space-y-3">
+            @forelse($floorOptionsList as $floor)
+                @php
+                    $fval = $floor['value'] ?? '';
+                    $flab = $floor['label'] ?? $fval;
+                    $img  = $floorPlanImages[$fval] ?? null;
+                @endphp
+                <div class="flex items-center gap-4 p-3 rounded-xl border border-ink-100">
+                    <div class="w-24 h-16 rounded-lg bg-ink-50 border border-ink-100 overflow-hidden flex items-center justify-center shrink-0">
+                        @if($img)
+                            <img src="{{ $img }}" alt="{{ $flab }}" class="w-full h-full object-cover">
+                        @else
+                            <i class="pi pi-image text-ink-300 text-[20px]"></i>
+                        @endif
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13px] font-semibold text-ink-900">{{ $flab }}</div>
+                        <div class="text-[11px] text-ink-400 mb-1">{{ $img ? __('Plano cargado') : __('Sin plano') }}</div>
+                        <input type="file" name="plans[{{ $fval }}]" accept="image/*"
+                               class="block w-full text-[12px] text-ink-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[12px] file:font-semibold file:bg-brand-tint file:text-brand hover:file:bg-brand/10 file:cursor-pointer">
+                    </div>
+                    @if($img)
+                        <label class="flex items-center gap-1.5 text-[11px] text-err cursor-pointer shrink-0">
+                            <input type="checkbox" name="remove[{{ $fval }}]" value="1" class="w-4 h-4 accent-err">
+                            {{ __('Quitar') }}
+                        </label>
+                    @endif
+                </div>
+            @empty
+                <p class="text-[12px] text-ink-500 text-center py-6">{{ __('No hay pisos configurados. Agregalos en "Configuraciones · Plantas / Pisos".') }}</p>
+            @endforelse
+        </div>
+
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
+            <button type="button" onclick="document.getElementById('modal-pisos').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Guardar planos') }}</button>
+        </div>
+    </form>
+</dialog>
 
 {{-- Formulario oculto para el borrado en lote de unidades --}}
 <form id="units-bulk-delete-form" method="POST" action="{{ route('admin.units.bulk-delete') }}" class="hidden">

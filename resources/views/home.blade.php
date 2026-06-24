@@ -2290,6 +2290,21 @@
                 return [$f => $n];
             });
 
+            // Imagen de plano (planta) por piso. El admin la sube desde
+            // "Unidades · Pisos" y se guarda en Setting('floor_plan_images')
+            // con la clave = valor del piso ('ground','1st',...). El bucket
+            // "Ground" usa la clave 'ground'.
+            $floorPlanImagesRaw = \App\Models\Setting::get('floor_plan_images', []) ?: [];
+            $floorPlanFallback  = '/images/plan-view/makai-planview.png';
+            $floorPlanImageMap  = [];
+            foreach ($floorOrder as $f) {
+                $key = ($f === 'Ground') ? 'ground' : $f;
+                if (!empty($floorPlanImagesRaw[$key])) {
+                    $floorPlanImageMap[$f] = $floorPlanImagesRaw[$key];
+                }
+            }
+            $activeFloorPlanImg = $floorPlanImageMap[$activeFloor] ?? $floorPlanFallback;
+
             // Distinct, well-spread anchor coords across the 1366×769 planview.
             // Markers cycle through this list per floor; "side" flips to keep the
             // tail pointing into the canvas. Add more entries if a floor has more.
@@ -2381,10 +2396,14 @@
           <div class="fg-plan-canvas" style="background-color: white!important;" id="fgPlanCanvas">
             <!-- Pannable / zoomable stage (transform driven by JS on mobile) -->
             <div class="fg-plan-stage" id="fgPlanStage">
-            <!-- Planview image — labels, compass, and PHASE 1 are baked in -->
-            <img src="/images/plan-view/makai-planview.png"
+            <!-- Planview image — por defecto el plano general; si el admin subió
+                 un plano para el piso activo se usa ese (y JS lo cambia al
+                 cambiar de piso). -->
+            <img src="{{ $activeFloorPlanImg }}"
                  alt="{{ __('Plan view') }}"
                  class="fg-plan-img"
+                 id="fgPlanImg"
+                 data-fallback="{{ $floorPlanFallback }}"
                  draggable="false">
 
             {{-- Render one marker per real unit, grouped by floor. JS toggles
@@ -3048,7 +3067,13 @@
         const canvas    = document.getElementById('fgPlanCanvas');
         const labelEl   = document.getElementById('fgPlanPisoLabel');
         const countEl   = document.getElementById('fgPlanPisoCount');
+        const planImg   = document.getElementById('fgPlanImg');
         if ((!chips.length && !menu) || !canvas) return;
+
+        // Mapa piso → imagen de plano subida por el admin. Si un piso no tiene
+        // imagen propia se usa el plano general (data-fallback).
+        const FLOOR_PLANS = @json($floorPlanImageMap);
+        const PLAN_FALLBACK = planImg ? (planImg.dataset.fallback || planImg.src) : '';
 
         // Cadenas traducidas (Blade → JS) para que la etiqueta PISO y el contador
         // se rerendericen en el idioma activo al cambiar de piso.
@@ -3076,6 +3101,14 @@
           void canvas.offsetWidth;
           canvas.classList.add('is-switching');
           setTimeout(() => canvas.classList.remove('is-switching'), 380);
+
+          // Cambiar la imagen de plano según el piso (o el plano general).
+          if (planImg) {
+            const nextSrc = FLOOR_PLANS[floor] || PLAN_FALLBACK;
+            if (nextSrc && planImg.getAttribute('src') !== nextSrc) {
+              planImg.src = nextSrc;
+            }
+          }
 
           let available = 0;
           let i = 0;

@@ -213,6 +213,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     Route::get('/units', [AdminController::class, 'units'])->name('admin.units');
     Route::post('/units/options', [AdminController::class, 'updateUnitOptions'])->name('admin.units.options');
+    Route::post('/units/floor-plans', [AdminController::class, 'updateFloorPlans'])->name('admin.units.floor-plans');
     Route::get('/units/create', [AdminController::class, 'createUnit'])->name('admin.units.create');
     Route::post('/units', [AdminController::class, 'storeUnit'])->name('admin.units.store');
     Route::post('/units/bulk-discount', [AdminController::class, 'bulkDiscount'])->name('admin.units.bulk-discount');
