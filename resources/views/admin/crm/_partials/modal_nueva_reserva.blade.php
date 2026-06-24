@@ -26,12 +26,16 @@
             {{-- ── Modo: cliente existente ── --}}
             <div data-pane="existing" class="hidden">
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Buscar cliente') }}</label>
-                <select name="user_id" data-existing-input class="crm-input pl-3 mt-1" disabled>
-                    <option value="">{{ __('Seleccionar cliente…') }}</option>
-                    @foreach($clients ?? [] as $c)
-                        <option value="{{ $c->id }}">{{ $c->name ?: trim(($c->first_name ?? '').' '.($c->last_name ?? '')) }} — {{ $c->email }}</option>
-                    @endforeach
-                </select>
+                <div class="relative mt-1" data-combobox data-existing-input>
+                    <input type="hidden" name="user_id" data-combobox-value disabled>
+                    <input type="text" data-combobox-search autocomplete="off" placeholder="{{ __('Escribe nombre o email…') }}" class="crm-input pl-3" disabled>
+                    <ul data-combobox-list class="hidden absolute z-30 left-0 right-0 mt-1 max-h-56 overflow-auto bg-white border border-ink-200 rounded-lg shadow-lg">
+                        @foreach($clients ?? [] as $c)
+                            @php $clabel = ($c->name ?: trim(($c->first_name ?? '').' '.($c->last_name ?? ''))).' — '.$c->email; @endphp
+                            <li data-value="{{ $c->id }}" data-label="{{ $clabel }}" class="px-3 py-2 text-[13px] text-ink-700 hover:bg-ink-50 cursor-pointer">{{ $clabel }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 <p class="text-[11px] text-ink-500 mt-1.5">{{ __('La reserva se vinculará a la cuenta seleccionada.') }}</p>
             </div>
 
@@ -52,12 +56,16 @@
             <div class="grid grid-cols-2 gap-3 pt-1">
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Unidad') }}</label>
-                    <select name="unit_id" required class="crm-input pl-3 mt-1">
-                        <option value="">Seleccionar…</option>
-                        @foreach($units ?? [] as $u)
-                            <option value="{{ $u->id }}">{{ $u->custom_id ?? $u->name }} — ${{ number_format($u->price ?? 0) }}</option>
-                        @endforeach
-                    </select>
+                    <div class="relative mt-1" data-combobox>
+                        <input type="hidden" name="unit_id" data-combobox-value>
+                        <input type="text" data-combobox-search autocomplete="off" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pl-3">
+                        <ul data-combobox-list class="hidden absolute z-30 left-0 right-0 mt-1 max-h-56 overflow-auto bg-white border border-ink-200 rounded-lg shadow-lg">
+                            @foreach($units ?? [] as $u)
+                                @php $ulabel = ($u->custom_id ?? $u->name).' — $'.number_format($u->price ?? 0); @endphp
+                                <li data-value="{{ $u->id }}" data-label="{{ $ulabel }}" class="px-3 py-2 text-[13px] text-ink-700 hover:bg-ink-50 cursor-pointer">{{ $ulabel }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha') }}</label>
@@ -90,6 +98,40 @@
     const panes     = { new: form.querySelector('[data-pane="new"]'), existing: form.querySelector('[data-pane="existing"]') };
     const newInputs = form.querySelectorAll('[data-new-input]');
     const existing  = form.querySelector('[data-existing-input]');
+    const existingValue  = existing.querySelector('[data-combobox-value]');
+    const existingSearch = existing.querySelector('[data-combobox-search]');
+
+    // ── Combobox buscable (cliente existente + unidad) ──
+    form.querySelectorAll('[data-combobox]').forEach(box => {
+        const value  = box.querySelector('[data-combobox-value]');
+        const search = box.querySelector('[data-combobox-search]');
+        const list   = box.querySelector('[data-combobox-list]');
+        const items  = Array.from(list.querySelectorAll('li'));
+
+        const open  = () => list.classList.remove('hidden');
+        const close = () => list.classList.add('hidden');
+
+        function filter() {
+            const q = search.value.trim().toLowerCase();
+            let shown = 0;
+            items.forEach(li => {
+                const match = li.dataset.label.toLowerCase().includes(q);
+                li.classList.toggle('hidden', !match);
+                if (match) shown++;
+            });
+            if (shown) open(); else close();
+        }
+
+        search.addEventListener('focus', () => { items.forEach(li => li.classList.remove('hidden')); open(); });
+        search.addEventListener('input', () => { value.value = ''; filter(); });
+        items.forEach(li => li.addEventListener('mousedown', e => {
+            e.preventDefault();
+            value.value = li.dataset.value;
+            search.value = li.dataset.label;
+            close();
+        }));
+        box.addEventListener('focusout', () => setTimeout(() => { if (!box.contains(document.activeElement)) close(); }, 0));
+    });
 
     function setMode(mode) {
         hidden.value = mode;
@@ -109,9 +151,27 @@
 
         // Requeridos + enabled según el modo (evita enviar campos del modo oculto)
         newInputs.forEach(i => { i.required = (mode === 'new'); i.disabled = (mode !== 'new'); });
-        existing.required = (mode === 'existing');
-        existing.disabled = (mode !== 'existing');
+        existingValue.disabled  = (mode !== 'existing');
+        existingSearch.disabled = (mode !== 'existing');
     }
+
+    const unitBox    = form.querySelector('[name="unit_id"]');
+    const unitSearch = unitBox.closest('[data-combobox]').querySelector('[data-combobox-search]');
+
+    // Validación: unidad obligatoria + cliente seleccionado en modo existente
+    form.addEventListener('submit', e => {
+        if (!unitBox.value) {
+            e.preventDefault();
+            unitSearch.focus();
+            alert('{{ __('Selecciona una unidad del listado.') }}');
+            return;
+        }
+        if (hidden.value === 'existing' && !existingValue.value) {
+            e.preventDefault();
+            existingSearch.focus();
+            alert('{{ __('Selecciona un cliente del listado.') }}');
+        }
+    });
 
     btns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
     setMode('new');
