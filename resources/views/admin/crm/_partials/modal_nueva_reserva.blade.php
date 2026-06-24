@@ -68,8 +68,9 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha') }}</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha del primer pago (reserva)') }}</label>
                     <input type="date" name="fecha" required value="{{ now()->toDateString() }}" class="crm-input pl-3 mt-1">
+                    <span class="text-[10px] text-ink-400">{{ __('Define la fecha de la seña y el arranque del plan de pagos.') }}</span>
                 </div>
             </div>
             <div>

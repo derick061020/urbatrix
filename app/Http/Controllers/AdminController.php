@@ -2771,6 +2771,9 @@ class AdminController extends Controller
             'reservation_code' => strtoupper(\Illuminate\Support\Str::random(8)),
             'status'           => 'pending',
             'created_at'       => $data['fecha'],
+            // La fecha de la reserva es la del primer pago (seña): ancla también
+            // el arranque del plan de pagos (cuotas) salvo que se cambie luego.
+            'payment_start_date' => $data['fecha'],
         ];
         // Backfill any not-null columns the legacy schema requires
         $required = ['unit_name', 'unit_price', 'unit_developer'];
