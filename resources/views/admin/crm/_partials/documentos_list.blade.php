@@ -72,7 +72,7 @@
                             <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="text-[12px] text-brand font-semibold hover:underline mr-2"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                             <a href="{{ route('documents.download', $d->id) }}" class="text-[12px] text-brand font-semibold hover:underline mr-2">{{ __('Descargar') }}</a>
                         @endif
-                        <a href="{{ route('admin.crm.expediente.detalle', $d->reservation_id ?? 0) }}?tab=documentos" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition-colors" title="{{ __('Ir a expediente') }}" aria-label="{{ __('Ir a expediente') }}"><i class="pi pi-folder-open text-[14px]"></i></a>
+                        <a href="{{ route('admin.crm.expediente.detalle', $d->reservation_id ?? 0) }}?tab=documentos" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-brand hover:border-brand hover:bg-brand-tint transition-colors" title="{{ __('Ir a expediente') }}" aria-label="{{ __('Ir a expediente') }}"><i class="pi pi-folder-open text-[14px]"></i></a>
                     </td>
                 </tr>
             @empty

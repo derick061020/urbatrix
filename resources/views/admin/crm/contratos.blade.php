@@ -116,7 +116,7 @@
                                 @if($estado[0] === 'Por firmar')
                                     <a href="{{ route('admin.crm.contract.generate', $r->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1">{{ __('Firmar') }}</a>
                                 @endif
-                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition-colors" title="{{ __('Ver') }}" aria-label="{{ __('Ver') }}"><i class="pi pi-eye text-[14px]"></i></a>
+                                <a href="{{ route('admin.crm.expediente.detalle', $r->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-ink-200 bg-white text-ink-500 hover:text-brand hover:border-brand hover:bg-brand-tint transition-colors" title="{{ __('Ver') }}" aria-label="{{ __('Ver') }}"><i class="pi pi-eye text-[14px]"></i></a>
                             </td>
                         </tr>
                     @empty
