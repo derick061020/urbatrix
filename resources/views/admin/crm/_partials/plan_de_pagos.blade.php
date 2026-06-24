@@ -219,10 +219,19 @@ window.submitSignedPlan = async function (btn) {
 
     if (!file) {
         document.getElementById('manual-plan-fields-' + '{{ $r->id }}')?.classList.remove('hidden');
-        if (progress) progress.textContent = 'Seleccioná el archivo firmado.';
+        if (window.crmToast) crmToast('Seleccioná el archivo firmado.', 'err');
+        else if (progress) progress.textContent = 'Seleccioná el archivo firmado.';
         return;
     }
-    if (!confirm('¿Subir el plan de pagos firmado con esta configuración y aprobarlo sin la confirmación del cliente?')) return;
+    const okConfirm = window.crmConfirm
+        ? await crmConfirm({
+            title: 'Subir plan de pagos firmado',
+            body: 'Se guardará esta configuración (porcentajes y cuotas) y el plan firmado quedará aprobado sin esperar la confirmación del cliente. ¿Continuar?',
+            ok: 'Subir y aprobar',
+            icon: 'pi-upload',
+        })
+        : confirm('¿Subir el plan de pagos firmado con esta configuración y aprobarlo sin la confirmación del cliente?');
+    if (!okConfirm) return;
 
     // Campos de configuración que deben guardarse junto al archivo.
     const cfgNames = ['payment_method', 'payment_initial_percentage', 'payment_construction_percentage',
@@ -262,7 +271,9 @@ window.submitSignedPlan = async function (btn) {
             if (d.done) { if (progress) progress.textContent = 'Listo, recargando…'; window.location.reload(); return; }
         }
     } catch (e) {
-        if (progress) progress.textContent = e.message || 'No se pudo subir el archivo.';
+        const msg = e.message || 'No se pudo subir el archivo.';
+        if (window.crmToast) crmToast(msg, 'err');
+        if (progress) progress.textContent = msg;
         btn.disabled = false;
         btn.innerHTML = original;
     }

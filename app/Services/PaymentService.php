@@ -26,8 +26,9 @@ class PaymentService
         
         $payments = [];
         
-        // Use reservation creation date or today as fallback
-        $startDate = $reservation->created_at ?? now();
+        // Use the configured plan start date (set by the admin in the budget form).
+        // Fall back to the reservation creation date, then today.
+        $startDate = $reservation->payment_start_date ?? $reservation->created_at ?? now();
         if (!($startDate instanceof \Carbon\Carbon)) {
             $startDate = \Carbon\Carbon::parse($startDate);
         }

@@ -492,6 +492,33 @@
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.document_preview_modal')
 
+{{-- Confirmación HTML reutilizable (subir versión firmada y aprobada, etc.) --}}
+<dialog id="confirmSignedModal" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
+    <div class="w-[460px] max-w-[92vw] bg-white rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg border border-ink-200 flex items-center justify-center text-brand"><i class="pi pi-verified"></i></div>
+            <div id="confirmSignedTitle" class="text-[15px] font-bold text-ink-900 flex-1">{{ __('Confirmar acción') }}</div>
+            <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
+        </div>
+        <div class="p-6">
+            <p id="confirmSignedBody" class="text-[13px] text-ink-600 leading-relaxed"></p>
+        </div>
+        <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
+            <button type="button" id="confirmSignedCancel" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
+            <button type="button" id="confirmSignedOk" class="crm-btn crm-btn-primary"><i class="pi pi-upload"></i> {{ __('Subir y aprobar') }}</button>
+        </div>
+    </div>
+</dialog>
+
+{{-- Toast HTML para avisos/errores (reemplaza alert) --}}
+<div id="crmToast" class="fixed bottom-5 right-5 z-[60] hidden">
+    <div class="flex items-start gap-3 bg-white border border-ink-200 shadow-lg rounded-xl px-4 py-3 max-w-[360px]">
+        <i id="crmToastIcon" class="pi pi-info-circle text-brand mt-0.5"></i>
+        <div id="crmToastMsg" class="text-[12px] text-ink-700 leading-snug"></div>
+        <button type="button" onclick="document.getElementById('crmToast').classList.add('hidden')" class="text-ink-400 hover:text-ink-700 ml-1"><i class="pi pi-times text-[11px]"></i></button>
+    </div>
+</div>
+
 {{-- Wire Transfer Modal --}}
 <div id="wireTransferModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
@@ -590,6 +617,45 @@ function syncSignNow(docId, btn) {
     });
 }
 
+// ── Confirmación HTML reutilizable (devuelve Promise<boolean>) ──
+window.crmConfirm = function (opts) {
+    opts = opts || {};
+    const modal  = document.getElementById('confirmSignedModal');
+    const okBtn  = document.getElementById('confirmSignedOk');
+    const cancel = document.getElementById('confirmSignedCancel');
+    document.getElementById('confirmSignedTitle').textContent = opts.title || 'Confirmar acción';
+    document.getElementById('confirmSignedBody').textContent  = opts.body  || '¿Confirmás esta acción?';
+    okBtn.innerHTML = (opts.icon ? '<i class="pi ' + opts.icon + '"></i> ' : '') + (opts.ok || 'Confirmar');
+
+    return new Promise((resolve) => {
+        const cleanup = (val) => {
+            okBtn.removeEventListener('click', onOk);
+            cancel.removeEventListener('click', onCancel);
+            modal.removeEventListener('close', onClose);
+            modal.close();
+            resolve(val);
+        };
+        const onOk = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+        const onClose = () => { okBtn.removeEventListener('click', onOk); cancel.removeEventListener('click', onCancel); resolve(false); };
+        okBtn.addEventListener('click', onOk);
+        cancel.addEventListener('click', onCancel);
+        modal.addEventListener('close', onClose, { once: true });
+        modal.showModal();
+    });
+};
+
+// ── Toast HTML para avisos/errores (reemplaza alert) ──
+window.crmToast = function (msg, type) {
+    const box  = document.getElementById('crmToast');
+    const icon = document.getElementById('crmToastIcon');
+    document.getElementById('crmToastMsg').textContent = msg;
+    icon.className = 'pi mt-0.5 ' + (type === 'err' ? 'pi-exclamation-triangle text-err' : (type === 'ok' ? 'pi-check-circle text-ok' : 'pi-info-circle text-brand'));
+    box.classList.remove('hidden');
+    clearTimeout(window._crmToastT);
+    window._crmToastT = setTimeout(() => box.classList.add('hidden'), 5000);
+};
+
 // ── Subida por chunks de documentos firmados (plan de pagos / contrato) ──
 // Evita el 413 ("Too Large") partiendo el archivo en trozos de 512 KB, igual
 // que la subida del menú del cliente. El backend reensambla y finaliza.
@@ -606,8 +672,14 @@ document.addEventListener('submit', async function(ev) {
     const url      = form.dataset.url;
     const file     = input?.files?.[0];
 
-    if (!file) { progress.textContent = 'Seleccioná un archivo.'; return; }
-    if (!confirm('¿Subir el archivo firmado y aprobarlo sin la confirmación del cliente?')) return;
+    if (!file) { crmToast('Seleccioná un archivo.', 'err'); return; }
+    const okConfirm = await crmConfirm({
+        title: 'Subir versión firmada',
+        body: 'Se subirá la versión firmada y quedará aprobada sin esperar la confirmación del cliente. ¿Continuar?',
+        ok: 'Subir y aprobar',
+        icon: 'pi-upload',
+    });
+    if (!okConfirm) return;
 
     const chunkSize = 512 * 1024;
     const total     = Math.ceil(file.size / chunkSize) || 1;
@@ -644,7 +716,9 @@ document.addEventListener('submit', async function(ev) {
             }
         }
     } catch (e) {
-        progress.textContent = e.message || 'No se pudo subir el archivo.';
+        const msg = e.message || 'No se pudo subir el archivo.';
+        crmToast(msg, 'err');
+        progress.textContent = msg;
         btn.disabled = false;
         btn.innerHTML = original;
     }
