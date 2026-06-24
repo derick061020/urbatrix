@@ -33,9 +33,13 @@ class DocumentDataHelper
         $totalPrice = $breakdown['total_sin_legales'];
         $cantidadCuotas = (int) $breakdown['cantidad_cuotas'];
 
-        // Calendario de cuotas mensuales
+        // Calendario de cuotas mensuales. Arranca en la fecha de inicio
+        // configurada por el admin (puede ser anterior a hoy) o, si no se fijó,
+        // en la fecha actual.
         $cuotas = [];
-        $inicio = new DateTime();
+        $inicio = $reservation->payment_start_date
+            ? new DateTime($reservation->payment_start_date->format('Y-m-d'))
+            : new DateTime();
         for ($i = 1; $i <= $cantidadCuotas; $i++) {
             $fecha = clone $inicio;
             $fecha->add(new DateInterval('P' . $i . 'M'));

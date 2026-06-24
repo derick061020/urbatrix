@@ -127,6 +127,11 @@
                 <input type="number" min="0" max="120" name="payment_installments" value="{{ $installments }}" {{ $isLocked ? 'disabled' : '' }} class="crm-input pl-3 mt-1">
             </div>
             <div>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha de inicio') }}</label>
+                <input type="date" name="payment_start_date" value="{{ optional($r->payment_start_date)->format('Y-m-d') }}" {{ $isLocked ? 'disabled' : '' }} class="crm-input pl-3 mt-1">
+                <span class="text-[10px] text-ink-400">{{ __('Puede ser anterior a hoy. Define el arranque de las cuotas.') }}</span>
+            </div>
+            <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Costos legales') }}</label>
                 <div class="relative mt-1">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-ink-500">$</span>
