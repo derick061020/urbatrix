@@ -374,13 +374,20 @@
                                     <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                                     <td class="text-[12px] text-ink-500">{{ $p->payment_method ?? '—' }}</td>
                                     <td class="text-right">
-                                        @if($p->status !== 'paid')
-                                            <button type="button"
-                                                    onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->label ?? $p->payment_type))"
-                                                    class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
-                                        @else
-                                            <span class="text-[11px] text-ink-400">—</span>
-                                        @endif
+                                        <div class="inline-flex items-center gap-1 justify-end">
+                                            @if($p->receipt_path)
+                                                <button type="button"
+                                                        onclick="openDocumentPreview(@js(['url' => asset('storage/'.$p->receipt_path), 'title' => 'Comprobante de pago', 'filename' => basename((string) $p->receipt_path)]))"
+                                                        class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver comprobante') }}"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                            @endif
+                                            @if($p->status !== 'paid')
+                                                <button type="button"
+                                                        onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->label ?? $p->payment_type))"
+                                                        class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
+                                            @elseif(! $p->receipt_path)
+                                                <span class="text-[11px] text-ink-400">—</span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
