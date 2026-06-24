@@ -1688,7 +1688,7 @@
               <!-- Language Toggle -->
               <div style="display:flex;flex-direction:column;align-items:flex-start;padding:8px 0;position:relative;width:100%;flex-shrink:0;">
                 <div style="background:#f2f5f8;display:flex;gap:4px;align-items:center;justify-content:center;overflow:hidden;padding:4px;border-radius:12px;width:308px;position:relative;">
-                  <div style="position:absolute;background:white;height:32px;left:4px;border-radius:8px;top:4px;width:148px;" id="lang-indicator"></div>
+                  <div style="position:absolute;background:white;height:32px;left:4px;border-radius:8px;top:4px;width:148px;box-shadow:0 1px 3px rgba(0,0,0,0.12);border:1px solid #e5e7eb;transition:left 0.2s ease;" id="lang-indicator"></div>
                   <button onclick="setLanguage('es')" id="lang-es" style="display:flex;gap:6px;align-items:center;justify-content:center;padding:6px;border-radius:8px;flex:1;min-width:0;position:relative;z-index:1;background:transparent;border:none;cursor:pointer;">
                     <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;border-radius:50%;">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
