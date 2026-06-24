@@ -2882,7 +2882,7 @@
               } else if (isPending) {
                   btn.textContent = 'Pending';
               } else {
-                  btn.textContent = 'Reserve Online';
+                  btn.textContent = '{{__("Reserve Online")}}';
               }
           }
           
