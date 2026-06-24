@@ -5529,8 +5529,21 @@
 @include('partials.profile-modal')
 
 {{-- Modal para visualizar documentos del menú del cliente --}}
+<style>
+  #clientDocModal{opacity:0;transition:opacity .22s ease;}
+  #clientDocModal.is-open{opacity:1;}
+  #clientDocModal .client-doc-card{
+    transform:translateY(12px) scale(.97);
+    opacity:0;
+    transition:transform .26s cubic-bezier(.16,1,.3,1), opacity .26s ease;
+  }
+  #clientDocModal.is-open .client-doc-card{transform:translateY(0) scale(1);opacity:1;}
+  @media (prefers-reduced-motion: reduce){
+    #clientDocModal,#clientDocModal .client-doc-card{transition:none;}
+  }
+</style>
 <div id="clientDocModal" style="position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(15,17,24,.55);padding:20px;">
-  <div style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(10,13,20,.45);">
+  <div class="client-doc-card" style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(10,13,20,.45);">
     <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #ebebeb;">
       <div id="clientDocTitle" style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;color:#222530;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Documento</div>
       <a id="clientDocDownload" href="#" target="_blank" rel="noopener" style="text-decoration:none;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:#2563eb;display:inline-flex;align-items:center;gap:6px;">
@@ -5552,12 +5565,22 @@
     document.getElementById('clientDocDownload').href = url;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    // forzar reflow para que la transición de entrada se dispare
+    void modal.offsetWidth;
+    modal.classList.add('is-open');
   };
   window.closeClientDoc = function(){
     var modal = document.getElementById('clientDocModal');
-    modal.style.display = 'none';
-    document.getElementById('clientDocFrame').src = '';
+    modal.classList.remove('is-open');
     document.body.style.overflow = '';
+    var done = function(){
+      modal.style.display = 'none';
+      document.getElementById('clientDocFrame').src = '';
+      modal.removeEventListener('transitionend', done);
+    };
+    modal.addEventListener('transitionend', done);
+    // respaldo por si no se dispara transitionend (reduced motion, etc.)
+    setTimeout(done, 320);
   };
   document.getElementById('clientDocModal').addEventListener('click', function(e){
     if (e.target === this) closeClientDoc();
