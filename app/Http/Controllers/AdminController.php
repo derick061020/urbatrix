@@ -320,10 +320,10 @@ class AdminController extends Controller
         fclose($in);
         fclose($out);
 
-        // Tope de 20 MB acumulado.
-        if (filesize($tmpPath) > 20971520) {
+        // Tope de 30 MB acumulado.
+        if (filesize($tmpPath) > 31457280) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'La imagen supera los 20 MB.'], 422);
+            return response()->json(['success' => false, 'message' => 'La imagen supera los 30 MB.'], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.

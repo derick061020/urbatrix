@@ -1719,7 +1719,7 @@
         const files = Array.from(e.target.files || []);
         for (const f of files) {
             if (!/^image\//.test(f.type)) { stShowAlert('"' + f.name + '" no es una imagen.', 'err'); continue; }
-            if (f.size > 20 * 1024 * 1024) { stShowAlert('"' + f.name + '" supera los 20 MB.', 'err'); continue; }
+            if (f.size > 30 * 1024 * 1024) { stShowAlert('"' + f.name + '" supera los 30 MB.', 'err'); continue; }
             hsUpload(f);
         }
         e.target.value = '';
