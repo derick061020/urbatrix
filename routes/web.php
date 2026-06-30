@@ -287,6 +287,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Subida de documentos por chunks (evita el límite de post_max_size en archivos grandes)
     Route::post('/client-menu/upload', [AdminController::class, 'uploadClientMenuChunk'])->name('admin.client-menu.upload');
 
+    // Slider de portada (imágenes configurables que aparecen bajo el hero en la home)
+    Route::post('/home-slider', [AdminController::class, 'updateHomeSlider'])->name('admin.home-slider.update');
+    Route::post('/home-slider/upload', [AdminController::class, 'uploadHomeSliderChunk'])->name('admin.home-slider.upload');
+
     // CRM Operativo
     Route::get('/crm/dashboard',    [AdminController::class, 'crmDashboard'])->name('admin.crm.dashboard');
     Route::get('/crm/expedientes',  [AdminController::class, 'crmExpedientes'])->name('admin.crm.expedientes');

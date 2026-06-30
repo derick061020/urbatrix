@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=19">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=23">
 </head>
 
 <body data-view="grid">
@@ -118,6 +118,9 @@
         if(hidden) return; hidden = true;
         replayHero();
         loader.classList.add('is-hidden');
+        // Señal para el slider de portada: el hero acaba de empezar su animación
+        // de entrada; el carrusel se revela cuando ésta termina.
+        document.dispatchEvent(new CustomEvent('makai:hero-revealed'));
         setTimeout(function(){ if(loader && loader.parentNode){ loader.parentNode.removeChild(loader); } }, 700);
       }
       function requestHide(){
@@ -1941,19 +1944,56 @@
       </div><!-- /pill -->
     </nav>
 
-    <!-- Hero -->
-    <div class="fg-hero" id="hero" data-active="makai">
-      <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
+    @php $homeSlider = \App\Models\Setting::get('home_slider', []) ?: []; @endphp
+    {{-- Carrusel horizontal: el hero es la celda #0 y las imágenes del admin son
+         las celdas siguientes. El "track" se desplaza lateralmente con translateX
+         para pasar de una slide a la otra. --}}
+    <div class="fg-stage{{ !empty($homeSlider) ? ' has-slider' : '' }}">
 
-      <span class="fg-hero-text" data-project="makai"  aria-hidden="true">MAKAI</span>
-      <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
-      <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
+      <div class="hs-track" id="hsTrack">
 
-      <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Makai Residences') }}">
-      <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
-      <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
+        <!-- Celda 0: Hero -->
+        <div class="hs-cell hs-cell-hero">
+          <div class="fg-hero" id="hero" data-active="makai">
+            <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-    </div>
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true">MAKAI</span>
+            <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
+            <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
+
+            <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Makai Residences') }}">
+            <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
+            <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
+          </div>
+        </div>
+
+        @if(!empty($homeSlider))
+        <!-- Celdas 1..N: imágenes configurables desde el admin (Configuración → Slider de portada) -->
+        @foreach($homeSlider as $i => $src)
+          <div class="hs-cell hs-cell-img" style="background-image:url('{{ $src }}')" aria-hidden="true"></div>
+        @endforeach
+        @endif
+
+      </div><!-- /hs-track -->
+
+      @if(!empty($homeSlider))
+      <!-- Indicador (píldora): el primer segmento corresponde al hero (slide inicial). -->
+      <div class="hs-slider-nav" role="tablist" aria-label="{{ __('Seleccionar imagen') }}" data-count="{{ count($homeSlider) + 1 }}">
+        <button type="button" class="hs-pill-seg is-active" role="tab" data-idx="0"
+                aria-selected="true" aria-label="{{ __('Portada') }}">
+          <span class="hs-pill-fill"></span>
+        </button>
+        @foreach($homeSlider as $i => $src)
+          <button type="button" class="hs-pill-seg" role="tab" data-idx="{{ $i + 1 }}"
+                  aria-selected="false" aria-label="{{ __('Imagen') }} {{ $i + 1 }}">
+            <span class="hs-pill-fill"></span>
+          </button>
+        @endforeach
+      </div>
+      @endif
+
+    </div><!-- /fg-stage -->
+
     <div class="fg-hero-spacer" aria-hidden="true"></div>
 
     <!-- Main Content -->
@@ -5619,6 +5659,98 @@
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape' && document.getElementById('clientDocModal').style.display === 'flex') closeClientDoc();
   });
+</script>
+
+<!-- ░░░ HERO SLIDER — carrusel horizontal: hero (celda 0) → imágenes, ciclando ░░░ -->
+<script>
+  (function(){
+    var stage = document.querySelector('.fg-stage.has-slider');
+    var track = document.getElementById('hsTrack');
+    if(!stage || !track) return;
+
+    var cells = Array.prototype.slice.call(track.querySelectorAll('.hs-cell'));  // hero + imágenes
+    var segs  = Array.prototype.slice.call(stage.querySelectorAll('.hs-pill-seg'));
+    var total = cells.length;
+    if(total < 2) return; // sin imágenes no hay carrusel
+
+    var DURATION = 5000; // ms por slide
+    stage.style.setProperty('--hs-duration', DURATION + 'ms');
+
+    var cur = 0, timer = null, started = false;
+
+    function setSeg(i){
+      segs.forEach(function(s, k){
+        var on = (k === i);
+        s.classList.toggle('is-active', on);
+        s.setAttribute('aria-selected', on ? 'true' : 'false');
+        if(on){
+          // Reinicia la barra de relleno del segmento activo.
+          var fill = s.querySelector('.hs-pill-fill');
+          if(fill){ fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = ''; }
+        }
+      });
+    }
+
+    function show(i){
+      i = (i + total) % total;
+      cur = i;
+      // Desplazamiento LATERAL del track.
+      track.style.transform = 'translateX(' + (-i * 100) + '%)';
+      cells.forEach(function(c, k){ c.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+      setSeg(i);
+    }
+
+    function next(){ show(cur + 1); }
+
+    // Autoplay con setTimeout auto-reprogramado (más resistente que setInterval:
+    // no se "apila" ni queda en estados raros tras throttling de la pestaña).
+    function startAuto(){
+      stopAuto();
+      timer = setTimeout(function tick(){
+        try { next(); } catch(e){}              // nunca cortar la cadena por un error
+        timer = setTimeout(tick, DURATION);     // reprograma SIEMPRE el próximo cambio
+      }, DURATION);
+    }
+    function stopAuto(){ if(timer){ clearTimeout(timer); timer = null; } }
+
+    // Click en un segmento → salta a esa slide y reinicia el autoplay.
+    segs.forEach(function(seg){
+      seg.addEventListener('click', function(){
+        var t = parseInt(seg.dataset.idx, 10) || 0;
+        if(t === cur) return;
+        show(t);
+        startAuto();
+      });
+    });
+
+    // Pausa solo cuando la pestaña no está visible; al volver, reanuda. (No se
+    // pausa por hover: el slider ocupa casi toda la pantalla y el cursor casi
+    // siempre queda encima, lo que lo dejaba congelado.)
+    document.addEventListener('visibilitychange', function(){
+      if(!started) return;
+      if(document.hidden) stopAuto(); else startAuto();
+    });
+
+    // Arranca el ciclo: el hero (slide 0) ya está visible y su indicador empieza
+    // a llenarse; tras DURATION se desplaza lateralmente a la primera imagen.
+    function start(){
+      if(started) return; started = true;
+      setSeg(0);
+      startAuto();
+    }
+
+    // Programa el arranque una sola vez (gana el primero que dispare).
+    var kicked = false;
+    function kick(delay){ if(kicked) return; kicked = true; setTimeout(start, delay); }
+
+    // Caso normal: esperar a que termine la carga (loader) y la animación de
+    // entrada del hero (~1.6s) antes de iniciar el ciclo del carrusel.
+    document.addEventListener('makai:hero-revealed', function(){ kick(1750); }, { once: true });
+    // Respaldo 1: si el evento no llegó, arrancar poco después de la carga total.
+    window.addEventListener('load', function(){ setTimeout(function(){ kick(1750); }, 300); });
+    // Respaldo 2 (tope absoluto): arrancar igual aunque nada de lo anterior dispare.
+    setTimeout(function(){ kick(0); }, 8000);
+  })();
 </script>
 </body>
 

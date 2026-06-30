@@ -446,6 +446,11 @@
         map.forEach((val, el) => {
             if (el.type === 'checkbox' || el.type === 'radio') el.checked = val;
             else el.value = val;
+            // Re-sincroniza dropdowns custom (.crm-select) que pintan la etiqueta
+            // desde el valor del input oculto.
+            if (el.type === 'hidden' && el.closest('.crm-select')) {
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
         });
     }
     function differs(map) {

@@ -6,7 +6,7 @@ use App\Models\Setting;
 
 /**
  * Listas de opciones globales del proyecto para las unidades:
- * tipos, plantas, vistas (outlook), direcciones y amenidades.
+ * tipos, plantas, vistas (outlook) y amenidades.
  *
  * Por defecto devuelve los valores históricos (los que antes estaban
  * hardcodeados en el formulario y en el home). El admin puede sobreescribirlos
@@ -17,7 +17,7 @@ use App\Models\Setting;
 class UnitOptions
 {
     /** Claves de categorías editables. */
-    public const CATEGORIES = ['types', 'floors', 'outlooks', 'addresses', 'amenities'];
+    public const CATEGORIES = ['types', 'floors', 'outlooks', 'amenities'];
 
     /** Prefijo de las claves guardadas en la tabla settings. */
     private const PREFIX = 'unit_options_';
@@ -54,7 +54,6 @@ class UnitOptions
                 ['value' => 'ocean',       'label' => 'Vista al mar'],
                 ['value' => 'mountain',    'label' => 'Vista a la montaña'],
             ],
-            'addresses' => [],
             'amenities' => [
                 ['value' => 'pool',        'label' => 'Pool',          'icon' => 'pool'],
                 ['value' => 'gym',         'label' => 'Gym',           'icon' => 'gym'],
@@ -119,15 +118,6 @@ class UnitOptions
         }
 
         return $map;
-    }
-
-    /** Lista de direcciones como strings simples (para datalist). */
-    public static function addresses(): array
-    {
-        return array_values(array_filter(array_map(
-            fn ($row) => $row['label'] ?? ($row['value'] ?? null),
-            self::get('addresses')
-        )));
     }
 
     /**

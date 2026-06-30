@@ -113,7 +113,7 @@
                             <td class="text-[12px] text-ink-700">{{ $u->floor ?? '—' }}</td>
                             <td class="text-[12px] text-ink-700">{{ $u->bedrooms ?? '—' }}B · {{ $u->bathrooms ?? '—' }}Ba</td>
                             <td class="text-[12px] text-ink-700">{{ $u->internal_area ?? '—' }}</td>
-                            <td class="text-[12px] text-ink-700">{{ $u->expense_1 ?? '—' }}</td>
+                            <td class="text-[12px] text-ink-700">{{ $u->external_area ?? '—' }}</td>
                             <td class="text-[13px] font-bold text-ok-dark">${{ number_format($u->price ?? 0, 0) }}</td>
                             @php
                                 $vs      = $viewStatsByUnit[$u->id] ?? null;
@@ -368,7 +368,6 @@
         'types'     => ['label' => 'Tipos de unidad', 'icon' => 'pi-th-large',  'hint' => 'Aparecen en el selector "Tipo" del formulario.'],
         'floors'    => ['label' => 'Plantas / Pisos',  'icon' => 'pi-building',  'hint' => 'Selector "Planta" del formulario y filtro de la home.'],
         'outlooks'  => ['label' => 'Vistas',           'icon' => 'pi-eye',       'hint' => 'Selector "Vista" del formulario y filtro de la home.'],
-        'addresses' => ['label' => 'Direcciones',      'icon' => 'pi-map-marker','hint' => 'Sugerencias para el campo "Dirección".'],
         'amenities' => ['label' => 'Amenidades',       'icon' => 'pi-star',      'hint' => 'Tarjetas de amenidades del formulario y front.'],
     ];
     $amenityIcons = \App\Support\UnitOptions::amenityIcons();
@@ -711,23 +710,20 @@
         const wrap = document.createElement('div');
         wrap.className = 'flex items-center gap-2';
 
-        if (cat === 'addresses') {
-            wrap.innerHTML = `
-                <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Dirección" class="crm-input pl-3 flex-1">
-                <input type="hidden" name="${base}[value]" value="${esc(row.value)}">
-                <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
-        } else if (cat === 'amenities') {
+        // El "value" (clave estable) se conserva oculto: para filas existentes se
+        // mantiene, y para nuevas el backend genera un slug a partir de la etiqueta.
+        if (cat === 'amenities') {
             const sel = row.icon || 'check';
             wrap.innerHTML = `
                 <span class="cfg-icon-prev w-8 h-8 flex items-center justify-center text-ink-500 shrink-0">${iconPreview(sel)}</span>
                 <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Etiqueta" class="crm-input pl-3 flex-1">
-                <input type="text" name="${base}[value]" value="${esc(row.value)}" placeholder="valor (opcional)" class="crm-input pl-3 w-32">
-                <select name="${base}[icon]" class="crm-input pl-3 w-28 cfg-icon-sel">${iconOptions(sel)}</select>
+                <input type="hidden" name="${base}[value]" value="${esc(row.value)}">
+                <select name="${base}[icon]" class="crm-input pl-3 w-32 cfg-icon-sel">${iconOptions(sel)}</select>
                 <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
         } else {
             wrap.innerHTML = `
                 <input type="text" name="${base}[label]" value="${esc(row.label)}" placeholder="Etiqueta" class="crm-input pl-3 flex-1">
-                <input type="text" name="${base}[value]" value="${esc(row.value)}" placeholder="valor (opcional)" class="crm-input pl-3 w-40">
+                <input type="hidden" name="${base}[value]" value="${esc(row.value)}">
                 <button type="button" class="crm-btn crm-btn-ghost px-2 cfg-del" title="Quitar"><i class="pi pi-trash text-err"></i></button>`;
         }
         return wrap;

@@ -657,6 +657,120 @@
       .fg-hero-building { animation: none !important; opacity: 1; transform: none; }
     }
 
+    /* ░░░ HERO SLIDER ░░░
+       Carrusel HORIZONTAL: el hero es la celda #0 y las imágenes del admin
+       (Configuración → Slider de portada) son las celdas siguientes. El "track"
+       se desplaza lateralmente con translateX para cambiar de slide. El indicador
+       es una "píldora" de cristal esmerilado cuyo segmento activo se va rellenando
+       marcando el tiempo hasta el próximo cambio. */
+    .fg-stage { position: relative; }
+    /* Con slider, la etapa fija el encuadre (mismo aspect-ratio que el hero, SIN
+       max-height para que el ancho sea siempre 100%) y recorta el track que se
+       desborda lateralmente. */
+    .fg-stage.has-slider {
+      overflow: hidden;
+      aspect-ratio: 1366 / 620;
+    }
+    @media (max-width: 768px) {
+      .fg-stage.has-slider { aspect-ratio: auto; height: 52vh; min-height: 380px; max-height: 560px; }
+    }
+
+    /* Track horizontal: fila de celdas a 100% de ancho cada una. */
+    .fg-stage.has-slider .hs-track {
+      display: flex;
+      height: 100%;
+      transform: translateX(0);
+      transition: transform .8s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      will-change: transform;
+    }
+    .fg-stage.has-slider .hs-cell {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    /* El hero llena su celda (la etapa ya tiene el mismo aspect-ratio). */
+    .fg-stage.has-slider .hs-cell-hero .fg-hero {
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .hs-cell-img {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #e6edf2; /* fallback hasta que carga la imagen */
+    }
+    /* Difuminación blanca inferior en las celdas de imagen — igual que el hero
+       (.fg-hero::after), para que la slide se funda con el contenido de abajo. */
+    .hs-cell-img::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -1px;
+      height: 8%;
+      background: linear-gradient(to top,
+        #ffffff 0%,
+        rgba(255,255,255,0.92) 35%,
+        rgba(255,255,255,0.45) 70%,
+        rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+
+    /* Píldora de cristal esmerilado con segmentos — vive en la etapa (sobre el
+       track) para verse siempre, en cualquier slide. */
+    .hs-slider-nav {
+      position: absolute;
+      left: 50%;
+      bottom: 6%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: rgba(120, 124, 130, 0.34);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+    @media (max-width: 768px) { .hs-slider-nav { bottom: 5%; gap: 9px; padding: 9px 14px; } }
+
+    .hs-pill-seg {
+      position: relative;
+      width: 9px;
+      height: 9px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.45);
+      cursor: pointer;
+      overflow: hidden;
+      transition: width .45s cubic-bezier(0.22, 1, 0.36, 1), background .3s ease;
+    }
+    .hs-pill-seg:hover { background: rgba(255, 255, 255, 0.7); }
+    .hs-pill-seg.is-active {
+      width: 46px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+    @media (max-width: 768px) { .hs-pill-seg.is-active { width: 38px; } }
+
+    .hs-pill-fill {
+      position: absolute;
+      inset: 0;
+      width: 0;
+      border-radius: 999px;
+      background: #ffffff;
+    }
+    .hs-pill-seg.is-active .hs-pill-fill {
+      animation: hs-fill var(--hs-duration, 5s) linear forwards;
+    }
+    @keyframes hs-fill { from { width: 0; } to { width: 100%; } }
+
+    /* Nota: NO se desactiva la transición del track bajo prefers-reduced-motion,
+       porque el deslizamiento lateral del carrusel es parte intencional del diseño. */
+
     /* FILTER BAR (v2) — sits below the toggle, aligned with the cards grid */
     .fg-filter-bar {
       background: #f2f5f8;

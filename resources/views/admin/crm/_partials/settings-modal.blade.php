@@ -324,6 +324,10 @@
                 <i class="pi pi-bars"></i> {{ __('Menú del cliente') }}
                 <i class="pi pi-angle-right chev"></i>
             </button>
+            <button type="button" class="st-nav-item" data-st-pane="slider">
+                <i class="pi pi-images"></i> {{ __('Slider de portada') }}
+                <i class="pi pi-angle-right chev"></i>
+            </button>
             @endif
 
             {{-- Cerrar sesión — anclado al fondo del sidebar --}}
@@ -378,6 +382,10 @@
             {{-- CLIENT MENU TABS --}}
             <div class="st-tabs" data-st-tabs="menu" style="display:none;">
                 <button type="button" class="st-tab active" data-st-tab="menu-main">{{ __('Menú del cliente') }}</button>
+            </div>
+            {{-- HOME SLIDER TABS --}}
+            <div class="st-tabs" data-st-tabs="slider" style="display:none;">
+                <button type="button" class="st-tab active" data-st-tab="slider-main">{{ __('Slider de portada') }}</button>
             </div>
             @endif
 
@@ -766,6 +774,27 @@
                         <div id="cmEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay ítems. Agregá el primero para que aparezca en el menú del cliente.') }}</div>
                     </div>
                 </div>
+
+                {{-- =========== HOME SLIDER PANE — SLIDER DE PORTADA =========== --}}
+                <div class="st-pane" data-st-pane="slider-main">
+                    <div class="st-row" style="display:block;">
+                        <div style="margin-bottom:14px;">
+                            <div class="st-row-label">{{ __('Imágenes del slider') }}</div>
+                            <div class="st-row-desc">
+                                {{ __('Estas imágenes se muestran en un carrusel debajo del hero de la página principal, una vez que termina la animación de entrada. Subí varias y se alternarán automáticamente. Recomendado: formato apaisado (ej. 1600×600).') }}
+                            </div>
+                        </div>
+
+                        <div id="hsList" style="display:flex; flex-wrap:wrap; gap:12px;"></div>
+
+                        <label class="st-btn st-btn-ghost" style="margin-top:14px; cursor:pointer; display:inline-flex;">
+                            <i class="pi pi-plus"></i> {{ __('Agregar imágenes') }}
+                            <input type="file" id="hsFileInput" accept="image/*" multiple class="hidden" style="display:none;">
+                        </label>
+
+                        <div id="hsEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay imágenes. Agregá la primera para que aparezca el slider en la portada.') }}</div>
+                    </div>
+                </div>
                 @endif
 
             </div>
@@ -775,6 +804,29 @@
 
 @if($stIsAdmin)
 <style>
+    /* ===== Slider de portada (cards) ===== */
+    .hs-card {
+        position: relative; width: 150px; height: 96px; border-radius: 10px; overflow: hidden;
+        border: 1px solid #eaecf0; background: #f5f6f8; flex: 0 0 auto;
+    }
+    .hs-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hs-card-actions {
+        position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+        gap: 6px; padding: 6px; opacity: 0; transition: opacity .15s ease;
+        background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 60%);
+    }
+    .hs-card:hover .hs-card-actions { opacity: 1; }
+    .hs-card-actions button {
+        width: 26px; height: 26px; border-radius: 7px; border: none; cursor: pointer;
+        background: rgba(255,255,255,.92); color: #344054; display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px;
+    }
+    .hs-card-actions button:hover { background: #fff; }
+    .hs-card-actions button:disabled { opacity: .4; cursor: default; }
+    .hs-card-actions .hs-del:hover { background: #fee4e2; color: #d92d20; }
+    .hs-card-loading { display: flex; align-items: center; justify-content: center; }
+    .hs-spin { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #667085; font-size: 12px; }
+
     /* ===== Dropdown de tipo (menú del cliente) ===== */
     .cm-select { position: relative; }
     .cm-select-trigger {
@@ -929,6 +981,7 @@
                 notifications: ['Configuración de la cuenta', 'Elige qué notificaciones quieres recibir', 'Guardar cambios', false],
                 signature:     ['Firma del proyecto',        'Esta firma se usa para firmar los contratos a nombre de Makai', 'Guardar firma', true],
                 menu:          ['Menú del cliente',          'Configurá los ítems (enlaces y documentos) que ve el cliente en su menú', 'Guardar menú', true],
+                slider:        ['Slider de portada',         'Subí las imágenes que se muestran en el carrusel debajo del hero de la portada', 'Guardar slider', true],
             };
             const t = titles[activePane];
             document.querySelector('[data-st-title]').textContent = t[0];
@@ -942,6 +995,9 @@
             }
             if (activePane === 'menu' && typeof window.cmRender === 'function') {
                 window.cmRender();
+            }
+            if (activePane === 'slider' && typeof window.hsRender === 'function') {
+                window.hsRender();
             }
 
             // En mobile, al elegir un apartado pasamos al detalle (paso 2).
@@ -1164,6 +1220,10 @@
         }
         if (activePane === 'menu') {
             if (typeof window.cmSave === 'function') window.cmSave();
+            return;
+        }
+        if (activePane === 'slider') {
+            if (typeof window.hsSave === 'function') window.hsSave();
             return;
         }
         if (activePane === 'security') {
@@ -1562,6 +1622,133 @@
             stShowAlert(d.message || 'Menú del cliente guardado.', 'ok', 2600);
         })
         .catch(() => { btn.disabled = false; stShowAlert('Error de red al guardar el menú.', 'err'); });
+    };
+
+    /* ======================= Slider de portada ======================= */
+    let hsData = @json(\App\Models\Setting::get('home_slider', []) ?: []);
+    let hsUploading = 0;
+
+    function hsUpdateEmpty(){
+        document.getElementById('hsEmpty').style.display = hsData.length ? 'none' : '';
+    }
+
+    window.hsRender = function(){
+        const list = document.getElementById('hsList');
+        if (!list) return;
+        list.innerHTML = '';
+        hsData.forEach((src, i) => {
+            const card = document.createElement('div');
+            card.className = 'hs-card';
+            card.innerHTML =
+                '<img src="' + src + '" alt="">' +
+                '<div class="hs-card-actions">' +
+                    '<button type="button" title="Mover a la izquierda" data-hs-move="-1" ' + (i === 0 ? 'disabled' : '') + '><i class="pi pi-arrow-left"></i></button>' +
+                    '<button type="button" title="Mover a la derecha" data-hs-move="1" ' + (i === hsData.length - 1 ? 'disabled' : '') + '><i class="pi pi-arrow-right"></i></button>' +
+                    '<button type="button" class="hs-del" title="Quitar imagen" data-hs-del><i class="pi pi-trash"></i></button>' +
+                '</div>';
+            card.querySelector('[data-hs-del]').addEventListener('click', () => {
+                hsData.splice(i, 1);
+                window.hsRender();
+            });
+            card.querySelectorAll('[data-hs-move]').forEach(b => b.addEventListener('click', () => {
+                const j = i + parseInt(b.dataset.hsMove, 10);
+                if (j < 0 || j >= hsData.length) return;
+                [hsData[i], hsData[j]] = [hsData[j], hsData[i]];
+                window.hsRender();
+            }));
+            list.appendChild(card);
+        });
+        hsUpdateEmpty();
+    };
+
+    // Sube una imagen en trozos de 512 KB y agrega su ruta a hsData.
+    async function hsUpload(file){
+        const chunkSize = 512 * 1024;
+        const total = Math.ceil(file.size / chunkSize) || 1;
+        const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        const saveBtn = document.getElementById('stSaveBtn');
+
+        // Placeholder de carga
+        const list = document.getElementById('hsList');
+        const ph = document.createElement('div');
+        ph.className = 'hs-card hs-card-loading';
+        ph.innerHTML = '<div class="hs-spin"><i class="pi pi-spin pi-spinner"></i><span class="hs-pct">0%</span></div>';
+        list.appendChild(ph);
+
+        hsUploading++;
+        saveBtn.disabled = true;
+        try {
+            for (let i = 0; i < total; i++) {
+                const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
+                const fd = new FormData();
+                fd.append('chunk', chunk);
+                fd.append('upload_id', uploadId);
+                fd.append('index', i);
+                fd.append('total', total);
+                fd.append('name', file.name);
+                fd.append('_token', st2faCsrf());
+
+                const res = await fetch('{{ route('admin.home-slider.upload') }}', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd,
+                    credentials: 'same-origin',
+                });
+                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño.');
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir la imagen.');
+
+                const pct = ph.querySelector('.hs-pct');
+                if (pct) pct.textContent = Math.round(((i + 1) / total) * 100) + '%';
+
+                if (d.done && d.path) {
+                    hsData.push(d.path);
+                }
+            }
+        } catch (e) {
+            stShowAlert(e.message || 'No se pudo subir la imagen.', 'err');
+        } finally {
+            ph.remove();
+            hsUploading--;
+            if (hsUploading <= 0) saveBtn.disabled = false;
+            window.hsRender();
+        }
+    }
+
+    document.getElementById('hsFileInput')?.addEventListener('change', function(e){
+        const files = Array.from(e.target.files || []);
+        for (const f of files) {
+            if (!/^image\//.test(f.type)) { stShowAlert('"' + f.name + '" no es una imagen.', 'err'); continue; }
+            if (f.size > 20 * 1024 * 1024) { stShowAlert('"' + f.name + '" supera los 20 MB.', 'err'); continue; }
+            hsUpload(f);
+        }
+        e.target.value = '';
+    });
+
+    window.hsSave = function(){
+        if (hsUploading > 0) { stShowAlert('Esperá a que terminen las subidas.', 'err'); return; }
+
+        const fd = new FormData();
+        hsData.forEach(src => fd.append('images[]', src));
+        fd.append('_token', st2faCsrf());
+
+        const btn = document.getElementById('stSaveBtn');
+        btn.disabled = true;
+
+        fetch('{{ route('admin.home-slider.update') }}', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: fd,
+            credentials: 'same-origin',
+        })
+        .then(r => r.json().catch(() => ({})))
+        .then(d => {
+            btn.disabled = false;
+            if (d.success === false) { stShowAlert(d.message || 'No se pudo guardar el slider.', 'err'); return; }
+            if (Array.isArray(d.images)) { hsData = d.images; window.hsRender(); }
+            stShowAlert(d.message || 'Slider de portada guardado.', 'ok', 2600);
+        })
+        .catch(() => { btn.disabled = false; stShowAlert('Error de red al guardar el slider.', 'err'); });
     };
     @endif
 })();

@@ -237,6 +237,133 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * Guarda la lista ordenada de imágenes del slider de portada (home).
+     *
+     * Las imágenes ya se subieron por chunks (uploadHomeSliderChunk); aquí sólo
+     * llega el array ordenado de rutas públicas (/storage/home-slider/...). Se
+     * guarda en Setting('home_slider') y se borran las que dejaron de usarse.
+     */
+    public function updateHomeSlider(Request $request)
+    {
+        $data = $request->validate([
+            'images'   => ['nullable', 'array', 'max:30'],
+            'images.*' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $previous = \App\Models\Setting::get('home_slider', []) ?: [];
+
+        $clean = [];
+        foreach ($data['images'] ?? [] as $path) {
+            $path = trim((string) $path);
+            // Sólo aceptamos rutas que nosotros generamos.
+            if ($path === '' || !str_starts_with($path, '/storage/home-slider/')) {
+                continue;
+            }
+            if (!in_array($path, $clean, true)) {
+                $clean[] = $path;
+            }
+        }
+
+        // Borrar archivos que ya no se usan (reemplazados o quitados).
+        foreach ($previous as $oldPath) {
+            if (!in_array($oldPath, $clean, true)) {
+                $this->deleteHomeSliderFile((string) $oldPath);
+            }
+        }
+
+        \App\Models\Setting::put('home_slider', $clean);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Slider de portada actualizado.',
+            'images'  => $clean,
+        ]);
+    }
+
+    /**
+     * Recibe una imagen del slider en trozos (~512 KB) para esquivar el límite
+     * client_max_body_size de nginx (413). Mismo patrón que los planos de pisos.
+     * Devuelve la ruta pública /storage/... cuando recibe el último chunk.
+     */
+    public function uploadHomeSliderChunk(Request $request)
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:1000'],
+            'name'      => ['required', 'string', 'max:255'],
+        ]);
+
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+        }
+
+        $tmpDir = storage_path('app/tmp-home-slider');
+        if (!is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope de 20 MB acumulado.
+        if (filesize($tmpPath) > 20971520) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'La imagen supera los 20 MB.'], 422);
+        }
+
+        // Chunks intermedios: confirmar y esperar el siguiente.
+        if ($index + 1 < $total) {
+            return response()->json(['success' => true, 'done' => false]);
+        }
+
+        // Último chunk: validar extensión de imagen y mover al disco público.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array($ext, $allowed, true)) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'Formato de imagen no permitido.'], 422);
+        }
+
+        $finalRel = 'home-slider/' . $uploadId . '.' . $ext;
+        $stream   = fopen($tmpPath, 'rb');
+        Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'path'    => '/storage/' . $finalRel,
+            'name'    => $request->input('name'),
+        ]);
+    }
+
+    /** Borra el archivo físico de una imagen del slider (best-effort). */
+    private function deleteHomeSliderFile(string $publicPath): void
+    {
+        $relative = ltrim(str_replace('/storage/', '', $publicPath), '/');
+        if ($relative !== '' && Storage::disk('public')->exists($relative)) {
+            Storage::disk('public')->delete($relative);
+        }
+    }
+
     public function editUnit(Unit $unit)
     {
         $unit->load(['images', 'histories', 'dealHistories', 'paymentHistories']);
@@ -283,10 +410,8 @@ class AdminController extends Controller
     public function updateUnit(Request $request, Unit $unit)
     {
         $booleanFields = [
-            'public', 'pre_arranged', 'plot', 'guaranteed_rental', 'override_action',
-            'aircon', 'bypass_launch_date', 'display_on_home_page', 'show_enquire_button',
-            'set_discount_globally', 'hide_original_price', 'show_price_alternative',
-            'is_high_demand', 'is_second_chance', 'fully_furnished',
+            'public', 'plot', 'display_on_home_page', 'aircon', 'fully_furnished',
+            'is_high_demand', 'is_second_chance',
         ];
 
         foreach ($booleanFields as $field) {
@@ -294,42 +419,21 @@ class AdminController extends Controller
         }
 
         $validated = $request->validate([
-            // Existing
+            // General
             'name'                  => 'required|string|max:255',
             'status'                => 'required|in:AVAILABLE,PENDING,RESERVED,HELD,SOLD',
             'type'                  => 'nullable|string|max:50',
             'price'                 => 'nullable|numeric|min:0',
-            'public'                => 'boolean',
-            'pre_arranged'          => 'boolean',
-            'description'           => 'nullable|string',
-
-            // Reservation Details
-            'discount'              => 'nullable|numeric',
-            'additional_parking'    => 'nullable|integer|min:0',
-            'price_adjustment'      => 'nullable|numeric',
-            'purchase_price'        => 'nullable|numeric|min:0',
-
-            // Reservation Customer
-            'first_name'            => 'nullable|string|max:255',
-            'last_name'             => 'nullable|string|max:255',
-            'contact_number'        => 'nullable|string|max:50',
-            'email'                 => 'nullable|email|max:255',
-
-            // Agent
-            'agent_id'              => 'nullable|exists:agents,id',
-
-            // Unit General
-            'plot'                  => 'boolean',
+            'discount'              => 'nullable|numeric|min:0',
             'address'               => 'nullable|string|max:255',
             'custom_id'             => 'nullable|string|max:100',
-            'price_wording'         => 'nullable|string|max:255',
-            'levies'                => 'nullable|numeric|min:0',
-            'rates'                 => 'nullable|numeric|min:0',
-            'est_rental'            => 'nullable|numeric|min:0',
-            'guaranteed_rental'     => 'boolean',
-            'override_action'       => 'boolean',
+            'agent_id'              => 'nullable|exists:agents,id',
+            'public'                => 'boolean',
+            'plot'                  => 'boolean',
+            'display_on_home_page'  => 'boolean',
+            'description'           => 'nullable|string',
 
-            // Unit Specifications
+            // Especificaciones
             'floor'                 => 'nullable|string|max:50',
             'layout'                => 'nullable|string|max:100',
             'bedrooms'              => 'nullable|integer|min:0',
@@ -339,50 +443,37 @@ class AdminController extends Controller
             'direction'             => 'nullable|string|max:10',
             'outlook'               => 'nullable|string|max:50',
             'aircon'                => 'boolean',
+            'fully_furnished'       => 'boolean',
 
-            // Unit Monthly Expenses
-            'expense_1'             => 'nullable|numeric|min:0',
-            'expense_2'             => 'nullable|numeric|min:0',
-            'expense_3'             => 'nullable|numeric|min:0',
-
-            // Unit Custom Information
-            'custom_1'              => 'nullable|string|max:255',
-            'custom_2'              => 'nullable|string|max:255',
-            'custom_3'              => 'nullable|string|max:255',
-
-            // Unit Dimensions
+            // Dimensiones
             'internal_area'         => 'nullable|numeric|min:0',
             'external_area'         => 'nullable|numeric|min:0',
             'total_area'            => 'nullable|numeric|min:0',
 
-            // Unit Settings
-            'bypass_launch_date'    => 'boolean',
-            'display_on_home_page'  => 'boolean',
-            'show_enquire_button'   => 'boolean',
-            'set_discount_globally' => 'boolean',
-            'hide_original_price'   => 'boolean',
-            'show_price_alternative'=> 'boolean',
+            // Gastos & rentabilidad
+            'expense_1'             => 'nullable|numeric|min:0',
+            'expense_2'             => 'nullable|numeric|min:0',
+            'expense_3'             => 'nullable|numeric|min:0',
+            'levies'                => 'nullable|numeric|min:0',
+            'rates'                 => 'nullable|numeric|min:0',
+            'est_rental'            => 'nullable|numeric|min:0',
 
-            // Availability & demand
+            // Disponibilidad & demanda
             'reserved_until'        => 'nullable|date',
             'released_at'           => 'nullable|date',
             'views_today'           => 'nullable|integer|min:0',
             'is_high_demand'        => 'boolean',
             'is_second_chance'      => 'boolean',
 
-            // For Investment / For Living content
+            // Contenido segmentado · Investment / Living
             'for_investment_text'   => 'nullable|string|max:5000',
             'for_living_text'       => 'nullable|string|max:5000',
             'projected_value'       => 'nullable|numeric|min:0',
             'projected_value_year'  => 'nullable|string|max:10',
             'roi_percent'           => 'nullable|numeric|min:0|max:999',
-            'fully_furnished'       => 'boolean',
             'comparison_text'       => 'nullable|string|max:500',
             'amenities'             => 'nullable|array',
-            'amenities.*'           => 'string|in:pool,gym,beach_club,restaurant,spa,tennis,golf,security,parking,concierge,playground,bbq',
-            'amenities_text'        => 'nullable|string|max:500',
-            'walk_score'            => 'nullable|integer|min:0|max:100',
-            'school_proximity'      => 'nullable|string|max:255',
+            'amenities.*'           => 'string|max:50',
         ]);
 
         if (array_key_exists('agent_id', $validated) && $validated['agent_id'] === '') {

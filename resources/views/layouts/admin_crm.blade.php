@@ -259,6 +259,38 @@
           .topbar-search-wrap { display: none !important; }
           #crm-topbar { padding-left: 16px !important; padding-right: 16px !important; gap: 12px !important; }
       }
+
+      /* Custom dropdown (replaces native <select>) — see _partials/select.blade.php */
+      .crm-select { position: relative; width: 100%; }
+      .crm-select__btn {
+          height: 36px; width: 100%;
+          display: flex; align-items: center; justify-content: space-between; gap: 8px;
+          padding: 0 12px; border: 1px solid #eaecf0; border-radius: 8px;
+          background: #fff; font-size: 13px; color: #222530; text-align: left;
+          cursor: pointer; transition: border-color .15s, box-shadow .15s;
+      }
+      .crm-select__btn:hover { border-color: #cacfd8; }
+      .crm-select.is-open .crm-select__btn { border-color: #5c7c68; box-shadow: 0 0 0 3px rgba(92,124,104,.18); }
+      .crm-select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .crm-select__label.is-placeholder { color: #9aa1ad; }
+      .crm-select__caret { font-size: 11px; color: #717784; flex-shrink: 0; transition: transform .15s; }
+      .crm-select.is-open .crm-select__caret { transform: rotate(180deg); }
+      .crm-select__menu {
+          position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+          background: #fff; border: 1px solid #ebebeb; border-radius: 10px;
+          box-shadow: 0 20px 40px -12px rgba(0,0,0,.18);
+          max-height: 260px; overflow-y: auto; padding: 4px; z-index: 70; display: none;
+      }
+      .crm-select.is-open .crm-select__menu { display: block; }
+      .crm-select__opt {
+          width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+          padding: 8px 10px; border-radius: 7px; font-size: 13px; color: #222530;
+          background: transparent; text-align: left; cursor: pointer; transition: background-color .12s;
+      }
+      .crm-select__opt:hover, .crm-select__opt.is-highlight { background: #f5f7f6; }
+      .crm-select__check { font-size: 11px; color: #5c7c68; opacity: 0; flex-shrink: 0; }
+      .crm-select__opt.is-active .crm-select__check { opacity: 1; }
+      .crm-select__opt.is-active { font-weight: 600; }
     </style>
     @stack('styles')
 </head>
@@ -474,6 +506,86 @@
     if (document.readyState !== 'loading') wrapTables();
     else document.addEventListener('DOMContentLoaded', wrapTables);
   })();
+</script>
+
+{{-- Custom dropdowns (.crm-select): native-select replacement, polished look. --}}
+<script>
+(function () {
+    function closeAll(except) {
+        document.querySelectorAll('.crm-select.is-open').forEach(function (s) {
+            if (s !== except) {
+                s.classList.remove('is-open');
+                s.querySelector('.crm-select__btn')?.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // Refresca la etiqueta visible y el estado activo a partir del valor del hidden.
+    function syncFromValue(sel) {
+        const hidden = sel.querySelector('input[type="hidden"]');
+        const label  = sel.querySelector('[data-select-label]');
+        if (!hidden || !label) return;
+        const val = String(hidden.value ?? '');
+        let activeLabel = null;
+        sel.querySelectorAll('.crm-select__opt').forEach(function (opt) {
+            const on = String(opt.dataset.value) === val;
+            opt.classList.toggle('is-active', on);
+            if (on) activeLabel = opt.querySelector('span')?.textContent ?? '';
+        });
+        const ph = sel.dataset.placeholder || '—';
+        if (activeLabel === null || val === '') {
+            label.textContent = ph;
+            label.classList.add('is-placeholder');
+        } else {
+            label.textContent = activeLabel;
+            label.classList.remove('is-placeholder');
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        const opt = e.target.closest('.crm-select__opt');
+        if (opt) {
+            const sel = opt.closest('.crm-select');
+            const hidden = sel.querySelector('input[type="hidden"]');
+            if (hidden && hidden.value !== opt.dataset.value) {
+                hidden.value = opt.dataset.value;
+                // 'change' burbujea hasta el form → dispara el autosave del editor.
+                hidden.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            syncFromValue(sel);
+            closeAll();
+            return;
+        }
+
+        const btn = e.target.closest('.crm-select__btn');
+        if (btn) {
+            const sel = btn.closest('.crm-select');
+            const willOpen = !sel.classList.contains('is-open');
+            closeAll(willOpen ? sel : null);
+            sel.classList.toggle('is-open', willOpen);
+            btn.setAttribute('aria-expanded', String(willOpen));
+            if (willOpen) {
+                sel.querySelector('.crm-select__opt.is-active')
+                   ?.scrollIntoView({ block: 'nearest' });
+            }
+            return;
+        }
+
+        // Clic fuera: cerrar todo.
+        if (!e.target.closest('.crm-select')) closeAll();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAll();
+    });
+
+    // Mantener la etiqueta sincronizada si el valor del hidden cambia por código
+    // (p. ej. "Descartar cambios" del editor restaura los valores originales).
+    document.addEventListener('change', function (e) {
+        const sel = e.target.closest?.('.crm-select');
+        if (sel && e.target.matches('input[type="hidden"]')) syncFromValue(sel);
+    });
+})();
 </script>
 
 @stack('scripts')
