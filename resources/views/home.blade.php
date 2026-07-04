@@ -5529,7 +5529,7 @@
       else params.set('view', view);
       const qs = params.toString();
       window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
-    }
+    }//xd
 
     document.querySelectorAll('.fg-toggle button[data-view], .fg-location-btn[data-view]').forEach(btn => {
       btn.addEventListener('click', function() {
