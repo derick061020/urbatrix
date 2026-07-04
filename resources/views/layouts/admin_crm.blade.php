@@ -85,7 +85,7 @@
           color:#525866; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab.active { background:#e11019; color:#fff; }
+      .crm-tab.active { background:#1f2430; color:#fff; }
       .crm-tab-line {
           padding: 14px 4px; font-size:14px; font-weight:500; color:#717784;
           border-bottom:2px solid transparent; cursor:pointer;

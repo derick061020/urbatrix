@@ -808,7 +808,7 @@
     .sh-copy-btn {
         flex-shrink:0;
         padding: 9px 16px; border-radius: 9px;
-        background:#e11019; color:#fff; border:none; cursor:pointer;
+        background:#1f2430; color:#fff; border:none; cursor:pointer;
         font-size:13px; font-weight:600;
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
