@@ -759,14 +759,18 @@
     .hs-pill-fill {
       position: absolute;
       inset: 0;
-      width: 0;
+      width: 100%;
       border-radius: 999px;
       background: #ffffff;
+      /* Se rellena con transform:scaleX (compuesto por la GPU) en lugar de
+         animar width, que forzaría layout+repaint en cada frame. */
+      transform: scaleX(0);
+      transform-origin: left center;
     }
     .hs-pill-seg.is-active .hs-pill-fill {
       animation: hs-fill var(--hs-duration, 5s) linear forwards;
     }
-    @keyframes hs-fill { from { width: 0; } to { width: 100%; } }
+    @keyframes hs-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
     /* Nota: NO se desactiva la transición del track bajo prefers-reduced-motion,
        porque el deslizamiento lateral del carrusel es parte intencional del diseño. */
