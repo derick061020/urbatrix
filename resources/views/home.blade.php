@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=25">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=24">
 </head>
 
 <body data-view="grid">
@@ -1964,12 +1964,6 @@
             <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Makai Residences') }}">
             <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
             <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
-
-            {{-- Capa de grading atmosférico: unifica el tono cálido de la casa con
-                 el cielo azul (neblina cálida en el horizonte + viñeta suave para
-                 dar profundidad), de modo que la composición se lea como una sola
-                 foto armónica en vez de un recorte pegado sobre el cielo. --}}
-            <div class="fg-hero-atmos" aria-hidden="true"></div>
           </div>
         </div>
 

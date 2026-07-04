@@ -527,32 +527,6 @@
       z-index: 4;
       transform: scale(0.8);
     }
-    /* Grading atmosférico sobre TODA la composición (sky + casa): con soft-light
-       preserva los medios tonos y solo empuja la temperatura de color, así el
-       recorte cálido de la casa y el cielo azul se leen como una sola foto.
-       z-index 4 → por encima de los edificios (z3), por debajo del difuminado
-       inferior blanco (.fg-hero::after, z5). */
-    .fg-hero-atmos {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      pointer-events: none;
-      background:
-        /* viñeta suave: enmarca y da profundidad, oscurece apenas las esquinas */
-        radial-gradient(125% 95% at 50% 32%,
-          rgba(255,255,255,0) 52%,
-          rgba(18,42,74,0.30) 100%),
-        /* neblina cálida en el horizonte: casa el tono madera con el cielo */
-        linear-gradient(to top,
-          rgba(255,208,158,0.34) 0%,
-          rgba(255,214,170,0.10) 24%,
-          rgba(255,214,170,0) 46%),
-        /* velo fresco arriba: agrega densidad al cielo y evita el azul quemado */
-        linear-gradient(to bottom,
-          rgba(96,158,214,0.22) 0%,
-          rgba(96,158,214,0) 32%);
-      mix-blend-mode: soft-light;
-    }
     .fg-hero-text {
       position: absolute;
       left: 0;
@@ -567,8 +541,8 @@
       line-height: 1;
       letter-spacing: 0.2em;
       background: linear-gradient(to bottom,
-        rgba(255,255,255,0.66) 30%,
-        rgba(255,255,255,0.16) 88%);
+        rgba(255,255,255,0.48) 37.79%,
+        rgba(255,255,255,0.08) 86.925%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
