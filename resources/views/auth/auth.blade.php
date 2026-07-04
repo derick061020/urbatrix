@@ -43,14 +43,7 @@
         width: 100%; height: 100%;
         object-fit: cover; object-position: center;
       }
-      /* Decorative isotipo in the hero top-right area */
-      .auth-bg::after {
-        content:""; position:absolute; top:-10px; right:-10px;
-        width: 450px; height: 450px;
-        background: url('/images/isotipo-makai.png') no-repeat center/contain;
-        opacity: 1;
-        pointer-events:none;
-      }
+      
 
       /* ---- Floating panel ---- */
       #auth-panel {
