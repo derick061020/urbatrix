@@ -414,7 +414,7 @@
 
 {{-- Full-screen hero background --}}
 <div class="auth-bg">
-    <img src="{{ asset('images/brand/login-hero.jpg') }}" alt="{{ __('Makai Residences') }}">
+    <img src="{{ asset('images/brand/login_hero.png') }}" alt="{{ __('Makai Residences') }}">
 </div>
 
 {{-- Floating panel --}}
