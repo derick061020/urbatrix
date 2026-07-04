@@ -27,7 +27,12 @@
       "Bash(composer require *)",
       "Bash(rg -rn \"route\\('dashboard\" resources/views/layouts/)",
       "Bash(rg -rln \"dashboard.acuerdos\" resources/views/)",
-      "Bash(timeout 8 curl -sI https://repo.packagist.org)"
+      "Bash(timeout 8 curl -sI https://repo.packagist.org)",
+      "Bash(perl -pi -e ' *)",
+      "Bash(perl -pi -e 's/background:var\\\\\\(--brand\\\\\\);color:white/background:#1f2430;color:white/g' resources/views/support.blade.php)",
+      "Bash(perl -pi -e 's/color:#fff; background:#e11019; \\\\}/color:#fff; background:#1f2430; }/' resources/views/layouts/broker.blade.php)",
+      "Bash(perl -pi -e 's/background: #e11019; color: #fff;/background: #1f2430; color: #fff;/' resources/views/partials/profile-modal.blade.php)",
+      "Bash(perl -pi -e 's/style=\"background:#e11019; \\\\{\\\\{/style=\"background:#1f2430; {{/' resources/views/layouts/admin_crm.blade.php resources/views/layouts/client.blade.php)"
     ]
   }
 }

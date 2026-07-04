@@ -423,7 +423,7 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#e11019; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#1f2430; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
                 <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">

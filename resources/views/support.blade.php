@@ -214,7 +214,7 @@
                 @if($user && $user->avatar)
                   <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
                 @else
-                  <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--brand);color:white;font-family:var(--ff);font-weight:600;font-size:16px;border-radius:999px;">{{ $userInitials }}</span>
+                  <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1f2430;color:white;font-family:var(--ff);font-weight:600;font-size:16px;border-radius:999px;">{{ $userInitials }}</span>
                 @endif
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">

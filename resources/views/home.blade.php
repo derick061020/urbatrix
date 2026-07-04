@@ -1572,7 +1572,7 @@
 
         <!-- CENTER: Units sold + online users -->
         <div class="nav-center" style="display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0;">
-          <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
+          <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:#1f2430;text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
           <div class="nav-online" style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
             <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> {{ __('online_users') }}</span>
@@ -1648,7 +1648,7 @@
               @if(auth()->check() && auth()->user()->avatar)
                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="display:inline-block;width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" aria-hidden="true">
               @else
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--brand);color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1f2430;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
                   {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
                 </span>
               @endif
@@ -1663,7 +1663,7 @@
                   @if(auth()->check() && auth()->user()->avatar)
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
                   @else
-                    <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--brand);color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
+                    <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1f2430;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
                       {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
                     </span>
                   @endif
@@ -2102,7 +2102,7 @@
                 @php $priceSep = \Illuminate\Support\Str::startsWith(app()->getLocale(), 'es') ? '.' : ','; @endphp
                 <input type="text" inputmode="numeric" id="maxPrice" oninput="formatPriceInput(this)" placeholder="1{{ $priceSep }}000{{ $priceSep }}000" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
-              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:var(--brand);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
+              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:#1f2430;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
             </div>
           </div>
 

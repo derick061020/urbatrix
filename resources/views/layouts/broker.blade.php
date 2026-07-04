@@ -43,7 +43,7 @@
       .brk-input { height:36px; padding:0 14px; border:1px solid #eaecf0; border-radius:8px; font-size:13px; color:#222530; background:#fff; width:100%; outline:none; }
       .brk-input:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
       .brk-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:600; line-height:1; letter-spacing:.04em; text-transform:uppercase; }
-      .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#e11019; }
+      .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#1f2430; }
       @media (max-width:1023px){ #brk-sidebar{ display:none !important; } }
     </style>
     @stack('styles')
