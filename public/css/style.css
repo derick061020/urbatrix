@@ -541,8 +541,8 @@
       line-height: 1;
       letter-spacing: 0.2em;
       background: linear-gradient(to bottom,
-        rgba(255,255,255,0.48) 37.79%,
-        rgba(255,255,255,0.08) 86.925%);
+        rgba(255,255,255,0.68) 37.79%,
+        rgba(255,255,255,0.28) 86.925%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
