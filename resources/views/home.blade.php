@@ -5516,7 +5516,7 @@
           if (typeof filterListRows === 'function') filterListRows('');
         }
       }
-      // Recoloca la barra activa según el botón ahora seleccionado (grid/list).
+      // Recoloca la barra activa según el botón ahora seleccionado (grid/list)
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
