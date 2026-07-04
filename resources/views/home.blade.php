@@ -813,7 +813,7 @@
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
     }
-    .sh-copy-btn:hover { background:#b60d14; }
+    .sh-copy-btn:hover { background:#141821; }
     .sh-copy-btn.copied { background:#1fc16b; }
 
     .sh-divider {
