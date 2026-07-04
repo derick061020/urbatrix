@@ -73,8 +73,8 @@
     }
     .pr-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
     .pr-btn-ghost:hover { background:#f5f7fa; }
-    .pr-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; }
-    .pr-btn-primary:hover { background:#b60d14; }
+    .pr-btn-primary { background:#1f2430; color:#fff; border:1px solid #1f2430; }
+    .pr-btn-primary:hover { background:#141821; }
     .pr-avatar-sm {
         width:30px; height:30px; border-radius:999px;
         display:inline-flex; align-items:center; justify-content:center;

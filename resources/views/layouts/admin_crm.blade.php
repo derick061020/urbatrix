@@ -97,8 +97,8 @@
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
           line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s;
       }
-      .crm-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; }
-      .crm-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
+      .crm-btn-primary { background:#1f2430; color:#fff; border:1px solid #1f2430; }
+      .crm-btn-primary:hover { background:#141821; border-color:#141821; }
       .crm-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .crm-btn-ghost:hover { background:#f5f7fa; }
       .crm-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }

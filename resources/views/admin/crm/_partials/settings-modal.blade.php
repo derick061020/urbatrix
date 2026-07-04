@@ -115,8 +115,8 @@
     }
     .st-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .st-btn-ghost:hover { background:#f5f7fa; }
-    .st-btn-primary { background:#e11019; color:#fff; border-color:#e11019; }
-    .st-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
+    .st-btn-primary { background:#1f2430; color:#fff; border-color:#1f2430; }
+    .st-btn-primary:hover { background:#141821; border-color:#141821; }
     .st-btn-link { background:transparent; color:#e11019; border:none; padding:6px 8px; font-weight:600; font-size:12px; cursor:pointer; }
     .st-btn-link:hover { color:#b60d14; }
 

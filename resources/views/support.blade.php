@@ -121,8 +121,8 @@
   .ts.open{ color:var(--brand-dark); background:var(--brand-bg); } .ts.proc{ color:var(--info-ink); background:var(--info-bg); } .ts.done{ color:#15803d; background:var(--green-bg); }
   .ticket .tq{ font-size:13px; font-weight:600; color:var(--ink-strong); margin-top:7px; }
   .ticket .tm{ font-size:11px; color:var(--muted); margin-top:3px; }
-  .btn-primary{ font:inherit; font-size:13px; font-weight:700; border:0; background:var(--brand); color:#fff; border-radius:10px; padding:11px 14px; cursor:pointer; width:100%; transition:background-color .15s; }
-  .btn-primary:hover{ background:var(--brand-dark); }
+  .btn-primary{ font:inherit; font-size:13px; font-weight:700; border:0; background:#1f2430; color:#fff; border-radius:10px; padding:11px 14px; cursor:pointer; width:100%; transition:background-color .15s; }
+  .btn-primary:hover{ background:#141821; }
   .newform{ display:none; margin-top:12px; border-top:1px solid var(--line-2); padding-top:14px; }
   .newform.show{ display:block; }
   .newform label{ display:block; font-size:11.5px; font-weight:600; color:var(--muted-2); margin:0 0 5px; }

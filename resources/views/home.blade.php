@@ -1258,8 +1258,8 @@
     }
     .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .vc-btn-ghost:hover { background:#f5f7fa; }
-    .vc-btn-primary { background:#e11019; color:#fff; border-color:#e11019; }
-    .vc-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
+    .vc-btn-primary { background:#1f2430; color:#fff; border-color:#1f2430; }
+    .vc-btn-primary:hover { background:#141821; border-color:#141821; }
 
     .vc-alert {
         margin: 0 20px 12px;

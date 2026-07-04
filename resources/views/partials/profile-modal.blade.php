@@ -55,8 +55,8 @@
     .pm-btn:hover { transform: translateY(-1px); }
     .pm-btn-ghost { background: #fff; color: #344054; }
     .pm-btn-ghost:hover { background: #f4f4f5; }
-    .pm-btn-primary { background: #e11019; border-color: #e11019; color: #fff; }
-    .pm-btn-primary:hover { background: #b60d14; border-color: #b60d14; }
+    .pm-btn-primary { background: #1f2430; border-color: #1f2430; color: #fff; }
+    .pm-btn-primary:hover { background: #141821; border-color: #141821; }
     .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #e11019; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
     .pm-upload { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #e11019; cursor: pointer; }
     .pm-alert { padding: 10px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 16px; }

@@ -51,8 +51,8 @@
         transition: background-color .15s, border-color .15s, color .15s, transform .12s;
       }
       .auth-btn:active { transform: translateY(1px); }
-      .auth-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
-      .auth-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
+      .auth-btn-primary { background:#1f2430; color:#fff; border:1px solid #1f2430; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
+      .auth-btn-primary:hover { background:#141821; border-color:#141821; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#fff; color:#171717; border:1px solid #ebebeb; }
       .auth-btn-ghost:hover { background:#f8f8f8; }
