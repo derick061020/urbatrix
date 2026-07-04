@@ -61,7 +61,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 @php
                     $stats = [
-                        ['Hoy',          $viewStats['today']  ?? 0, '#5c7c68'],
+                        ['Hoy',          $viewStats['today']  ?? 0, '#e11019'],
                         ['Últimos 7d',   $viewStats['week']   ?? 0, '#335cff'],
                         ['Últimos 30d',  $viewStats['month']  ?? 0, '#fa7319'],
                         ['Total',        $viewStats['total']  ?? 0, '#717784'],

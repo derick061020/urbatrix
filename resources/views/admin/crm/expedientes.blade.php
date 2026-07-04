@@ -91,7 +91,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68']; @endphp
+                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#e11019']; @endphp
                     @forelse($reservations as $r)
                         @php
                             $init = strtoupper(substr($r->first_name ?? 'C', 0, 1) . substr($r->last_name ?? '', 0, 1));
@@ -122,7 +122,7 @@
                                 <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                                     @for ($s = 1; $s <= 5; $s++)
                                         <span class="dot-tip" tabindex="0" data-tip-label="{{ $phaseNames[$s] }}" data-tip-state="{{ $s <= $step ? 'done' : 'pending' }}">
-                                            <span class="dot" style="background: {{ $s <= $step ? '#5c7c68' : '#eaecf0' }}"></span>
+                                            <span class="dot" style="background: {{ $s <= $step ? '#e11019' : '#eaecf0' }}"></span>
                                         </span>
                                     @endfor
                                     <span class="text-[11px] text-ink-500 ml-2">{{ $stepName }}</span>

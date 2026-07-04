@@ -46,7 +46,7 @@
     .ml-ring{
       position:absolute; inset:0; margin:auto;
       width:36px; height:36px; border-radius:50%;
-      border:1.5px solid #5c7c68;
+      border:1.5px solid #e11019;
       transform:scale(.3); opacity:0;
       animation:ml-ripple 2.4s cubic-bezier(.22,.61,.36,1) infinite;
     }
@@ -55,7 +55,7 @@
     .ml-core{
       position:absolute; inset:0; margin:auto;
       width:14px; height:14px; border-radius:50%;
-      background:#5c7c68;
+      background:#e11019;
       animation:ml-pulse 2.4s ease-in-out infinite;
     }
     @keyframes ml-ripple{
@@ -78,11 +78,11 @@
     }
     .ml-bar{
       width:160px; height:3px; border-radius:99px;
-      background:rgba(92,124,104,.15); overflow:hidden;
+      background:rgba(225,16,25,.15); overflow:hidden;
     }
     .ml-bar span{
       display:block; height:100%; width:40%; border-radius:99px;
-      background:linear-gradient(90deg, transparent, #5c7c68, transparent);
+      background:linear-gradient(90deg, transparent, #e11019, transparent);
       animation:ml-slide 1.3s ease-in-out infinite;
     }
     @keyframes ml-slide{
@@ -790,7 +790,7 @@
     .sh-social-btn.tg  .sh-social-icon { background:#229ED9; color:#fff; }
     .sh-social-btn.fb  .sh-social-icon { background:#1877F2; color:#fff; }
     .sh-social-btn.tw  .sh-social-icon { background:#000;     color:#fff; }
-    .sh-social-btn.em  .sh-social-icon { background:#5c7c68;  color:#fff; }
+    .sh-social-btn.em  .sh-social-icon { background:#e11019;  color:#fff; }
     .sh-social-btn.sm  .sh-social-icon { background:#222530;  color:#fff; }
 
     .sh-url-row {
@@ -808,12 +808,12 @@
     .sh-copy-btn {
         flex-shrink:0;
         padding: 9px 16px; border-radius: 9px;
-        background:#5c7c68; color:#fff; border:none; cursor:pointer;
+        background:#e11019; color:#fff; border:none; cursor:pointer;
         font-size:13px; font-weight:600;
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
     }
-    .sh-copy-btn:hover { background:#4a6354; }
+    .sh-copy-btn:hover { background:#b60d14; }
     .sh-copy-btn.copied { background:#1fc16b; }
 
     .sh-divider {
@@ -825,14 +825,14 @@
         margin: 14px 22px 22px;
         display:flex; align-items:center; gap:12px;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #5c7c68 0%, #4a6354 100%);
+        background: linear-gradient(135deg, #e11019 0%, #b60d14 100%);
         border-radius: 14px;
         cursor:pointer; border:none; width: calc(100% - 44px); text-align:left;
         color:#fff;
         transition: transform .12s, box-shadow .15s;
-        box-shadow: 0 6px 16px -8px rgba(92,124,104,.55);
+        box-shadow: 0 6px 16px -8px rgba(225,16,25,.55);
     }
-    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(92,124,104,.65); }
+    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(225,16,25,.65); }
     .sh-download:active { transform: translateY(0); }
     .sh-download-icon {
         width:42px; height:42px; border-radius:10px;
@@ -846,8 +846,8 @@
     .sh-download-arrow { opacity:.8; }
 
     /* Smaller share tab in modal */
-    .mt-tab.mt-tab-download { color:#5c7c68;border-left: 1px solid #eaecf0;}
-    .mt-tab.mt-tab-download:hover { background:#eef2ef; }
+    .mt-tab.mt-tab-download { color:#e11019;border-left: 1px solid #eaecf0;}
+    .mt-tab.mt-tab-download:hover { background:#fdecec; }
   </style>
 
   <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Compartir propiedad') }}">
@@ -1172,8 +1172,8 @@
         font-family:inherit;
     }
     .vc-input:focus, .vc-select:focus, .vc-textarea:focus {
-        border-color:#5c7c68; background:#fff;
-        box-shadow:0 0 0 3px rgba(92,124,104,.18);
+        border-color:#e11019; background:#fff;
+        box-shadow:0 0 0 3px rgba(225,16,25,.18);
     }
     .vc-select { appearance:none; padding-right:36px;
         background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23717784' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
@@ -1209,8 +1209,8 @@
     }
     .vc-slot:hover { background:#fff; border-color:#cacfd8; color:#222530; }
     .vc-slot.active {
-        background:#5c7c68; border-color:#5c7c68; color:#fff;
-        box-shadow:0 4px 12px -4px rgba(92,124,104,.45);
+        background:#e11019; border-color:#e11019; color:#fff;
+        box-shadow:0 4px 12px -4px rgba(225,16,25,.45);
     }
     .vc-slot[disabled], .vc-slot.disabled {
         opacity:.45; cursor:not-allowed; text-decoration:line-through;
@@ -1258,8 +1258,8 @@
     }
     .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .vc-btn-ghost:hover { background:#f5f7fa; }
-    .vc-btn-primary { background:#5c7c68; color:#fff; border-color:#5c7c68; }
-    .vc-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+    .vc-btn-primary { background:#e11019; color:#fff; border-color:#e11019; }
+    .vc-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
 
     .vc-alert {
         margin: 0 20px 12px;
@@ -1398,7 +1398,7 @@
       align-items: center; justify-content: center; gap: 12px;
       width: 100%;
       padding: 26px 0 34px;
-      color: #5c7c68;
+      color: #e11019;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px; font-weight: 600; letter-spacing: .2px;
       opacity: 0;
@@ -1414,7 +1414,7 @@
     .fg-lazy-dots { display: inline-flex; gap: 6px; }
     .fg-lazy-dots span {
       width: 8px; height: 8px; border-radius: 50%;
-      background: #5c7c68;
+      background: #e11019;
       animation: fgLazyDot 1s ease-in-out infinite;
     }
     .fg-lazy-dots span:nth-child(2) { animation-delay: .15s; }
@@ -2407,7 +2407,7 @@
                           id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
                     <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
                     <span class="fg-plan-piso-caret" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5c7c68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e11019" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </span>
                   </button>
                   <ul class="fg-plan-piso-menu" id="fgFloorMenu" role="listbox" aria-label="{{ __('Floor filter') }}">
@@ -3772,7 +3772,7 @@
     }
 
     const PROJECT_BRAND_RGB = {
-      makai:  [92, 124, 104],
+      makai:  [225, 16, 25],
       naviva: [197, 191, 86],
       liv:    [85, 127, 128],
     };
@@ -4185,7 +4185,7 @@
         bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--brand, #5c7c68);
+        background: var(--brand, #e11019);
         color: white;
         padding: 12px 24px;
         border-radius: 10px;

@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
         @php $kpi = [
-            ['n' => $reservasCount,  'label' => 'Reservas',    'c' => '#5c7c68'],
+            ['n' => $reservasCount,  'label' => 'Reservas',    'c' => '#e11019'],
             ['n' => $countContratos, 'label' => 'Contratos',   'c' => '#335cff'],
             ['n' => $porFirmar,      'label' => 'Por firmar',  'c' => '#fa7319'],
             ['n' => $pagoVencido,    'label' => 'Pago vencido','c' => '#fb3748'],

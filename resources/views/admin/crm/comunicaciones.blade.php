@@ -17,9 +17,9 @@
         content:""; position:absolute; top:2px; left:2px; width:16px; height:16px;
         border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.18); transition:left .15s;
     }
-    .cc-sw[aria-checked="true"]{ background:#5c7c68; border-color:#5c7c68; }
+    .cc-sw[aria-checked="true"]{ background:#e11019; border-color:#e11019; }
     .cc-sw[aria-checked="true"]::after{ left:20px; }
-    .cc-sw[aria-checked="mixed"]{ background:#5c7c68; border-color:#5c7c68; opacity:.5; }
+    .cc-sw[aria-checked="mixed"]{ background:#e11019; border-color:#e11019; opacity:.5; }
     .cc-sw[aria-checked="mixed"]::after{ left:11px; }
     .cc-sw:disabled{ opacity:.4; cursor:not-allowed; }
     .cc-sw.fam{ --w:46px; --h:24px; }

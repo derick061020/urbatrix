@@ -1,8 +1,8 @@
 <a href="{{ url('/') }}" class="flex items-center gap-3 select-none">
     {{-- Logo mark: white rounded square with the Landmass mark --}}
-    <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm" style="background:#ffffff;border:1px solid rgba(0,0,0,0.06)">
+    <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm" style="background:#e11019">
         <span class="block w-6 h-6">
-            <img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full" />
+            <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt="" class="block w-full h-full" />
         </span>
     </span>
     <span class="flex flex-col leading-none">

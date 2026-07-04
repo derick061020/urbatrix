@@ -40,7 +40,7 @@
         padding: 0 12px; font-size: 13px; color: #171717; font-family: inherit; background: #fff;
         transition: border-color .15s, box-shadow .15s;
     }
-    .pm-input:focus { outline: none; border-color: #5c7c68; box-shadow: 0 0 0 3px rgba(92,124,104,.15); }
+    .pm-input:focus { outline: none; border-color: #e11019; box-shadow: 0 0 0 3px rgba(225,16,25,.15); }
     .pm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .pm-grid .pm-col-span-2 { grid-column: 1 / -1; }
     .pm-divider { height: 1px; background: #ececec; margin: 4px 0 18px; }
@@ -55,10 +55,10 @@
     .pm-btn:hover { transform: translateY(-1px); }
     .pm-btn-ghost { background: #fff; color: #344054; }
     .pm-btn-ghost:hover { background: #f4f4f5; }
-    .pm-btn-primary { background: #5c7c68; border-color: #5c7c68; color: #fff; }
-    .pm-btn-primary:hover { background: #4a6354; border-color: #4a6354; }
-    .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #5c7c68; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
-    .pm-upload { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #5c7c68; cursor: pointer; }
+    .pm-btn-primary { background: #e11019; border-color: #e11019; color: #fff; }
+    .pm-btn-primary:hover { background: #b60d14; border-color: #b60d14; }
+    .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #e11019; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
+    .pm-upload { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #e11019; cursor: pointer; }
     .pm-alert { padding: 10px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 16px; }
     .pm-alert-ok { background: #e8f5ee; border: 1px solid rgba(31,193,107,.3); color: #0f7a45; }
     .pm-alert-err { background: #fde8e8; border: 1px solid rgba(220,38,38,.3); color: #b42318; }

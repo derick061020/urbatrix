@@ -7,7 +7,7 @@
 <style>
     .brk-field label{ font-size:11.5px; font-weight:600; color:#525866; margin-bottom:5px; display:block; }
     .brk-field input, .brk-field select{ font-size:13.5px; color:#222530; border:1px solid #eaecf0; border-radius:8px; background:#fff; padding:9px 11px; width:100%; outline:none; }
-    .brk-field input:focus, .brk-field select:focus{ border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+    .brk-field input:focus, .brk-field select:focus{ border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
     .brk-field .req{ color:#fb3748; }
 </style>
 @endpush

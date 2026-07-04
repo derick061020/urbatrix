@@ -16,7 +16,7 @@
 
     {{-- Header --}}
     <div class="cli-card overflow-hidden">
-        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#5c7c68 0%, #3f5848 100%)">
+        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#e11019 0%, #960a10 100%)">
             <div class="absolute -top-20 -right-32 w-[440px] h-[440px] pointer-events-none opacity-25" style="background:
                 radial-gradient(circle at center, transparent 47%, rgba(255,255,255,.5) 47.5%, rgba(255,255,255,.5) 48.5%, transparent 49%),
                 radial-gradient(circle at center, transparent 35%, rgba(255,255,255,.45) 35.5%, rgba(255,255,255,.45) 36.5%, transparent 37%),

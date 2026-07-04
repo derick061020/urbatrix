@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -54,9 +54,9 @@
       .cli-nav-link.active { background:#ffffff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
       .cli-nav-link.active::after {
           content:""; position:absolute; right:0px; top:6px; bottom:6px;
-          width:3px; border-radius:3px 0 0 3px; background:#5c7c68;
+          width:3px; border-radius:3px 0 0 3px; background:#e11019;
       }
-      .cli-nav-link.active .pi { color:#5c7c68; }
+      .cli-nav-link.active .pi { color:#e11019; }
       .cli-nav-section { font-size:10px; font-weight:600; color:#99a0ae; letter-spacing:.08em; text-transform:uppercase; padding:16px 12px 6px; }
       .badge-count {
           display:inline-flex; align-items:center; justify-content:center;
@@ -75,8 +75,8 @@
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
           line-height:1; cursor:pointer; transition:background-color .15s, border-color .15s;
       }
-      .cli-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; }
-      .cli-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+      .cli-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; }
+      .cli-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
       .cli-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .cli-btn-ghost:hover { background:#f5f7fa; }
       .cli-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }
@@ -86,7 +86,7 @@
           font-size:13px; color:#222530; background:#fff;
           width:100%; outline:none; transition:border-color .15s, box-shadow .15s;
       }
-      .cli-input:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .cli-input:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
       .cli-avatar {
           width:36px; height:36px; border-radius:999px;
           display:inline-flex; align-items:center; justify-content:center;
@@ -117,7 +117,7 @@
           font-size:13px; color:#222530; background:#fff;
           width:100%; outline:none; transition:border-color .15s, box-shadow .15s;
       }
-      .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .topbar-search:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
 
       /* Search dropdown */
       .search-dropdown {
@@ -139,7 +139,7 @@
           text-decoration:none; color:#171717;
       }
       .search-dropdown__item:hover,
-      .search-dropdown__item.is-active { background:#f5f7f6; }
+      .search-dropdown__item.is-active { background:#f8f4f4; }
       .search-dropdown__icon {
           width:30px; height:30px; border-radius:8px; background:#f2f5f8;
           display:flex; align-items:center; justify-content:center;
@@ -290,7 +290,7 @@
             </a>
             <a href="{{ route('dashboard.guardados') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'guardados' ? 'active' : '' }}">
                 <i class="pi pi-heart"></i> {{ __('Guardados') }}
-                @if($savedCount > 0)<span class="badge-count" style="background:#5c7c68">{{ $savedCount }}</span>@endif
+                @if($savedCount > 0)<span class="badge-count" style="background:#e11019">{{ $savedCount }}</span>@endif
             </a>
 
             <div class="cli-nav-section">{{ __('Comunicación') }}</div>
@@ -309,7 +309,7 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#e11019; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
                 <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">

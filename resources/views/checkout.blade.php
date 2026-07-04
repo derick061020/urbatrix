@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -40,7 +40,7 @@
         background:#fff; color:#171717; font-size:14px;
         transition: border-color .15s, box-shadow .15s;
       }
-      .auth-input:focus { outline:none; border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.15); }
+      .auth-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .auth-input.is-invalid { border-color:#fb3748 !important; box-shadow:0 0 0 3px rgba(251,55,72,.14) !important; }
       .auth-select { appearance:none; padding-right:36px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position: right 12px center; }
@@ -51,7 +51,7 @@
         border:1px solid #ebebeb; border-radius:10px;
         background:#fff; transition: border-color .15s, box-shadow .15s;
       }
-      .stripe-field.StripeElement--focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.15); }
+      .stripe-field.StripeElement--focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
       .stripe-field.StripeElement--invalid { border-color:#fb3748; box-shadow:0 0 0 3px rgba(251,55,72,.14); }
 
       .auth-btn {
@@ -61,8 +61,8 @@
         transition: background-color .15s, border-color .15s, color .15s, transform .12s;
       }
       .auth-btn:active { transform: translateY(1px); }
-      .auth-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
-      .auth-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+      .auth-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
+      .auth-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#fff; color:#171717; border:1px solid #ebebeb; }
       .auth-btn-ghost:hover { background:#f8f8f8; }
@@ -91,11 +91,11 @@
           background:#fff; cursor:pointer; transition: border-color .15s, background-color .15s;
       }
       .pay-card:hover { background:#f8f8f8; }
-      .pay-card.selected { border-color:#5c7c68; background:#fff; box-shadow:0 0 0 1px #5c7c68; }
+      .pay-card.selected { border-color:#e11019; background:#fff; box-shadow:0 0 0 1px #e11019; }
 
       .check-circle {
           width:64px; height:64px; border-radius:999px;
-          background:#5c7c68; color:#fff;
+          background:#e11019; color:#fff;
           display:flex; align-items:center; justify-content:center;
           margin: 0 auto 18px;
           position: relative;
@@ -111,7 +111,7 @@
 
       .check-circle::after {
           content:""; position:absolute; inset:-6px; border-radius:999px;
-          border:3px solid #5c7c68; opacity:0;
+          border:3px solid #e11019; opacity:0;
       }
       #success-view:not(.hidden) .check-circle::after { animation: ring-pulse .9s ease-out .35s 2; }
 
@@ -361,7 +361,7 @@
 
     function celebrate() {
         if (typeof confetti !== 'function') return;
-        const brand = ['#5c7c68', '#4a6354', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
+        const brand = ['#e11019', '#b60d14', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
 
         // Big opening burst
         confetti({ particleCount: 160, spread: 90, origin: { y: 0.55 }, colors: brand, scalar: 1.1, zIndex: 9999 });

@@ -6,7 +6,7 @@
 
 @section('content')
 @php
-    $color      = $proyecto->color ?? '#5c7c68';
+    $color      = $proyecto->color ?? '#e11019';
     $totalUnits = (int) $proyecto->units_count;
     $sold       = (int) $proyecto->sold_count;
     $reserved   = (int) $proyecto->reserved_count;
@@ -150,7 +150,7 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $invKpis = [
             ['Ventas cerradas',  '$'.number_format($vendidoSoloUSD / 1_000_000, 2).'M',  $sold.' unidades · prom. $'.number_format($avgPrice), '#fa7319'],
-            ['ROI total anual est.', number_format($avgRoi, 1).'%',                       round($avgRoi - 5, 1).'% renta neta + 5% apreciación', '#5c7c68'],
+            ['ROI total anual est.', number_format($avgRoi, 1).'%',                       round($avgRoi - 5, 1).'% renta neta + 5% apreciación', '#e11019'],
             ['Renta mensual neta',  '$'.number_format($avgRentNet),                       'Tras 22% gestión · 72% ocup. estimada',                '#335cff'],
             ['Payback period',   '~'.($payback ?: '10.0').'a',                            'Retorno completo de capital invertido',               '#717784'],
         ]; @endphp

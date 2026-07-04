@@ -22,9 +22,9 @@
     .esc-age.ok   { color:#717784; background:#f2f5f8; }
     .esc-item:hover { background:#fafbfc; }
     .esc-tab { font-size:11.5px; font-weight:600; color:#525866; background:none; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; }
-    .esc-tab.on { background:#eef2ef; color:#4a6354; }
+    .esc-tab.on { background:#fdecec; color:#b60d14; }
     .esc-tab .n { color:#99a0ae; }
-    .esc-tab.on .n { color:#4a6354; }
+    .esc-tab.on .n { color:#b60d14; }
 
     .esc-batch { display:none; }
     .esc-batch.show { display:flex; }
@@ -60,7 +60,7 @@
         'documento' => 'background:#eef3fb;color:#3b6fb5;',
         'contrato'  => 'background:#e3f7ec;color:#1daf61;',
         'broker'    => 'background:#fcf1e6;color:#d98a3b;',
-        'tarea'     => 'background:#eef2ef;color:#4a6354;',
+        'tarea'     => 'background:#fdecec;color:#b60d14;',
         'noadv'     => 'background:#ffebec;color:#fb3748;',
     ];
     $pillShort = ['kyc' => 'KYC', 'documento' => __('Doc.'), 'contrato' => __('Contrato'), 'broker' => 'Broker', 'tarea' => __('Tarea'), 'noadv' => 'S/Asesor'];

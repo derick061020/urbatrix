@@ -96,7 +96,7 @@
 
     {{-- Hero card with property summary --}}
     <div class="cli-card overflow-hidden relative">
-        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#5c7c68 0%, #3f5848 100%)">
+        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#e11019 0%, #960a10 100%)">
             {{-- Decorative Landmass isotipo top-right (matches login) --}}
             <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt=""
                  class="absolute -top-16 -right-24 w-[360px] h-[360px] pointer-events-none opacity-20 select-none" />
@@ -217,7 +217,7 @@
             {{-- Asesor card --}}
             <div class="cli-card p-4">
                 <div class="flex items-center gap-3">
-                    <div class="cli-avatar" style="background:#5c7c68">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
+                    <div class="cli-avatar" style="background:#e11019">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? 'Carlos Méndez' }}</div>
                         <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> {{ __('Disponible ahora') }}</div>

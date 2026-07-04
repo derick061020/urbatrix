@@ -382,7 +382,7 @@
     }
     .rcs-canvas-wrap { position:relative; }
     .rcs-canvas-wrap.has-stroke .rcs-empty-canvas { display:none; }
-    .rcs-canvas-wrap.has-stroke #receipt-sig-canvas { border-style:solid; border-color:#5c7c68; }
+    .rcs-canvas-wrap.has-stroke #receipt-sig-canvas { border-style:solid; border-color:#e11019; }
     .rcs-empty-canvas {
         position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
         color:#a3a3a3; font-size:11px; pointer-events:none; font-style:italic;

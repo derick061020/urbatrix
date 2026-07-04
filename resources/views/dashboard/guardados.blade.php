@@ -8,8 +8,8 @@
 <style>
     /* === Saved-units page — same card as home (fg-card) === */
     .sv-scope {
-        --brand: #5c7c68;
-        --brand-soft: rgba(92, 124, 104, 0.10);
+        --brand: #e11019;
+        --brand-soft: rgba(225, 16, 25, 0.10);
     }
 
     /* Header summary block */
@@ -44,7 +44,7 @@
     .sv-empty-cta {
         display:inline-flex; align-items:center; gap:6px;
         margin-top:16px; padding:0 18px; height:38px;
-        background:#5c7c68; color:#fff; border:1px solid #5c7c68; border-radius:10px;
+        background:#e11019; color:#fff; border:1px solid #e11019; border-radius:10px;
         font-family:'Poppins', sans-serif; font-weight:600; font-size:12px;
         text-decoration:none; cursor:pointer;
     }
@@ -71,8 +71,8 @@
 
     .sv-scope .fg-card {
         --status-color: var(--brand);
-        --status-soft: rgba(92, 124, 104, 0.10);
-        --status-bg-faint: rgba(92, 124, 104, 0.04);
+        --status-soft: rgba(225, 16, 25, 0.10);
+        --status-bg-faint: rgba(225, 16, 25, 0.04);
         position: relative;
         display: flex;
         flex-direction: column;

@@ -146,9 +146,9 @@
                         <!-- Logo Section -->
                         <div id="logo-section" class="pt-3 px-4 transition-all duration-300 ease-in-out">
                             <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10">
-                                <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#ffffff;border:1px solid rgba(0,0,0,0.08)">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#e11019">
                                     <span class="block w-6 h-6">
-                                        <img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full">
+                                        <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt="" class="block w-full h-full">
                                     </span>
                                 </span>
                                 <div class="flex-1 min-w-0 leading-none">

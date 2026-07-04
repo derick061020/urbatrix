@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -60,9 +60,9 @@
       .crm-nav-link.active { background:#ffffff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
       .crm-nav-link.active::after {
           content:""; position:absolute; right:0px; top:6px; bottom:6px;
-          width:3px; border-radius:3px 0 0 3px; background:#5c7c68;
+          width:3px; border-radius:3px 0 0 3px; background:#e11019;
       }
-      .crm-nav-link.active .pi { color:#5c7c68; }
+      .crm-nav-link.active .pi { color:#e11019; }
       .crm-nav-section {
           font-size: 10px; font-weight: 600; color:#99a0ae;
           letter-spacing: .08em; text-transform: uppercase;
@@ -85,20 +85,20 @@
           color:#525866; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab.active { background:#5c7c68; color:#fff; }
+      .crm-tab.active { background:#e11019; color:#fff; }
       .crm-tab-line {
           padding: 14px 4px; font-size:14px; font-weight:500; color:#717784;
           border-bottom:2px solid transparent; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab-line.active { color:#222530; border-color:#5c7c68; font-weight:600; }
+      .crm-tab-line.active { color:#222530; border-color:#e11019; font-weight:600; }
       .crm-btn {
           display:inline-flex; align-items:center; gap:6px;
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
           line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s;
       }
-      .crm-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; }
-      .crm-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+      .crm-btn-primary { background:#e11019; color:#fff; border:1px solid #e11019; }
+      .crm-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
       .crm-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .crm-btn-ghost:hover { background:#f5f7fa; }
       .crm-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }
@@ -124,7 +124,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .crm-input:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .crm-input:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
       .crm-avatar {
           width:36px; height:36px; border-radius:999px;
           display:inline-flex; align-items:center; justify-content:center;
@@ -171,7 +171,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .topbar-search:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
 
       /* Search dropdown */
       .search-dropdown {
@@ -193,7 +193,7 @@
           text-decoration:none; color:#171717;
       }
       .search-dropdown__item:hover,
-      .search-dropdown__item.is-active { background:#f5f7f6; }
+      .search-dropdown__item.is-active { background:#f8f4f4; }
       .search-dropdown__icon {
           width:30px; height:30px; border-radius:8px; background:#f2f5f8;
           display:flex; align-items:center; justify-content:center;
@@ -270,7 +270,7 @@
           cursor: pointer; transition: border-color .15s, box-shadow .15s;
       }
       .crm-select__btn:hover { border-color: #cacfd8; }
-      .crm-select.is-open .crm-select__btn { border-color: #5c7c68; box-shadow: 0 0 0 3px rgba(92,124,104,.18); }
+      .crm-select.is-open .crm-select__btn { border-color: #e11019; box-shadow: 0 0 0 3px rgba(225,16,25,.18); }
       .crm-select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .crm-select__label.is-placeholder { color: #9aa1ad; }
       .crm-select__caret { font-size: 11px; color: #717784; flex-shrink: 0; transition: transform .15s; }
@@ -287,8 +287,8 @@
           padding: 8px 10px; border-radius: 7px; font-size: 13px; color: #222530;
           background: transparent; text-align: left; cursor: pointer; transition: background-color .12s;
       }
-      .crm-select__opt:hover, .crm-select__opt.is-highlight { background: #f5f7f6; }
-      .crm-select__check { font-size: 11px; color: #5c7c68; opacity: 0; flex-shrink: 0; }
+      .crm-select__opt:hover, .crm-select__opt.is-highlight { background: #f8f4f4; }
+      .crm-select__check { font-size: 11px; color: #e11019; opacity: 0; flex-shrink: 0; }
       .crm-select__opt.is-active .crm-select__check { opacity: 1; }
       .crm-select__opt.is-active { font-weight: 600; }
     </style>
@@ -423,7 +423,7 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#e11019; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
                 <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">

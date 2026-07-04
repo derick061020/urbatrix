@@ -72,14 +72,14 @@
         text-align: left; transition: background .15s, color .15s;
         position: relative;
     }
-    .st-nav-item:hover { background: rgba(92,124,104,.06); color: #222530; }
+    .st-nav-item:hover { background: rgba(225,16,25,.06); color: #222530; }
     .st-nav-item .pi { font-size: 14px; color: #717784; }
     .st-nav-item.active {
         background: #fff; color: #222530; font-weight: 600;
         box-shadow: 0 1px 2px rgba(10,13,20,.05);
         border: 1px solid #eaecf0;
     }
-    .st-nav-item.active .pi { color: #5c7c68; }
+    .st-nav-item.active .pi { color: #e11019; }
     .st-nav-item .chev {
         margin-left: auto; opacity: 0; transition: opacity .15s;
         font-size: 11px;
@@ -115,10 +115,10 @@
     }
     .st-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .st-btn-ghost:hover { background:#f5f7fa; }
-    .st-btn-primary { background:#5c7c68; color:#fff; border-color:#5c7c68; }
-    .st-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
-    .st-btn-link { background:transparent; color:#5c7c68; border:none; padding:6px 8px; font-weight:600; font-size:12px; cursor:pointer; }
-    .st-btn-link:hover { color:#4a6354; }
+    .st-btn-primary { background:#e11019; color:#fff; border-color:#e11019; }
+    .st-btn-primary:hover { background:#b60d14; border-color:#b60d14; }
+    .st-btn-link { background:transparent; color:#e11019; border:none; padding:6px 8px; font-weight:600; font-size:12px; cursor:pointer; }
+    .st-btn-link:hover { color:#b60d14; }
 
     .st-tabs {
         margin: 14px 28px 0;
@@ -132,7 +132,7 @@
         transition: color .15s, border-color .15s;
     }
     .st-tab:hover { color: #222530; }
-    .st-tab.active { color: #222530; font-weight: 600; border-color: #5c7c68; }
+    .st-tab.active { color: #222530; font-weight: 600; border-color: #e11019; }
 
     .st-body { padding: 8px 28px 24px; overflow-y: auto; flex: 1; }
     .st-pane { display: none; }
@@ -165,8 +165,8 @@
     .st-edit-wrap {
         display: none; align-items: center; gap: 8px;
         width: 100%; max-width: 360px;
-        background:#fff; border:1px solid #5c7c68;
-        box-shadow: 0 0 0 3px rgba(92,124,104,.18);
+        background:#fff; border:1px solid #e11019;
+        box-shadow: 0 0 0 3px rgba(225,16,25,.18);
         border-radius: 8px; padding: 4px 4px 4px 12px;
     }
     .st-edit-wrap.open { display: flex; }
@@ -180,7 +180,7 @@
     .st-avatar-row { display: flex; align-items: center; gap: 14px; justify-content: flex-end; }
     .st-avatar {
         width: 56px; height: 56px; border-radius: 999px;
-        background: #5c7c68; color: #fff;
+        background: #e11019; color: #fff;
         display: inline-flex; align-items: center; justify-content: center;
         font-weight: 700; font-size: 18px;
         background-size: cover; background-position: center;
@@ -207,7 +207,7 @@
         width: 18px; height: 18px; border-radius: 999px;
         background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.18);
     }
-    .st-toggle.on { background: #5c7c68; }
+    .st-toggle.on { background: #e11019; }
     .st-toggle.on::after { left: 18px; }
 
     .st-row.compact { padding: 14px 0; align-items: center; }
@@ -435,7 +435,7 @@
                                 <div class="st-edit-wrap">
                                     <input type="text" name="name" value="{{ $sName }}" placeholder="{{ __('Tu nombre completo') }}" data-st-input>
                                     <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#e11019;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -454,7 +454,7 @@
                                 <div class="st-edit-wrap">
                                     <input type="email" name="email" value="{{ $sEmail }}" placeholder="tu@correo.com" data-st-input>
                                     <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#e11019;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -473,7 +473,7 @@
                                 <div class="st-edit-wrap open">
                                     <input type="tel" name="phone" value="{{ $sPhone ?: '+1 (123) 456-6789' }}" placeholder="+57 300 000 0000" data-st-input>
                                     <button type="button" class="st-btn-link" onclick="stCancelEdit(this)">{{ __('Cancelar') }}</button>
-                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#5c7c68;">{{ __('Guardar') }}</button>
+                                    <button type="button" class="st-btn-link" onclick="stConfirmEdit(this)" style="color:#e11019;">{{ __('Guardar') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -860,7 +860,7 @@
     }
     .cm-select-opt svg { color: #707a8a; flex-shrink: 0; }
     .cm-select-opt:hover { background: #f4f5f7; color: #222530; }
-    .cm-select-opt.active { background: #eef2ef; color: #222530; }
+    .cm-select-opt.active { background: #fdecec; color: #222530; }
     .cm-select-opt.active svg { color: #3f6a52; }
 </style>
 

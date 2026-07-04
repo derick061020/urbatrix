@@ -133,7 +133,7 @@
     }
     .acm-canvas-wrap { position:relative; }
     .acm-canvas-wrap.has-stroke .acm-empty-canvas { display:none; }
-    .acm-canvas-wrap.has-stroke #acm-sig-canvas { border-style:solid; border-color:#5c7c68; }
+    .acm-canvas-wrap.has-stroke #acm-sig-canvas { border-style:solid; border-color:#e11019; }
     .acm-empty-canvas {
         position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
         color:#a3a3a3; font-size:11px; pointer-events:none; font-style:italic;
@@ -151,7 +151,7 @@
 
     .acm-bubble { max-width:90%; padding:9px 12px; border-radius:14px; font-size:12px; line-height:1.45; }
     .acm-bubble .meta { font-size:10px; text-transform:uppercase; letter-spacing:.04em; opacity:.7; margin-bottom:4px; display:flex; align-items:center; gap:4px; }
-    .acm-bubble-client { background:#5c7c68; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+    .acm-bubble-client { background:#e11019; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
     .acm-bubble-admin  { background:#fff; color:#222530; border:1px solid #eaecf0; align-self:flex-start; border-bottom-left-radius:4px; }
     .acm-bubble-accept { background:#e3f7ec; border:1px solid rgba(31,193,107,.3); color:#1daf61; align-self:flex-end; border-bottom-right-radius:4px; }
 

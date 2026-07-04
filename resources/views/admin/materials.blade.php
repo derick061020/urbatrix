@@ -14,7 +14,7 @@
         outline:none; transition:border-color .15s, box-shadow .15s;
     }
     .mat-field::placeholder { color:#9aa1ad; }
-    .mat-field:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+    .mat-field:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
     textarea.mat-field { height:auto; min-height:64px; padding:10px 12px; resize:vertical; line-height:1.5; }
     .mat-label { display:block; font-size:12px; font-weight:600; color:#3a4150; margin-bottom:6px; }
     /* Dropzone de archivo */
@@ -23,7 +23,7 @@
         border:1.5px dashed #d6dae1; border-radius:10px; padding:14px 16px;
         background:#fafbfc; cursor:pointer; transition:border-color .15s, background-color .15s;
     }
-    .mat-drop:hover { border-color:#5c7c68; background:#f5f8f6; }
+    .mat-drop:hover { border-color:#e11019; background:#f5f8f6; }
     .mat-drop input[type=file] { display:none; }
     /* Selector de icono */
     .mat-icons { display:grid; grid-template-columns:repeat(8, 1fr); gap:6px; }
@@ -32,8 +32,8 @@
         border:1px solid #eaecf0; border-radius:8px; background:#fff; color:#3a4150;
         font-size:15px; cursor:pointer; transition:border-color .15s, background-color .15s, color .15s;
     }
-    .mat-icon-btn:hover { border-color:#5c7c68; background:#f5f8f6; }
-    .mat-icon-btn.is-active { border-color:#5c7c68; background:#5c7c68; color:#fff; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+    .mat-icon-btn:hover { border-color:#e11019; background:#f5f8f6; }
+    .mat-icon-btn.is-active { border-color:#e11019; background:#e11019; color:#fff; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
 </style>
 @endpush
 

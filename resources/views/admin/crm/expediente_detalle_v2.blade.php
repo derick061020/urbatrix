@@ -558,7 +558,7 @@
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-[#f2f5f8] flex items-center gap-2 justify-end bg-[#f5f7fa]">
-                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#5c7c68] border border-[#5c7c68] hover:bg-[#4a6354] hover:border-[#4a6354] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#e11019] border border-[#e11019] hover:bg-[#b60d14] hover:border-[#b60d14] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
                 <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">{{ __('Cerrar') }}</button>
             </div>
         </div>
