@@ -5515,7 +5515,7 @@
           listInput.value = '';
           if (typeof filterListRows === 'function') filterListRows('');
         }
-      }
+      }//hoa
       // Recoloca la barra activa según el botón ahora seleccionado (grid/list)
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
