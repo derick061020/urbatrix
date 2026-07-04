@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-    <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -54,11 +54,11 @@
     {{-- SIDEBAR --}}
     <aside id="brk-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         <div class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5">
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#5c7c68">
-                <span class="block w-6 h-6"><img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full"></span>
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#ffffff;border:1px solid rgba(0,0,0,0.06)">
+                <span class="block w-6 h-6"><img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full"></span>
             </span>
             <div class="flex-1 min-w-0 leading-none">
-                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
+                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">LANDMASS</div>
                 <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Portal Broker') }}</div>
             </div>
         </div>

@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
+<link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
 <style>
   :root{
     --bg:#f4f6f4; --card:#ffffff; --ink:#171717; --ink-strong:#222530;
@@ -181,7 +181,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </a>
       <a href="/" style="display:flex;align-items:center;text-decoration:none;flex:none;">
-        <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="logo-img">
+        <img src="/images/makai-logo.png" alt="Landmass" class="logo-img">
       </a>
       <span class="crumb"><b>{{ __('Soporte') }}</b></span>
       <div class="tright">

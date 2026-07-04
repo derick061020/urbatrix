@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=23">
 </head>
@@ -25,7 +25,7 @@
         <span class="ml-ring"></span>
         <span class="ml-core"></span>
       </div>
-      <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="ml-logo">
+      <img src="/images/makai-logo.png" alt="Landmass" class="ml-logo">
       <div class="ml-bar"><span></span></div>
     </div>
   </div>
@@ -166,7 +166,7 @@
       <!-- HEADER -->
       <div class="mt-header">
         <div class="mt-header-left">
-          <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="mt-header-logo">
+          <img src="/images/makai-logo.png" alt="Landmass" class="mt-header-logo">
           <span class="mt-header-dot"></span>
           <span class="mt-header-unit">{{ __('Unit') }} <span id="modalUnitNum">A-101</span></span>
           <span id="modalStatusBadge" class="mt-badge-available">

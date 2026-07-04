@@ -97,8 +97,8 @@
     {{-- Hero card with property summary --}}
     <div class="cli-card overflow-hidden relative">
         <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#5c7c68 0%, #3f5848 100%)">
-            {{-- Decorative Makai isotipo top-right (matches login) --}}
-            <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt=""
+            {{-- Decorative Landmass isotipo top-right (matches login) --}}
+            <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt=""
                  class="absolute -top-16 -right-24 w-[360px] h-[360px] pointer-events-none opacity-20 select-none" />
 
             <div class="relative z-10">

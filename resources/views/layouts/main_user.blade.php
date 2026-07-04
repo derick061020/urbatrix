@@ -5,7 +5,7 @@
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <title>{{ __('Sidebar Navigation') }}</title>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
-        <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
+        <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
         <link
             crossorigin=""
             href="https://fonts.gstatic.com"
@@ -146,13 +146,13 @@
                         <!-- Logo Section -->
                         <div id="logo-section" class="pt-3 px-4 transition-all duration-300 ease-in-out">
                             <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10">
-                                <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#5c7c68">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#ffffff;border:1px solid rgba(0,0,0,0.08)">
                                     <span class="block w-6 h-6">
-                                        <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full">
+                                        <img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full">
                                     </span>
                                 </span>
                                 <div class="flex-1 min-w-0 leading-none">
-                                    <div class="text-[14px] font-bold text-white tracking-tight">MAKAI</div>
+                                    <div class="text-[14px] font-bold text-white tracking-tight">LANDMASS</div>
                                     <div class="text-[9px] font-semibold text-white/70 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
                                 </div>
                             </div>
