@@ -981,8 +981,8 @@
     .fg-toggle-bg-active {
       position: absolute;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%),
-        var(--brand, rgb(225, 16, 25));
+        linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
+        #1f2430;
       height: 44px;
       left: 0;
       top: 0;
