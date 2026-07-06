@@ -6,7 +6,33 @@
 
 @section('content')
 @php
-    $units = \App\Models\Unit::with('agent')->orderBy('custom_id')->orderBy('id')->paginate(50);
+    // Filtros por estado (pestañas) y búsqueda de texto. Se resuelven del lado del
+    // servidor para que funcionen junto con la paginación.
+    $statusFilters = [
+        'available' => ['AVAILABLE','available'],
+        'reserved'  => ['RESERVED','reserved'],
+        'sold'      => ['SOLD','sold'],
+    ];
+    $activeStatus = request('status');
+    if (!array_key_exists($activeStatus, $statusFilters)) $activeStatus = '';
+    $search = trim((string) request('q'));
+
+    $unitsQuery = \App\Models\Unit::with('agent')
+        ->when($activeStatus, fn ($q) => $q->whereIn('status', $statusFilters[$activeStatus]))
+        ->when($search !== '', function ($q) use ($search) {
+            $like = '%'.$search.'%';
+            $q->where(function ($sub) use ($like) {
+                $sub->where('custom_id', 'like', $like)
+                    ->orWhere('name', 'like', $like)
+                    ->orWhere('type', 'like', $like)
+                    ->orWhere('layout', 'like', $like)
+                    ->orWhere('first_name', 'like', $like)
+                    ->orWhere('last_name', 'like', $like);
+            });
+        })
+        ->orderBy('custom_id')->orderBy('id');
+
+    $units = $unitsQuery->paginate(50)->withQueryString();
     $countAvailable = \App\Models\Unit::whereIn('status', ['AVAILABLE','available'])->count();
     $countReserved  = \App\Models\Unit::whereIn('status', ['RESERVED','reserved'])->count();
     $countSold      = \App\Models\Unit::whereIn('status', ['SOLD','sold'])->count();
@@ -63,18 +89,26 @@
     <div class="crm-card">
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-                @foreach (['Todos','Disponibles','Reservados','Vendidas'] as $i => $tab)
-                    <button class="crm-tab {{ $i === 0 ? 'active' : '' }}">{{ $tab }}</button>
+                @php
+                    $unitTabs = ['' => 'Todos', 'available' => 'Disponibles', 'reserved' => 'Reservados', 'sold' => 'Vendidas'];
+                @endphp
+                @foreach ($unitTabs as $tabKey => $tabLabel)
+                    <a href="{{ request()->fullUrlWithQuery(['status' => $tabKey ?: null, 'page' => null]) }}"
+                       class="crm-tab {{ $activeStatus === $tabKey ? 'active' : '' }}">{{ __($tabLabel) }}</a>
                 @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+            <form method="GET" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+                @if($activeStatus)<input type="hidden" name="status" value="{{ $activeStatus }}">@endif
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pr-3">
+                    <input type="text" name="q" value="{{ $search }}" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
+                @if($search !== '' || $activeStatus)
+                    <a href="{{ url()->current() }}" class="crm-btn crm-btn-ghost" title="{{ __('Limpiar filtros') }}"><i class="pi pi-times"></i></a>
+                @endif
                 <button type="button" id="units-bulk-delete" class="crm-btn crm-btn-ghost text-err disabled:opacity-40 disabled:cursor-not-allowed" disabled><i class="pi pi-trash"></i> {{ __('Eliminar') }} (<span id="units-selected-count">0</span>)</button>
-            </div>
+            </form>
         </div>
 
         <div class="overflow-x-auto">
