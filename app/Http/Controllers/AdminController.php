@@ -617,13 +617,16 @@ class AdminController extends Controller
     {
         $request->validate([
             'images' => 'required|array|max:10',
-            'images.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:5120'
+            'images.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:5120',
+            'category' => 'nullable|in:property,amenities',
         ]);
+
+        $category = $request->input('category', 'property');
 
         $uploadedImages = [];
 
-        DB::transaction(function () use ($request, $unit, &$uploadedImages) {
-            $maxSortOrder = $unit->images()->max('sort_order') ?? 0;
+        DB::transaction(function () use ($request, $unit, $category, &$uploadedImages) {
+            $maxSortOrder = $unit->images()->where('category', $category)->max('sort_order') ?? 0;
 
             foreach ($request->file('images') as $index => $image) {
                 if ($image->isValid()) {
@@ -632,6 +635,7 @@ class AdminController extends Controller
 
                     $unitImage = UnitImage::create([
                         'unit_id' => $unit->id,
+                        'category' => $category,
                         'name' => $image->getClientOriginalName(),
                         'path' => '/storage/' . $path,
                         'sort_order' => $maxSortOrder + $index + 1
@@ -639,6 +643,7 @@ class AdminController extends Controller
 
                     $uploadedImages[] = [
                         'id' => $unitImage->id,
+                        'category' => $unitImage->category,
                         'name' => $unitImage->name,
                         'path' => $unitImage->path,
                         'sort_order' => $unitImage->sort_order

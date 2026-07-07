@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UnitImage extends Model
 {
-    protected $fillable = ['unit_id', 'name', 'path', 'sort_order'];
+    protected $fillable = ['unit_id', 'category', 'name', 'path', 'sort_order'];
 
     public function unit()
     {

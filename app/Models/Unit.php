@@ -231,6 +231,16 @@ class Unit extends Model
         return $this->hasMany(UnitImage::class)->orderBy('sort_order');
     }
 
+    public function propertyImages()
+    {
+        return $this->hasMany(UnitImage::class)->where('category', 'property')->orderBy('sort_order');
+    }
+
+    public function amenityImages()
+    {
+        return $this->hasMany(UnitImage::class)->where('category', 'amenities')->orderBy('sort_order');
+    }
+
     public function histories()
     {
         return $this->hasMany(UnitHistory::class)->orderByDesc('datetime');
