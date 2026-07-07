@@ -617,13 +617,16 @@ class AdminController extends Controller
     {
         $request->validate([
             'images' => 'required|array|max:10',
-            'images.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:5120'
+            'images.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:5120',
+            'category' => 'nullable|in:property,amenities',
         ]);
+
+        $category = $request->input('category', 'property');
 
         $uploadedImages = [];
 
-        DB::transaction(function () use ($request, $unit, &$uploadedImages) {
-            $maxSortOrder = $unit->images()->max('sort_order') ?? 0;
+        DB::transaction(function () use ($request, $unit, $category, &$uploadedImages) {
+            $maxSortOrder = $unit->images()->where('category', $category)->max('sort_order') ?? 0;
 
             foreach ($request->file('images') as $index => $image) {
                 if ($image->isValid()) {
@@ -632,6 +635,7 @@ class AdminController extends Controller
 
                     $unitImage = UnitImage::create([
                         'unit_id' => $unit->id,
+                        'category' => $category,
                         'name' => $image->getClientOriginalName(),
                         'path' => '/storage/' . $path,
                         'sort_order' => $maxSortOrder + $index + 1
@@ -639,6 +643,7 @@ class AdminController extends Controller
 
                     $uploadedImages[] = [
                         'id' => $unitImage->id,
+                        'category' => $unitImage->category,
                         'name' => $unitImage->name,
                         'path' => $unitImage->path,
                         'sort_order' => $unitImage->sort_order
@@ -2990,24 +2995,112 @@ class AdminController extends Controller
             'reservation_id' => 'required|exists:reservations,id',
             'document_type'  => 'required|string',
             'title'          => 'required|string|max:255',
-            'file'           => 'required|file|max:4096|mimes:pdf,jpg,jpeg,png',
+            // El archivo puede llegar ya subido por chunks (file_path + file_name)
+            // o, como respaldo, como archivo directo en el formulario.
+            'file'           => 'nullable|file|max:4096|mimes:pdf,jpg,jpeg,png',
+            'file_path'      => 'nullable|string|max:255',
+            'file_name'      => 'nullable|string|max:255',
             'status'         => 'nullable|string',
             'generated_at'   => 'nullable|date',
         ]);
 
-        $path = $request->file('file')->store('documents', 'public');
+        $path     = $data['file_path'] ?? null;
+        $filename = $data['file_name'] ?? null;
+        if (! $path && $request->hasFile('file')) {
+            $path     = $request->file('file')->store('documents', 'public');
+            $filename = $request->file('file')->getClientOriginalName();
+        }
+
+        if (! $path) {
+            return back()->with('error', 'Debes seleccionar un archivo.');
+        }
 
         Document::create([
             'reservation_id' => $data['reservation_id'],
             'document_type'  => $data['document_type'],
             'title'          => $data['title'],
-            'filename'       => $request->file('file')->getClientOriginalName(),
+            'filename'       => $filename ?: basename($path),
             'file_path'      => $path,
             'status'         => $data['status'] ?? 'pending',
             'generated_at'   => $data['generated_at'] ?? now(),
         ]);
 
         return back()->with('success', 'Documento subido correctamente.');
+    }
+
+    /**
+     * Recibe un documento de expediente en trozos (chunks) para evitar el límite
+     * de post_max_size / 413 en archivos grandes. Anexa cada chunk a un temporal
+     * y, en el último, lo mueve al disco público devolviendo la ruta final.
+     * Espejo de uploadReceiptChunk(), pero guardando en 'documents/'.
+     */
+    public function uploadDocumentChunk(Request $request)
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:1000'],
+            'name'      => ['required', 'string', 'max:255'],
+        ]);
+
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+        }
+
+        $tmpDir = storage_path('app/tmp-documents');
+        if (! is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return response()->json(['success' => false, 'message' => 'No se pudo procesar el archivo.'], 500);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope de 50 MB acumulado.
+        if (filesize($tmpPath) > 52428800) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'El archivo supera los 50 MB.'], 422);
+        }
+
+        // Chunks intermedios: confirmar y esperar el siguiente.
+        if ($index + 1 < $total) {
+            return response()->json(['success' => true, 'done' => false]);
+        }
+
+        // Último chunk: validar extensión y mover al disco público.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+        if (! in_array($ext, $allowed, true)) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'Formato de archivo no permitido.'], 422);
+        }
+
+        $finalRel = 'documents/' . $uploadId . '.' . $ext;
+        $stream   = fopen($tmpPath, 'rb');
+        \Illuminate\Support\Facades\Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'path'    => $finalRel,
+            'name'    => $request->input('name'),
+        ]);
     }
 
     /**

@@ -330,6 +330,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // CRM acciones desde modales
     Route::post('/crm/reservation/create', [AdminController::class, 'createReservationQuick'])->name('admin.crm.reservation.create');
     Route::post('/crm/document/upload',    [AdminController::class, 'uploadDocumentQuick'])->name('admin.crm.document.upload');
+    // Subida por chunks del documento (evita el 413 en archivos grandes)
+    Route::post('/crm/document/upload-chunk', [AdminController::class, 'uploadDocumentChunk'])->name('admin.crm.document.upload-chunk');
     // Admin requests a document from the client + removes a request/document
     Route::post('/crm/expedientes/{reservation}/document/request', [AdminController::class, 'requestDocument'])->name('admin.crm.document.request');
     Route::post('/crm/document/{document}/delete', [AdminController::class, 'deleteDocumentQuick'])->name('admin.crm.document.delete');
