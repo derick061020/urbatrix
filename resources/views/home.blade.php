@@ -1475,6 +1475,69 @@
       body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{ font-size:23px; }
     }
 
+    /* =====================================================================
+       MASTERPLAN de lotes  ·  reemplaza el plano con pines en la vista "plan".
+       Estética alineada al sitio (tarjeta blanca) + acentos verde/crema de las
+       bandas del grid. Sólo afecta a la vista plan.
+       ===================================================================== */
+    body[data-view="plan"] #fgPlanWrap{ padding: 8px 24px 72px; }
+    body[data-view="plan"] .fg-plan-board{
+      padding:0; background:transparent; border:none; box-shadow:none; min-height:0;
+    }
+    .fg-master{
+      --m-ink:#0b1c0a; --m-terra:#c97c40;
+      --m-disp:#2f7d57; --m-res:#b0752a; --m-sold:#8a8f86;
+      max-width:1224px; margin:0 auto;
+      display:grid; grid-template-columns:1fr 300px; gap:24px;
+      background:#fff; border:1px solid #ecece4; border-radius:20px;
+      padding:24px; box-shadow:0 12px 30px rgba(11,28,10,.06);
+    }
+    .fg-master-board{ display:flex; flex-direction:column; gap:18px; min-width:0; }
+    .fg-master-row{ display:flex; gap:18px; align-items:flex-start; }
+    .fg-master-rowhead{ width:118px; flex-shrink:0; padding-top:8px; }
+    .fg-master-rowname{ display:block; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:var(--m-ink); }
+    .fg-master-rowmeta{ font-size:11px; color:#9ba095; }
+    .fg-master-lots{ display:flex; flex-wrap:wrap; gap:10px; min-width:0; }
+    .fg-lot{
+      width:54px; height:44px; border:none; border-radius:9px; cursor:pointer; color:#fff;
+      font-family:'Poppins',sans-serif; font-weight:600; font-size:12px;
+      display:flex; align-items:center; justify-content:center; position:relative;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+    .fg-lot:hover{ transform:translateY(-2px); box-shadow:0 7px 16px rgba(11,28,10,.20); }
+    .fg-lot.is-default, .fg-lot.is-hot, .fg-lot.is-2nd{ background:var(--m-disp); }
+    .fg-lot.is-reserved{ background:var(--m-res); }
+    .fg-lot.is-sold{ background:var(--m-sold); }
+    .fg-lot.is-selected{ outline:3px solid var(--m-ink); outline-offset:2px; }
+    .fg-lot.is-hot::after{ content:""; position:absolute; top:5px; right:6px; width:6px; height:6px; border-radius:50%; background:#ffd27a; }
+    .fg-master-empty{ color:#9ba095; font-size:13px; padding:8px 2px; }
+    .fg-master-side{ border-left:1px solid #f0efe8; padding-left:22px; min-width:0; }
+    .fg-master-title{ font-family:'Poppins',sans-serif; font-weight:600; font-size:16px; margin:0 0 14px; color:var(--m-ink); }
+    .fg-master-legend{ display:flex; flex-direction:column; gap:10px; font-size:13px; color:#5a6472; padding-bottom:16px; border-bottom:1px solid #f0efe8; }
+    .fg-master-legend span{ display:flex; align-items:center; gap:9px; }
+    .fg-master-legend b{ margin-left:auto; color:var(--m-ink); font-weight:600; }
+    .fg-master-legend .sw{ width:14px; height:14px; border-radius:4px; flex-shrink:0; }
+    .fg-master-legend .sw.disp{ background:var(--m-disp); }
+    .fg-master-legend .sw.res{ background:var(--m-res); }
+    .fg-master-legend .sw.sold{ background:var(--m-sold); }
+    .fg-master-detail{ margin-top:16px; font-size:13px; color:#5a6472; line-height:1.55; }
+    .fg-master-detail.is-empty{ color:#9ba095; }
+    .fg-master-detail .md-eyebrow{ color:var(--m-terra); font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+    .fg-master-detail .md-name{ font-family:'Poppins',sans-serif; font-weight:600; font-size:19px; color:var(--m-ink); margin-top:2px; }
+    .fg-master-detail .md-badge{ display:inline-block; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; }
+    .fg-master-detail .md-specs{ margin-top:6px; color:#5a6472; }
+    .fg-master-detail .md-price{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:var(--m-ink); margin:10px 0 4px; }
+    .fg-master-detail .md-btn{ width:100%; margin-top:8px; background:var(--m-ink); color:#f1ede3; border:none; border-radius:12px; padding:12px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+    .fg-master-detail .md-btn:hover{ background:#132e11; }
+    @media (max-width:860px){
+      body[data-view="plan"] #fgPlanWrap{ padding:8px 14px 60px; }
+      .fg-master{ grid-template-columns:1fr; gap:18px; padding:18px; }
+      .fg-master-side{ border-left:none; border-top:1px solid #f0efe8; padding-left:0; padding-top:16px; }
+      .fg-master-row{ flex-direction:column; gap:8px; }
+      .fg-master-rowhead{ width:auto; padding-top:0; }
+      .fg-master-lots{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; }
+    }
+
     #fgListTable tbody tr[data-filter-unit] {
       transition: opacity .25s ease;
     }
@@ -2558,145 +2621,109 @@
             };
           @endphp
 
-          <!-- chips-filters bar (Figma 193:6017) -->
-          <div class="fg-plan-topbar">
-            <div class="fg-plan-chips" role="tablist" aria-label="{{ __('Floor filter') }}">
+          <!-- ================= MASTERPLAN de lotes (reemplaza plano con pines) =================
+               Lotes reales agrupados por piso, coloreados por estado; clic → panel de detalle.
+               Reaprovecha $floorBuckets / $floorOrder / $availableByFloor / $markerStateFor / $floorDisplay.
+               ================================================================================== -->
+          @php
+            $allU    = collect($units ?? []);
+            $totSold = $allU->filter(fn($u) => strtolower((string) $u->status) === 'sold')->count();
+            $totRes  = $allU->filter(fn($u) => in_array(strtolower((string) $u->status), ['reserved','pending']))->count();
+            $totDisp = max(0, $allU->count() - $totSold - $totRes);
+          @endphp
+          <div class="fg-master">
+            <div class="fg-master-board">
               @forelse($floorOrder as $floorLabel)
-                @php $isActive = ($floorLabel === $activeFloor); @endphp
-                <button type="button"
-                        class="fg-chip-floor{{ $isActive ? ' is-active' : '' }}"
-                        role="tab"
-                        aria-selected="{{ $isActive ? 'true' : 'false' }}"
-                        data-floor="{{ $floorLabel }}">
-                  <span class="fg-chip-left">
-                    <span class="fg-chip-dot"></span>
-                    <span class="fg-chip-text">{{ $floorDisplay($floorLabel) }}</span>
-                  </span>
-                  <span class="fg-chip-count">{{ $floorBuckets[$floorLabel]->count() }}</span>
-                </button>
-              @empty
-                <div class="fg-plan-empty-chips" style="color:#9aa3a0;font-size:13px;padding:8px 12px;">
-                  {{ __('Sin unidades publicadas.') }}
+                <div class="fg-master-row">
+                  <div class="fg-master-rowhead">
+                    <span class="fg-master-rowname">{{ $floorDisplay($floorLabel) }}</span>
+                    <span class="fg-master-rowmeta">{{ $availableByFloor[$floorLabel] ?? 0 }} / {{ $floorBuckets[$floorLabel]->count() }} {{ __('disp.') }}</span>
+                  </div>
+                  <div class="fg-master-lots">
+                    @foreach($floorBuckets[$floorLabel]->values() as $unit)
+                      @php
+                        $state   = $markerStateFor($unit);
+                        $lotLbl  = $unit->custom_id ?? $unit->id;
+                        $moreId  = $unit->custom_id ?? $unit->id;
+                        $lprice  = (float) ($unit->price ?? 0);
+                      @endphp
+                      <button type="button"
+                              class="fg-lot is-{{ $state }}"
+                              data-more-id="{{ $moreId }}"
+                              data-lot="{{ $lotLbl }}"
+                              data-name="{{ $unit->name ?? $lotLbl }}"
+                              data-floor="{{ $floorDisplay($floorLabel) }}"
+                              data-state="{{ $state }}"
+                              data-beds="{{ (int) ($unit->bedrooms ?? 0) }}"
+                              data-baths="{{ (int) ($unit->bathrooms ?? 0) }}"
+                              data-area="{{ (int) round($unit->internal_area ?? 0) }}"
+                              data-dir="{{ strtoupper($unit->direction ?? '') }}"
+                              data-price="{{ $lprice }}"
+                              data-sold="{{ $state === 'sold' ? '1' : '0' }}"
+                              aria-label="{{ $lotLbl }}">{{ $lotLbl }}</button>
+                    @endforeach
+                  </div>
                 </div>
+              @empty
+                <div class="fg-master-empty">{{ __('Sin unidades publicadas.') }}</div>
               @endforelse
             </div>
 
-            <!-- Active floor label · N UNIDADES DISPONIBLES.
-                 En mobile solo el pill "PISO X" (izquierda) es el selector:
-                 abre un menú propio (HTML/CSS) con los pisos. El contador de la
-                 derecha queda como texto normal. -->
-            <div class="fg-plan-piso" style="overflow: visible;">
-              @if($floorOrder->isNotEmpty())
-                <div class="fg-plan-piso-picker" id="fgFloorPicker">
-                  <button type="button" class="fg-plan-piso-left fg-plan-piso-trigger"
-                          id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
-                    <span class="fg-plan-piso-caret" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e11019" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </span>
-                  </button>
-                  <ul class="fg-plan-piso-menu" id="fgFloorMenu" role="listbox" aria-label="{{ __('Floor filter') }}">
-                    @foreach($floorOrder as $floorLabel)
-                      <li class="fg-plan-piso-option{{ $floorLabel === $activeFloor ? ' is-active' : '' }}"
-                          role="option" aria-selected="{{ $floorLabel === $activeFloor ? 'true' : 'false' }}"
-                          data-floor="{{ $floorLabel }}">
-                        <span class="fg-plan-piso-option-name">{{ $floorDisplay($floorLabel) }}</span>
-                        <span class="fg-plan-piso-option-count">{{ $availableByFloor[$floorLabel] ?? 0 }}</span>
-                      </li>
-                    @endforeach
-                  </ul>
-                </div>
-              @else
-                <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
-                  {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
-                </div>
-              @endif
-              <div class="fg-plan-piso-right" id="fgPlanPisoCount">
-                {{ $availableByFloor[$activeFloor] ?? 0 }} {{ strtoupper(__('Unidades disponibles')) }}
+            <aside class="fg-master-side">
+              <h3 class="fg-master-title">{{ __('Disponibilidad') }}</h3>
+              <div class="fg-master-legend">
+                <span><i class="sw disp"></i>{{ __('Disponible') }} <b>{{ $totDisp }}</b></span>
+                <span><i class="sw res"></i>{{ __('Reservada') }} <b>{{ $totRes }}</b></span>
+                <span><i class="sw sold"></i>{{ __('Vendida') }} <b>{{ $totSold }}</b></span>
               </div>
-            </div>
+              <div class="fg-master-detail is-empty" id="fgMasterDetail">
+                {{ __('Selecciona un lote en el plano para ver el detalle de la villa.') }}
+              </div>
+            </aside>
           </div>
 
-          <!-- Map container (Figma 193:6600 — ContainerMap, 1366×769) -->
-          <div class="fg-plan-canvas" style="background-color: white!important;" id="fgPlanCanvas">
-            <!-- Pannable / zoomable stage (transform driven by JS on mobile) -->
-            <div class="fg-plan-stage" id="fgPlanStage">
-            <!-- Planview image — por defecto el plano general; si el admin subió
-                 un plano para el piso activo se usa ese (y JS lo cambia al
-                 cambiar de piso). -->
-            <img src="{{ $activeFloorPlanImg }}"
-                 alt="{{ __('Plan view') }}"
-                 class="fg-plan-img"
-                 id="fgPlanImg"
-                 data-fallback="{{ $floorPlanFallback }}"
-                 draggable="false">
-
-            {{-- Render one marker per real unit, grouped by floor. JS toggles
-                 visibility based on the active floor chip. --}}
-            @foreach($floorOrder as $floorLabel)
-              @foreach($floorBuckets[$floorLabel]->values() as $idx => $unit)
-                @php
-                  $anchor   = $anchorPoints[$idx % count($anchorPoints)];
-                  $leftPct  = ($anchor['x'] / 1366) * 100;
-                  $topPct   = ($anchor['y'] / 769) * 100;
-                  $state    = $markerStateFor($unit);
-                  $side     = $anchor['side'];
-                  $unitId   = $unit->id;
-                  $unitLbl  = $unit->custom_id ?? ('U-'.$unit->id);
-                  $price    = (float) ($unit->price ?? 0);
-                  $priceTxt = $price > 0 ? '$'.number_format($price/1000, 0).'k' : '—';
-                  $area     = $unit->internal_area ?? 0;
-                  $areaTxt  = $area > 0 ? rtrim(rtrim(number_format($area, 0), '0'), '.') : '—';
-                  $hidden   = ($floorLabel !== $activeFloor);
-                  $uid      = $floorLabel.'_'.$idx.'_'.$state;
-                @endphp
-                <button type="button"
-                        class="fg-plan-marker is-{{ $state }} side-{{ $side }}{{ $hidden ? ' is-hidden' : '' }}"
-                        style="left:{{ number_format($leftPct, 4, '.', '') }}%;top:{{ number_format($topPct, 4, '.', '') }}%;{{ $hidden ? 'display:none;' : '' }}"
-                        data-floor="{{ $floorLabel }}"
-                        data-unit-id="{{ $unitId }}"
-                        onclick="openMoreInfo('{{ $unitId }}')"
-                        aria-label="Unit {{ $unitLbl }}">
-                  <span class="fg-plan-marker-bubble">
-                    @include('partials._plan_marker_svg', [
-                        'state' => $state,
-                        'side'  => $side,
-                        'uid'   => $uid,
-                    ])
-                    <span class="fg-plan-marker-text">
-                      <span class="fg-plan-marker-price">{{ $priceTxt }}</span>
-                      <span class="fg-plan-marker-sqft">{{ $areaTxt }}</span>
-                    </span>
-                    @if($state === 'hot')
-                      <span class="fg-plan-marker-fire" aria-hidden="true">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23a7 7 0 0 1-7-7c0-2 1-3 1-3 0 1 1 2 2 2 0-3 2-5 2-8 0-2-1-3-1-3 4 0 8 4 8 9 1-1 2-2 2-4 2 1 3 4 3 7a7 7 0 0 1-7 7z"/></svg>
-                      </span>
-                    @endif
-                  </span>
-                </button>
-              @endforeach
-            @endforeach
-            </div><!-- /.fg-plan-stage -->
-
-            <!-- Zoom controls (mobile pan/zoom map) -->
-            <div class="fg-plan-zoom" aria-hidden="false">
-              <button type="button" class="fg-plan-zoom-btn" id="fgPlanZoomIn" aria-label="{{ __('Acercar') }}">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              </button>
-              <button type="button" class="fg-plan-zoom-btn" id="fgPlanZoomOut" aria-label="{{ __('Alejar') }}">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              </button>
-              <button type="button" class="fg-plan-zoom-btn fg-plan-zoom-reset" id="fgPlanZoomReset" aria-label="{{ __('Restablecer') }}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 4v4h4"/></svg>
-              </button>
-            </div>
-
-            <!-- Drag-to-explore hint (mobile only, auto-fades) -->
-            <div class="fg-plan-hint" id="fgPlanHint" aria-hidden="true">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l-3 3-3-3"/><path d="M19 9l3 3-3 3"/><path d="M2 12h20"/><path d="M12 2v20"/></svg>
-              <span>{{ __('Arrastra para explorar · pellizca para zoom') }}</span>
-            </div>
-          </div>
+          <script>
+          (function(){
+            const wrap   = document.getElementById('fgPlanWrap');
+            const detail = document.getElementById('fgMasterDetail');
+            if(!wrap || !detail) return;
+            const T = {
+              disp: @json(__('Disponible')), res: @json(__('Reservada')), sold: @json(__('Vendida')),
+              hab:  @json(__('hab')),        bath: @json(__('baños')),
+              more: @json(__('Más información')), na: @json(__('No disponible')),
+            };
+            // estado → [texto, bg, fg]
+            const BADGE = {
+              'default':['+',  '#e6f0e0','#2f7d57'], 'hot':['+','#e6f0e0','#2f7d57'], '2nd':['+','#e6f0e0','#2f7d57'],
+              'reserved':['*', '#f6ead6','#b0752a'], 'sold':['-','#e8e6dd','#8a8f86'],
+            };
+            const label = s => s==='reserved'?T.res : s==='sold'?T.sold : T.disp;
+            const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+            const fmt = n => Number(n).toLocaleString('es-DO');
+            wrap.addEventListener('click', function(e){
+              const lot = e.target.closest('.fg-lot'); if(!lot) return;
+              wrap.querySelectorAll('.fg-lot.is-selected').forEach(x => x.classList.remove('is-selected'));
+              lot.classList.add('is-selected');
+              const d = lot.dataset;
+              const b = BADGE[d.state] || BADGE['default'];
+              const sold = d.sold === '1';
+              const price = parseFloat(d.price) || 0;
+              const area = parseInt(d.area,10) || 0;
+              detail.className = 'fg-master-detail';
+              detail.innerHTML =
+                '<div class="md-eyebrow">'+ esc(d.floor) +'</div>'+
+                '<div class="md-name">'+ esc(d.name || d.lot) +'</div>'+
+                '<div style="margin:7px 0 3px"><span class="md-badge" style="background:'+b[1]+';color:'+b[2]+'">'+ label(d.state) +'</span></div>'+
+                '<div class="md-specs">'+ esc(d.beds) +' '+ T.hab +' &middot; '+ esc(d.baths) +' '+ T.bath +
+                  (area>0 ? ' &middot; '+ area +' m&sup2;' : '') + (d.dir ? ' &middot; '+ esc(d.dir) : '') +'</div>'+
+                (price>0 ? '<div class="md-price"><span class="price" data-usd="'+ price +'">$'+ fmt(price) +'</span></div>' : '')+
+                (sold
+                   ? '<span class="md-badge" style="background:#e8e6dd;color:#8a8f86">'+ T.na +'</span>'
+                   : '<button type="button" class="md-btn" onclick="openMoreInfo(\''+ esc(d.moreId) +'\')">'+ T.more +'</button>');
+              try { updateCurrencyDisplay(localStorage.getItem('selectedCurrency') || 'USD'); } catch(_){}
+            });
+          })();
+          </script>
 
         </div>
       </div>
