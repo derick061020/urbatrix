@@ -33,6 +33,7 @@
         @endphp
         <!--- unit - start  ---->
         <div class="{{ $cardCls }}"
+             data-idx="{{ $loop->iteration ?? 0 }}"
              data-filter-unit="{{ $unitId }}"
              data-filter-name="{{ strtolower($unit->name ?? $unitId) }}"
              data-filter-search="{{ $searchBlob }}"
@@ -46,6 +47,9 @@
              data-filter-status="{{ $st }}"
              data-filter-second="{{ !empty($unit->is_second_chance) ? '1' : '0' }}">
           <div class="fg-card-inner">
+
+            <!-- Ghost number (editorial band · Figma 943:2315) -->
+            <div class="fg-band-num" aria-hidden="true">{{ str_pad((string) ($loop->iteration ?? 0), 2, '0', STR_PAD_LEFT) }}</div>
 
             <!-- Image area -->
             <div class="fg-card-img">

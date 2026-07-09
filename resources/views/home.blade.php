@@ -1290,6 +1290,148 @@
       pointer-events: none;
     }
 
+    /* =====================================================================
+       GRID → BANDAS EDITORIALES  ·  concepto Figma 943:2315 / mockup villas
+       ---------------------------------------------------------------------
+       Reconvierte cada .fg-card del grid en una banda a sangre (render full
+       bleed + número fantasma + panel flotante crema/glass). Sólo re-maqueta
+       vía CSS: conserva TODOS los hooks JS existentes (data-filter-*,
+       .price[data-usd], wishlist, openMoreInfo, openAdvisorVideoCall…).
+       ===================================================================== */
+    body[data-view="grid"] .fg-units-grid{
+      display:flex; flex-direction:column; gap:24px;
+      grid-template-columns:none;
+      max-width:1224px; padding:12px 24px 72px;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card{
+      --band-cream:#f1ede3; --band-ink:#0b1c0a; --band-terra:#c97c40;
+      --band-green:#82b870; --band-muted:#6d7268; --band-faint:#9ba095;
+      height:500px; border-radius:26px; overflow:hidden; background:#e9e6dd;
+      box-shadow:0 20px 44px rgba(11,28,10,.16);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card:hover{ transform:none; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-inner{
+      position:static; height:100%; padding:0; gap:0; background:transparent; border-radius:26px;
+    }
+    /* Render a sangre */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img{
+      position:absolute; inset:0; height:100%; width:100%; border-radius:26px; background:#e9e6dd;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img > img{
+      position:absolute; inset:0; left:0; top:0; transform:none;
+      width:100%; height:100%; aspect-ratio:auto; object-fit:cover;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img::before{
+      content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+      background:linear-gradient(180deg,rgba(11,28,10,.34),rgba(11,28,10,0) 42%);
+    }
+    /* Número fantasma (bleed superior, mezcla overlay) */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-band-num{
+      position:absolute; top:-26px; z-index:2;
+      font-family:'Poppins',sans-serif; font-weight:700; font-size:220px; line-height:1;
+      color:rgba(255,255,255,.5); mix-blend-mode:overlay; letter-spacing:-.06em;
+      user-select:none; pointer-events:none;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-band-num{ right:40px; }
+    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-band-num{ left:40px; }
+    /* Chips (estado + wishlist) por encima del scrim */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-chip-row{
+      position:absolute; top:16px; left:16px; right:16px; z-index:5; padding:0;
+    }
+    /* En la banda ocultamos la cinta de reserva y la tira de estado inferior:
+       el estado ya lo comunican el chip superior + la línea de disponibilidad. */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-reserve-banner,
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-status-strip{ display:none !important; }
+
+    /* Panel flotante (crema) */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body{
+      position:absolute; bottom:16px; z-index:4; width:min(46%,500px);
+      background:var(--band-cream); border-radius:18px; padding:24px 30px;
+      box-shadow:0 24px 48px rgba(11,28,10,.24);
+      display:flex; flex-direction:column; gap:10px;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-body{ left:16px; }
+    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-body{ right:16px; }
+    /* Cabecera: subtítulo → eyebrow terracota; nombre grande */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-head{ display:flex; flex-direction:column; gap:6px; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-subtitle{
+      order:-1; margin:0; color:var(--band-terra);
+      font-size:10px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{
+      font-family:'Poppins',sans-serif; font-weight:600; font-size:27px; line-height:1.05; color:var(--band-ink);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .furnished{
+      background:rgba(11,28,10,.06); color:var(--band-muted);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-divider{
+      background:rgba(11,28,10,.12); height:1px; margin:4px 0;
+    }
+    /* Precio con etiqueta DESDE */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price{ display:block; margin:0; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price::before{
+      content:"DESDE"; display:block; margin-bottom:2px;
+      font-size:9px; font-weight:600; letter-spacing:.18em; color:var(--band-faint);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price .price{
+      font-family:'Poppins',sans-serif; font-weight:700; font-size:25px; color:var(--band-ink);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price .sqft{ color:var(--band-faint); font-weight:400; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-discount{
+      align-self:flex-start; font-size:11px; padding:5px 10px;
+    }
+    /* Specs (reaprovecha las 6 cajas) → fila fina */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stats{
+      padding:0; background:transparent; gap:8px; flex-wrap:wrap;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat{ color:var(--band-muted); font-size:12px; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat svg{ color:var(--band-terra); }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat-divider{ background:rgba(11,28,10,.12); }
+    /* Acciones: "More Info" pill verde + "Book Video Call" enlace */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-actions{ margin-top:2px; gap:8px; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-buttons{ display:flex; gap:16px; align-items:center; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info,
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info-similar{
+      background:var(--band-ink); color:#f1ede3; border:none; border-radius:12px;
+      padding:13px 22px; font-weight:600; font-size:12.5px;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta{
+      background:transparent; border:none; color:var(--band-muted);
+      padding:6px 2px; font-weight:500; font-size:12px; box-shadow:none;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta svg{ display:none; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-availability{
+      color:var(--band-muted); font-size:11.5px; margin-top:2px;
+    }
+    /* Primera tarjeta: panel glassmorphism sobre el render */
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-body{
+      background:rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.28);
+      -webkit-backdrop-filter:blur(26px); backdrop-filter:blur(26px);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-title-row .name,
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price .price{ color:#fff; }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-subtitle{ color:#e6c39c; }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-stat,
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-availability,
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price .sqft{ color:rgba(255,255,255,.86); }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-divider{ background:rgba(255,255,255,.28); }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-btn-cta{ color:rgba(255,255,255,.88); }
+    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price::before{ color:rgba(255,255,255,.72); }
+    /* Responsive: panel a todo el ancho, número más chico */
+    @media (max-width:820px){
+      body[data-view="grid"] .fg-units-grid{ padding:12px 14px 60px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card{ height:440px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card .fg-band-num{ font-size:132px; top:-8px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-band-num{ right:16px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-band-num{ left:16px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body,
+      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-body,
+      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-body{
+        left:12px; right:12px; width:auto; bottom:12px; padding:18px 20px;
+      }
+      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{ font-size:23px; }
+    }
+
     #fgListTable tbody tr[data-filter-unit] {
       transition: opacity .25s ease;
     }
