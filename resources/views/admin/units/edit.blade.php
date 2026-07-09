@@ -117,6 +117,12 @@
     </div>
 
     {{-- ===================== IMAGES ===================== --}}
+    @php
+        $imageSections = [
+            'property'  => ['label' => __('Propiedad'),  'icon' => 'pi-home'],
+            'amenities' => ['label' => __('Amenidades'), 'icon' => 'pi-star'],
+        ];
+    @endphp
     <div class="crm-card">
         <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
             <i class="pi pi-image text-ink-500"></i>
@@ -124,63 +130,78 @@
             <span class="ml-auto text-[11px] text-ink-500">{{ $unit->images->count() }} imágenes</span>
         </div>
 
-        <div class="p-5 space-y-4">
-            {{-- Upload area --}}
-            <div id="image-upload-container"
-                 data-upload-url="{{ route('admin.units.images.upload', $unit->id) }}"
-                 data-csrf="{{ csrf_token() }}"
-                 class="border-2 border-dashed border-ink-200 rounded-xl p-6 text-center hover:border-brand/40 transition-colors">
-                <i class="pi pi-cloud-upload text-[28px] text-ink-400"></i>
-                <p class="text-[13px] text-ink-700 mt-2">{{ __('Arrastrá imágenes aquí o') }}</p>
-                <input type="file" multiple accept="image/*" class="hidden" id="image-upload">
-                <label for="image-upload" class="crm-btn crm-btn-ghost mt-3 inline-flex"><i class="pi pi-plus text-[10px]"></i> {{ __('Elegir archivos') }}</label>
-                <p class="mt-3 text-[11px] text-ink-400">{{ __('JPG, PNG, WEBP o GIF · máx. 5 MB · hasta 10 imágenes por carga') }}</p>
+        <div class="p-5 space-y-8">
+            <p class="text-[12px] text-ink-500 -mb-2">{{ __('Las imágenes se dividen en dos apartados. En la ficha pública el cliente puede alternar entre "Propiedad" y "Amenidades".') }}</p>
 
-                <div id="upload-progress" class="hidden mt-4 max-w-md mx-auto">
-                    <div class="crm-progress"><span id="progress-bar" class="bg-brand" style="width:0%"></span></div>
-                    <p class="text-[11px] text-ink-500 mt-1">Subiendo… <span id="progress-text">0%</span></p>
+            @foreach($imageSections as $catKey => $section)
+                @php $catImages = $unit->images->where('category', $catKey); @endphp
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <i class="pi {{ $section['icon'] }} text-brand text-[13px]"></i>
+                        <div class="text-[12px] font-bold uppercase tracking-wide text-ink-700">{{ $section['label'] }}</div>
+                        <span class="ml-auto text-[11px] text-ink-500">{{ $catImages->count() }} {{ __('imágenes') }}</span>
+                    </div>
+
+                    {{-- Upload area --}}
+                    <div class="image-upload-container"
+                         data-category="{{ $catKey }}"
+                         data-upload-url="{{ route('admin.units.images.upload', $unit->id) }}"
+                         data-csrf="{{ csrf_token() }}"
+                         class="border-2 border-dashed border-ink-200 rounded-xl p-6 text-center hover:border-brand/40 transition-colors">
+                        <i class="pi pi-cloud-upload text-[28px] text-ink-400"></i>
+                        <p class="text-[13px] text-ink-700 mt-2">{{ __('Arrastrá imágenes aquí o') }}</p>
+                        <input type="file" multiple accept="image/*" class="hidden image-upload-input" id="image-upload-{{ $catKey }}">
+                        <label for="image-upload-{{ $catKey }}" class="crm-btn crm-btn-ghost mt-3 inline-flex"><i class="pi pi-plus text-[10px]"></i> {{ __('Elegir archivos') }}</label>
+                        <p class="mt-3 text-[11px] text-ink-400">{{ __('JPG, PNG, WEBP o GIF · máx. 5 MB · hasta 10 imágenes por carga') }}</p>
+
+                        <div class="upload-progress hidden mt-4 max-w-md mx-auto">
+                            <div class="crm-progress"><span class="progress-bar bg-brand" style="width:0%"></span></div>
+                            <p class="text-[11px] text-ink-500 mt-1">Subiendo… <span class="progress-text">0%</span></p>
+                        </div>
+                        <div class="upload-status hidden mt-3"></div>
+                    </div>
+
+                    {{-- Sortable images table --}}
+                    <div class="overflow-x-auto">
+                        <table class="w-full crm-table">
+                            <thead class="bg-ink-50">
+                                <tr>
+                                    <th class="w-8"></th>
+                                    <th>{{ __('Preview') }}</th>
+                                    <th>{{ __('Nombre') }}</th>
+                                    <th class="text-right">{{ __('Acciones') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="unit-images-tbody"
+                                   data-category="{{ $catKey }}"
+                                   data-reorder-url="{{ route('admin.units.images.reorder', $unit->id) }}"
+                                   data-delete-url-template="{{ route('admin.units.images.delete', [$unit->id, '__ID__']) }}"
+                                   data-csrf="{{ csrf_token() }}">
+                                @forelse($catImages as $image)
+                                    <tr data-image-id="{{ $image->id }}">
+                                        <td>
+                                            <span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="{{ __('Arrastrar para reordenar') }}">
+                                                <i class="pi pi-bars"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <img src="{{ $image->path ?: '#' }}" alt="{{ $image->name }}" class="w-16 h-16 object-cover rounded-lg bg-ink-100 border border-ink-200">
+                                        </td>
+                                        <td class="text-[12px] text-ink-700">
+                                            <div class="max-w-xs truncate" title="{{ $image->name }}">{{ $image->name }}</div>
+                                        </td>
+                                        <td class="text-right">
+                                            <button type="button" class="image-delete-btn inline-flex items-center gap-1 px-2 py-1 rounded-md text-err hover:bg-err-soft text-[11px] font-semibold"><i class="pi pi-trash text-[10px]"></i> {{ __('Eliminar') }}</button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr class="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin imágenes todavía.') }}</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div id="upload-status" class="hidden mt-3"></div>
-            </div>
-
-            {{-- Sortable images table --}}
-            <div class="overflow-x-auto">
-                <table class="w-full crm-table">
-                    <thead class="bg-ink-50">
-                        <tr>
-                            <th class="w-8"></th>
-                            <th>{{ __('Preview') }}</th>
-                            <th>{{ __('Nombre') }}</th>
-                            <th class="text-right">{{ __('Acciones') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody id="unit-images-tbody"
-                           data-reorder-url="{{ route('admin.units.images.reorder', $unit->id) }}"
-                           data-delete-url-template="{{ route('admin.units.images.delete', [$unit->id, '__ID__']) }}"
-                           data-csrf="{{ csrf_token() }}">
-                        @forelse($unit->images as $image)
-                            <tr data-image-id="{{ $image->id }}">
-                                <td>
-                                    <span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="{{ __('Arrastrar para reordenar') }}">
-                                        <i class="pi pi-bars"></i>
-                                    </span>
-                                </td>
-                                <td>
-                                    <img src="{{ $image->path ?: '#' }}" alt="{{ $image->name }}" class="w-16 h-16 object-cover rounded-lg bg-ink-100 border border-ink-200">
-                                </td>
-                                <td class="text-[12px] text-ink-700">
-                                    <div class="max-w-xs truncate" title="{{ $image->name }}">{{ $image->name }}</div>
-                                </td>
-                                <td class="text-right">
-                                    <button type="button" class="image-delete-btn inline-flex items-center gap-1 px-2 py-1 rounded-md text-err hover:bg-err-soft text-[11px] font-semibold"><i class="pi pi-trash text-[10px]"></i> {{ __('Eliminar') }}</button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr id="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin imágenes todavía.') }}</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            @endforeach
         </div>
     </div>
 
@@ -284,10 +305,9 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
-(function () {
-    const tbody = document.getElementById('unit-images-tbody');
-    if (!tbody) return;
-
+/* Cada apartado de imágenes (Propiedad / Amenidades) se maneja de forma
+   independiente: su propia tabla ordenable, borrado y subida. */
+document.querySelectorAll('.unit-images-tbody').forEach(function (tbody) {
     const csrf         = tbody.dataset.csrf;
     const reorderUrl   = tbody.dataset.reorderUrl;
     const deleteUrlTpl = tbody.dataset.deleteUrlTemplate;
@@ -334,23 +354,23 @@
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); tr.remove();
             if (!tbody.querySelector('tr[data-image-id]')) {
                 tbody.insertAdjacentHTML('beforeend',
-                    '<tr id="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin imágenes todavía.</td></tr>');
+                    '<tr class="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin imágenes todavía.</td></tr>');
             }
         })
         .catch(err => { console.error('Delete failed', err); alert('{{ __("No se pudo eliminar la imagen.") }}'); });
     });
-})();
+});
 
-(function() {
-    const uploadContainer = document.getElementById('image-upload-container');
-    const fileInput     = document.getElementById('image-upload');
-    const progressBar   = document.getElementById('progress-bar');
-    const progressText  = document.getElementById('progress-text');
-    const uploadProgress= document.getElementById('upload-progress');
-    const uploadStatus  = document.getElementById('upload-status');
-    const imagesTbody   = document.getElementById('unit-images-tbody');
+document.querySelectorAll('.image-upload-container').forEach(function (uploadContainer) {
+    const category      = uploadContainer.dataset.category || 'property';
+    const fileInput     = uploadContainer.querySelector('.image-upload-input');
+    const progressBar   = uploadContainer.querySelector('.progress-bar');
+    const progressText  = uploadContainer.querySelector('.progress-text');
+    const uploadProgress= uploadContainer.querySelector('.upload-progress');
+    const uploadStatus  = uploadContainer.querySelector('.upload-status');
+    const imagesTbody   = document.querySelector('.unit-images-tbody[data-category="' + category + '"]');
 
-    if (!uploadContainer || !fileInput) return;
+    if (!fileInput) return;
     const uploadUrl = uploadContainer.dataset.uploadUrl;
     const csrf      = uploadContainer.dataset.csrf;
 
@@ -368,6 +388,7 @@
         if (imageFiles.length === 0)  return showStatus('Seleccioná archivos de imagen válidos', 'error');
         if (imageFiles.length > 10)   return showStatus('Máximo 10 imágenes por carga', 'error');
         imageFiles.forEach(f => formData.append('images[]', f));
+        formData.append('category', category);
 
         uploadProgress.classList.remove('hidden');
         uploadStatus.classList.add('hidden');
@@ -384,8 +405,10 @@
                 progressBar.style.width = '100%'; progressText.textContent = '100%';
                 showStatus(`${data.images.length} imagen(es) subida(s) correctamente`, 'success');
                 addImagesToTable(data.images);
-                const emptyRow = document.getElementById('unit-images-empty');
-                if (emptyRow) emptyRow.remove();
+                if (imagesTbody) {
+                    const emptyRow = imagesTbody.querySelector('.unit-images-empty');
+                    if (emptyRow) emptyRow.remove();
+                }
                 fileInput.value = '';
                 setTimeout(() => uploadProgress.classList.add('hidden'), 1800);
             } else {
@@ -413,11 +436,11 @@
 
     function showStatus(message, type) {
         uploadStatus.classList.remove('hidden');
-        uploadStatus.className = `px-3 py-2 rounded-md text-[12px] ${type === 'success' ? 'bg-ok-soft text-ok-dark border border-ok/30' : 'bg-err-soft text-err border border-err/30'}`;
+        uploadStatus.className = `upload-status px-3 py-2 rounded-md text-[12px] ${type === 'success' ? 'bg-ok-soft text-ok-dark border border-ok/30' : 'bg-err-soft text-err border border-err/30'}`;
         uploadStatus.textContent = message;
         setTimeout(() => uploadStatus.classList.add('hidden'), 5000);
     }
-})();
+});
 
 /* ===================== AUTOSAVE + DISCARD ===================== */
 (function () {

@@ -465,6 +465,17 @@
             </button>
           </div>
 
+          <!-- Category toggle (Propiedad / Amenidades) -->
+          <div class="mt-cat-toggle" id="mtCatToggle">
+            <div class="mt-cat-pill">
+              <button type="button" class="mt-cat-btn active" data-cat="property" onclick="setModalCategory('property')">{{ __('PROPIEDAD') }}</button>
+              <button type="button" class="mt-cat-btn" data-cat="amenities" onclick="setModalCategory('amenities')">{{ __('AMENIDADES') }}</button>
+            </div>
+            <button type="button" class="mt-cat-swap" onclick="toggleModalCategory()" aria-label="{{ __('Cambiar apartado') }}" title="{{ __('Cambiar apartado') }}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+          </div>
+
           <!-- Image -->
           <div class="mt-gallery">
             <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="{{ __('Unit') }}" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
@@ -590,9 +601,41 @@
     }
     .mt-zoom-hint:hover{ background:#fff; color:#171717; }
     .mt-gallery-img{ cursor:zoom-in; }
+
+    /* Category toggle (Propiedad / Amenidades) */
+    .mt-cat-toggle{
+      display:flex; align-items:center; gap:10px; margin-bottom:12px;
+    }
+    .mt-cat-pill{
+      display:inline-flex; align-items:center; gap:4px;
+      background:#eef1f6; border-radius:999px; padding:5px;
+      flex:1 1 auto;
+    }
+    .mt-cat-btn{
+      flex:1 1 0; border:none; background:transparent; cursor:pointer;
+      padding:9px 18px; border-radius:999px;
+      font-size:13px; font-weight:700; letter-spacing:.04em;
+      color:#9aa2b1; transition:all .18s ease; white-space:nowrap;
+    }
+    .mt-cat-btn.active{
+      background:#fff; color:#171717;
+      box-shadow:0 1px 3px rgba(10,13,20,.10);
+    }
+    .mt-cat-btn:not(.active):hover{ color:#5c6373; }
+    .mt-cat-swap{
+      flex:0 0 auto; width:44px; height:44px; border-radius:14px;
+      background:#fff; border:1px solid #e6e9ef; color:#6b7280;
+      display:inline-flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all .15s ease;
+    }
+    .mt-cat-swap:hover{ color:#171717; border-color:#cfd4dd; box-shadow:0 1px 3px rgba(10,13,20,.08); }
+    .mt-cat-btn[disabled]{ opacity:.4; cursor:not-allowed; }
+
     @media (max-width:600px){
       .iz-arrow{ width:40px; height:40px; }
       .iz-arrow-left{ left:8px; } .iz-arrow-right{ right:8px; }
+      .mt-cat-btn{ padding:8px 12px; font-size:12px; }
+      .mt-cat-swap{ width:40px; height:40px; }
     }
   </style>
   <script>
@@ -2729,6 +2772,57 @@
     ];
     let currentModalImg = 0;
 
+    // Imágenes agrupadas por apartado. El toggle "PROPIEDAD / AMENIDADES"
+    // cambia entre estos grupos. modalImages siempre apunta al grupo activo.
+    const MODAL_IMG_FALLBACK = 'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FUIpwnmJz8oBQ2cKHMMA6%2Ftwo_bed%2F1773908343700%2Ffull.webp';
+    let modalImageGroups = { property: [], amenities: [] };
+    let currentModalCategory = 'property';
+
+    // Reparte las imágenes de la unidad en los dos apartados y activa el primero
+    // que tenga imágenes. Deshabilita la pestaña de un apartado vacío.
+    function loadModalImageGroups(images) {
+      const groups = { property: [], amenities: [] };
+      (images || []).forEach(img => {
+        const cat = (img.category === 'amenities') ? 'amenities' : 'property';
+        if (img.path) groups[cat].push(img.path);
+      });
+      modalImageGroups = groups;
+
+      // Habilitar/deshabilitar pestañas según haya imágenes
+      document.querySelectorAll('#mtCatToggle .mt-cat-btn').forEach(btn => {
+        const cat = btn.dataset.cat;
+        btn.disabled = groups[cat].length === 0;
+      });
+
+      // Apartado inicial: propiedad si tiene imágenes, si no amenidades
+      const initial = groups.property.length > 0 ? 'property'
+                    : (groups.amenities.length > 0 ? 'amenities' : 'property');
+      setModalCategory(initial);
+    }
+
+    // Cambia el apartado activo y refresca la galería
+    function setModalCategory(cat) {
+      if (cat !== 'property' && cat !== 'amenities') cat = 'property';
+      currentModalCategory = cat;
+
+      const imgs = modalImageGroups[cat] || [];
+      modalImages = imgs.length > 0 ? imgs.slice() : [MODAL_IMG_FALLBACK];
+      currentModalImg = 0;
+
+      document.querySelectorAll('#mtCatToggle .mt-cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cat === cat);
+      });
+
+      updateModalImage();
+    }
+
+    // Botón de swap: alterna al otro apartado (si tiene imágenes)
+    function toggleModalCategory() {
+      const other = currentModalCategory === 'property' ? 'amenities' : 'property';
+      if ((modalImageGroups[other] || []).length === 0) return;
+      setModalCategory(other);
+    }
+
     // When a high-demand unit is open, the modal "people view" counter mirrors
     // the card's outside strip ("N people viewed this unit today") instead of
     // the live shortlisted count — keep them in sync. This flag tells the
@@ -3097,16 +3191,8 @@
           if (unit.outlook) description += ` | ${outlookLabels[unit.outlook] || unit.outlook}`;
           if (unitDesc) unitDesc.textContent = description || 'Unit details';
 
-          // Update images
-          modalImages = unit.images && unit.images.length > 0 
-            ? unit.images.map(img => img.path) 
-            : ['https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FUIpwnmJz8oBQ2cKHMMA6%2Ftwo_bed%2F1773908343700%2Ffull.webp'];
-
-          console.log('Modal images:', modalImages);
-
-          // Reset image to first
-          currentModalImg = 0;
-          updateModalImage();
+          // Update images — se dividen en apartados (Propiedad / Amenidades)
+          loadModalImageGroups(unit.images);
 
           // Re-apply current buyer mode to hide/show the right blocks
           if (typeof window.applyBuyerMode === 'function') {
@@ -3148,10 +3234,8 @@
           document.getElementById('modalPrice').textContent = data.price;
           document.getElementById('modalDesc').textContent = data.floor + ' | ' + data.desc;
           
-          modalImages = ['https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FUIpwnmJz8oBQ2cKHMMA6%2Ftwo_bed%2F1773908343700%2Ffull.webp'];
-          currentModalImg = 0;
-          updateModalImage();
-          
+          loadModalImageGroups([]);
+
           const modal = document.getElementById('moreInfoModal');
           if (modal) {
             modal.style.display = 'flex';
