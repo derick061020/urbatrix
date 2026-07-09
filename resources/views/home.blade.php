@@ -1446,20 +1446,21 @@
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-availability{
       color:var(--band-muted); font-size:11.5px; margin-top:2px;
     }
-    /* Primera tarjeta: panel glassmorphism sobre el render */
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-body{
-      background:rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.28);
-      -webkit-backdrop-filter:blur(26px); backdrop-filter:blur(26px);
+    /* Todas las tarjetas (incl. la 1ª) usan el panel crema sólido — sin
+       glassmorphism. Además neutralizamos los aros de color (box-shadow de
+       is-reserved / is-high-demand / is-pending / is-second-chance) que en la
+       banda a sangre se leían como bordes/franjas rosadas o azules. */
+    body[data-view="grid"] .fg-units-grid > .fg-card,
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-reserved,
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-high-demand,
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-pending,
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-second-chance{
+      box-shadow:0 20px 44px rgba(11,28,10,.16);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-title-row .name,
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price .price{ color:#fff; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-subtitle{ color:#e6c39c; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-stat,
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-availability,
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price .sqft{ color:rgba(255,255,255,.86); }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-divider{ background:rgba(255,255,255,.28); }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-btn-cta{ color:rgba(255,255,255,.88); }
-    body[data-view="grid"] .fg-units-grid > .fg-card:first-child .fg-card-price::before{ color:rgba(255,255,255,.72); }
+    /* Estado "sin imagen": placeholder cálido en vez de blanco plano. */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img-noimage{
+      background:linear-gradient(135deg,#e9e6dd,#dfe3d6); color:#9ba095; font-size:13px;
+    }
     /* Responsive: panel a todo el ancho, número más chico */
     @media (max-width:820px){
       body[data-view="grid"] .fg-units-grid{ padding:12px 14px 60px; }
@@ -1473,6 +1474,15 @@
         left:12px; right:12px; width:auto; bottom:12px; padding:18px 20px;
       }
       body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{ font-size:23px; }
+    }
+    /* PC / monitor grande → 2 columnas. Laptop y abajo → 1 columna (base). */
+    @media (min-width:1600px){
+      body[data-view="grid"] .fg-units-grid{
+        flex-direction:row; flex-wrap:wrap; max-width:1560px; gap:26px;
+      }
+      body[data-view="grid"] .fg-units-grid > .fg-card{ width:calc(50% - 13px); height:460px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card .fg-band-num{ font-size:150px; top:-14px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body{ width:min(70%,440px); }
     }
 
     /* =====================================================================
