@@ -201,7 +201,7 @@
                 @else
                   <div class="fg-card-buttons">
                     <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
-                    <button class="fg-btn-cta" type="button" onclick="openAdvisorVideoCall('{{ $unitId }}')">
+                    <button class="fg-btn-cta" type="button" onclick="openMoreInfo('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
