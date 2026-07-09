@@ -1432,22 +1432,22 @@
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat-divider{ background:rgba(11,28,10,.12); }
     /* Acciones: "More Info" pill verde + "Book Video Call" enlace */
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-actions{ margin-top:2px; gap:8px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-buttons{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-buttons{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+    /* Botón primario = "Ver villas →" del Figma: pill verde oscuro + texto crema */
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info,
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info-similar{
       background:var(--band-ink); color:#f1ede3; border:none; border-radius:12px;
-      padding:13px 22px; font-weight:600; font-size:12.5px;
+      padding:13px 24px; font-weight:600; font-size:12.5px; box-shadow:none;
     }
-    /* "Agendar videollamada" → pill verde con ícono (estilo mockup/Figma) */
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info:hover,
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info-similar:hover{ background:#132e11; }
+    /* Botón secundario = "Videollamada" del Figma: texto gris plano, sin pill ni ícono */
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta{
-      display:inline-flex; align-items:center; gap:8px;
-      background:#4f8a3f; border:none; color:#fff; border-radius:12px;
-      padding:13px 18px; font-weight:600; font-size:12.5px; box-shadow:none;
+      background:transparent; border:none; color:#6d7268;
+      padding:6px 2px; font-weight:500; font-size:12px; box-shadow:none;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta:hover{ background:#437534; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta svg{
-      display:inline-block; width:16px; height:16px; flex-shrink:0;
-    }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta:hover{ color:var(--band-ink); background:transparent; }
+    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta svg{ display:none; }
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-availability{
       color:var(--band-muted); font-size:11.5px; margin-top:2px;
     }
