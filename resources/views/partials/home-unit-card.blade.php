@@ -12,7 +12,9 @@
           elseif ($isPending)  $cardCls .= ' is-pending';
           elseif ($isSecond)   $cardCls .= ' is-second-chance';
           elseif ($isHighDem)  $cardCls .= ' is-high-demand';
-          $unitId = $unit->custom_id ?? $unit->id;
+          // Usar `?:` (no `??`): muchas unidades traen custom_id = "" (string vacío,
+          // no null), y `??` lo dejaría pasar → openMoreInfo('') → /api/units/ → 404.
+          $unitId = $unit->custom_id ?: $unit->id;
           $shortlistedCount = (int) ($unit->shortlisted_count ?? 0);
         @endphp
         @php

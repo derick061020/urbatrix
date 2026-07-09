@@ -199,11 +199,20 @@ class HomeController extends Controller
      */
     public function getUnitDetails($unitId)
     {
+        // El front llama /api/units/{unitId} con el custom_id de la unidad
+        // (o el id numérico si no tiene custom_id). Resolvemos por cualquiera de
+        // los dos para que funcione en ambos casos.
         $unit = Unit::with(['images' => function($query) {
                 $query->orderBy('sort_order');
             }])
             ->where('public', true)
-            ->findOrFail($unitId);
+            ->where(function ($q) use ($unitId) {
+                $q->where('custom_id', $unitId);
+                if (is_numeric($unitId)) {
+                    $q->orWhere('id', $unitId);
+                }
+            })
+            ->firstOrFail();
 
         return response()->json($unit);
     }
