@@ -434,8 +434,8 @@ class AdminController extends Controller
             'description'           => 'nullable|string',
 
             // Especificaciones
-            'floor'                 => 'nullable|string|max:50',
-            'layout'                => 'nullable|string|max:100',
+            'stories'               => 'nullable|integer|min:0|max:255',
+            'phase'                 => 'nullable|string|max:50',
             'bedrooms'              => 'nullable|integer|min:0',
             'bathrooms'             => 'nullable|numeric|min:0',
             'parking_bays'          => 'nullable|integer|min:0',
@@ -449,13 +449,10 @@ class AdminController extends Controller
             'internal_area'         => 'nullable|numeric|min:0',
             'external_area'         => 'nullable|numeric|min:0',
             'total_area'            => 'nullable|numeric|min:0',
+            'plot_area'             => 'nullable|numeric|min:0',
+            'roof_area'             => 'nullable|numeric|min:0',
 
-            // Gastos & rentabilidad
-            'expense_1'             => 'nullable|numeric|min:0',
-            'expense_2'             => 'nullable|numeric|min:0',
-            'expense_3'             => 'nullable|numeric|min:0',
-            'levies'                => 'nullable|numeric|min:0',
-            'rates'                 => 'nullable|numeric|min:0',
+            // Rentabilidad
             'est_rental'            => 'nullable|numeric|min:0',
 
             // Disponibilidad & demanda

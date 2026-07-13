@@ -41,8 +41,6 @@ class Unit extends Model
         'address',
         'custom_id',
         'price_wording',
-        'levies',
-        'rates',
         'est_rental',
         'guaranteed_rental',
         'override_action',
@@ -50,6 +48,8 @@ class Unit extends Model
         // Unit Specifications
         'floor',
         'layout',
+        'stories',
+        'phase',
         'bedrooms',
         'bathrooms',
         'parking_bays',
@@ -57,11 +57,6 @@ class Unit extends Model
         'direction',
         'outlook',
         'aircon',
-
-        // Unit Monthly Expenses
-        'expense_1',
-        'expense_2',
-        'expense_3',
 
         // Unit Custom Information
         'custom_1',
@@ -72,6 +67,8 @@ class Unit extends Model
         'internal_area',
         'external_area',
         'total_area',
+        'plot_area',
+        'roof_area',
 
         // Unit Settings
         'bypass_launch_date',
@@ -98,8 +95,6 @@ class Unit extends Model
         'comparison_text',
         'amenities',
         'amenities_text',
-        'walk_score',
-        'school_proximity',
     ];
 
     /**
@@ -189,19 +184,17 @@ class Unit extends Model
         'price_adjustment' => 'decimal:2',
         'purchase_price' => 'decimal:2',
         'plot' => 'boolean',
-        'levies' => 'decimal:2',
-        'rates' => 'decimal:2',
         'est_rental' => 'decimal:2',
         'guaranteed_rental' => 'boolean',
         'override_action' => 'boolean',
         'bathrooms' => 'decimal:1',
         'aircon' => 'boolean',
-        'expense_1' => 'decimal:2',
-        'expense_2' => 'decimal:2',
-        'expense_3' => 'decimal:2',
+        'stories' => 'integer',
         'internal_area' => 'decimal:2',
         'external_area' => 'decimal:2',
         'total_area' => 'decimal:2',
+        'plot_area' => 'decimal:2',
+        'roof_area' => 'decimal:2',
         'bypass_launch_date' => 'boolean',
         'display_on_home_page' => 'boolean',
         'show_enquire_button' => 'boolean',

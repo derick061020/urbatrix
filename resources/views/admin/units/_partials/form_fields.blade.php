@@ -17,7 +17,6 @@
     if ($currentType && !array_key_exists($currentType, $typeOptions)) {
         $typeOptions = [$currentType => $currentType] + $typeOptions;
     }
-    $floorOptions   = UnitOptions::map('floors');
     $outlookOptions = UnitOptions::map('outlooks');
     $statusOptions = [
         'AVAILABLE' => 'Disponible',
@@ -100,13 +99,13 @@
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">{{ __('Planta') }}</label>
-            @php $currentFloor = old('floor', $u->floor ?? ''); @endphp
-            @include('admin.units._partials.select', ['name' => 'floor', 'options' => ['' => '—'] + $floorOptions, 'selected' => $currentFloor])
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('N° de plantas') }}</label>
+            <input type="number" min="0" max="255" name="stories" value="{{ old('stories', $u->stories ?? '') }}" placeholder="{{ __('Ej. 2') }}" class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Niveles de la villa (1 = un nivel, 2 = dos niveles).') }}</p>
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">{{ __('Layout') }}</label>
-            <input type="text" name="layout" value="{{ old('layout', $u->layout ?? '') }}" placeholder="{{ __('Ej. 2B-A') }}" class="crm-input pl-3 mt-1">
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Fase / Etapa') }}</label>
+            <input type="text" name="phase" value="{{ old('phase', $u->phase ?? '') }}" placeholder="{{ __('Ej. Fase 1') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
             <label class="text-[12px] font-semibold text-ink-700">{{ __('Camas') }}</label>
@@ -161,50 +160,33 @@
             <input type="number" step="0.01" min="0" name="external_area" value="{{ old('external_area', $u->external_area ?? '') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
-            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área total (m²)') }}</label>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área roof / solárium (m²)') }}</label>
+            <input type="number" step="0.01" min="0" name="roof_area" value="{{ old('roof_area', $u->roof_area ?? '') }}" class="crm-input pl-3 mt-1">
+        </div>
+        <div>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área de parcela / lote (m²)') }}</label>
+            <input type="number" step="0.01" min="0" name="plot_area" value="{{ old('plot_area', $u->plot_area ?? '') }}" class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Terreno de la villa. Clave para el producto de villas.') }}</p>
+        </div>
+        <div>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Área total privativa (m²)') }}</label>
             <input type="number" step="0.01" min="0" name="total_area" value="{{ old('total_area', $u->total_area ?? '') }}" class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Interior + terraza + roof. Base del cálculo de $/m².') }}</p>
         </div>
     </div>
 </div>
 
-{{-- ===================== 4 · EXPENSES & YIELD ===================== --}}
+{{-- ===================== 4 · YIELD ===================== --}}
 <div class="crm-card">
     <div class="px-5 py-3 bg-ink-50 border-b border-ink-100 flex items-center gap-2">
         <i class="pi pi-wallet text-ink-500"></i>
-        <div class="text-[13px] font-bold text-ink-700">{{ __('Gastos & rentabilidad') }}</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ __('Rentabilidad') }}</div>
     </div>
-    <div class="p-5 space-y-4">
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-            <div class="text-[11px] uppercase font-semibold text-ink-400 tracking-wide mb-2">{{ __('Gastos comunes mensuales') }}</div>
-            <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Gasto 1') }}</label>
-                    <input type="number" step="0.01" min="0" name="expense_1" value="{{ old('expense_1', $u->expense_1 ?? '') }}" class="crm-input pl-3 mt-1">
-                </div>
-                <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Gasto 2') }}</label>
-                    <input type="number" step="0.01" min="0" name="expense_2" value="{{ old('expense_2', $u->expense_2 ?? '') }}" class="crm-input pl-3 mt-1">
-                </div>
-                <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Gasto 3') }}</label>
-                    <input type="number" step="0.01" min="0" name="expense_3" value="{{ old('expense_3', $u->expense_3 ?? '') }}" class="crm-input pl-3 mt-1">
-                </div>
-            </div>
-            <p class="text-[10px] text-ink-400 mt-1">{{ __('Los tres se suman como "gastos comunes" en la vista de inversión del front.') }}</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">{{ __('Mantenimiento (levies)') }}</label>
-                <input type="number" step="0.01" min="0" name="levies" value="{{ old('levies', $u->levies ?? '') }}" class="crm-input pl-3 mt-1">
-            </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">{{ __('Impuestos (rates)') }}</label>
-                <input type="number" step="0.01" min="0" name="rates" value="{{ old('rates', $u->rates ?? '') }}" class="crm-input pl-3 mt-1">
-            </div>
-            <div>
-                <label class="text-[12px] font-semibold text-ink-700">{{ __('Alquiler estimado') }}</label>
-                <input type="number" step="0.01" min="0" name="est_rental" value="{{ old('est_rental', $u->est_rental ?? '') }}" class="crm-input pl-3 mt-1">
-            </div>
+            <label class="text-[12px] font-semibold text-ink-700">{{ __('Alquiler estimado') }}</label>
+            <input type="number" step="0.01" min="0" name="est_rental" value="{{ old('est_rental', $u->est_rental ?? '') }}" class="crm-input pl-3 mt-1">
+            <p class="text-[10px] text-ink-400 mt-1">{{ __('Renta mensual de referencia. Si se deja vacío, el front la estima desde el precio.') }}</p>
         </div>
     </div>
 </div>

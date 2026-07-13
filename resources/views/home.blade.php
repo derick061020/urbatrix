@@ -264,6 +264,10 @@
                   <div class="value"><span id="modalStatTotal">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3h18"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="9"/></svg></div>
                   <div class="label">{{ __('TOTAL M²') }}</div>
                 </div>
+                <div class="mt-stat-box" id="modalStatBoxPlot" style="display:none;">
+                  <div class="value"><span id="modalStatPlot">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
+                  <div class="label">{{ __('PARCELA M²') }}</div>
+                </div>
               </div>
             </div>
 
@@ -2954,6 +2958,14 @@
           setStat('modalStatExt',   unit.external_area);
           setStat('modalStatTotal', unit.total_area);
 
+          // Parcela / lote — sólo se muestra en villas (cuando hay m² de terreno)
+          const plotBox = document.getElementById('modalStatBoxPlot');
+          if (plotBox) {
+            const plot = Number(unit.plot_area || 0);
+            if (plot > 0) { setStat('modalStatPlot', unit.plot_area); plotBox.style.display = ''; }
+            else { plotBox.style.display = 'none'; }
+          }
+
           // People-view counter. When the unit is high demand, mirror the card's
           // outside strip ("N people viewed this unit today"); otherwise show the
           // shortlisted count, which stays live with the wishlist toggle.
@@ -2992,11 +3004,7 @@
               }
           };
           // Investment view
-          toggleRow('modalRowLevies', 'modalLevies', unit.levies);
           toggleRow('modalRowRental', 'modalRental', unit.est_rental);
-          const feesSum = [unit.expense_1, unit.expense_2, unit.expense_3].reduce((a, b) => Number(a||0) + Number(b||0), 0);
-          toggleRow('modalRowFees',   'modalFees',  feesSum);
-          toggleRow('modalRowRates',  'modalRates', unit.rates);
 
           // Living extras
           const setTextRow = (rowId, valId, value) => {
@@ -3156,11 +3164,12 @@
           const spaceBlock = document.getElementById('modalSpaceBlock');
           const spaceVal   = document.getElementById('modalSpaceVal');
           if (spaceBlock && spaceVal) {
-              const inA = Number(unit.internal_area || 0), exA = Number(unit.external_area || 0);
-              if (inA > 0 || exA > 0) {
+              const inA = Number(unit.internal_area || 0), exA = Number(unit.external_area || 0), rfA = Number(unit.roof_area || 0);
+              if (inA > 0 || exA > 0 || rfA > 0) {
                   let s = '';
                   if (inA > 0) s += number_format(inA, 0, ',', ',') + ' m² {{ __('indoor') }}';
                   if (exA > 0) s += (s ? ' + ' : '') + number_format(exA, 0, ',', ',') + ' m² {{ __('terrace') }}';
+                  if (rfA > 0) s += (s ? ' + ' : '') + number_format(rfA, 0, ',', ',') + ' m² {{ __('roof') }}';
                   spaceVal.textContent = s;
                   spaceBlock.style.display = '';
               } else { spaceBlock.style.display = 'none'; }
@@ -3225,13 +3234,15 @@
           
           // Build description
           const outlookLabels = @json($outlookLabels);
-          let description = '';
-          if (unit.floor) description += unit.floor.charAt(0).toUpperCase() + unit.floor.slice(1);
-          if (unit.bedrooms) description += ` | ${unit.bedrooms} Bed`;
-          if (unit.bathrooms) description += ` | ${unit.bathrooms} Bath`;
-          if (unit.direction) description += ` | ${unit.direction.toUpperCase()}`;
-          if (unit.outlook) description += ` | ${outlookLabels[unit.outlook] || unit.outlook}`;
-          if (unitDesc) unitDesc.textContent = description || 'Unit details';
+          const descParts = [];
+          if (unit.phase) descParts.push(unit.phase);
+          if (unit.stories) descParts.push(`${unit.stories} ${Number(unit.stories) === 1 ? '{{ __('nivel') }}' : '{{ __('niveles') }}'}`);
+          else if (unit.floor) descParts.push(unit.floor.charAt(0).toUpperCase() + unit.floor.slice(1));
+          if (unit.bedrooms) descParts.push(`${unit.bedrooms} Bed`);
+          if (unit.bathrooms) descParts.push(`${unit.bathrooms} Bath`);
+          if (unit.direction) descParts.push(unit.direction.toUpperCase());
+          if (unit.outlook) descParts.push(outlookLabels[unit.outlook] || unit.outlook);
+          if (unitDesc) unitDesc.textContent = descParts.length ? descParts.join(' | ') : 'Unit details';
 
           // Update images — se dividen en apartados (Propiedad / Amenidades)
           loadModalImageGroups(unit.images);
