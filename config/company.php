@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| Datos de la empresa / proyecto (MAKAI · Duna Development Group)
+| Datos de la empresa / proyecto (LANDMASS)
 |--------------------------------------------------------------------------
 | Datos fijos que alimentan los documentos imprimibles (comprobante de pago,
 | hoja de datos para transferencia) y los correos. Editar aquí — o sobreponer
@@ -11,9 +11,9 @@
 
 return [
 
-    'brand'        => env('COMPANY_BRAND', 'MAKAI'),
-    'project'      => env('COMPANY_PROJECT', 'Makai Residences'),
-    'group'        => env('COMPANY_GROUP', 'Duna Development Group'),
+    'brand'        => env('COMPANY_BRAND', 'LANDMASS'),
+    'project'      => env('COMPANY_PROJECT', 'Landmass'),
+    'group'        => env('COMPANY_GROUP', 'LANDMASS'),
     'location'     => env('COMPANY_LOCATION', 'Cap Cana, República Dominicana'),
 
     // Emisor de los comprobantes

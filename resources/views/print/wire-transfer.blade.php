@@ -10,25 +10,25 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink:      #1a1a18;
-  --ink-mid:  #4a4a46;
-  --ink-mute: #8a8a84;
-  --rule:     #d8d8d4;
-  --rule-lt:  #eeeeea;
-  --green:    #4A5E3F;
-  --green-bg: #0b1c0a;
-  --field-bg: #f7f6f3;
-  --gold:     #B8962E;
+  --ink:      #171717;
+  --ink-mid:  #525866;
+  --ink-mute: #99a0ae;
+  --rule:     #cacfd8;
+  --rule-lt:  #eaecf0;
+  --green:    #525866;
+  --green-bg: #171717;
+  --field-bg: #f5f7fa;
+  --gold:     #e11019;
 }
 
-body { font-family: 'Inter', sans-serif; background: #f0efec; color: var(--ink); -webkit-font-smoothing: antialiased; width: 210mm; margin: 0 auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: 'Inter', sans-serif; background: #f2f5f8; color: var(--ink); -webkit-font-smoothing: antialiased; width: 210mm; margin: 0 auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .page { width: 210mm; min-height: 297mm; background: #fff; display: flex; flex-direction: column; }
 
 .hdr { background: var(--green-bg); padding: 14px 44px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .hdr-logo { display: flex; align-items: center; gap: 12px; }
 .hdr-iso  { width: 26px; height: 26px; flex-shrink: 0; }
-.hdr-name { font-size: 12px; font-weight: 600; color: #F1EDE3; letter-spacing: .2em; }
-.hdr-sub  { font-size: 7px; font-weight: 400; color: rgba(241,237,227,.3); letter-spacing: .14em; text-transform: uppercase; margin-top: 2px; }
+.hdr-name { font-size: 12px; font-weight: 600; color: #ffffff; letter-spacing: .2em; }
+.hdr-sub  { font-size: 7px; font-weight: 400; color: rgba(255,255,255,.3); letter-spacing: .14em; text-transform: uppercase; margin-top: 2px; }
 
 .gold-bar { height: 2px; background: var(--gold); flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
@@ -62,12 +62,12 @@ body { font-family: 'Inter', sans-serif; background: #f0efec; color: var(--ink);
 .nota b   { color: var(--ink); font-weight: 600; }
 
 .footer { background: var(--green-bg); padding: 7px 44px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; margin-top: auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.footer-l { font-size: 7px; font-weight: 500; color: rgba(241,237,227,.35); letter-spacing: .14em; text-transform: uppercase; }
-.footer-c { font-size: 6.5px; color: rgba(241,237,227,.18); }
-.footer-r { font-size: 7px; color: rgba(241,237,227,.25); }
+.footer-l { font-size: 7px; font-weight: 500; color: rgba(255,255,255,.35); letter-spacing: .14em; text-transform: uppercase; }
+.footer-c { font-size: 6.5px; color: rgba(255,255,255,.18); }
+.footer-r { font-size: 7px; color: rgba(255,255,255,.25); }
 
 .print-bar { position: fixed; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 50; }
-.print-bar button { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; background: var(--green-bg); color: #F1EDE3; }
+.print-bar button { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; background: var(--green-bg); color: #ffffff; }
 @media print { body { background: #fff; } .page { margin-bottom: 0; } .print-bar { display: none; } }
 </style>
 </head>
@@ -84,7 +84,7 @@ body { font-family: 'Inter', sans-serif; background: #f0efec; color: var(--ink);
       <svg class="hdr-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg>
       <div>
         <div class="hdr-name">{{ $company['brand'] }}</div>
-        <div class="hdr-sub">{{ $company['group'] }}</div>
+        <div class="hdr-sub">{{ $company['location'] }}</div>
       </div>
     </div>
   </div>
