@@ -9,7 +9,7 @@
 
 <!-- HERO -->
 <tr>
-  <td style="background-color:#222530;padding:26px 36px 22px 36px;">
+  <td style="background-color:#053330;padding:26px 36px 22px 36px;">
     <p style="margin:0 0 7px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500;color:rgba(255,255,255,0.4);letter-spacing:0.24em;text-transform:uppercase;">{{ __('Activación de cuenta') }}</p>
     <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:22px;font-weight:300;color:#ffffff;letter-spacing:-0.02em;line-height:1.15;">{{ __('Te damos la') }} <strong style="font-weight:700;">{{ __('bienvenida') }}</strong></p>
   </td>

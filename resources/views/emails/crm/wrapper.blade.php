@@ -12,9 +12,9 @@
     $brand    = config('company.brand', 'BAHÍA MAR');
     $group    = config('company.group', 'BAHÍA MAR');
     $location = config('company.location', 'Cap Cana, Punta Cana, República Dominicana');
-    $email    = config('company.support_email', 'hello@makairesidences.com');
+    $email    = config('company.support_email', 'hello@landmasscapital.com');
     $phone    = config('company.phone', '+1 849 499 2578');
-    $website   = config('company.website', 'makairesidences.com');
+    $website   = config('company.website', 'landmasscapital.com');
     $docLabel  = $docLabel ?? '';
     $preheader = $preheader ?? '';
 @endphp
@@ -46,7 +46,7 @@
 
         <!-- HEADER -->
         <tr>
-          <td style="background-color:#171717;padding:22px 36px 20px 36px;">
+          <td style="background-color:#074540;padding:22px 36px 20px 36px;">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                 <td style="vertical-align:middle;">
@@ -86,7 +86,7 @@
 
         <!-- FOOTER -->
         <tr>
-          <td style="background-color:#171717;padding:16px 36px;">
+          <td style="background-color:#074540;padding:16px 36px;">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                 <td style="vertical-align:middle;">

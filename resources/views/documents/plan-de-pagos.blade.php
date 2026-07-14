@@ -305,7 +305,7 @@ body {
 
   <div class="footer">
     <div class="footer-l">{{ __('BAHÍA MAR') }}</div>
-    <div class="footer-c">+1 (809) 710-9044 · info@dunadevelopment.com · Cap Cana, R.D.</div>
+    <div class="footer-c">+1 (809) 710-9044 · info@landmasscapital.com · Cap Cana, R.D.</div>
     <div class="footer-r"><span class="f">{{ $referencia }}</span> {{ __('· Validez 30 días naturales') }}</div>
   </div>
 </div>

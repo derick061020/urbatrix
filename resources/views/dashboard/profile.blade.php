@@ -46,7 +46,7 @@
             <div class="flex items-center gap-5 flex-wrap">
                 <div class="relative">
                     <div id="avatar-preview"
-                         class="w-24 h-24 rounded-full overflow-hidden bg-[#1f2430] flex items-center justify-center text-white text-[28px] font-bold shadow-card border border-ink-200"
+                         class="w-24 h-24 rounded-full overflow-hidden bg-[#074540] flex items-center justify-center text-white text-[28px] font-bold shadow-card border border-ink-200"
                          @if($avatarUrl) style="background-image:url('{{ $avatarUrl }}');background-size:cover;background-position:center;" @endif>
                         @if(!$avatarUrl) {{ $initials ?: 'U' }} @endif
                     </div>

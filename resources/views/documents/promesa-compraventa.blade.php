@@ -186,7 +186,7 @@ body {
           &nbsp;&nbsp;&nbsp;Ensanche Serralles, Santo Domingo<br>
           <b>Representante:</b> Nacionalidad española<br>
           &nbsp;&nbsp;&nbsp;Pasaporte No. XDE584016<br>
-          <b>Correo:</b> jgonzalez@dunadevelopment.com
+          <b>Correo:</b> jgonzalez@landmasscapital.com
         </div>
       </div>
       <div class="cover-party-divider"></div>
@@ -264,7 +264,7 @@ body {
   <div class="body">
     <div class="sec-title">Promesa de Venta de Inmueble — Entre:</div>
 
-    <p class="p">De una parte, <strong>IGUANAS LAKE CONDO &amp; RESIDENCES, S.R.L.</strong>, sociedad constituida de conformidad con las leyes de la República Dominicana, provista del Registro Nacional de Contribuyentes (RNC) número: 1-33-17485-5, Registro Mercantil # 203755SD, con domicilio social en Calle Abraham Lincoln, No. 51, ensanche Serralles, Santo Domingo, República Dominicana, y debidamente representada por el señor <strong>JOSE ANTONIO GONZALEZ DIAZ</strong>, de nacionalidad española, mayor de edad, soltero, portador del pasaporte No. XDE584016, domiciliado y residente en la Calle A, No. 9, Urb. Fernández, Santo Domingo, Distrito Nacional, República Dominicana y accidentalmente en Punta Cana, Distrito Municipal de Verón, Municipio de Higüey, Provincia La Altagracia, República Dominicana, con el correo electrónico jgonzalez@dunadevelopment.com, quien en lo adelante y para los fines del presente Contrato se denominará <strong>EL DESARROLLADOR</strong>.</p>
+    <p class="p">De una parte, <strong>IGUANAS LAKE CONDO &amp; RESIDENCES, S.R.L.</strong>, sociedad constituida de conformidad con las leyes de la República Dominicana, provista del Registro Nacional de Contribuyentes (RNC) número: 1-33-17485-5, Registro Mercantil # 203755SD, con domicilio social en Calle Abraham Lincoln, No. 51, ensanche Serralles, Santo Domingo, República Dominicana, y debidamente representada por el señor <strong>JOSE ANTONIO GONZALEZ DIAZ</strong>, de nacionalidad española, mayor de edad, soltero, portador del pasaporte No. XDE584016, domiciliado y residente en la Calle A, No. 9, Urb. Fernández, Santo Domingo, Distrito Nacional, República Dominicana y accidentalmente en Punta Cana, Distrito Municipal de Verón, Municipio de Higüey, Provincia La Altagracia, República Dominicana, con el correo electrónico jgonzalez@landmasscapital.com, quien en lo adelante y para los fines del presente Contrato se denominará <strong>EL DESARROLLADOR</strong>.</p>
 
     <p class="p">Nombre(s) de "El Comprador": <span class="f">{{ $comprador_nombre }}</span><br>
     Empresa o Individuo: <span class="f">{{ $comprador_tipo }}</span><br>

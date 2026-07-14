@@ -22,9 +22,9 @@ return [
     'address'      => env('COMPANY_ADDRESS', 'Cap Cana, Punta Cana, República Dominicana'),
 
     // Contacto
-    'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@makairesidences.com'),
+    'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@landmasscapital.com'),
     'phone'         => env('COMPANY_PHONE', '+1 849 499 2578'),
-    'website'       => env('COMPANY_WEBSITE', 'makairesidences.com'),
+    'website'       => env('COMPANY_WEBSITE', 'landmasscapital.com'),
 
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Landmass'),

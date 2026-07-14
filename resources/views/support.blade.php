@@ -121,8 +121,8 @@
   .ts.open{ color:var(--brand-dark); background:var(--brand-bg); } .ts.proc{ color:var(--info-ink); background:var(--info-bg); } .ts.done{ color:#15803d; background:var(--green-bg); }
   .ticket .tq{ font-size:13px; font-weight:600; color:var(--ink-strong); margin-top:7px; }
   .ticket .tm{ font-size:11px; color:var(--muted); margin-top:3px; }
-  .btn-primary{ font:inherit; font-size:13px; font-weight:700; border:0; background:#1f2430; color:#fff; border-radius:10px; padding:11px 14px; cursor:pointer; width:100%; transition:background-color .15s; }
-  .btn-primary:hover{ background:#141821; }
+  .btn-primary{ font:inherit; font-size:13px; font-weight:700; border:0; background:#074540; color:#fff; border-radius:10px; padding:11px 14px; cursor:pointer; width:100%; transition:background-color .15s; }
+  .btn-primary:hover{ background:#053330; }
   .newform{ display:none; margin-top:12px; border-top:1px solid var(--line-2); padding-top:14px; }
   .newform.show{ display:block; }
   .newform label{ display:block; font-size:11.5px; font-weight:600; color:var(--muted-2); margin:0 0 5px; }
@@ -214,7 +214,7 @@
                 @if($user && $user->avatar)
                   <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
                 @else
-                  <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1f2430;color:white;font-family:var(--ff);font-weight:600;font-size:16px;border-radius:999px;">{{ $userInitials }}</span>
+                  <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#074540;color:white;font-family:var(--ff);font-weight:600;font-size:16px;border-radius:999px;">{{ $userInitials }}</span>
                 @endif
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
@@ -337,9 +337,9 @@
         <div class="ch mail">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
           <div class="cn">{{ __('Email') }}</div>
-          <div class="cv"><b>soporte@urbatrix.com</b></div>
+          <div class="cv"><b>soporte@landmasscapital.com</b></div>
           <div class="sla">{{ __('Respondemos en hasta 48 h hábiles') }}</div>
-          <a class="cta ghost" href="mailto:soporte@urbatrix.com">{{ __('Escribir') }}</a>
+          <a class="cta ghost" href="mailto:soporte@landmasscapital.com">{{ __('Escribir') }}</a>
         </div>
         <div class="ch tel">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></div>
@@ -419,7 +419,7 @@
     <div class="statusbar"><span class="dot"></span> {{ __('Todos los sistemas operativos · estado en vivo') }}</div>
     <div class="note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <span>Los plazos de respuesta son reales según horario laboral; para temas legales o de privacidad se aplican los canales y plazos específicos (legal@ / privacidad@urbatrix.com). El estado del servicio refleja datos reales, no estimaciones.</span>
+      <span>Los plazos de respuesta son reales según horario laboral; para temas legales o de privacidad se aplican los canales y plazos específicos (legal@ / privacidad@landmasscapital.com). El estado del servicio refleja datos reales, no estimaciones.</span>
     </div>
 
   </div>

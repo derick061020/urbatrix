@@ -51,8 +51,8 @@
         transition: background-color .15s, border-color .15s, color .15s, transform .12s;
       }
       .auth-btn:active { transform: translateY(1px); }
-      .auth-btn-primary { background:#1f2430; color:#fff; border:1px solid #1f2430; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
-      .auth-btn-primary:hover { background:#141821; border-color:#141821; }
+      .auth-btn-primary { background:#074540; color:#fff; border:1px solid #074540; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
+      .auth-btn-primary:hover { background:#053330; border-color:#053330; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#fff; color:#171717; border:1px solid #ebebeb; }
       .auth-btn-ghost:hover { background:#f8f8f8; }
@@ -76,7 +76,7 @@
         transition: background-color .2s, color .2s, border-color .2s;
       }
       .step-pill.active       { color:#171717; }
-      .step-pill.active .num  { background:#222530; color:#fff; border-color:#222530; }
+      .step-pill.active .num  { background:#053330; color:#fff; border-color:#053330; }
       .step-pill.done         { color:#171717; }
       .step-pill.done .num    { background:#1fc16b; color:#fff; border-color:#1fc16b; }
 

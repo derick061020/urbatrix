@@ -28,7 +28,7 @@
 
         <!-- HEADER -->
         <tr>
-          <td style="background-color:#171717;padding:22px 36px 20px 36px;">
+          <td style="background-color:#074540;padding:22px 36px 20px 36px;">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                 <td style="vertical-align:middle;">
@@ -58,7 +58,7 @@
 
         <!-- HERO -->
         <tr>
-          <td style="background-color:#222530;padding:28px 36px 24px 36px;">
+          <td style="background-color:#053330;padding:28px 36px 24px 36px;">
             @if($eyebrow)<p style="margin:0 0 8px 0;font-size:9px;font-weight:600;color:#074540;letter-spacing:0.24em;text-transform:uppercase;">{{ $eyebrow }}</p>@endif
             <p style="margin:0;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-size:23px;font-weight:600;color:#ffffff;letter-spacing:-0.02em;line-height:1.18;">{!! $title !!}</p>
           </td>
@@ -78,7 +78,7 @@
 
         <!-- FOOTER -->
         <tr>
-          <td style="background-color:#171717;padding:16px 36px;">
+          <td style="background-color:#074540;padding:16px 36px;">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                 <td style="vertical-align:middle;">

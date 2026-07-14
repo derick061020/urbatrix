@@ -27,7 +27,7 @@
       <td style="background-color:#ffffff;padding:0 36px 0 36px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top:1px solid #eaecf0;">
           <tr>
-            <td colspan="2" style="background-color:#171717;padding:20px 18px;">
+            <td colspan="2" style="background-color:#074540;padding:20px 18px;">
               <p style="margin:0 0 4px 0;font-size:9px;font-weight:500;color:#f97066;letter-spacing:0.14em;text-transform:uppercase;">{{ __('Progreso actual de obra') }}</p>
               <p style="margin:0;font-size:30px;font-weight:600;color:#ffffff;letter-spacing:-0.01em;">{{ $report->overall_progress }}<span style="font-size:18px;">%</span> <span style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.5);">{{ __('completado') }}</span></p>
               <!-- barra -->

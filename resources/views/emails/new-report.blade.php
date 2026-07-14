@@ -38,7 +38,7 @@
             </td>
           </tr>
           <tr>
-            <td colspan="2" style="background-color:#171717;padding:18px 16px;">
+            <td colspan="2" style="background-color:#074540;padding:18px 16px;">
               <p style="margin:0 0 4px 0;font-size:9px;font-weight:500;color:#f97066;letter-spacing:0.14em;text-transform:uppercase;">Avance actual · {{ $report->period }}</p>
               <p style="margin:0;font-size:26px;font-weight:600;color:#ffffff;letter-spacing:-0.01em;">{{ $report->overall_progress }}%</p>
               <p style="margin:5px 0 0 0;font-size:10px;color:rgba(255,255,255,0.45);">completado · entrega estimada {{ $report->estimated_delivery ?: 'Q4 2026' }}</p>

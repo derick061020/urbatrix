@@ -141,7 +141,7 @@
 
     .acm-toast {
         position:fixed; bottom:24px; left:50%; transform: translateX(-50%);
-        background:#171717; color:#fff; padding:10px 18px; border-radius:12px;
+        background:#074540; color:#fff; padding:10px 18px; border-radius:12px;
         font-size:13px; font-weight:500;
         box-shadow:0 12px 32px -8px rgba(10,13,20,.35);
         z-index:1300; opacity:0; transition: opacity .2s, transform .2s;
@@ -736,7 +736,7 @@ function fmt$(n) { return '$' + Number(n || 0).toLocaleString('en-US'); }
 function acmToast(msg, type) {
     const t = document.getElementById('acm-toast');
     t.textContent = msg;
-    t.style.background = type === 'err' ? '#fb3748' : (type === 'ok' ? '#1daf61' : '#171717');
+    t.style.background = type === 'err' ? '#fb3748' : (type === 'ok' ? '#1daf61' : '#074540');
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2600);
 }

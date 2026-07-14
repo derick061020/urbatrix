@@ -11,7 +11,7 @@
        table's / cell's overflow-x-auto (which also clips overflow-y). */
     #dot-tip-float {
         position: fixed; z-index: 1000; transform: translate(-50%, -100%);
-        background: #222530; color: #fff; font-size: 11px; font-weight: 500; line-height: 1.2;
+        background: #053330; color: #fff; font-size: 11px; font-weight: 500; line-height: 1.2;
         padding: 5px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none;
         opacity: 0; visibility: hidden; transition: opacity .12s;
         box-shadow: 0 4px 12px -2px rgba(0,0,0,.25);

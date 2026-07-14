@@ -37,7 +37,7 @@
 
   $recipientName = request('to', 'Cliente');
   $advisorName   = optional($unit->agent)->name ?? 'Carlos Ramírez Méndez';
-  $advisorEmail  = optional($unit->agent)->email ?? 'carlos.ramirez@dunadevelopment.com';
+  $advisorEmail  = optional($unit->agent)->email ?? 'carlos.ramirez@landmasscapital.com';
   $advisorPhone  = '+1 (809) 710-9044';
   $advisorWA     = '18097109044';
   $advisorInitials = collect(explode(' ', $advisorName))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('');
@@ -79,7 +79,7 @@ body {
 .sheet:last-of-type { page-break-after: auto; break-after: auto; }
 .sheet-inner { transform-origin: top left; }
 
-.hdr { background: #171717; padding: 14px 36px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #074540; }
+.hdr { background: #074540; padding: 14px 36px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #EEDCCF; }
 .hdr-logo { display: flex; align-items: center; gap: 12px; }
 .hdr-isotipo { width: 32px; height: 32px; flex-shrink: 0; object-fit: contain; }
 .hdr-wordmark { display: flex; flex-direction: column; gap: 2px; }
@@ -90,9 +90,9 @@ body {
 .hdr-date { font-size: 10.5px; color: rgba(255,255,255,.68); margin-top: 5px; }
 .hdr-ref { font-size: 8px; font-weight: 700; color: #074540; letter-spacing: .1em; margin-top: 3px; }
 
-.hdr-for-strip { background: #1f2430; padding: 6px 36px; border-top: 1px solid rgba(7,69,64,.15); border-bottom: 1px solid rgba(7,69,64,.15); font-size: 8px; font-weight: 600; color: #074540; letter-spacing: .1em; text-transform: uppercase; }
+.hdr-for-strip { background: #074540; padding: 6px 36px; border-top: 1px solid rgba(7,69,64,.15); border-bottom: 1px solid rgba(7,69,64,.15); font-size: 8px; font-weight: 600; color: #EEDCCF; letter-spacing: .1em; text-transform: uppercase; }
 
-.hero { background: linear-gradient(140deg, #222530 0%, #171717 55%, #2b303b 100%); padding: 24px 36px; display: flex; gap: 26px; align-items: center; position: relative; }
+.hero { background: linear-gradient(140deg, #074540 0%, #053330 55%, #096057 100%); padding: 24px 36px; display: flex; gap: 26px; align-items: center; position: relative; }
 .hero-img { width: 220px; height: 176px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,.12); overflow: hidden; }
 .hero-img img { width: 100%; height: 100%; object-fit: cover; }
 .hero-img-label { font-size: 28px; font-weight: 700; letter-spacing: .06em; }
@@ -182,7 +182,7 @@ body {
 .airbnb-dv { font-weight: 600; color: #171717; }
 .airbnb-dv.green { color: #059669; }
 .airbnb-dv.red { color: #DC2626; }
-.airbnb-total { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #171717; font-size: 11px; font-weight: 700; }
+.airbnb-total { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #074540; font-size: 11px; font-weight: 700; }
 .airbnb-total-lbl { color: rgba(255,255,255,.7); }
 .airbnb-total-val { color: #074540; font-size: 14px; }
 
@@ -216,8 +216,8 @@ body {
 
 .cta-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
 .cta-box { padding: 16px 18px; display: flex; flex-direction: column; }
-.cta-reserve { background: #171717; border-top: 2px solid #074540; }
-.cta-visit { background: #F9FAFB; border: 1px solid #E9EAEC; border-top: 2px solid #171717; }
+.cta-reserve { background: #074540; border-top: 2px solid #EEDCCF; }
+.cta-visit { background: #F9FAFB; border: 1px solid #E9EAEC; border-top: 2px solid #074540; }
 .cta-label { font-size: 7px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 8px; }
 .cta-reserve .cta-label { color: rgba(255,255,255,.28); }
 .cta-visit .cta-label { color: #9CA3AF; }
@@ -231,8 +231,17 @@ body {
 .cta-reserve .cta-desc { color: rgba(255,255,255,.42); }
 .cta-visit .cta-desc { color: #6B7280; }
 .cta-link { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; display: inline-block; }
-.cta-reserve .cta-link { color: #074540; }
+.cta-reserve .cta-link { color: #EEDCCF; }
 .cta-visit .cta-link { color: #171717; }
+/* Cream accents on the green (formerly dark) surfaces so nothing disappears */
+.hdr-ref { color: #EEDCCF; }
+.hero-roi { background: rgba(238,220,207,.14); border-color: rgba(238,220,207,.32); color: #EEDCCF; }
+.reserve-lbl { color: rgba(238,220,207,.62); }
+.reserve-amt { color: #EEDCCF; }
+.reserve-cur { color: rgba(238,220,207,.62); }
+.airbnb-total-val { color: #EEDCCF; }
+.cta-reserve .cta-amount { color: #EEDCCF; }
+.cta-reserve .cta-amount-cur { color: rgba(238,220,207,.6); }
 
 .qr-section { display: flex; align-items: center; justify-content: center; gap: 64px; padding: 22px 0 14px; }
 .qr-divider { width: 1px; height: 120px; background: #E5E7EB; }
@@ -432,7 +441,7 @@ body {
       <div class="advisor-name">{{ $advisorName }}</div>
       <div class="advisor-contact">
         {{ $advisorEmail }}<br>
-        dunadevelopment.com · Cap Cana, R.D.
+        landmasscapital.com · Cap Cana, R.D.
       </div>
     </div>
     <div class="advisor-cta">

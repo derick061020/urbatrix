@@ -45,7 +45,7 @@
             <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
                    class="tf-input mt-1.5 tracking-[0.3em] text-center" placeholder="000000" autofocus>
             <button type="submit"
-                    class="w-full h-[46px] mt-4 rounded-xl bg-[#1f2430] hover:bg-[#141821] text-white font-semibold text-[14px] transition">
+                    class="w-full h-[46px] mt-4 rounded-xl bg-[#074540] hover:bg-[#053330] text-white font-semibold text-[14px] transition">
                 Verificar
             </button>
         </form>
@@ -57,7 +57,7 @@
             <input type="text" name="recovery_code"
                    class="tf-input mt-1.5 text-center uppercase" placeholder="XXXX-XXXX">
             <button type="submit"
-                    class="w-full h-[46px] mt-4 rounded-xl bg-[#1f2430] hover:bg-[#141821] text-white font-semibold text-[14px] transition">
+                    class="w-full h-[46px] mt-4 rounded-xl bg-[#074540] hover:bg-[#053330] text-white font-semibold text-[14px] transition">
                 Verificar
             </button>
         </form>

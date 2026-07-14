@@ -38,8 +38,8 @@
       .has-trail { padding-right:40px; }
       .auth-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:10px; font-weight:500; font-size:14px; line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s, color .15s, transform .12s; }
       .auth-btn:active { transform: translateY(1px); }
-      .auth-btn-primary { background:#1f2430; color:#fff; border:1px solid #1f2430; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
-      .auth-btn-primary:hover { background:#141821; border-color:#141821; }
+      .auth-btn-primary { background:#074540; color:#fff; border:1px solid #074540; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
+      .auth-btn-primary:hover { background:#053330; border-color:#053330; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#f5f5f5; color:#171717; border:1px solid transparent; }
       .auth-btn-ghost:hover { background:#ebebeb; }

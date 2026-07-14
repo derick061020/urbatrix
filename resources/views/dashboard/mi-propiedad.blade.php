@@ -217,7 +217,7 @@
             {{-- Asesor card --}}
             <div class="cli-card p-4">
                 <div class="flex items-center gap-3">
-                    <div class="cli-avatar" style="background:#1f2430">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
+                    <div class="cli-avatar" style="background:#074540">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? 'Carlos Méndez' }}</div>
                         <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> {{ __('Disponible ahora') }}</div>

@@ -838,7 +838,7 @@
     .sh-social-btn.fb  .sh-social-icon { background:#1877F2; color:#fff; }
     .sh-social-btn.tw  .sh-social-icon { background:#000;     color:#fff; }
     .sh-social-btn.em  .sh-social-icon { background:#074540;  color:#fff; }
-    .sh-social-btn.sm  .sh-social-icon { background:#222530;  color:#fff; }
+    .sh-social-btn.sm  .sh-social-icon { background:#053330;  color:#fff; }
 
     .sh-url-row {
         margin: 8px 22px 0;
@@ -855,12 +855,12 @@
     .sh-copy-btn {
         flex-shrink:0;
         padding: 9px 16px; border-radius: 9px;
-        background:#1f2430; color:#fff; border:none; cursor:pointer;
+        background:#074540; color:#fff; border:none; cursor:pointer;
         font-size:13px; font-weight:600;
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
     }
-    .sh-copy-btn:hover { background:#141821; }
+    .sh-copy-btn:hover { background:#053330; }
     .sh-copy-btn.copied { background:#1fc16b; }
 
     .sh-divider {
@@ -1305,8 +1305,8 @@
     }
     .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .vc-btn-ghost:hover { background:#f5f7fa; }
-    .vc-btn-primary { background:#1f2430; color:#fff; border-color:#1f2430; }
-    .vc-btn-primary:hover { background:#141821; border-color:#141821; }
+    .vc-btn-primary { background:#074540; color:#fff; border-color:#074540; }
+    .vc-btn-primary:hover { background:#053330; border-color:#053330; }
 
     .vc-alert {
         margin: 0 20px 12px;
@@ -1839,7 +1839,7 @@
 
         <!-- CENTER: Units sold + online users -->
         <div class="nav-center" style="display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0;">
-          <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:#1f2430;text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
+          <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:#074540;text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
           <div class="nav-online" style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
             <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> {{ __('online_users') }}</span>
@@ -1915,7 +1915,7 @@
               @if(auth()->check() && auth()->user()->avatar)
                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="display:inline-block;width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" aria-hidden="true">
               @else
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1f2430;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#074540;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
                   {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
                 </span>
               @endif
@@ -1930,7 +1930,7 @@
                   @if(auth()->check() && auth()->user()->avatar)
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
                   @else
-                    <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1f2430;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
+                    <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#074540;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
                       {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
                     </span>
                   @endif
@@ -2369,7 +2369,7 @@
                 @php $priceSep = \Illuminate\Support\Str::startsWith(app()->getLocale(), 'es') ? '.' : ','; @endphp
                 <input type="text" inputmode="numeric" id="maxPrice" oninput="formatPriceInput(this)" placeholder="1{{ $priceSep }}000{{ $priceSep }}000" style="width:100%;padding:6px 8px;border:1px solid #ebebeb;border-radius:6px;font-size:14px;font-family:'Poppins',sans-serif;">
               </div>
-              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:#1f2430;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
+              <button onclick="applyPriceFilter()" style="width:100%;padding:8px;background:#074540;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;">{{__('Apply')}}</button>
             </div>
           </div>
 

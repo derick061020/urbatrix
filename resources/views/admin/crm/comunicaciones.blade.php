@@ -364,7 +364,7 @@
     function toast(msg){
         if(!toastEl){
             toastEl = document.createElement('div');
-            toastEl.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#222530;color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:80;';
+            toastEl.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#053330;color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:80;';
             document.body.appendChild(toastEl);
         }
         toastEl.textContent = msg;

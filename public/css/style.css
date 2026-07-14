@@ -982,7 +982,7 @@
       position: absolute;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
-        #1f2430;
+        #074540;
       height: 44px;
       left: 0;
       top: 0;
@@ -1119,7 +1119,7 @@
     .fg-location-btn.active {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
-        #1f2430;
+        #074540;
       border: none;
       box-shadow:
         0 10px 22px -6px rgba(31,36,48,0.45),

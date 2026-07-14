@@ -55,9 +55,9 @@
     .pm-btn:hover { transform: translateY(-1px); }
     .pm-btn-ghost { background: #fff; color: #344054; }
     .pm-btn-ghost:hover { background: #f4f4f5; }
-    .pm-btn-primary { background: #1f2430; border-color: #1f2430; color: #fff; }
-    .pm-btn-primary:hover { background: #141821; border-color: #141821; }
-    .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #1f2430; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
+    .pm-btn-primary { background: #074540; border-color: #074540; color: #fff; }
+    .pm-btn-primary:hover { background: #053330; border-color: #053330; }
+    .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #074540; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
     .pm-upload { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #074540; cursor: pointer; }
     .pm-alert { padding: 10px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 16px; }
     .pm-alert-ok { background: #e8f5ee; border: 1px solid rgba(31,193,107,.3); color: #0f7a45; }

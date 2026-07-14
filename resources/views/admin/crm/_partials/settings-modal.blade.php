@@ -115,8 +115,8 @@
     }
     .st-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .st-btn-ghost:hover { background:#f5f7fa; }
-    .st-btn-primary { background:#1f2430; color:#fff; border-color:#1f2430; }
-    .st-btn-primary:hover { background:#141821; border-color:#141821; }
+    .st-btn-primary { background:#074540; color:#fff; border-color:#074540; }
+    .st-btn-primary:hover { background:#053330; border-color:#053330; }
     .st-btn-link { background:transparent; color:#074540; border:none; padding:6px 8px; font-weight:600; font-size:12px; cursor:pointer; }
     .st-btn-link:hover { color:#053330; }
 
@@ -752,7 +752,7 @@
                        
                         <div>
                             <label class="st-row-label" style="font-size:12px; display:block; margin-bottom:6px;">{{ __('URL del sitio web') }}</label>
-                            <input type="url" id="cmSiteUrl" value="{{ \App\Models\Setting::get('site_url', '') }}" placeholder="https://makairesidences.com"
+                            <input type="url" id="cmSiteUrl" value="{{ \App\Models\Setting::get('site_url', '') }}" placeholder="https://landmasscapital.com"
                                    style="width:100%; max-width:480px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
                         </div>
                     </div>
