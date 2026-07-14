@@ -7,7 +7,7 @@
 <style>
     .brk-field label{ font-size:11.5px; font-weight:600; color:#525866; margin-bottom:5px; display:block; }
     .brk-field select{ font-size:13.5px; color:#222530; border:1px solid #eaecf0; border-radius:8px; background:#fff; padding:9px 11px; width:100%; outline:none; }
-    .brk-field select:focus{ border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
+    .brk-field select:focus{ border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.18); }
 </style>
 @endpush
 
@@ -20,7 +20,7 @@
     <div class="brk-card p-5">
         <div class="flex items-center justify-between mb-4">
             <span class="text-[14px] font-bold text-ink-950">{{ __('Material descargable') }}</span>
-            <span class="brk-pill bg-brand text-white">{{ __('Aprobado por Duna') }}</span>
+            <span class="brk-pill bg-brand text-white">{{ __('Aprobado por Landmass') }}</span>
         </div>
         @if($materials->count())
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -41,7 +41,7 @@
                 @endforeach
             </div>
         @else
-            <div class="text-[12px] text-ink-400 text-center py-8">{{ __('Aún no hay material publicado. Duna lo cargará próximamente.') }}</div>
+            <div class="text-[12px] text-ink-400 text-center py-8">{{ __('Aún no hay material publicado. Landmass lo cargará próximamente.') }}</div>
         @endif
     </div>
 

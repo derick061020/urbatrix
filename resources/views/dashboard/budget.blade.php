@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Presupuesto — MAKAI')
+@section('title', 'Presupuesto — BAHÍA MAR')
 @section('page_title', 'Presupuesto')
 @section('page_breadcrumb', 'Mi Propiedad · Presupuesto')
 @php $activeRoute = 'mi-propiedad'; @endphp
@@ -16,7 +16,7 @@
 
     {{-- Header --}}
     <div class="cli-card overflow-hidden">
-        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#e11019 0%, #960a10 100%)">
+        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#074540 0%, #960a10 100%)">
             <div class="absolute -top-20 -right-32 w-[440px] h-[440px] pointer-events-none opacity-25" style="background:
                 radial-gradient(circle at center, transparent 47%, rgba(255,255,255,.5) 47.5%, rgba(255,255,255,.5) 48.5%, transparent 49%),
                 radial-gradient(circle at center, transparent 35%, rgba(255,255,255,.45) 35.5%, rgba(255,255,255,.45) 36.5%, transparent 37%),
@@ -29,7 +29,7 @@
                 <div>
                     <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Presupuesto') }}</div>
                     <div class="font-display text-[32px] font-medium leading-tight">{{ $unidad }}</div>
-                    <div class="text-[13px] opacity-80">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
+                    <div class="text-[13px] opacity-80">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
                 </div>
             </div>
         </div>

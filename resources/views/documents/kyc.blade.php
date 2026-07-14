@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ __('LANDMASS · KYC — Verificación de Identidad') }}</title>
+<title>{{ __('BAHÍA MAR · KYC — Verificación de Identidad') }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 @page { margin: 0; size: A4 portrait; }
@@ -45,7 +45,7 @@ body {
 
 .hdr {
   background: var(--green-bg);
-  border-bottom: 3px solid #e11019;
+  border-bottom: 3px solid #074540;
   padding: 16px 44px;
   display: flex;
   align-items: center;
@@ -250,7 +250,7 @@ body {
   <div class="hdr">
     <div class="hdr-logo">
       <svg class="hdr-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg>
-      <span class="hdr-name">LANDMASS</span>
+      <span class="hdr-name">BAHÍA MAR</span>
     </div>
     <div class="hdr-right">
       <div class="hdr-doc">{{ __('KYC · Verificación de Identidad') }}</div>
@@ -394,7 +394,7 @@ body {
     <div class="declaration">
       <div class="declaration-title">{{ __('Declaración del titular') }}</div>
       <div class="declaration-text">
-        Yo, <strong>{{ $comprador_nombre }}</strong>, declaro bajo juramento que los datos suministrados en el presente formulario son verídicos, completos y exactos al momento de su llenado. Me comprometo a notificar a Duna Development Group cualquier cambio que se produzca en la información aquí registrada. Asimismo, autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la empresa.
+        Yo, <strong>{{ $comprador_nombre }}</strong>, declaro bajo juramento que los datos suministrados en el presente formulario son verídicos, completos y exactos al momento de su llenado. Me comprometo a notificar a Landmass cualquier cambio que se produzca en la información aquí registrada. Asimismo, autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la empresa.
       </div>
     </div>
 
@@ -409,7 +409,7 @@ body {
       <div class="sig-block">
         <div class="sig-role">{{ __('Verificado por') }}</div>
         <div class="sig-name">{{ $asesor }}</div>
-        <div class="sig-entity">{{ __('Asesor Comercial · Duna Development Group') }}</div>
+        <div class="sig-entity">{{ __('Asesor Comercial · Landmass') }}</div>
         <div class="sig-line"></div>
         <div class="sig-label">{{ __('Firma · Sello · Fecha: _____ / _____ / _________') }}</div>
       </div>
@@ -418,7 +418,7 @@ body {
   </div>
 
   <div class="footer">
-    <div class="footer-l">{{ __('LANDMASS · Confidencial') }}</div>
+    <div class="footer-l">{{ __('BAHÍA MAR · Confidencial') }}</div>
     <div class="footer-c">{{ __('Este documento contiene información personal protegida. Uso interno exclusivo.') }}</div>
     <div class="footer-r">{{ __('KYC · Pág. 1 de 1') }}</div>
   </div>

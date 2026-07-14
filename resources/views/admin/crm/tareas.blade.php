@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Tareas — CRM Duna Makai')
+@section('title', 'Tareas — CRM Landmass Bahía Mar')
 @section('page_title', 'Tareas')
 @section('page_breadcrumb', 'Equipo · Tareas del día')
 @php $activeRoute = 'crm.tareas'; @endphp

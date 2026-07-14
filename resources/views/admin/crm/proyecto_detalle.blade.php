@@ -1,12 +1,12 @@
 @extends('layouts.admin_crm')
-@section('title', $proyecto->name . ' — CRM Duna Makai')
+@section('title', $proyecto->name . ' — CRM Landmass Bahía Mar')
 @section('page_title', 'Ficha de Proyecto')
 @section('page_breadcrumb', 'Proyectos · Ficha completa')
 @php $activeRoute = 'crm.proyectos'; @endphp
 
 @section('content')
 @php
-    $color      = $proyecto->color ?? '#e11019';
+    $color      = $proyecto->color ?? '#074540';
     $totalUnits = (int) $proyecto->units_count;
     $sold       = (int) $proyecto->sold_count;
     $reserved   = (int) $proyecto->reserved_count;
@@ -88,7 +88,7 @@
             <div class="relative z-10 flex items-start gap-4">
                 <a href="{{ route('admin.crm.proyectos') }}" class="w-10 h-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25"><i class="pi pi-arrow-left text-[12px]"></i></a>
                 <div class="flex-1">
-                    <div class="text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold">{{ $proyecto->developer ?? 'Duna Development Group' }}</div>
+                    <div class="text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold">{{ $proyecto->developer ?? 'Landmass' }}</div>
                     <div class="font-display text-[28px] sm:text-[34px] font-semibold leading-tight mt-1">{{ $proyecto->name }}</div>
                     <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?? 'Cap Cana · Punta Cana' }}</div>
                 </div>
@@ -150,7 +150,7 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $invKpis = [
             ['Ventas cerradas',  '$'.number_format($vendidoSoloUSD / 1_000_000, 2).'M',  $sold.' unidades · prom. $'.number_format($avgPrice), '#fa7319'],
-            ['ROI total anual est.', number_format($avgRoi, 1).'%',                       round($avgRoi - 5, 1).'% renta neta + 5% apreciación', '#e11019'],
+            ['ROI total anual est.', number_format($avgRoi, 1).'%',                       round($avgRoi - 5, 1).'% renta neta + 5% apreciación', '#074540'],
             ['Renta mensual neta',  '$'.number_format($avgRentNet),                       'Tras 22% gestión · 72% ocup. estimada',                '#335cff'],
             ['Payback period',   '~'.($payback ?: '10.0').'a',                            'Retorno completo de capital invertido',               '#717784'],
         ]; @endphp
@@ -334,7 +334,7 @@
                 <div class="mt-2 flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-building"></i></div>
                     <div>
-                        <div class="text-[13px] font-bold text-ink-900">{{ $proyecto->rental_pool ?? 'Duna Hospitality Group' }}</div>
+                        <div class="text-[13px] font-bold text-ink-900">{{ $proyecto->rental_pool ?? 'Landmass Hospitality Group' }}</div>
                         <div class="text-[11px] text-ink-500">{{ __('Gestión profesional · 72% ocupación estimada') }}</div>
                     </div>
                 </div>
@@ -348,7 +348,7 @@
             ['Estado legal',  'Fideicomiso activo', 'Registrado ante DGII',                   'ok',   'pi-shield'],
             ['Riesgo entrega','Bajo',               '0 proyectos con retrasos',               'info', 'pi-bolt'],
             ['Financiamiento','Disponible',         'Bancos locales e internac.',             'warn', 'pi-wallet'],
-            ['Gestor de renta','Sí',                ($proyecto->rental_pool ?? 'Duna Hospitality Group'), 'err', 'pi-briefcase'],
+            ['Gestor de renta','Sí',                ($proyecto->rental_pool ?? 'Landmass Hospitality Group'), 'err', 'pi-briefcase'],
         ]; @endphp
         @foreach($statusStrip as $s)
             <div class="crm-card p-4 flex items-center gap-3">

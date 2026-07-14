@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'CRM Duna - Makai')</title>
+    <title>@yield('title', 'CRM Landmass - Bahía Mar')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
+              brand: { DEFAULT:'#074540', dark:'#053330', soft:'#07454033', tint:'#e8f0ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -60,9 +60,9 @@
       .crm-nav-link.active { background:#ffffff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
       .crm-nav-link.active::after {
           content:""; position:absolute; right:0px; top:6px; bottom:6px;
-          width:3px; border-radius:3px 0 0 3px; background:#e11019;
+          width:3px; border-radius:3px 0 0 3px; background:#074540;
       }
-      .crm-nav-link.active .pi { color:#e11019; }
+      .crm-nav-link.active .pi { color:#074540; }
       .crm-nav-section {
           font-size: 10px; font-weight: 600; color:#99a0ae;
           letter-spacing: .08em; text-transform: uppercase;
@@ -91,7 +91,7 @@
           border-bottom:2px solid transparent; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab-line.active { color:#222530; border-color:#e11019; font-weight:600; }
+      .crm-tab-line.active { color:#222530; border-color:#074540; font-weight:600; }
       .crm-btn {
           display:inline-flex; align-items:center; gap:6px;
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
@@ -124,7 +124,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .crm-input:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
+      .crm-input:focus { border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.18); }
       .crm-avatar {
           width:36px; height:36px; border-radius:999px;
           display:inline-flex; align-items:center; justify-content:center;
@@ -171,7 +171,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .topbar-search:focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.18); }
+      .topbar-search:focus { border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.18); }
 
       /* Search dropdown */
       .search-dropdown {
@@ -270,7 +270,7 @@
           cursor: pointer; transition: border-color .15s, box-shadow .15s;
       }
       .crm-select__btn:hover { border-color: #cacfd8; }
-      .crm-select.is-open .crm-select__btn { border-color: #e11019; box-shadow: 0 0 0 3px rgba(225,16,25,.18); }
+      .crm-select.is-open .crm-select__btn { border-color: #074540; box-shadow: 0 0 0 3px rgba(7,69,64,.18); }
       .crm-select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .crm-select__label.is-placeholder { color: #9aa1ad; }
       .crm-select__caret { font-size: 11px; color: #717784; flex-shrink: 0; transition: transform .15s; }
@@ -288,7 +288,7 @@
           background: transparent; text-align: left; cursor: pointer; transition: background-color .12s;
       }
       .crm-select__opt:hover, .crm-select__opt.is-highlight { background: #f8f4f4; }
-      .crm-select__check { font-size: 11px; color: #e11019; opacity: 0; flex-shrink: 0; }
+      .crm-select__check { font-size: 11px; color: #074540; opacity: 0; flex-shrink: 0; }
       .crm-select__opt.is-active .crm-select__check { opacity: 1; }
       .crm-select__opt.is-active { font-weight: 600; }
     </style>
@@ -311,8 +311,8 @@
                 </span>
             </span>
             <div class="flex-1 min-w-0 leading-none">
-                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">LANDMASS</div>
-                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
+                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">BAHÍA MAR</div>
+                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Landmass') }}</div>
             </div>
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
         </a>

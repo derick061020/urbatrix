@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Calendario — MAKAI')
+@section('title', 'Calendario — BAHÍA MAR')
 @section('page_title', 'Mi Propiedad')
 @section('page_breadcrumb', 'Mi Propiedad · Calendario')
 @php $activeRoute = 'calendario'; @endphp

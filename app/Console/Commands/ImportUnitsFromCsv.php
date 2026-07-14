@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Importa unidades de Makai desde las listas de precios en CSV
+ * Importa unidades de Bahía Mar desde las listas de precios en CSV
  * (database/data/makai_etapa_*.csv).
  *
  * Estructura esperada del CSV (17 columnas, generadas desde el Excel original):
@@ -37,7 +37,7 @@ class ImportUnitsFromCsv extends Command
 {
     protected $signature = 'units:import
                             {files?* : Rutas a los CSV (por defecto database/data/makai_etapa_*.csv)}
-                            {--project=Makai Cap Cana : Nombre del proyecto destino}
+                            {--project=Bahía Mar Cap Cana : Nombre del proyecto destino}
                             {--fresh : Borra todas las unidades del proyecto antes de importar}
                             {--public : Marca las unidades como públicas (visibles en el home)}
                             {--force : No pedir confirmación al borrar}';

@@ -2,7 +2,7 @@
     @php
         $linkBase = 'inline-flex items-center justify-center min-w-[34px] h-[34px] px-2 rounded-lg text-[13px] font-semibold transition-colors';
         $idle = 'text-ink-700 bg-white border border-ink-100 hover:bg-ink-50';
-        $active = 'text-white bg-[#e11019] border border-[#e11019]';
+        $active = 'text-white bg-[#074540] border border-[#074540]';
         $disabled = 'text-ink-300 bg-white border border-ink-100 cursor-not-allowed';
     @endphp
     <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" role="navigation" aria-label="{{ __('Paginación') }}">

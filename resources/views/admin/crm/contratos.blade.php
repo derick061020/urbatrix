@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Reservas y Contratos — CRM Duna Makai')
+@section('title', 'Reservas y Contratos — CRM Landmass Bahía Mar')
 @section('page_title', 'Reservas y Contratos')
 @section('page_breadcrumb', 'Gestión · Reservas y contratos')
 @php $activeRoute = 'crm.contratos'; @endphp
@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
         @php $kpi = [
-            ['n' => $reservasCount,  'label' => 'Reservas',    'c' => '#e11019'],
+            ['n' => $reservasCount,  'label' => 'Reservas',    'c' => '#074540'],
             ['n' => $countContratos, 'label' => 'Contratos',   'c' => '#335cff'],
             ['n' => $porFirmar,      'label' => 'Por firmar',  'c' => '#fa7319'],
             ['n' => $pagoVencido,    'label' => 'Pago vencido','c' => '#fb3748'],
@@ -105,7 +105,7 @@
                             <td class="text-[13px] font-semibold text-ink-900">{{ $r->first_name }} {{ $r->last_name }}</td>
                             <td>
                                 <div class="text-[13px] text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Bahía Mar Residences') }}</div>
                             </td>
                             <td><span class="crm-pill {{ $tipoColor[$tipo] }}">{{ $tipo }}</span></td>
                             <td><span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }}">{{ $estado[0] }}</span></td>

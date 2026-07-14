@@ -18,7 +18,7 @@
   --green:    #525866;
   --green-bg: #171717;
   --field-bg: #f5f7fa;
-  --gold:     #e11019;
+  --gold:     #074540;
 }
 
 body {

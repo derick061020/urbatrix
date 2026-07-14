@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Transacciones — CRM Duna Makai')
+@section('title', 'Transacciones — CRM Landmass Bahía Mar')
 @section('page_title', 'Transacciones')
 @section('page_breadcrumb', 'Gestión · Transacciones y pagos')
 @php $activeRoute = 'transactions-report'; @endphp
@@ -100,7 +100,7 @@
                             <td class="text-[13px] font-semibold text-ink-900">{{ $r?->first_name }} {{ $r?->last_name }}</td>
                             <td>
                                 <div class="text-[13px] text-ink-900">{{ $r?->unit?->name ?? $r?->unit?->custom_id ?? '—' }}</div>
-                                <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Bahía Mar Residences') }}</div>
                             </td>
                             <td class="text-[13px] text-ink-700">{{ $p->label ?? $p->payment_type }}</td>
                             <td class="text-[13px] font-bold text-ok-dark">${{ number_format($p->amount, 0) }}</td>

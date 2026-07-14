@@ -32,7 +32,7 @@
               <p style="margin:0;font-size:30px;font-weight:600;color:#ffffff;letter-spacing:-0.01em;">{{ $report->overall_progress }}<span style="font-size:18px;">%</span> <span style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.5);">{{ __('completado') }}</span></p>
               <!-- barra -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:12px;background:rgba(255,255,255,0.12);border-radius:3px;">
-                <tr><td style="height:6px;font-size:0;line-height:0;background:#e11019;border-radius:3px;width:{{ max(2,min(100,$report->overall_progress)) }}%;">&nbsp;</td></tr>
+                <tr><td style="height:6px;font-size:0;line-height:0;background:#074540;border-radius:3px;width:{{ max(2,min(100,$report->overall_progress)) }}%;">&nbsp;</td></tr>
               </table>
             </td>
           </tr>
@@ -62,7 +62,7 @@
       <td style="background-color:#ffffff;padding:24px 36px 8px 36px;">
         <p style="margin:0 0 12px 0;font-size:12px;color:#525866;line-height:1.65;">{{ __('Accede a la galería fotográfica completa y al detalle de los hitos de construcción en tu portal.') }}</p>
         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-          <tr><td style="background-color:#e11019;">
+          <tr><td style="background-color:#074540;">
             <a href="{{ $linkPortal }}" style="display:inline-block;padding:11px 24px;font-size:11px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">{{ __('Ver galería y reporte') }}</a>
           </td></tr>
         </table>
@@ -74,7 +74,7 @@
       <td style="background-color:#ffffff;padding:20px 36px 32px 36px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
           <tr>
-            <td style="padding:0 0 0 20px;border-left:2px solid #e11019;">
+            <td style="padding:0 0 0 20px;border-left:2px solid #074540;">
               @php $asesor = $nombreAsesor ? ', tu asesor '.e($nombreAsesor).',' : ''; @endphp
               <p style="margin:0;font-size:12px;color:#525866;line-height:1.6;">Ante cualquier consulta{!! $asesor !!} estamos a tu disposición en <strong style="color:#171717;font-weight:600;">{{ $c['support_email'] }}</strong> · {{ $c['phone'] }}.</p>
             </td>

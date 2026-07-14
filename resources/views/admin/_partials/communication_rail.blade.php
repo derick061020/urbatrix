@@ -11,7 +11,7 @@
             <label class="text-[11px] text-ink-500">{{ __('Plantilla rápida') }}</label>
             <select name="template" class="crm-input pl-3 mt-1 text-[12px]" onchange="this.form.message.value = this.options[this.selectedIndex].dataset.body || ''">
                 <option value="">{{ __('Seleccionar plantilla') }}</option>
-                <option data-body="Bienvenido a Makai Residences. Te confirmamos la reserva.">{{ __('Bienvenida') }}</option>
+                <option data-body="Bienvenido a Bahía Mar Residences. Te confirmamos la reserva.">{{ __('Bienvenida') }}</option>
                 <option data-body="Recordatorio: tu cuota está próxima a vencer.">{{ __('Recordatorio de cuota') }}</option>
                 <option data-body="Tu documento KYC está pendiente. Por favor completa los datos.">{{ __('KYC pendiente') }}</option>
             </select>

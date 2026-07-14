@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Dashboard — CRM Duna Makai'))
+@section('title', __('Dashboard — CRM Landmass Bahía Mar'))
 @section('page_title', __('Escritorio'))
 @section('page_breadcrumb', __('Vista global · todos los proyectos'))
 @php $activeRoute = 'crm.dashboard'; @endphp
@@ -22,9 +22,9 @@
     .esc-age.ok   { color:#717784; background:#f2f5f8; }
     .esc-item:hover { background:#fafbfc; }
     .esc-tab { font-size:11.5px; font-weight:600; color:#525866; background:none; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; }
-    .esc-tab.on { background:#fdecec; color:#b60d14; }
+    .esc-tab.on { background:#e8f0ef; color:#053330; }
     .esc-tab .n { color:#99a0ae; }
-    .esc-tab.on .n { color:#b60d14; }
+    .esc-tab.on .n { color:#053330; }
 
     .esc-batch { display:none; }
     .esc-batch.show { display:flex; }
@@ -60,7 +60,7 @@
         'documento' => 'background:#eef3fb;color:#3b6fb5;',
         'contrato'  => 'background:#e3f7ec;color:#1daf61;',
         'broker'    => 'background:#fcf1e6;color:#d98a3b;',
-        'tarea'     => 'background:#fdecec;color:#b60d14;',
+        'tarea'     => 'background:#e8f0ef;color:#053330;',
         'noadv'     => 'background:#ffebec;color:#fb3748;',
     ];
     $pillShort = ['kyc' => 'KYC', 'documento' => __('Doc.'), 'contrato' => __('Contrato'), 'broker' => 'Broker', 'tarea' => __('Tarea'), 'noadv' => 'S/Asesor'];

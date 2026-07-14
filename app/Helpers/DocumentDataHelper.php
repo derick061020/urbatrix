@@ -62,7 +62,7 @@ class DocumentDataHelper
             'fecha'             => date('d/m/Y'),
 
             // Firma del proyecto (Promitente Vendedora)
-            'vendedor_nombre'   => $firma['name'] ?: 'Duna Development Group S.R.L.',
+            'vendedor_nombre'   => $firma['name'] ?: 'Landmass S.R.L.',
             'vendedor_entidad'  => $firma['entity'] ?: 'RNC: 1-31-12345-6 · Representante legal autorizado',
             'vendedor_firma_img' => $firma['image'],
             'comprador_nombre'  => trim($reservation->first_name . ' ' . $reservation->last_name),
@@ -165,7 +165,7 @@ class DocumentDataHelper
 
         return [
             'referencia'       => $reservation->reservation_code,
-            'proyecto'         => 'Makai Residences',
+            'proyecto'         => 'Bahía Mar Residences',
             'unidad'           => self::unidadNombre($reservation),
             'comprador_nombre' => trim($reservation->first_name . ' ' . $reservation->last_name) ?: 'N/A',
             'nombres'          => $reservation->first_name ?: 'N/A',
@@ -173,7 +173,7 @@ class DocumentDataHelper
             'fecha_llenado'    => optional($reservation->updated_at)->format('d / m / Y') ?: date('d / m / Y'),
             'estado'           => $estados[$status] ?? 'En revisión',
             'estado_clase'     => $clases[$status] ?? 'pending',
-            'asesor'           => $advisor->name ?? 'Duna Development Group',
+            'asesor'           => $advisor->name ?? 'Landmass',
 
             'fecha_nacimiento' => $reservation->birth_date ? $reservation->birth_date->format('d / m / Y') : 'N/A',
             'nacionalidad'     => $reservation->nationality ?: 'N/A',
@@ -277,7 +277,7 @@ class DocumentDataHelper
      * Firma del proyecto configurada en Configuración (modal de ajustes).
      * Alimenta el recuadro de firma del Desarrollador/Vendedora en los
      * documentos imprimibles, para que el contrato salga ya firmado a nombre
-     * de Makai. Devuelve image (data URI o null), name y entity.
+     * de Bahía Mar. Devuelve image (data URI o null), name y entity.
      */
     public static function projectSignature(): array
     {

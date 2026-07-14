@@ -226,7 +226,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Comentario comparativo') }}</label>
-                    <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="{{ __('Miami Beach reference: $900/m² · Makai $450/m² — 50% menos') }}">
+                    <input type="text" maxlength="500" name="comparison_text" value="{{ old('comparison_text', $u->comparison_text ?? '') }}" class="crm-input pl-3 mt-1" placeholder="{{ __('Miami Beach reference: $900/m² · Bahía Mar $450/m² — 50% menos') }}">
                 </div>
             </div>
 

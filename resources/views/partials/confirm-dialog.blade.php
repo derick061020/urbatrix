@@ -40,7 +40,7 @@
         display: inline-flex; align-items: center; justify-content: center;
         background: #fff1f2; color: #dc2626; margin-bottom: 14px;
     }
-    .confirm-dlg-card.tone-brand .confirm-dlg-icon { background: rgba(225,16,25,.12); color: #e11019; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-icon { background: rgba(7,69,64,.12); color: #074540; }
     .confirm-dlg-title {
         margin: 0; color: #171717; font-size: 18px; font-weight: 700;
         line-height: 1.25; letter-spacing: -0.02em;
@@ -61,8 +61,8 @@
     .confirm-dlg-cancel:hover { background: #f9fafb; }
     .confirm-dlg-submit { border-color: #dc2626; background: #dc2626; color: #fff; }
     .confirm-dlg-submit:hover { border-color: #b91c1c; background: #b91c1c; }
-    .confirm-dlg-card.tone-brand .confirm-dlg-submit { border-color: #e11019; background: #e11019; }
-    .confirm-dlg-card.tone-brand .confirm-dlg-submit:hover { border-color: #b60d14; background: #b60d14; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-submit { border-color: #074540; background: #074540; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-submit:hover { border-color: #053330; background: #053330; }
     @media (max-width: 520px) {
         .confirm-dlg-card { padding: 20px; }
         .confirm-dlg-actions { flex-direction: column-reverse; }

@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Mensajes — MAKAI')
+@section('title', 'Mensajes — BAHÍA MAR')
 @section('page_title', 'Mensajes')
 @section('page_breadcrumb', 'Mi portal · Mensajes')
 @php $activeRoute = 'messages'; @endphp
@@ -28,7 +28,7 @@
             </div>
             <div class="flex-1">
                 <div class="text-[15px] font-bold text-ink-950">{{ $advisor->name ?? 'Tu asesor' }}</div>
-                <div class="text-[12px] text-ink-500">{{ __('Tu asesor · Makai Residences') }}</div>
+                <div class="text-[12px] text-ink-500">{{ __('Tu asesor · Bahía Mar Residences') }}</div>
             </div>
             @if($advisor?->phone)
                 <a href="https://wa.me/{{ preg_replace('/\D/', '', $advisor->phone) }}" target="_blank" class="cli-btn cli-btn-ghost"><i class="pi pi-whatsapp text-[12px]"></i> WhatsApp</a>

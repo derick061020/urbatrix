@@ -2875,7 +2875,7 @@ class AdminController extends Controller
                 $reservationData[$col] = match ($col) {
                     'unit_name'      => $unit?->name ?? $unit?->custom_id ?? '—',
                     'unit_price'     => (string) ($unit?->price ?? 0),
-                    'unit_developer' => 'Makai',
+                    'unit_developer' => 'Bahía Mar',
                     default          => '',
                 };
             }
@@ -4084,7 +4084,7 @@ class AdminController extends Controller
      * Guarda la firma del proyecto (imagen manuscrita + nombre y entidad del
      * firmante). Esta firma se inyecta en el recuadro del Desarrollador /
      * Vendedora de la promesa de compraventa y el plan de pagos, de modo que
-     * los contratos salgan ya firmados a nombre de Makai.
+     * los contratos salgan ya firmados a nombre de Bahía Mar.
      */
     public function updateProjectSignature(Request $request)
     {

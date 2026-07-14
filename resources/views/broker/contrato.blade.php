@@ -8,7 +8,7 @@
 <div class="p-4 sm:p-6 lg:p-7 space-y-5" x-data>
 
     {{-- Hero --}}
-    <div class="brk-card overflow-hidden" style="border-top:3px solid #e11019">
+    <div class="brk-card overflow-hidden" style="border-top:3px solid #074540">
         <div class="p-6 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-6 items-center">
             <div>
                 <div class="text-[10px] uppercase tracking-[0.12em] text-ink-500 mb-3">Contrato de colaboración · #BR-{{ str_pad((string)($agent->id ?? 0), 4, '0', STR_PAD_LEFT) }}</div>
@@ -93,7 +93,7 @@
                         </div>
                     @empty
                         @if(! $brokerDocs->count())
-                            <div class="px-5 py-10 text-center text-[12px] text-ink-400">{{ __('No hay documentos de contrato disponibles. Duna los publicará aquí cuando estén listos.') }}</div>
+                            <div class="px-5 py-10 text-center text-[12px] text-ink-400">{{ __('No hay documentos de contrato disponibles. Landmass los publicará aquí cuando estén listos.') }}</div>
                         @endif
                     @endforelse
                 </div>

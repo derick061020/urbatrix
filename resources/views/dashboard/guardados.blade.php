@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Guardados — MAKAI')
+@section('title', 'Guardados — BAHÍA MAR')
 @section('page_title', 'Mi Propiedad')
 @section('page_breadcrumb', 'Mi Propiedad · Guardados')
 @php $activeRoute = 'guardados'; @endphp
@@ -8,8 +8,8 @@
 <style>
     /* === Saved-units page — same card as home (fg-card) === */
     .sv-scope {
-        --brand: #e11019;
-        --brand-soft: rgba(225, 16, 25, 0.10);
+        --brand: #074540;
+        --brand-soft: rgba(7, 69, 64, 0.10);
     }
 
     /* Header summary block */
@@ -44,7 +44,7 @@
     .sv-empty-cta {
         display:inline-flex; align-items:center; gap:6px;
         margin-top:16px; padding:0 18px; height:38px;
-        background:#e11019; color:#fff; border:1px solid #e11019; border-radius:10px;
+        background:#074540; color:#fff; border:1px solid #074540; border-radius:10px;
         font-family:'Poppins', sans-serif; font-weight:600; font-size:12px;
         text-decoration:none; cursor:pointer;
     }
@@ -71,8 +71,8 @@
 
     .sv-scope .fg-card {
         --status-color: var(--brand);
-        --status-soft: rgba(225, 16, 25, 0.10);
-        --status-bg-faint: rgba(225, 16, 25, 0.04);
+        --status-soft: rgba(7, 69, 64, 0.10);
+        --status-bg-faint: rgba(7, 69, 64, 0.04);
         position: relative;
         display: flex;
         flex-direction: column;
@@ -544,7 +544,7 @@
 @php
     $units = $units ?? collect();
     $project = optional($units->first())->project_id ? \App\Models\Project::find(optional($units->first())->project_id) : null;
-    $projectName = $project->name ?? 'Makai Residences, Cap Cana';
+    $projectName = $project->name ?? 'Bahía Mar Residences, Cap Cana';
 @endphp
 
 <div class="sv-scope p-4 sm:p-6 lg:p-7 space-y-5">

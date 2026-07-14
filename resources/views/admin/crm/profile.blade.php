@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Mi Perfil — CRM Duna Makai')
+@section('title', 'Mi Perfil — CRM Landmass Bahía Mar')
 @section('page_title', 'Mi Perfil')
 @section('page_breadcrumb', 'Cuenta · Editar perfil')
 @php $activeRoute = 'crm.profile'; @endphp

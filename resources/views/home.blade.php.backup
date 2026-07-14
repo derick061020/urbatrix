@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Makai Residences</title>
+  <title>Bahía Mar Residences</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
@@ -216,7 +216,7 @@
         <!-- LEFT: Info Panel (1/3 width) -->
         <div style="width:33.33%;display:flex;flex-direction:column;padding:2.5rem 1.25rem 1.5rem 1.25rem;background:rgb(249,248,246);order:1;z-index:40;">
           <div style="text-align:left;font-weight:400;">
-            <p style="font-size:1.5rem;font-weight:600;letter-spacing:0;color:rgb(98,84,65);margin:0 0 0.25rem 0;">Makai Residences</p>
+            <p style="font-size:1.5rem;font-weight:600;letter-spacing:0;color:rgb(98,84,65);margin:0 0 0.25rem 0;">Bahía Mar Residences</p>
             <p style="font-size:1.25rem;margin:0 0 0.5rem 0;color:rgb(98,84,65);">Unit <span id="modalUnitNum">113</span></p>
             <div style="margin-bottom:0.5rem;">
               <span id="modalPrice" style="display:block;font-weight:800;background:linear-gradient(to bottom right,rgb(210,182,144),rgb(107,80,43));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.4rem;">$431 000</span>
@@ -364,7 +364,7 @@
       <!-- Form Area -->
       <div style="display:flex;flex-direction:column;align-items:center;padding:1.25rem;background:white;min-height:60vh;">
         <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;margin:0 auto;">
-          <p style="font-size:1.125rem;font-weight:600;color:rgb(98,84,65);">Makai Residences <span style="font-weight:400;">Unit 111</span></p>
+          <p style="font-size:1.125rem;font-weight:600;color:rgb(98,84,65);">Bahía Mar Residences <span style="font-weight:400;">Unit 111</span></p>
 
           <!-- Form Container -->
           <div style="margin-top:0.75rem;padding:1.25rem;background:rgb(243,244,246);border-radius:0.5rem;min-width:min(650px,90vw);">
@@ -444,7 +444,7 @@
         <!-- T&C Section -->
         <div style="margin-top:2.5rem;text-align:left;max-width:min(650px,90vw);padding:0 1.25rem;color:rgb(98,84,65);">
           <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;">Terms &amp; Conditions</h3>
-          <p style="font-size:0.875rem;margin:0.25rem 0;">A unit is only reserved once Makai has received the proof of payment of the reservation deposit.</p>
+          <p style="font-size:0.875rem;margin:0.25rem 0;">A unit is only reserved once Bahía Mar has received the proof of payment of the reservation deposit.</p>
           <p style="font-size:0.875rem;margin:0.25rem 0;">The reservation deposit will be deducted from the 25% purchase deposit.</p>
           <p style="font-size:0.875rem;margin:0.25rem 0;">Your reservation would need to be secured within 30 days by paying the first deposit and signing the Promise of Sale document.</p>
           <p style="font-size:0.875rem;margin:0.25rem 0;">Completion of this purchase can be made by anyone that is authorised by the client.</p>
@@ -469,7 +469,7 @@
       </div>
 
       <div style="display:flex;flex-direction:column;align-items:center;padding:1.25rem;background:white;min-height:60vh;">
-        <p style="font-size:1.125rem;font-weight:600;color:rgb(98,84,65);margin-bottom:1rem;">Makai Residences <span style="font-weight:400;">Unit 111</span></p>
+        <p style="font-size:1.125rem;font-weight:600;color:rgb(98,84,65);margin-bottom:1rem;">Bahía Mar Residences <span style="font-weight:400;">Unit 111</span></p>
 
         <div style="min-width:min(650px,90vw);padding:1.25rem;background:rgb(243,244,246);border-radius:0.5rem;">
           <!-- Unit Specs Row -->
@@ -656,7 +656,7 @@
             <div class="projects-dropdown-content">
               <ul>
                 <li>
-                  <a href="#" onclick="selectProject('Makai')" style="display:block;width:100%;height:1.75rem;line-height:1.75rem;padding:0 0.15rem;border-radius:0.2rem;text-decoration:none;color:rgb(98,84,65);font-weight:600;font-size:0.8rem;font-family:'Montserrat',Helvetica,Arial,sans-serif;background:transparent;border:none;cursor:pointer;text-align:center;">Makai</a>
+                  <a href="#" onclick="selectProject('Bahía Mar')" style="display:block;width:100%;height:1.75rem;line-height:1.75rem;padding:0 0.15rem;border-radius:0.2rem;text-decoration:none;color:rgb(98,84,65);font-weight:600;font-size:0.8rem;font-family:'Montserrat',Helvetica,Arial,sans-serif;background:transparent;border:none;cursor:pointer;text-align:center;">Bahía Mar</a>
                 </li>
               </ul>
             </div>
@@ -683,7 +683,7 @@
                 </button>
               </li>
               <li>
-                <a href="mailto:support+makai_residences@launchbase.co.za?subject=Support - Makai Residences">Tech Support</a>
+                <a href="mailto:support+makai_residences@launchbase.co.za?subject=Support - Bahía Mar Residences">Tech Support</a>
               </li>
               <li>
                 <a href="https://makai-capcana.com/" target="_blank">Main Website (EN)</a>
@@ -710,7 +710,7 @@
                 <a href="https://makai-capcana.com/makai-brochure-espanol/" target="_blank">Brochure (ES)</a>
               </li>
               <li>
-                <a href="https://makai-capcana.com/makai-especificaciones-espanol/" target="_blank">Makai Especificaciones (ES)</a>
+                <a href="https://makai-capcana.com/makai-especificaciones-espanol/" target="_blank">Bahía Mar Especificaciones (ES)</a>
               </li>
               <li>
                 <a href="#" onclick="showConstructionProgress()">Proceso de Avance de Obra</a>
@@ -726,7 +726,7 @@
 
     <!-- Hero Image -->
     <div style="position:relative;overflow:hidden;">
-      <img src="https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fartwork%2Fd9ce7036-fffd-4ce9-bd96-31553cc4db86.jpg?alt=media" alt="Makai Residences" style="width:100%;max-height:500px;object-fit:cover;display:block;">
+      <img src="https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fartwork%2Fd9ce7036-fffd-4ce9-bd96-31553cc4db86.jpg?alt=media" alt="Bahía Mar Residences" style="width:100%;max-height:500px;object-fit:cover;display:block;">
     </div>
 
     <!-- Main Content -->
@@ -2043,9 +2043,9 @@
     // ============================
     const modalImages = [
       'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Makai_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Makai_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Makai_Cards_Render_Map_Pins_111%2F1773673791087%2Ffull.webp'
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Bahía Mar_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Bahía Mar_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Bahía Mar_Cards_Render_Map_Pins_111%2F1773673791087%2Ffull.webp'
     ];
     let currentModalImg = 0;
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LANDMASS · Promesa de Venta de Inmueble · {{ $referencia }}</title>
+<title>BAHÍA MAR · Promesa de Venta de Inmueble · {{ $referencia }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 @page { margin: 0; size: A4 portrait; }
@@ -55,7 +55,7 @@ body {
 }
 .page:last-child { page-break-after: auto; break-after: auto; }
 
-.hdr { background: var(--green-bg); padding: 16px 44px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #e11019; flex-shrink: 0; }
+.hdr { background: var(--green-bg); padding: 16px 44px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #074540; flex-shrink: 0; }
 .hdr-logo { display: flex; align-items: center; gap: 12px; }
 .hdr-iso { width: 28px; height: 28px; flex-shrink: 0; }
 .hdr-name { font-size: 14px; font-weight: 600; color: #ffffff; letter-spacing: .2em; }
@@ -152,8 +152,8 @@ body {
 </div>
 
 @php
-  $phHeader = '<div class="ph"><div class="ph-left"><svg class="ph-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg><div class="ph-name">LANDMASS</div></div><div class="ph-right"><div class="ph-doc">Promesa de Venta de Inmueble</div><div class="ph-pg">Makai Residences · Cap Cana, R.D.</div></div></div>';
-  $ftr = '<div class="footer"><div class="footer-l">LANDMASS</div><div class="footer-c">Documento Confidencial · Uso Exclusivo de las Partes</div><div class="footer-r">Makai Residences · Cap Cana, R.D.</div></div>';
+  $phHeader = '<div class="ph"><div class="ph-left"><svg class="ph-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg><div class="ph-name">BAHÍA MAR</div></div><div class="ph-right"><div class="ph-doc">Promesa de Venta de Inmueble</div><div class="ph-pg">Bahía Mar Residences · Cap Cana, R.D.</div></div></div>';
+  $ftr = '<div class="footer"><div class="footer-l">BAHÍA MAR</div><div class="footer-c">Documento Confidencial · Uso Exclusivo de las Partes</div><div class="footer-r">Bahía Mar Residences · Cap Cana, R.D.</div></div>';
 @endphp
 
 <!-- PÁGINA 1 — PORTADA -->
@@ -161,7 +161,7 @@ body {
   <div class="hdr">
     <div class="hdr-logo">
       <svg class="hdr-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg>
-      <div class="hdr-name">LANDMASS</div>
+      <div class="hdr-name">BAHÍA MAR</div>
     </div>
     <div class="hdr-right">
       <div class="hdr-doc">Documento Legal · Confidencial</div>
@@ -172,7 +172,7 @@ body {
   <div class="cover">
     <div class="cover-eyebrow">Documento Legal Oficial</div>
     <div class="cover-title"><strong>Promesa</strong> de Venta de Inmueble</div>
-    <div class="cover-project">Proyecto Makai Residences — Dolce by Wyndham · Cap Cana, República Dominicana</div>
+    <div class="cover-project">Proyecto Bahía Mar Residences — Dolce by Wyndham · Cap Cana, República Dominicana</div>
     <hr class="cover-rule">
 
     <div class="cover-parties">
@@ -209,7 +209,7 @@ body {
     <div class="cover-property">
       <div class="cover-prop-label">Unidad Objeto de la Promesa</div>
       <div class="cover-prop-grid">
-        <div class="cover-prop-cell"><div class="cover-prop-cell-label">Proyecto</div><div class="cover-prop-cell-val">MAKAI Residences</div></div>
+        <div class="cover-prop-cell"><div class="cover-prop-cell-label">Proyecto</div><div class="cover-prop-cell-val">BAHÍA MAR Residences</div></div>
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Unidad</div><div class="cover-prop-cell-val"><span class="f">{{ $unidad }}</span></div></div>
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Nivel</div><div class="cover-prop-cell-val"><span class="f">{{ $nivel }}</span></div></div>
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Área (m²)</div><div class="cover-prop-cell-val"><span class="f">{{ $area }}</span></div></div>
@@ -288,7 +288,7 @@ body {
     </div>
     <div class="pc">
       <div class="pc-tag">Por Cuanto</div>
-      <p class="p">EL DESARROLLADOR, dentro de las instalaciones de CAP CANA está llevando a cabo un desarrollo inmobiliario residencial denominado Proyecto MAKAI RESIDENCES, el cual será operado bajo los estándares y usos de la marca DOLCE BY WYNDHAM (en lo adelante EL CONDOMINIO).</p>
+      <p class="p">EL DESARROLLADOR, dentro de las instalaciones de CAP CANA está llevando a cabo un desarrollo inmobiliario residencial denominado Proyecto BAHÍA MAR RESIDENCES, el cual será operado bajo los estándares y usos de la marca DOLCE BY WYNDHAM (en lo adelante EL CONDOMINIO).</p>
     </div>
     <div class="pc">
       <div class="pc-tag">Por Cuanto</div>
@@ -319,7 +319,7 @@ body {
       <div class="art-hdr"><span class="art-num">Art. 1</span><span class="art-name">Objeto del Contrato</span></div>
       <p class="p"><strong>Venta de El Inmueble:</strong> EL DESARROLLADOR por medio del presente Contrato otorga a EL PROMITENTE COMPRADOR con todas las garantías ordinarias de derecho y con sujeción a las demás estipulaciones contenidas en el presente Contrato, formal promesa de venta, cesión y traspaso, libre de cargas y gravámenes, ocupantes y afectaciones de cualquier género respecto de EL INMUEBLE que a continuación se describe, la cual se convertirá en una venta perfecta para LAS PARTES, una vez se cumplan con las condiciones que se establecen en el presente Contrato:</p>
       <div class="qblock">
-        <p class="p" style="margin:0; font-style:italic;">"Unidad <span class="f">{{ $unidad }}</span>, ubicada en el nivel <span class="f">{{ $nivel }}</span>, del proyecto MAKAI, con un área de <span class="f">{{ $area }}</span> m2. La unidad tendrá la siguiente distribución: recibidor, salón-cocina, terraza, <span class="f">{{ $dormitorios }}</span> dormitorio, <span class="f">{{ $banos }}</span> baño, <span class="f">{{ $estacionamientos }}</span> estacionamiento. De acuerdo al anexo A."</p>
+        <p class="p" style="margin:0; font-style:italic;">"Unidad <span class="f">{{ $unidad }}</span>, ubicada en el nivel <span class="f">{{ $nivel }}</span>, del proyecto BAHÍA MAR, con un área de <span class="f">{{ $area }}</span> m2. La unidad tendrá la siguiente distribución: recibidor, salón-cocina, terraza, <span class="f">{{ $dormitorios }}</span> dormitorio, <span class="f">{{ $banos }}</span> baño, <span class="f">{{ $estacionamientos }}</span> estacionamiento. De acuerdo al anexo A."</p>
       </div>
       <p class="p">El condominio contará con: 4 ascensores, escaleras de emergencias, Spa, gimnasio, cine, área de coworking, cancha de paddle, cancha de pickleball, 3 piscinas, área de mascotas y área de juegos.</p>
       <p class="p">EL PROMITENTE COMPRADOR declara, reconoce y acepta, que no podrá requerir de EL DESARROLLADOR el cambio o sustitución de El Inmueble tras la firma del presente Contrato, a menos que EL DESARROLLADOR lo acepte.</p>
@@ -338,7 +338,7 @@ body {
 
     <div class="art">
       <div class="art-hdr"><span class="art-num">Art. 2</span><span class="art-name">Entrega del Certificado de Título</span></div>
-      <p class="p">Por encontrarse el residencial denominado Proyecto MAKAI RESIDENCES sobre los inmuebles identificados como 506422751836 y Número 506422658172, matriculas 3000050704, 3000050703, y debido a que se someterá a un proceso de Régimen de Condominio, LAS PARTES convienen lo siguiente:</p>
+      <p class="p">Por encontrarse el residencial denominado Proyecto BAHÍA MAR RESIDENCES sobre los inmuebles identificados como 506422751836 y Número 506422658172, matriculas 3000050704, 3000050703, y debido a que se someterá a un proceso de Régimen de Condominio, LAS PARTES convienen lo siguiente:</p>
       <div class="sub">
         <div class="sub-id">2.1.1.</div>
         <p class="p">EL DESARROLLADOR entrega a la firma del presente Contrato copia de los planos particulares provisionales correspondientes a El Inmueble descrito en el Ordinal 1.1 del presente Contrato.</p>
@@ -349,7 +349,7 @@ body {
       </div>
       <div class="sub">
         <div class="sub-id">2.1.3.</div>
-        <p class="p">EL DESARROLLADOR, hace constar que realizará sus mejores gestiones para obtener la clasificación definitiva del proyecto MAKAI RESIDENCES, bajo los beneficios de la Ley 158-01 de incentivo turístico y sus modificaciones. La aprobación del proyecto bajo dicha clasificación es a total discreción del consejo de fomento turístico CONFOTUR, por lo que a la fecha EL DESARROLLADOR no puede otorgar garantía alguna respecto a la posibilidad de obtener dicha clasificación.</p>
+        <p class="p">EL DESARROLLADOR, hace constar que realizará sus mejores gestiones para obtener la clasificación definitiva del proyecto BAHÍA MAR RESIDENCES, bajo los beneficios de la Ley 158-01 de incentivo turístico y sus modificaciones. La aprobación del proyecto bajo dicha clasificación es a total discreción del consejo de fomento turístico CONFOTUR, por lo que a la fecha EL DESARROLLADOR no puede otorgar garantía alguna respecto a la posibilidad de obtener dicha clasificación.</p>
       </div>
       <div class="sub">
         <div class="sub-id">2.1.4.</div>
@@ -455,7 +455,7 @@ body {
       </div>
       <div class="sub">
         <div class="sub-id">6.1.6.</div>
-        <p class="p">LAS PARTES reconocen y aceptan expresamente que el proyecto MAKAI RESIDENCES ha sido concebido, estructurado y será operado bajo un modelo de condo-hotel, lo cual implica la integración de las unidades privadas dentro de un esquema de explotación hotelera organizado y centralizado. En ese sentido, EL PROMITENTE COMPRADOR declara, reconoce y otorga su consentimiento expreso, pleno e irrevocable respecto de dicho modelo de operación condo-hotel. Asimismo, LAS PARTES acuerdan que la sociedad OPHDOM CONDOS, S.R.L., o cualquier entidad que válidamente la sustituya o designe el desarrollador, será la operadora exclusiva del CONDOMINIO, por un período de quince (15) años contados a partir de su constitución, teniendo a su cargo la gestión, administración y explotación del programa de rentas de corta estadía (por períodos menores de ciento ochenta (180) días) de todas las unidades del proyecto.</p>
+        <p class="p">LAS PARTES reconocen y aceptan expresamente que el proyecto BAHÍA MAR RESIDENCES ha sido concebido, estructurado y será operado bajo un modelo de condo-hotel, lo cual implica la integración de las unidades privadas dentro de un esquema de explotación hotelera organizado y centralizado. En ese sentido, EL PROMITENTE COMPRADOR declara, reconoce y otorga su consentimiento expreso, pleno e irrevocable respecto de dicho modelo de operación condo-hotel. Asimismo, LAS PARTES acuerdan que la sociedad OPHDOM CONDOS, S.R.L., o cualquier entidad que válidamente la sustituya o designe el desarrollador, será la operadora exclusiva del CONDOMINIO, por un período de quince (15) años contados a partir de su constitución, teniendo a su cargo la gestión, administración y explotación del programa de rentas de corta estadía (por períodos menores de ciento ochenta (180) días) de todas las unidades del proyecto.</p>
       </div>
     </div>
 

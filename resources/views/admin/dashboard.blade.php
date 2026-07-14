@@ -19,7 +19,7 @@
     <!-- PAGE HEADER -->
     <div>
         <header class="mb-4">
-            <h1 class="text-3xl font-semibold text-surface-700">{{ __('Makai Residences Sales') }}</h1>
+            <h1 class="text-3xl font-semibold text-surface-700">{{ __('Bahía Mar Residences Sales') }}</h1>
             <p class="text-surface-700 text-base">{{ __('Manage your interactive price list and development sales') }}</p>
         </header>
 

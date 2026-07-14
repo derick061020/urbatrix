@@ -424,7 +424,7 @@ class BrokerController extends Controller
     }
 
     /**
-     * Material de ventas (#15) — recursos visibles aprobados por Duna.
+     * Material de ventas (#15) — recursos visibles aprobados por Landmass.
      */
     public function material()
     {

@@ -53,7 +53,7 @@
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
           <tr>
             <td align="center" style="padding:4px 0 8px 0;">
-              <a href="{{ $actionUrl }}" target="_blank" style="display:inline-block;background-color:#e11019;color:#ffffff;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.02em;text-decoration:none;padding:14px 34px;border-radius:10px;">{{ __('Volver a subir documentos') }}</a>
+              <a href="{{ $actionUrl }}" target="_blank" style="display:inline-block;background-color:#074540;color:#ffffff;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.02em;text-decoration:none;padding:14px 34px;border-radius:10px;">{{ __('Volver a subir documentos') }}</a>
             </td>
           </tr>
         </table>

@@ -70,7 +70,7 @@
         <p style="margin:0 0 12px 0;font-size:12px;color:#525866;line-height:1.65;">{{ __('El comprobante completo en PDF está disponible en tu portal. Guárdalo como respaldo oficial de tu pago.') }}</p>
         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
           <tr>
-            <td style="background-color:#e11019;">
+            <td style="background-color:#074540;">
               <a href="{{ $d['link_comprobante'] }}" style="display:inline-block;padding:11px 24px;font-size:11px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">{{ __('Descargar comprobante PDF') }}</a>
             </td>
             <td style="width:16px;"></td>
@@ -87,7 +87,7 @@
       <td style="background-color:#ffffff;padding:20px 36px 32px 36px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
           <tr>
-            <td style="padding:0 0 0 20px;border-left:2px solid #e11019;">
+            <td style="padding:0 0 0 20px;border-left:2px solid #074540;">
               <p style="margin:0 0 2px 0;font-size:12px;color:#525866;line-height:1.6;">{{ __('Para cualquier consulta sobre este pago escríbenos a') }} <strong style="color:#171717;font-weight:600;">{{ $c['support_email'] }}</strong>@if($d['nombre_asesor'] !== '—') o contacta a tu asesor <strong style="color:#171717;font-weight:600;">{{ $d['nombre_asesor'] }}</strong>@endif.</p>
               <p style="margin:4px 0 0 0;font-size:12px;color:#525866;">{{ __('Gracias por tu confianza.') }}</p>
             </td>

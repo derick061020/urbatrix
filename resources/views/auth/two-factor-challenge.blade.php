@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'MAKAI') }} · Verificación 2FA</title>
+    <title>{{ config('app.name', 'BAHÍA MAR') }} · Verificación 2FA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,13 +12,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
-        colors: { brand: { DEFAULT:'#e11019', dark:'#b60d14' } } } } }
+        colors: { brand: { DEFAULT:'#074540', dark:'#053330' } } } } }
     </script>
     <style>
       html, body { font-family:'Inter', system-ui, sans-serif; }
       .tf-input { width:100%; height:46px; padding:0 14px; border:1px solid #ebebeb; border-radius:10px;
         background:#fff; color:#171717; font-size:15px; transition:border-color .15s, box-shadow .15s; }
-      .tf-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .tf-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
     </style>
 </head>
 <body class="min-h-screen bg-[#f8f8f8] flex items-center justify-center p-5">

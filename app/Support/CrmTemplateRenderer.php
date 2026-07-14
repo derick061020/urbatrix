@@ -27,7 +27,7 @@ class CrmTemplateRenderer
         'nombre_profesional'     => 'María Broker',
         'nombre_asesor'          => 'Ana Gómez',
         'tel_asesor'             => '+1 809 555 0100',
-        'proyecto'               => 'Makai Residences',
+        'proyecto'               => 'Bahía Mar Residences',
         'unidad'                 => 'A-204',
         'precio_venta'           => 'USD 285,000.00',
         'monto_reserva'          => 'USD 15,000.00',

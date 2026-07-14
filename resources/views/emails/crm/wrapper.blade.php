@@ -1,5 +1,5 @@
 {{--
-    Layout compartido de los correos del CRM (LANDMASS).
+    Layout compartido de los correos del CRM (BAHÍA MAR).
     El chrome (header con logo, acento rojo, banda de firma y footer) vive aquí;
     cada plantilla aporta solo su contenido interno (hero + cuerpo) ya sustituido.
 
@@ -9,8 +9,8 @@
       $preheader string  (opcional) texto de preencabezado
 --}}
 @php
-    $brand    = config('company.brand', 'LANDMASS');
-    $group    = config('company.group', 'LANDMASS');
+    $brand    = config('company.brand', 'BAHÍA MAR');
+    $group    = config('company.group', 'BAHÍA MAR');
     $location = config('company.location', 'Cap Cana, Punta Cana, República Dominicana');
     $email    = config('company.support_email', 'hello@makairesidences.com');
     $phone    = config('company.phone', '+1 849 499 2578');
@@ -70,7 +70,7 @@
         </tr>
 
         <!-- RED ACCENT BAR -->
-        <tr><td style="background-color:#e11019;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="background-color:#074540;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         {{-- ── CONTENIDO DE LA PLANTILLA ── --}}
         {!! $content !!}

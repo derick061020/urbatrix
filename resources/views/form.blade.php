@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>KYC — Reserva {{ $reservation->reservation_code ?? '' }} · MAKAI</title>
+    <title>KYC — Reserva {{ $reservation->reservation_code ?? '' }} · BAHÍA MAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
+              brand: { DEFAULT:'#074540', dark:'#053330', soft:'#07454033', tint:'#e8f0ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -38,7 +38,7 @@
         background:#fff; color:#171717; font-size:14px;
         transition: border-color .15s, box-shadow .15s;
       }
-      .auth-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .auth-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .auth-input[readonly] { background:#f8f8f8; color:#5c5c5c; }
       .auth-input.is-invalid { border-color:#fb3748 !important; box-shadow:0 0 0 3px rgba(251,55,72,.14) !important; }
@@ -57,7 +57,7 @@
       .auth-btn-ghost { background:#fff; color:#171717; border:1px solid #ebebeb; }
       .auth-btn-ghost:hover { background:#f8f8f8; }
       .auth-link { color:#171717; font-weight:500; font-size:14px; border-bottom:1px solid #171717; padding-bottom:1px; }
-      .auth-link:hover { color:#e11019; border-color:#e11019; }
+      .auth-link:hover { color:#074540; border-color:#074540; }
 
       .field-label { display:block; font-size:13px; font-weight:500; color:#171717; margin-bottom:6px; }
       .field-required { color:#fb3748; }
@@ -94,7 +94,7 @@
           transition: border-color .15s, background-color .15s;
       }
       .pay-card:hover { background:#f8f8f8; }
-      .pay-card.selected { border-color:#e11019; background:#fff; box-shadow:0 0 0 1px #e11019; }
+      .pay-card.selected { border-color:#074540; background:#fff; box-shadow:0 0 0 1px #074540; }
       .pay-card.is-invalid { border-color:#fb3748; background:#fff7f7; box-shadow:0 0 0 1px #fb3748; }
       .pay-card .radio-dot {
           width:18px; height:18px; border-radius:999px;
@@ -102,8 +102,8 @@
           margin-left:auto; flex-shrink:0;
           display:flex; align-items:center; justify-content:center;
       }
-      .pay-card.selected .radio-dot { border-color:#e11019; }
-      .pay-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#e11019; }
+      .pay-card.selected .radio-dot { border-color:#074540; }
+      .pay-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#074540; }
 
       /* Drop zone */
       .file-drop {
@@ -111,13 +111,13 @@
           padding: 22px 16px; text-align:center;
           cursor:pointer; transition: border-color .15s, background-color .15s;
       }
-      .file-drop:hover { border-color:#e11019; background:#fafafa; }
+      .file-drop:hover { border-color:#074540; background:#fafafa; }
       .file-drop.is-invalid { border-color:#fb3748; background:#fff7f7; box-shadow:0 0 0 3px rgba(251,55,72,.10); }
 
       /* Spinner used by success modal */
       .check-circle {
           width:64px; height:64px; border-radius:999px;
-          background:#e11019; color:#fff;
+          background:#074540; color:#fff;
           display:flex; align-items:center; justify-content:center;
           margin: 0 auto 18px;
       }
@@ -130,7 +130,7 @@
       }
       .redirect-spinner {
           width:18px; height:18px; border-radius:999px;
-          border:2.5px solid #e2cccc; border-top-color:#e11019;
+          border:2.5px solid #e2cccc; border-top-color:#074540;
           animation: redirect-spin .7s linear infinite;
           flex-shrink:0;
       }
@@ -156,8 +156,8 @@
                 <span class="block w-6 h-6"><img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full"></span>
             </span>
             <span class="flex flex-col leading-none">
-                <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">LANDMASS</span>
-                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
+                <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">BAHÍA MAR</span>
+                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Landmass') }}</span>
             </span>
         </a>
 
@@ -765,7 +765,7 @@
 
     {{-- ============= FOOTER ============= --}}
     <footer class="flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 border-t border-ink-100 bg-white">
-        <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+        <span>{{ __('© 2026 BAHÍA MAR RESIDENCES') }}</span>
         <button class="flex items-center gap-1.5 hover:text-ink-700">
             <i class="pi pi-globe text-[12px]"></i><span>ESP</span><i class="pi pi-angle-down text-[10px]"></i>
         </button>

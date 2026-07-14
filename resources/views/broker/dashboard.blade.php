@@ -15,7 +15,7 @@
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         @php $cards = [
             ['Comisión cobrada · mes', '$'.number_format($kpis['collected_month'], 0), '#1fc16b', 'liberada al pagar tus clientes'],
-            ['Comisión acumulada',     '$'.number_format($kpis['accumulated'], 0),     '#e11019', 'histórico'],
+            ['Comisión acumulada',     '$'.number_format($kpis['accumulated'], 0),     '#074540', 'histórico'],
             ['Por liberar',            '$'.number_format($kpis['pending'], 0),          '#fa7319', 'según avance del inicial'],
             ['Clientes activos',       $kpis['clients'],                                '#335cff', 'en tu cartera'],
             ['Ventas cerradas',        $kpis['closed'],                                 '#0EA5A4', 'este histórico'],

@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Avance de Obra — MAKAI')
+@section('title', 'Avance de Obra — BAHÍA MAR')
 @section('page_title', 'Avance de Obra')
 @section('page_breadcrumb', 'Mi Propiedad · Avance de Obra')
 @php $activeRoute = 'progress'; @endphp
@@ -8,7 +8,7 @@
 @php
     $delivery = optional($report)->estimated_delivery ?: 'Q4 2026';
     $overall  = optional($report)->overall_progress ?? 52;
-    $projName = optional(optional($report)->project)->name ?? 'Makai Residences';
+    $projName = optional(optional($report)->project)->name ?? 'Bahía Mar Residences';
 @endphp
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 

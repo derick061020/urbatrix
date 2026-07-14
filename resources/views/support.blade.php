@@ -11,8 +11,8 @@
 @endphp
 <!doctype html>
 {{--
-  MAKAI · Portal del comprador · Soporte
-  Adaptación del mockup de soporte a la línea gráfica Makai (verde #e11019 · Inter / Inter Tight),
+  BAHÍA MAR · Portal del comprador · Soporte
+  Adaptación del mockup de soporte a la línea gráfica Bahía Mar (verde #074540 · Inter / Inter Tight),
   tomando como referencia las vistas de auth/register. Estructura: hero+búsqueda · soporte
   contextual (atado a la compra) · hub de canales · centro de ayuda (FAQs+guías) · mis solicitudes.
 --}}
@@ -21,7 +21,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>{{ __('MAKAI · Soporte') }}</title>
+<title>{{ __('BAHÍA MAR · Soporte') }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -30,10 +30,10 @@
   :root{
     --bg:#f4f6f4; --card:#ffffff; --ink:#171717; --ink-strong:#222530;
     --muted:#a3a3a3; --muted-2:#5c5c5c; --line:#ebebeb; --line-2:#f2f5f8;
-    --brand:#e11019; --brand-dark:#b60d14; --brand-bg:#fdecec; --brand-line:#dde6e0;
+    --brand:#074540; --brand-dark:#053330; --brand-bg:#e8f0ef; --brand-line:#dde6e0;
     --green:#1fc16b; --green-bg:#e3f7ec;
     --wa:#25d366; --wa-bg:#eafbf0;
-    --info-bg:#fdecec; --info-line:#dde6e0; --info-ink:#b60d14;
+    --info-bg:#e8f0ef; --info-line:#dde6e0; --info-ink:#053330;
     --ff:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --ff-display:'Inter Tight', 'Inter', system-ui, sans-serif;
     --r:14px;
@@ -64,7 +64,7 @@
   .hero h1{ font-family:var(--ff-display); font-weight:600; font-size:34px; color:var(--ink-strong); letter-spacing:-.01em; }
   .hero p{ font-size:14px; color:var(--muted-2); margin-top:6px; }
   .search{ max-width:560px; margin:18px auto 0; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 16px; box-shadow:0 6px 20px -14px rgba(16,32,61,.25); }
-  .search:focus-within{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+  .search:focus-within{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(7,69,64,.15); }
   .search svg{ width:18px; height:18px; color:var(--muted); flex:none; }
   .search input{ font:inherit; font-size:14px; border:0; outline:0; width:100%; color:var(--ink-strong); }
 
@@ -127,7 +127,7 @@
   .newform.show{ display:block; }
   .newform label{ display:block; font-size:11.5px; font-weight:600; color:var(--muted-2); margin:0 0 5px; }
   .newform select, .newform textarea{ font:inherit; font-size:13px; width:100%; border:1px solid var(--line); border-radius:9px; padding:10px; outline:none; margin-bottom:11px; color:var(--ink-strong); }
-  .newform select:focus, .newform textarea:focus{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+  .newform select:focus, .newform textarea:focus{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(7,69,64,.15); }
   .newform select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235c5c5c' stroke-width='2.4'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
   .newform textarea{ resize:vertical; min-height:70px; }
 
@@ -181,7 +181,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </a>
       <a href="/" style="display:flex;align-items:center;text-decoration:none;flex:none;">
-        <img src="/images/makai-logo.png" alt="Landmass" class="logo-img">
+        <img src="/images/makai-logo.png" alt="Bahía Mar" class="logo-img">
       </a>
       <span class="crumb"><b>{{ __('Soporte') }}</b></span>
       <div class="tright">
@@ -249,7 +249,7 @@
             <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;"><div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div></div>
 
             <a href="{{ route('support') }}" style="text-decoration:none;display:block;width:100%">
-              <div class="menu-item" style="background:#fdecec;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+              <div class="menu-item" style="background:#e8f0ef;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
                 <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand-dark);"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </div>
@@ -307,7 +307,7 @@
     <section class="ctx">
       <div class="ctx-head">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13z"/><path d="M9 21v-7h6v7"/></svg></div>
-        <div><div class="t">{{ __('Tu compra · Unit C-301') }}</div><div class="s">{{ __('Makai Residences · reserva activa') }}</div></div>
+        <div><div class="t">{{ __('Tu compra · Unit C-301') }}</div><div class="s">{{ __('Bahía Mar Residences · reserva activa') }}</div></div>
         <span class="badge">{{ __('Ayuda sobre tu unidad') }}</span>
       </div>
       <div class="qa">

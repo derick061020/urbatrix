@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| Datos de la empresa / proyecto (LANDMASS)
+| Datos de la empresa / proyecto (BAHÍA MAR)
 |--------------------------------------------------------------------------
 | Datos fijos que alimentan los documentos imprimibles (comprobante de pago,
 | hoja de datos para transferencia) y los correos. Editar aquí — o sobreponer
@@ -11,9 +11,9 @@
 
 return [
 
-    'brand'        => env('COMPANY_BRAND', 'LANDMASS'),
-    'project'      => env('COMPANY_PROJECT', 'Landmass'),
-    'group'        => env('COMPANY_GROUP', 'LANDMASS'),
+    'brand'        => env('COMPANY_BRAND', 'BAHÍA MAR'),
+    'project'      => env('COMPANY_PROJECT', 'Bahía Mar'),
+    'group'        => env('COMPANY_GROUP', 'BAHÍA MAR'),
     'location'     => env('COMPANY_LOCATION', 'Cap Cana, República Dominicana'),
 
     // Emisor de los comprobantes
@@ -27,7 +27,7 @@ return [
     'website'       => env('COMPANY_WEBSITE', 'makairesidences.com'),
 
     // Firmante autorizado de los comprobantes
-    'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
+    'signer_name'   => env('COMPANY_SIGNER_NAME', 'Landmass'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),
 
     // Datos bancarios para transferencias en USD

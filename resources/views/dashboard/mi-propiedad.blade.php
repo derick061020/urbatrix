@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', __('Mi Propiedad').' — MAKAI')
+@section('title', __('Mi Propiedad').' — BAHÍA MAR')
 @section('page_title', __('Mi Propiedad'))
-@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Makai Residences')
+@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Bahía Mar Residences')
 @php $activeRoute = 'mi-propiedad'; @endphp
 
 @section('content')
@@ -96,15 +96,15 @@
 
     {{-- Hero card with property summary --}}
     <div class="cli-card overflow-hidden relative">
-        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#e11019 0%, #960a10 100%)">
-            {{-- Decorative Landmass isotipo top-right (matches login) --}}
+        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#074540 0%, #960a10 100%)">
+            {{-- Decorative Bahía Mar isotipo top-right (matches login) --}}
             <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt=""
                  class="absolute -top-16 -right-24 w-[360px] h-[360px] pointer-events-none opacity-20 select-none" />
 
             <div class="relative z-10">
                 <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
                 <div class="font-display text-[48px] font-medium leading-tight mt-1">{{ $unidad }}</div>
-                <div class="text-[13px] opacity-80 mt-1">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
+                <div class="text-[13px] opacity-80 mt-1">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
 
                 {{-- Quick stats pills --}}
                 <div class="mt-6 inline-flex items-stretch rounded-2xl bg-white/10 backdrop-blur border border-white/15 overflow-hidden">
@@ -168,7 +168,7 @@
                         [__('Interior'),  ($reservation->unit->internal_area ?? '959').' sqft'],
                         [__('Terraza'),   ($reservation->unit->expense_1 ?? '207').' sqft'],
                         [__('Vista'),     ($reservation->unit->outlook ?? 'Lake Facing')],
-                        [__('Proyecto'),  'Makai Residences'],
+                        [__('Proyecto'),  'Bahía Mar Residences'],
                         [__('Ubicación'), 'Cap Cana, Punta Cana · RD'],
                     ];
                 @endphp

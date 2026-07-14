@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Mis documentos').' — MAKAI')
+@section('title', __('Mis documentos').' — BAHÍA MAR')
 @section('page_title', __('Mis documentos'))
 @section('page_breadcrumb', __('Mi propiedad').' · '.__('Documentos'))
 @php $activeRoute = 'documents'; @endphp
@@ -249,7 +249,7 @@
     {{-- Trust footer --}}
     <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200 text-[12px] text-ink-600">
         <i class="pi pi-lock text-ink-500"></i>
-        {{ __('Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Duna Development Group tiene acceso a tus archivos.') }}
+        {{ __('Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Landmass tiene acceso a tus archivos.') }}
         <span class="ml-auto font-semibold text-ink-950">{{ __('¿Tienes preguntas?') }} <a href="{{ route('dashboard.messages') }}" class="text-brand hover:underline">{{ __('Contáctanos') }} &rarr;</a></span>
     </div>
 </div>

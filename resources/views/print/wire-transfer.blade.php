@@ -18,7 +18,7 @@
   --green:    #525866;
   --green-bg: #171717;
   --field-bg: #f5f7fa;
-  --gold:     #e11019;
+  --gold:     #074540;
 }
 
 body { font-family: 'Inter', sans-serif; background: #f2f5f8; color: var(--ink); -webkit-font-smoothing: antialiased; width: 210mm; margin: 0 auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }

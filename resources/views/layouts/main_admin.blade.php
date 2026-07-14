@@ -146,8 +146,8 @@
                         <!-- Logo Section -->
                         <div id="logo-section" class="pt-3 px-4 transition-all duration-300 ease-in-out">
                             <img
-                                src="https://dunadevelopment.com/wp-content/cache/seraphinite-accelerator/s/m/d/img/c97274bc659c16e3ced9d91b315e2fd2.63be.png"
-                                alt="{{ __('Makai Residences') }}"
+                                src="{{ asset('images/brand/logo-horizontal.png') }}"
+                                alt="{{ __('Bahía Mar Residences') }}"
                                 class="w-[208px] h-auto object-contain transition-all duration-300 ease-in-out"
                             />
                             <div

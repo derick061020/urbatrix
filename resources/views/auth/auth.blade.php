@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('MAKAI · Duna Development') }}</title>
+    <title>{{ __('BAHÍA MAR · Landmass') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
+              brand: { DEFAULT:'#074540', dark:'#053330', soft:'#07454033', tint:'#e8f0ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -88,7 +88,7 @@
         background:#fff; color:#171717; font-size:14px;
         transition: border-color .15s, box-shadow .15s;
       }
-      .auth-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .auth-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .has-icon  { padding-left:38px; }
       .has-trail { padding-right:40px; }
@@ -113,7 +113,7 @@
       .auth-btn-ghost { background:#f5f5f5; color:#171717; border:1px solid transparent; }
       .auth-btn-ghost:hover { background:#ebebeb; }
       .auth-link { color:#171717; font-weight:500; font-size:14px; border-bottom:1px solid #171717; padding-bottom:1px; }
-      .auth-link:hover { color:#e11019; border-color:#e11019; }
+      .auth-link:hover { color:#074540; border-color:#074540; }
 
       /* ---- View toggles ---- */
       .login-view,
@@ -152,7 +152,7 @@
         background: #fff; color: #171717;
         transition: border-color .15s, box-shadow .15s;
       }
-      .code-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .code-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
 
       /* ---- Step indicator ---- */
       .step-pill { display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#a3a3a3; font-weight:500; white-space:nowrap; }
@@ -176,15 +176,15 @@
         transition: border-color .15s, background-color .15s;
       }
       .role-card:hover { background:#f8f8f8; }
-      .role-card.selected { border-color:#e11019; background:#fff; box-shadow: 0 0 0 1px #e11019; }
+      .role-card.selected { border-color:#074540; background:#fff; box-shadow: 0 0 0 1px #074540; }
       .role-card .radio-dot {
         width:18px; height:18px; border-radius:999px;
         border: 1.5px solid #cacfd8;
         margin-left:auto; flex-shrink:0;
         display:flex; align-items:center; justify-content:center;
       }
-      .role-card.selected .radio-dot { border-color:#e11019; }
-      .role-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#e11019; }
+      .role-card.selected .radio-dot { border-color:#074540; }
+      .role-card.selected .radio-dot::after { content:""; width:9px; height:9px; border-radius:999px; background:#074540; }
       @keyframes verif-pop {
         0%   { transform: scale(1); }
         50%  { transform: scale(1.15); }
@@ -199,10 +199,10 @@
         transition: background-color .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease;
       }
       .role-card.selected .verif-tag {
-        background: #e11019;
-        border-color: #e11019;
+        background: #074540;
+        border-color: #074540;
         color: #fff;
-        box-shadow: 0 0 0 3px rgba(225,16,25,.25);
+        box-shadow: 0 0 0 3px rgba(7,69,64,.25);
         animation: verif-pop .45s cubic-bezier(.34,1.56,.64,1) both;
       }
 
@@ -246,7 +246,7 @@
       }
       .auth-lang-item:hover { background: #f2f5f8; color: #171717; }
       .auth-lang-item.is-active { color: #171717; font-weight: 600; }
-      .auth-lang-check { visibility: hidden; color: #e11019; }
+      .auth-lang-check { visibility: hidden; color: #074540; }
       .auth-lang-item.is-active .auth-lang-check { visibility: visible; }
     </style>
 
@@ -328,8 +328,8 @@
             margin: 0;
         }
         .auth-phone-wrapper .iti .iti__tel-input:focus {
-            border-color: #e11019;
-            box-shadow: 0 0 0 3px rgba(225,16,25,.15);
+            border-color: #074540;
+            box-shadow: 0 0 0 3px rgba(7,69,64,.15);
         }
         .auth-phone-wrapper .iti .iti__tel-input::placeholder {
             color: #a3a3a3;
@@ -341,8 +341,8 @@
         }
         .auth-phone-wrapper .iti__selected-country:focus-visible {
             outline: none;
-            border-color: #e11019;
-            box-shadow: 0 0 0 3px rgba(225,16,25,.15);
+            border-color: #074540;
+            box-shadow: 0 0 0 3px rgba(7,69,64,.15);
         }
         .auth-phone-wrapper .iti__country-selector {
             background: #fff;
@@ -407,7 +407,7 @@
 
 {{-- Full-screen hero background --}}
 <div class="auth-bg">
-    <img src="{{ asset('images/brand/login_hero.png') }}" alt="{{ __('Makai Residences') }}">
+    <img src="{{ asset('images/brand/login_hero.png') }}" alt="{{ __('Bahía Mar Residences') }}">
 </div>
 
 {{-- Floating panel --}}
@@ -490,7 +490,7 @@
         </div>
 
         <footer class="flex items-center justify-between text-[12px] text-ink-500">
-            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+            <span>{{ __('© 2026 BAHÍA MAR RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>
@@ -547,7 +547,7 @@
                             <i class="pi pi-user-plus text-ink-600 text-[26px]"></i>
                         </div>
                         <h1 class="font-display text-[26px] font-medium text-ink-950 leading-8">{{ __('Crea tu cuenta') }}</h1>
-                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Accede a Duna Sales Platform de forma gratuita') }}</p>
+                        <p class="text-[14px] text-ink-500 mt-2">{{ __('Accede a Landmass Sales Platform de forma gratuita') }}</p>
                     </div>
                     <div class="h-px bg-ink-200/70 mb-6"></div>
 
@@ -838,7 +838,7 @@
 
         {{-- Footer --}}
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+            <span>{{ __('© 2026 BAHÍA MAR RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>

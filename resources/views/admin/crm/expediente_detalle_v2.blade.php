@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Expediente — CRM Duna Makai')
+@section('title', 'Expediente — CRM Landmass Bahía Mar')
 @section('page_title', 'Expedientes')
 @section('page_breadcrumb', 'Gestión · Expedientes de clientes · Detalle')
 @php $activeRoute = 'crm.expedientes'; @endphp
@@ -12,7 +12,7 @@
     $email   = $reservation->email ?? '';
     $phone   = $reservation->phone ?? '';
     $unidad  = $reservation->unit?->custom_id ?? $reservation->unit?->name ?? '—';
-    $proyecto= 'Makai Residences';
+    $proyecto= 'Bahía Mar Residences';
     $precio  = (float)($reservation->unit?->price ?? 0);
     $paid    = (float)($reservation->payments?->sum('paid_amount') ?? 0);
     $pct     = $precio > 0 ? round(($paid / $precio) * 100) : 0;
@@ -558,7 +558,7 @@
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-[#f2f5f8] flex items-center gap-2 justify-end bg-[#f5f7fa]">
-                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#e11019] border border-[#e11019] hover:bg-[#b60d14] hover:border-[#b60d14] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
+                <button type="button" onclick="downloadWireTransferPDF()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-white bg-[#074540] border border-[#074540] hover:bg-[#053330] hover:border-[#053330] transition-colors"><i class="pi pi-download"></i> {{ __('Descargar PDF') }}</button>
                 <button type="button" onclick="closeWireTransferModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-semibold text-[#525866] bg-white border border-[#eaecf0] hover:bg-[#f5f7fa] transition-colors">{{ __('Cerrar') }}</button>
             </div>
         </div>

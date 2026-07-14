@@ -63,7 +63,7 @@
       <td style="background-color:#ffffff;padding:24px 36px 8px 36px;">
         <p style="margin:0 0 12px 0;font-size:12px;color:#525866;line-height:1.65;">{{ __('Accede al reporte completo — galería fotográfica, detalle de hitos y documentos adjuntos — directamente en tu portal.') }}</p>
         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-          <tr><td style="background-color:#e11019;">
+          <tr><td style="background-color:#074540;">
             <a href="{{ $linkPortal }}" style="display:inline-block;padding:11px 24px;font-size:11px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">{{ __('Ver reporte completo') }}</a>
           </td></tr>
         </table>
@@ -75,7 +75,7 @@
       <td style="background-color:#ffffff;padding:20px 36px 32px 36px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
           <tr>
-            <td style="padding:0 0 0 20px;border-left:2px solid #e11019;">
+            <td style="padding:0 0 0 20px;border-left:2px solid #074540;">
               @php $asesor = $nombreAsesor ? ', tu asesor '.e($nombreAsesor).',' : ''; @endphp
               <p style="margin:0;font-size:12px;color:#525866;line-height:1.6;">Ante cualquier consulta sobre el reporte{!! $asesor !!} estamos a tu disposición en <strong style="color:#171717;font-weight:600;">{{ $c['support_email'] }}</strong> · {{ $c['phone'] }}.</p>
             </td>

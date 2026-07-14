@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Anuncios — CRM Duna Makai')
+@section('title', 'Anuncios — CRM Landmass Bahía Mar')
 @section('page_title', 'Anuncios')
 @section('page_breadcrumb', 'Comunicación · Anuncios internos')
 @php $activeRoute = 'crm.anuncios'; @endphp
@@ -19,16 +19,16 @@
     @php
         $pinned = [
             [
-                'title' => 'Actualización de precios Makai — Q2 2026',
-                'body'  => 'A partir del 1 de junio entran en vigor los nuevos precios lista para Makai Residences. Todas las cotizaciones activas tienen 30 días de gracia.',
+                'title' => 'Actualización de precios Bahía Mar — Q2 2026',
+                'body'  => 'A partir del 1 de junio entran en vigor los nuevos precios lista para Bahía Mar Residences. Todas las cotizaciones activas tienen 30 días de gracia.',
                 'tags'  => [['Compradores activos', 7, 'warn'], ['Compradores en proceso', 3, 'info'], ['Brokers activos', 3, 'away']],
-                'meta'  => 'Por Admin Duna · 2026-04-28',
+                'meta'  => 'Por Admin Landmass · 2026-04-28',
             ],
             [
                 'title' => 'Nuevo proceso de aprobación de descuentos',
                 'body'  => 'Todo descuento mayor al 3% sobre precio lista requiere aprobación doble: Gerente Comercial + Administración. El flujo está activo en el CRM.',
                 'tags'  => [['Equipo interno', 2, 'ok'], ['Brokers activos', 3, 'away']],
-                'meta'  => 'Por Admin Duna · 2026-04-15',
+                'meta'  => 'Por Admin Landmass · 2026-04-15',
             ],
         ];
         $recent = [
@@ -36,7 +36,7 @@
                 'title' => 'Capacitación CRM — Mayo 2026',
                 'body'  => 'Sesión de capacitación el jueves 9 de mayo a las 10 AM (hora RD). Se cubrirán los módulos de expedientes, documentos y aprobaciones. Asistencia obligatoria.',
                 'tags'  => [['Equipo interno', 2, 'ok'], ['Compradores en proceso', 3, 'info'], ['Brokers activos', 3, 'away']],
-                'meta'  => 'Por Admin Duna · 2026-05-01',
+                'meta'  => 'Por Admin Landmass · 2026-05-01',
             ],
         ];
     @endphp

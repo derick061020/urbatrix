@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', 'Editar unidad — CRM Duna Makai')
+@section('title', 'Editar unidad — CRM Landmass Bahía Mar')
 @section('page_title', 'Editar unidad')
 @section('page_breadcrumb', 'Proyectos · Unidades · ' . ($unit->custom_id ?? $unit->name))
 @php $activeRoute = 'units'; @endphp
@@ -61,7 +61,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 @php
                     $stats = [
-                        ['Hoy',          $viewStats['today']  ?? 0, '#e11019'],
+                        ['Hoy',          $viewStats['today']  ?? 0, '#074540'],
                         ['Últimos 7d',   $viewStats['week']   ?? 0, '#335cff'],
                         ['Últimos 30d',  $viewStats['month']  ?? 0, '#fa7319'],
                         ['Total',        $viewStats['total']  ?? 0, '#717784'],

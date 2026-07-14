@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Pago de reserva {{ $reservation->reservation_code ?? '' }} · MAKAI</title>
+    <title>Pago de reserva {{ $reservation->reservation_code ?? '' }} · BAHÍA MAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
+              brand: { DEFAULT:'#074540', dark:'#053330', soft:'#07454033', tint:'#e8f0ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -40,7 +40,7 @@
         background:#fff; color:#171717; font-size:14px;
         transition: border-color .15s, box-shadow .15s;
       }
-      .auth-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .auth-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .auth-input.is-invalid { border-color:#fb3748 !important; box-shadow:0 0 0 3px rgba(251,55,72,.14) !important; }
       .auth-select { appearance:none; padding-right:36px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position: right 12px center; }
@@ -51,7 +51,7 @@
         border:1px solid #ebebeb; border-radius:10px;
         background:#fff; transition: border-color .15s, box-shadow .15s;
       }
-      .stripe-field.StripeElement--focus { border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .stripe-field.StripeElement--focus { border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
       .stripe-field.StripeElement--invalid { border-color:#fb3748; box-shadow:0 0 0 3px rgba(251,55,72,.14); }
 
       .auth-btn {
@@ -91,11 +91,11 @@
           background:#fff; cursor:pointer; transition: border-color .15s, background-color .15s;
       }
       .pay-card:hover { background:#f8f8f8; }
-      .pay-card.selected { border-color:#e11019; background:#fff; box-shadow:0 0 0 1px #e11019; }
+      .pay-card.selected { border-color:#074540; background:#fff; box-shadow:0 0 0 1px #074540; }
 
       .check-circle {
           width:64px; height:64px; border-radius:999px;
-          background:#e11019; color:#fff;
+          background:#074540; color:#fff;
           display:flex; align-items:center; justify-content:center;
           margin: 0 auto 18px;
           position: relative;
@@ -111,7 +111,7 @@
 
       .check-circle::after {
           content:""; position:absolute; inset:-6px; border-radius:999px;
-          border:3px solid #e11019; opacity:0;
+          border:3px solid #074540; opacity:0;
       }
       #success-view:not(.hidden) .check-circle::after { animation: ring-pulse .9s ease-out .35s 2; }
 
@@ -142,8 +142,8 @@
                 <span class="block w-6 h-6"><img src="{{ asset('images/brand/logo-mark.png') }}" alt="" class="block w-full h-full"></span>
             </span>
             <span class="flex flex-col leading-none">
-                <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">LANDMASS</span>
-                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
+                <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">BAHÍA MAR</span>
+                <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Landmass') }}</span>
             </span>
         </a>
 
@@ -266,7 +266,7 @@
                                 <img src="{{ $img->path }}" alt="{{ $unitName }}" class="w-full h-36 object-cover" onerror="this.style.display='none'">
                             </div>
                         @endif
-                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">{{ __('Proyecto Duna · Playa del Carmen') }}</div>
+                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">{{ __('Proyecto Landmass · Playa del Carmen') }}</div>
                         <div class="font-display text-[18px] font-bold text-ink-950 mt-1">Unidad {{ $unitName }}</div>
 
                         <ul class="mt-4 space-y-2 text-[12px] text-ink-600">
@@ -311,7 +311,7 @@
 
     {{-- ============= FOOTER ============= --}}
     <footer class="flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 border-t border-ink-100 bg-white">
-        <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+        <span>{{ __('© 2026 BAHÍA MAR RESIDENCES') }}</span>
         <span class="flex items-center gap-1.5"><i class="pi pi-lock text-[12px]"></i> {{ __('Pago seguro con Stripe') }}</span>
     </footer>
 </div>
@@ -361,7 +361,7 @@
 
     function celebrate() {
         if (typeof confetti !== 'function') return;
-        const brand = ['#e11019', '#b60d14', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
+        const brand = ['#074540', '#053330', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
 
         // Big opening burst
         confetti({ particleCount: 160, spread: 90, origin: { y: 0.55 }, colors: brand, scalar: 1.1, zIndex: 9999 });

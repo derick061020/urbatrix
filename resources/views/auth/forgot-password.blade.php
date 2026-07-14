@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('MAKAI · Recuperar contraseña') }}</title>
+    <title>{{ __('BAHÍA MAR · Recuperar contraseña') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#e11019', dark:'#b60d14', soft:'#e1101933', tint:'#fdecec' },
+              brand: { DEFAULT:'#074540', dark:'#053330', soft:'#07454033', tint:'#e8f0ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -53,7 +53,7 @@
         background:#fff; color:#171717; font-size:14px;
         transition: border-color .15s, box-shadow .15s;
       }
-      .auth-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .auth-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .has-icon  { padding-left:38px; }
       .has-trail { padding-right:40px; }
@@ -72,7 +72,7 @@
       .auth-btn-ghost { background:#f5f5f5; color:#171717; border:1px solid transparent; }
       .auth-btn-ghost:hover { background:#ebebeb; }
       .auth-link { color:#171717; font-weight:500; font-size:14px; border-bottom:1px solid #171717; padding-bottom:1px; }
-      .auth-link:hover { color:#e11019; border-color:#e11019; }
+      .auth-link:hover { color:#074540; border-color:#074540; }
 
       /* Step transitions */
       @keyframes fp-step-in-forward {
@@ -105,7 +105,7 @@
         background: #fff; color: #171717;
         transition: border-color .15s, box-shadow .15s;
       }
-      .code-input:focus { outline:none; border-color:#e11019; box-shadow:0 0 0 3px rgba(225,16,25,.15); }
+      .code-input:focus { outline:none; border-color:#074540; box-shadow:0 0 0 3px rgba(7,69,64,.15); }
 
       /* Step indicator pills (same look as register) */
       .step-pill { display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#a3a3a3; font-weight:500; white-space:nowrap; }
@@ -156,7 +156,7 @@
       }
       .auth-lang-item:hover { background: #f2f5f8; color: #171717; }
       .auth-lang-item.is-active { color: #171717; font-weight: 600; }
-      .auth-lang-check { visibility: hidden; color: #e11019; }
+      .auth-lang-check { visibility: hidden; color: #074540; }
       .auth-lang-item.is-active .auth-lang-check { visibility: visible; }
     </style>
 </head>
@@ -333,7 +333,7 @@
         </main>
 
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+            <span>{{ __('© 2026 BAHÍA MAR RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>

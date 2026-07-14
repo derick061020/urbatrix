@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Statistics').' — CRM Duna Makai')
+@section('title', __('Statistics').' — CRM Landmass Bahía Mar')
 @section('page_title', __('Statistics'))
 @section('page_breadcrumb', __('System · Platform statistics'))
 @php $activeRoute = 'estadisticas'; @endphp
@@ -21,7 +21,7 @@
             [__('Visits this month'), number_format($viewsThisMonth), 'pi-eye', '#335cff', number_format($viewsTotal).' '.__('total')],
             [__('Active users'), number_format($activeUsers), 'pi-circle-fill', '#1fc16b', __('last 5 min')],
             [__('Viewed properties'), number_format($popularUnits->count()), 'pi-building', '#fa7319', __('with views')],
-            [__('Total users'), number_format($totalUsers), 'pi-users', '#e11019', '+'.number_format($newThisMonth).' '.__('this month')],
+            [__('Total users'), number_format($totalUsers), 'pi-users', '#074540', '+'.number_format($newThisMonth).' '.__('this month')],
             [__('New this month'), number_format($newThisMonth), 'pi-user-plus', '#222530', __('registrations')],
         ]; @endphp
         @foreach($kpis as [$label, $val, $icon, $color, $sub])
@@ -66,7 +66,7 @@
                             <span class="text-ink-700 font-medium">{{ $row->country }}</span>
                             <span class="text-ink-500">{{ $row->total }} · {{ $pct }}%</span>
                         </div>
-                        <div class="crm-progress"><span style="background:#e11019;width:{{ $pct }}%"></span></div>
+                        <div class="crm-progress"><span style="background:#074540;width:{{ $pct }}%"></span></div>
                     </div>
                 @empty
                     <div class="text-[12px] text-ink-400 text-center py-6">{{ __('No country data yet.') }}</div>
@@ -125,7 +125,7 @@
     {{-- KPIs comerciales --}}
     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
         @php $salesKpis = [
-            [__('Sales this month'), '$'.number_format($salesMonth, 0), '#e11019', $unitsMonth.' '.__('units')],
+            [__('Sales this month'), '$'.number_format($salesMonth, 0), '#074540', $unitsMonth.' '.__('units')],
             [__('Cumulative sales'), '$'.number_format($salesTotal, 0), '#0EA5A4', $unitsTotal.' '.__('units sold')],
             [__('Pipeline'), '$'.number_format($pipelineValue, 0), '#E2A33B', $pipelineCount.' '.__('active')],
             [__('Collected this month'), '$'.number_format($collectedMonth, 0), '#1fc16b', __('confirmed payments')],

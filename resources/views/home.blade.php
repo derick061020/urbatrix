@@ -16,7 +16,7 @@
 
 <body data-view="grid">
 
-  <!-- ░░░ MAKAI LOADING SCREEN ░░░ -->
+  <!-- ░░░ BAHÍA MAR LOADING SCREEN ░░░ -->
   <div id="makaiLoader" aria-hidden="true">
     <div class="ml-inner">
       <div class="ml-rings">
@@ -25,7 +25,7 @@
         <span class="ml-ring"></span>
         <span class="ml-core"></span>
       </div>
-      <img src="/images/makai-logo.png" alt="Landmass" class="ml-logo">
+      <img src="/images/makai-logo.png" alt="Bahía Mar" class="ml-logo">
       <div class="ml-bar"><span></span></div>
     </div>
   </div>
@@ -41,12 +41,12 @@
       display:flex; flex-direction:column; align-items:center; gap:30px;
       animation:ml-fade-in .7s ease both;
     }
-    /* Anillos topográficos / ondas que se expanden ("Makai" = hacia el mar) */
+    /* Anillos topográficos / ondas que se expanden ("Bahía Mar" = hacia el mar) */
     .ml-rings{ position:relative; width:120px; height:120px; }
     .ml-ring{
       position:absolute; inset:0; margin:auto;
       width:36px; height:36px; border-radius:50%;
-      border:1.5px solid #e11019;
+      border:1.5px solid #074540;
       transform:scale(.3); opacity:0;
       animation:ml-ripple 2.4s cubic-bezier(.22,.61,.36,1) infinite;
     }
@@ -55,7 +55,7 @@
     .ml-core{
       position:absolute; inset:0; margin:auto;
       width:14px; height:14px; border-radius:50%;
-      background:#e11019;
+      background:#074540;
       animation:ml-pulse 2.4s ease-in-out infinite;
     }
     @keyframes ml-ripple{
@@ -78,11 +78,11 @@
     }
     .ml-bar{
       width:160px; height:3px; border-radius:99px;
-      background:rgba(225,16,25,.15); overflow:hidden;
+      background:rgba(7,69,64,.15); overflow:hidden;
     }
     .ml-bar span{
       display:block; height:100%; width:40%; border-radius:99px;
-      background:linear-gradient(90deg, transparent, #e11019, transparent);
+      background:linear-gradient(90deg, transparent, #074540, transparent);
       animation:ml-slide 1.3s ease-in-out infinite;
     }
     @keyframes ml-slide{
@@ -135,7 +135,7 @@
       setTimeout(hide, 8000);
     })();
   </script>
-  <!-- ░░░ /MAKAI LOADING SCREEN ░░░ -->
+  <!-- ░░░ /BAHÍA MAR LOADING SCREEN ░░░ -->
 
   @php
     // Listas globales editables desde el admin (Unidades → Configuraciones).
@@ -166,7 +166,7 @@
       <!-- HEADER -->
       <div class="mt-header">
         <div class="mt-header-left">
-          <img src="/images/makai-logo.png" alt="Landmass" class="mt-header-logo">
+          <img src="/images/makai-logo.png" alt="Bahía Mar" class="mt-header-logo">
           <span class="mt-header-dot"></span>
           <span class="mt-header-unit">{{ __('Unit') }} <span id="modalUnitNum">A-101</span></span>
           <span id="modalStatusBadge" class="mt-badge-available">
@@ -506,13 +506,13 @@
               <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="1">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Makai_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Bahía Mar_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="2">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Makai_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Bahía Mar_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="3">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Makai_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Bahía Mar_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp" alt="">
             </button>
           </div>
         </section>
@@ -837,7 +837,7 @@
     .sh-social-btn.tg  .sh-social-icon { background:#229ED9; color:#fff; }
     .sh-social-btn.fb  .sh-social-icon { background:#1877F2; color:#fff; }
     .sh-social-btn.tw  .sh-social-icon { background:#000;     color:#fff; }
-    .sh-social-btn.em  .sh-social-icon { background:#e11019;  color:#fff; }
+    .sh-social-btn.em  .sh-social-icon { background:#074540;  color:#fff; }
     .sh-social-btn.sm  .sh-social-icon { background:#222530;  color:#fff; }
 
     .sh-url-row {
@@ -872,14 +872,14 @@
         margin: 14px 22px 22px;
         display:flex; align-items:center; gap:12px;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #e11019 0%, #b60d14 100%);
+        background: linear-gradient(135deg, #074540 0%, #053330 100%);
         border-radius: 14px;
         cursor:pointer; border:none; width: calc(100% - 44px); text-align:left;
         color:#fff;
         transition: transform .12s, box-shadow .15s;
-        box-shadow: 0 6px 16px -8px rgba(225,16,25,.55);
+        box-shadow: 0 6px 16px -8px rgba(7,69,64,.55);
     }
-    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(225,16,25,.65); }
+    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(7,69,64,.65); }
     .sh-download:active { transform: translateY(0); }
     .sh-download-icon {
         width:42px; height:42px; border-radius:10px;
@@ -893,8 +893,8 @@
     .sh-download-arrow { opacity:.8; }
 
     /* Smaller share tab in modal */
-    .mt-tab.mt-tab-download { color:#e11019;border-left: 1px solid #eaecf0;}
-    .mt-tab.mt-tab-download:hover { background:#fdecec; }
+    .mt-tab.mt-tab-download { color:#074540;border-left: 1px solid #eaecf0;}
+    .mt-tab.mt-tab-download:hover { background:#e8f0ef; }
   </style>
 
   <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Compartir propiedad') }}">
@@ -1096,14 +1096,14 @@
         const net  = btn.dataset.net;
         const url  = buildShareUrl();
         const unit = (document.getElementById('modalUnitNum')?.textContent || '').trim();
-        const text = 'Mira esta unidad de Makai Residences (' + unit + ')';
+        const text = 'Mira esta unidad de Bahía Mar Residences (' + unit + ')';
         let target = '';
         switch (net) {
           case 'wa':  target = 'https://wa.me/?text=' + encodeURIComponent(text + ' — ' + url); break;
           case 'tg':  target = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text); break;
           case 'fb':  target = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url); break;
           case 'tw':  target = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url); break;
-          case 'em':  target = 'mailto:?subject=' + encodeURIComponent('Makai Residences — Unidad ' + unit) + '&body=' + encodeURIComponent(text + '\n\n' + url); break;
+          case 'em':  target = 'mailto:?subject=' + encodeURIComponent('Bahía Mar Residences — Unidad ' + unit) + '&body=' + encodeURIComponent(text + '\n\n' + url); break;
           case 'sms': target = 'sms:?body=' + encodeURIComponent(text + ' ' + url); break;
         }
         if (target.startsWith('mailto:') || target.startsWith('sms:')) {
@@ -1219,8 +1219,8 @@
         font-family:inherit;
     }
     .vc-input:focus, .vc-select:focus, .vc-textarea:focus {
-        border-color:#e11019; background:#fff;
-        box-shadow:0 0 0 3px rgba(225,16,25,.18);
+        border-color:#074540; background:#fff;
+        box-shadow:0 0 0 3px rgba(7,69,64,.18);
     }
     .vc-select { appearance:none; padding-right:36px;
         background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23717784' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
@@ -1256,8 +1256,8 @@
     }
     .vc-slot:hover { background:#fff; border-color:#cacfd8; color:#222530; }
     .vc-slot.active {
-        background:#e11019; border-color:#e11019; color:#fff;
-        box-shadow:0 4px 12px -4px rgba(225,16,25,.45);
+        background:#074540; border-color:#074540; color:#fff;
+        box-shadow:0 4px 12px -4px rgba(7,69,64,.45);
     }
     .vc-slot[disabled], .vc-slot.disabled {
         opacity:.45; cursor:not-allowed; text-decoration:line-through;
@@ -1665,7 +1665,7 @@
       align-items: center; justify-content: center; gap: 12px;
       width: 100%;
       padding: 26px 0 34px;
-      color: #e11019;
+      color: #074540;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px; font-weight: 600; letter-spacing: .2px;
       opacity: 0;
@@ -1681,7 +1681,7 @@
     .fg-lazy-dots { display: inline-flex; gap: 6px; }
     .fg-lazy-dots span {
       width: 8px; height: 8px; border-radius: 50%;
-      background: #e11019;
+      background: #074540;
       animation: fgLazyDot 1s ease-in-out infinite;
     }
     .fg-lazy-dots span:nth-child(2) { animation-delay: .15s; }
@@ -1722,7 +1722,7 @@
         </div>
         <div class="vc-header-text">
           <div class="vc-header-title">{{ __('Agendar Videollamada') }}</div>
-          <div class="vc-header-sub" id="advisorModalSub">{{ __('Con tu asesor de Makai Residences') }}</div>
+          <div class="vc-header-sub" id="advisorModalSub">{{ __('Con tu asesor de Bahía Mar Residences') }}</div>
         </div>
         <button type="button" class="vc-close" onclick="closeAdvisorVideoCall()" aria-label="{{ __('Cerrar') }}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1825,8 +1825,8 @@
 
           <!-- PROJECT SELECTOR DROPDOWN -->
           <div class="project-selector" id="projectsDropdown" role="menu" aria-label="{{ __('Projects') }}">
-            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Makai')" aria-label="{{ __('Makai Residences') }}" role="menuitem">
-              <img src="/images/projects/makai.png" alt="{{ __('Makai Residences') }}">
+            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Bahía Mar')" aria-label="{{ __('Bahía Mar Residences') }}" role="menuitem">
+              <img src="/images/projects/makai.png" alt="{{ __('Bahía Mar Residences') }}">
             </button>
             <button type="button" class="project-card" data-project="naviva" onclick="selectProject('Naviva')" aria-label="{{ __('Naviva') }}" role="menuitem">
               <img src="/images/projects/naviva.png" alt="{{ __('Naviva') }}">
@@ -2224,11 +2224,11 @@
           <div class="fg-hero" id="hero" data-active="makai">
             <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true">LANDMASS</span>
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true">BAHÍA MAR</span>
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 
-            <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Makai Residences') }}">
+            <img class="fg-hero-building" data-project="makai"  src="/images/hero/BAHÍA MAR.png"  alt="{{ __('Bahía Mar Residences') }}">
             <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
             <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
           </div>
@@ -2759,7 +2759,7 @@
         
         <!-- Copyright -->
         <div class="fg-footer-copyright" data-node-id="124:3626">
-          <p>{{ __('©2026 Duna Development — Todos los derechos reservados') }}</p>
+          <p>{{ __('©2026 Landmass — Todos los derechos reservados') }}</p>
         </div>
         
         <!-- Social Icons -->
@@ -2812,9 +2812,9 @@
     // ============================
     let modalImages = [
       'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Makai_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Makai_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Makai_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp'
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Bahía Mar_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Bahía Mar_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Bahía Mar_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp'
     ];
     let currentModalImg = 0;
 
@@ -4051,7 +4051,7 @@
     }
 
     const PROJECT_BRAND_RGB = {
-      makai:  [225, 16, 25],
+      makai:  [7, 69, 64],
       naviva: [197, 191, 86],
       liv:    [85, 127, 128],
     };
@@ -4464,7 +4464,7 @@
         bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--brand, #e11019);
+        background: var(--brand, #074540);
         color: white;
         padding: 12px 24px;
         border-radius: 10px;
@@ -4501,7 +4501,7 @@
 
     function openVideoCall() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
-      const subject = encodeURIComponent('Agendar videollamada - Unidad ' + unitNum + ' Makai Residences');
+      const subject = encodeURIComponent('Agendar videollamada - Unidad ' + unitNum + ' Bahía Mar Residences');
       window.location.href = 'mailto:support+makai_residences@launchbase.co.za?subject=' + subject;
     }
 
@@ -4724,13 +4724,13 @@
     function openWhatsAppBroker() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
       const price = document.getElementById('modalPrice')?.textContent || '';
-      const text = encodeURIComponent('Hola, tengo interés en la Unidad ' + unitNum + ' de Makai Residences (' + price + '). ¿Podemos hablar?');
+      const text = encodeURIComponent('Hola, tengo interés en la Unidad ' + unitNum + ' de Bahía Mar Residences (' + price + '). ¿Podemos hablar?');
       window.open('https://wa.me/18097109044?text=' + text, '_blank');
     }
 
     function shareWithCoInvestor() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
-      const subject = encodeURIComponent('Makai Residences - Unidad ' + unitNum);
+      const subject = encodeURIComponent('Bahía Mar Residences - Unidad ' + unitNum);
       const body = encodeURIComponent('Te comparto esta unidad para que la veamos juntos: ' + window.location.href);
       window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
     }

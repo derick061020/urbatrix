@@ -7,7 +7,7 @@
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
     <p class="text-[12px] text-ink-500 max-w-xl leading-relaxed">
-        Solo puedes usar material aprobado por Duna. No está permitido modificar renders, planos ni material publicitario (Art. 1 del Acuerdo de Colaboración).
+        Solo puedes usar material aprobado por Landmass. No está permitido modificar renders, planos ni material publicitario (Art. 1 del Acuerdo de Colaboración).
     </p>
 
     {{-- Aviso legal --}}
@@ -47,7 +47,7 @@
     @else
         <div class="brk-card p-12 text-center text-[13px] text-ink-400">
             <i class="pi pi-folder-open text-[28px] text-ink-300 block mb-3"></i>
-            Aún no hay material de ventas publicado. Duna lo cargará próximamente.
+            Aún no hay material de ventas publicado. Landmass lo cargará próximamente.
         </div>
     @endif
 </div>

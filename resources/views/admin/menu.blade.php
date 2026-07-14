@@ -114,7 +114,7 @@
                     </td>
                 </tr>
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Makai Especificaciones (ES)') }}</td>
+                    <td class="py-3 px-6 text-center text-gray-700">{{ __('Bahía Mar Especificaciones (ES)') }}</td>
                     <td class="py-3 px-6 text-center text-gray-500">10</td>
                     <td class="py-3 px-6 text-center text-gray-500">Yes</td>
                     <td class="py-3 px-6 text-center">

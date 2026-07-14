@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Plan de pagos').' — MAKAI')
+@section('title', __('Plan de pagos').' — BAHÍA MAR')
 @section('page_title', __('Plan de pagos'))
 @section('page_breadcrumb', __('Mi propiedad').' · '.__('Plan de pagos'))
 @php $activeRoute = 'payments'; @endphp
@@ -31,7 +31,7 @@
     <div class="px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200 flex items-center gap-3">
         <div class="min-w-0">
             <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
-            <div class="text-[12px] text-ink-500">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
+            <div class="text-[12px] text-ink-500">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
         </div>
         <button onclick="downloadBankData()" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
             <i class="pi pi-download text-[12px]"></i> {{ __('Descargar datos bancarios') }}
@@ -382,7 +382,7 @@
     }
     .rcs-canvas-wrap { position:relative; }
     .rcs-canvas-wrap.has-stroke .rcs-empty-canvas { display:none; }
-    .rcs-canvas-wrap.has-stroke #receipt-sig-canvas { border-style:solid; border-color:#e11019; }
+    .rcs-canvas-wrap.has-stroke #receipt-sig-canvas { border-style:solid; border-color:#074540; }
     .rcs-empty-canvas {
         position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
         color:#a3a3a3; font-size:11px; pointer-events:none; font-style:italic;

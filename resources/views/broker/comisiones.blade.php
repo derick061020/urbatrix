@@ -86,7 +86,7 @@
                 @empty
                     <tr><td colspan="5" class="px-5 py-10 text-center text-[12px] text-ink-400">
                         @if(!$agent)
-                            Tu usuario aún no está vinculado a un perfil de agente. Contacta a Duna para activar tus comisiones.
+                            Tu usuario aún no está vinculado a un perfil de agente. Contacta a Landmass para activar tus comisiones.
                         @else
                             Todavía no tienes cierres registrados.
                         @endif

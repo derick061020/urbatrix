@@ -1,12 +1,12 @@
 <a href="{{ url('/') }}" class="flex items-center gap-3 select-none">
-    {{-- Logo mark: white rounded square with the Landmass mark --}}
-    <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm" style="background:#e11019">
+    {{-- Logo mark: white rounded square with the Bahía Mar mark --}}
+    <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm" style="background:#074540">
         <span class="block w-6 h-6">
             <img src="{{ asset('images/brand/logo-mark-white.png') }}" alt="" class="block w-full h-full" />
         </span>
     </span>
     <span class="flex flex-col leading-none">
-        <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">LANDMASS</span>
-        <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</span>
+        <span class="font-display text-[14px] font-bold text-ink-950 tracking-tight">BAHÍA MAR</span>
+        <span class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Landmass') }}</span>
     </span>
 </a>
