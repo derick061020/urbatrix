@@ -2228,7 +2228,7 @@
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 
-            <img class="fg-hero-building" data-project="makai"  src="/images/hero/BAHÍA MAR.png"  alt="{{ __('Bahía Mar Residences') }}">
+            <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Bahía Mar Residences') }}">
             <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
             <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
           </div>
