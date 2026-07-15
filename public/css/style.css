@@ -555,6 +555,17 @@
       transform: translateY(-180%);
       will-change: transform, opacity;
     }
+    /* Location subtitle under the big project name (e.g. "Las Terrenas") */
+    .fg-hero-sub {
+      display: block;
+      font-size: 0.30em;
+      letter-spacing: 0.30em;
+      margin-top: 0.10em;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.62);
+      -webkit-text-fill-color: rgba(255, 255, 255, 0.62);
+      background: none;
+    }
     /* Active project: visible + entrance animation */
     .fg-hero[data-active="makai"]  .fg-hero-text[data-project="makai"],
     .fg-hero[data-active="naviva"] .fg-hero-text[data-project="naviva"],
