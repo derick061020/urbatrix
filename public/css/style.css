@@ -555,12 +555,12 @@
       transform: translateY(-180%);
       will-change: transform, opacity;
     }
-    /* Location subtitle under the big project name (e.g. "Las Terrenas") */
+    /* Small brand label above the big location name (e.g. "Bahía Mar") */
     .fg-hero-sub {
       display: block;
-      font-size: 0.30em;
+      font-size: 0.26em;
       letter-spacing: 0.30em;
-      margin-top: 0.10em;
+      margin-bottom: 0.06em;
       font-weight: 600;
       color: rgba(255, 255, 255, 0.62);
       -webkit-text-fill-color: rgba(255, 255, 255, 0.62);
