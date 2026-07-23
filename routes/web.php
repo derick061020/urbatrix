@@ -226,7 +226,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::delete('/units/{unit}/images/{image}', [AdminController::class, 'deleteUnitImage'])->name('admin.units.images.delete');
     Route::post('/units/{unit}/images/reorder', [AdminController::class, 'reorderUnitImages'])->name('admin.units.images.reorder');
     Route::post('/units/{unit}/images/upload', [AdminController::class, 'uploadUnitImages'])->name('admin.units.images.upload');
-    
+    Route::post('/units/{unit}/images/upload-chunk', [AdminController::class, 'uploadUnitImageChunk'])->name('admin.units.images.upload-chunk');
+
     Route::get('/deals', [AdminController::class, 'deals'])->name('admin.deals');
     Route::post('/deals', [AdminController::class, 'storeDeal'])->name('admin.deals.store');
     Route::put('/deals/{deal}', [AdminController::class, 'updateDeal'])->name('admin.deals.update');
@@ -401,6 +402,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/api/reservations/{id}/payments', [AdminController::class, 'getReservationPayments']);
     Route::post('/api/reservations/{id}/payments', [AdminController::class, 'createPayment']);
     Route::put('/api/payments/{id}', [AdminController::class, 'updatePayment']);
+    Route::post('/api/payments/{id}/receipt', [AdminController::class, 'attachPaymentReceipt'])->name('admin.payments.receipt.attach');
     Route::delete('/api/payments/{id}', [AdminController::class, 'deletePayment']);
     Route::post('/api/payments/{id}/mark-paid', [AdminController::class, 'markPaymentAsPaid']);
     
