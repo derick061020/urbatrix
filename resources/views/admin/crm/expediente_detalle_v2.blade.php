@@ -384,9 +384,13 @@
                                                 <button type="button"
                                                         onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->label ?? $p->payment_type))"
                                                         class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
-                                            @elseif(! $p->receipt_path)
-                                                <span class="text-[11px] text-ink-400">—</span>
                                             @endif
+                                            {{-- Pago ya registrado: adjuntar o reemplazar el recibo firmado/sellado --}}
+                                            <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png" id="rcpt-file-{{ $p->id }}" onchange="attachReceiptToPayment({{ $p->id }}, this)">
+                                            <button type="button" onclick="document.getElementById('rcpt-file-{{ $p->id }}').click()"
+                                                    class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Subir comprobante') }}">
+                                                <i class="pi pi-paperclip text-[10px]"></i> {{ $p->receipt_path ? __('Reemplazar') : __('Adjuntar') }}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -396,6 +400,60 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- Adjunta/reemplaza el comprobante de un pago ya registrado.
+                     Sube por chunks (evita 413) y luego lo vincula al pago. --}}
+                <script>
+                async function attachReceiptToPayment(paymentId, input) {
+                    var file = input.files && input.files[0];
+                    if (!file) return;
+
+                    var csrf = document.querySelector('meta[name=csrf-token]')?.content || '';
+                    var chunkSize = 512 * 1024;
+                    var total    = Math.ceil(file.size / chunkSize) || 1;
+                    var uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+                    var receiptPath = '';
+
+                    try {
+                        for (var i = 0; i < total; i++) {
+                            var fd = new FormData();
+                            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
+                            fd.append('upload_id', uploadId);
+                            fd.append('index', i);
+                            fd.append('total', total);
+                            fd.append('name', file.name);
+                            fd.append('_token', csrf);
+
+                            var res = await fetch('{{ route('admin.crm.payment.receipt') }}', {
+                                method: 'POST',
+                                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                                body: fd,
+                                credentials: 'same-origin',
+                            });
+                            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413).');
+                            var d = await res.json().catch(function () { return {}; });
+                            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante.');
+                            if (d.done) receiptPath = d.path || '';
+                        }
+
+                        if (!receiptPath) throw new Error('No se pudo subir el comprobante.');
+
+                        var link = await fetch('{{ url('admin/api/payments') }}/' + paymentId + '/receipt', {
+                            method: 'POST',
+                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf },
+                            body: (function () { var f = new FormData(); f.append('receipt_path', receiptPath); return f; })(),
+                            credentials: 'same-origin',
+                        });
+                        var ld = await link.json().catch(function () { return {}; });
+                        if (!link.ok || ld.success === false) throw new Error(ld.message || 'No se pudo adjuntar el comprobante.');
+
+                        if (window.crmToast) crmToast('Comprobante adjuntado.', 'ok');
+                        window.location.reload();
+                    } catch (e) {
+                        alert(e.message || 'No se pudo adjuntar el comprobante.');
+                    }
+                }
+                </script>
                 @endif
 
             {{-- ============ HISTORIAL ============ --}}

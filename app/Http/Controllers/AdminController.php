@@ -655,6 +655,101 @@ class AdminController extends Controller
         ]);
     }
 
+    /**
+     * Subida de imágenes de unidad POR CHUNKS (trozos de ~512 KB).
+     *
+     * Evita los límites de PHP (upload_max_filesize / post_max_size) y el 413
+     * del servidor web que rompían la subida directa con fotos de celular
+     * (>2 MB). Cada archivo se envía en trozos; al recibir el último se
+     * ensambla, se valida como imagen y se crea el UnitImage.
+     */
+    public function uploadUnitImageChunk(Request $request, Unit $unit)
+    {
+        $request->validate([
+            'chunk'     => ['required', 'file', 'max:5120'], // 5 MB máx por chunk
+            'upload_id' => ['required', 'string', 'max:64'],
+            'index'     => ['required', 'integer', 'min:0'],
+            'total'     => ['required', 'integer', 'min:1', 'max:1000'],
+            'name'      => ['required', 'string', 'max:255'],
+            'category'  => ['nullable', 'in:property,amenities'],
+        ]);
+
+        $category = $request->input('category', 'property');
+        $uploadId = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $request->input('upload_id'));
+        $index    = (int) $request->input('index');
+        $total    = (int) $request->input('total');
+
+        if ($uploadId === '') {
+            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+        }
+
+        $tmpDir = storage_path('app/tmp-unit-images');
+        if (! is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0775, true);
+        }
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $uploadId . '.part';
+
+        // Anexar los bytes del chunk al temporal.
+        $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
+        $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
+        if ($in === false || $out === false) {
+            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+        }
+        stream_copy_to_stream($in, $out);
+        fclose($in);
+        fclose($out);
+
+        // Tope acumulado por imagen (10 MB).
+        if (filesize($tmpPath) > 10485760) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'La imagen supera los 10 MB.'], 422);
+        }
+
+        // Chunks intermedios: confirmar y esperar el siguiente.
+        if ($index + 1 < $total) {
+            return response()->json(['success' => true, 'done' => false]);
+        }
+
+        // Último chunk: validar extensión y que sea realmente una imagen.
+        $ext     = strtolower(pathinfo((string) $request->input('name'), PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (! in_array($ext, $allowed, true) || @getimagesize($tmpPath) === false) {
+            @unlink($tmpPath);
+            return response()->json(['success' => false, 'message' => 'El archivo no es una imagen válida.'], 422);
+        }
+
+        $filename = $uploadId . '.' . $ext;
+        $finalRel = 'units/images/' . $filename;
+        $stream   = fopen($tmpPath, 'rb');
+        \Illuminate\Support\Facades\Storage::disk('public')->put($finalRel, $stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+        @unlink($tmpPath);
+
+        $maxSortOrder = $unit->images()->where('category', $category)->max('sort_order') ?? 0;
+
+        $unitImage = UnitImage::create([
+            'unit_id'    => $unit->id,
+            'category'   => $category,
+            'name'       => $request->input('name'),
+            'path'       => '/storage/' . $finalRel,
+            'sort_order' => $maxSortOrder + 1,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'done'    => true,
+            'image'   => [
+                'id'         => $unitImage->id,
+                'category'   => $unitImage->category,
+                'name'       => $unitImage->name,
+                'path'       => $unitImage->path,
+                'sort_order' => $unitImage->sort_order,
+            ],
+        ]);
+    }
+
     public function agents()
     {
         $brokers = User::where('role', 'broker')
@@ -2844,6 +2939,7 @@ class AdminController extends Controller
             'unit_id'        => 'required|exists:units,id',
             'fecha'          => 'required|date',
             'monto'          => 'required|numeric|min:0',
+            'receipt_path'   => 'nullable|string|max:255',
         ]);
 
         $unit = Unit::find($data['unit_id']);
@@ -2894,6 +2990,7 @@ class AdminController extends Controller
                 'paid_at'        => $data['fecha'],
                 'status'         => 'paid',
                 'payment_method' => 'wire',
+                'receipt_path'   => $data['receipt_path'] ?? null,
             ]);
         }
 
@@ -3572,6 +3669,26 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error updating payment: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Adjunta (o reemplaza) el comprobante de un pago ya registrado.
+     *
+     * El archivo llega previamente subido por chunks (receipt_path, vía
+     * uploadReceiptChunk). Permite, por ejemplo, cargar el recibo firmado y
+     * sellado de la seña después de haber guardado el pago de reserva.
+     */
+    public function attachPaymentReceipt(Request $request, $id)
+    {
+        $data = $request->validate([
+            'receipt_path' => ['required', 'string', 'max:255'],
+        ]);
+
+        $payment = Payment::findOrFail($id);
+        $payment->receipt_path = $data['receipt_path'];
+        $payment->save();
+
+        return response()->json(['success' => true, 'receipt_path' => $payment->receipt_path]);
     }
 
     public function deletePayment($id)
