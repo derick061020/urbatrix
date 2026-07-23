@@ -146,13 +146,14 @@
                     <div class="image-upload-container"
                          data-category="{{ $catKey }}"
                          data-upload-url="{{ route('admin.units.images.upload', $unit->id) }}"
+                         data-upload-chunk-url="{{ route('admin.units.images.upload-chunk', $unit->id) }}"
                          data-csrf="{{ csrf_token() }}"
                          class="border-2 border-dashed border-ink-200 rounded-xl p-6 text-center hover:border-brand/40 transition-colors">
                         <i class="pi pi-cloud-upload text-[28px] text-ink-400"></i>
                         <p class="text-[13px] text-ink-700 mt-2">{{ __('Arrastrá imágenes aquí o') }}</p>
                         <input type="file" multiple accept="image/*" class="hidden image-upload-input" id="image-upload-{{ $catKey }}">
                         <label for="image-upload-{{ $catKey }}" class="crm-btn crm-btn-ghost mt-3 inline-flex"><i class="pi pi-plus text-[10px]"></i> {{ __('Elegir archivos') }}</label>
-                        <p class="mt-3 text-[11px] text-ink-400">{{ __('JPG, PNG, WEBP o GIF · máx. 5 MB · hasta 10 imágenes por carga') }}</p>
+                        <p class="mt-3 text-[11px] text-ink-400">{{ __('JPG, PNG, WEBP o GIF · máx. 10 MB · hasta 10 imágenes por carga') }}</p>
 
                         <div class="upload-progress hidden mt-4 max-w-md mx-auto">
                             <div class="crm-progress"><span class="progress-bar bg-brand" style="width:0%"></span></div>
@@ -371,8 +372,9 @@ document.querySelectorAll('.image-upload-container').forEach(function (uploadCon
     const imagesTbody   = document.querySelector('.unit-images-tbody[data-category="' + category + '"]');
 
     if (!fileInput) return;
-    const uploadUrl = uploadContainer.dataset.uploadUrl;
+    const chunkUrl  = uploadContainer.dataset.uploadChunkUrl;
     const csrf      = uploadContainer.dataset.csrf;
+    const CHUNK_SIZE = 512 * 1024; // 512 KB — evita post_max_size / 413 del servidor.
 
     fileInput.addEventListener('change', e => { if (e.target.files.length) uploadFiles(e.target.files); });
     uploadContainer.addEventListener('dragover', e => { e.preventDefault(); uploadContainer.classList.add('bg-ink-50','border-brand'); });
@@ -382,41 +384,69 @@ document.querySelectorAll('.image-upload-container').forEach(function (uploadCon
         if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
     });
 
-    function uploadFiles(files) {
-        const formData = new FormData();
+    // Sube UNA imagen por chunks. Al recibir el último trozo el servidor crea el
+    // UnitImage y devuelve sus datos para pintar la fila.
+    async function uploadOneImage(file) {
+        const total    = Math.ceil(file.size / CHUNK_SIZE) || 1;
+        const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        let image = null;
+
+        for (let i = 0; i < total; i++) {
+            const fd = new FormData();
+            fd.append('chunk', file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE));
+            fd.append('upload_id', uploadId);
+            fd.append('index', i);
+            fd.append('total', total);
+            fd.append('name', file.name);
+            fd.append('category', category);
+            fd.append('_token', csrf);
+
+            const res = await fetch(chunkUrl, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                body: fd,
+                credentials: 'same-origin',
+            });
+            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413).');
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir la imagen.');
+            if (d.done) image = d.image;
+        }
+        return image;
+    }
+
+    async function uploadFiles(files) {
         const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
         if (imageFiles.length === 0)  return showStatus('Seleccioná archivos de imagen válidos', 'error');
         if (imageFiles.length > 10)   return showStatus('Máximo 10 imágenes por carga', 'error');
-        imageFiles.forEach(f => formData.append('images[]', f));
-        formData.append('category', category);
 
         uploadProgress.classList.remove('hidden');
         uploadStatus.classList.add('hidden');
         progressBar.style.width = '0%'; progressText.textContent = '0%';
 
-        fetch(uploadUrl, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: formData,
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                progressBar.style.width = '100%'; progressText.textContent = '100%';
-                showStatus(`${data.images.length} imagen(es) subida(s) correctamente`, 'success');
-                addImagesToTable(data.images);
-                if (imagesTbody) {
-                    const emptyRow = imagesTbody.querySelector('.unit-images-empty');
-                    if (emptyRow) emptyRow.remove();
+        const uploaded = [];
+        try {
+            for (let n = 0; n < imageFiles.length; n++) {
+                const image = await uploadOneImage(imageFiles[n]);
+                if (image) {
+                    uploaded.push(image);
+                    addImagesToTable([image]);
+                    if (imagesTbody) {
+                        const emptyRow = imagesTbody.querySelector('.unit-images-empty');
+                        if (emptyRow) emptyRow.remove();
+                    }
                 }
-                fileInput.value = '';
-                setTimeout(() => uploadProgress.classList.add('hidden'), 1800);
-            } else {
-                showStatus('Error al subir imágenes', 'error');
-                uploadProgress.classList.add('hidden');
+                const pct = Math.round(((n + 1) / imageFiles.length) * 100);
+                progressBar.style.width = pct + '%'; progressText.textContent = pct + '%';
             }
-        })
-        .catch(err => { console.error('Upload error', err); showStatus('Error: ' + err.message, 'error'); uploadProgress.classList.add('hidden'); });
+            showStatus(`${uploaded.length} imagen(es) subida(s) correctamente`, 'success');
+            fileInput.value = '';
+            setTimeout(() => uploadProgress.classList.add('hidden'), 1800);
+        } catch (err) {
+            console.error('Upload error', err);
+            showStatus('Error: ' + err.message, 'error');
+            uploadProgress.classList.add('hidden');
+        }
     }
 
     function addImagesToTable(images) {

@@ -80,6 +80,21 @@
                     <input type="number" step="0.01" name="monto" required value="0.00" class="crm-input pl-7">
                 </div>
             </div>
+
+            {{-- ── Comprobante de la seña (opcional) ── --}}
+            {{-- Se sube por chunks (evita 413); aquí sólo viaja su ruta. --}}
+            <input type="hidden" name="receipt_path" id="nr-receipt-path" value="">
+            <input type="hidden" id="nr-uploading" value="">
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Comprobante de pago') }} <span class="text-ink-400 font-normal">({{ __('opcional') }})</span></label>
+                <div class="border-2 border-dashed border-ink-200 rounded-xl py-4 px-4 text-center cursor-pointer hover:border-brand transition-colors mt-1"
+                     onclick="this.querySelector('input[type=file]').click()">
+                    <i class="pi pi-cloud-upload text-ink-400 text-[18px]"></i>
+                    <div class="text-[12px] font-semibold text-ink-700 mt-1"><span id="nr-receipt-name">{{ __('Adjuntar recibo firmado y sellado') }}</span></div>
+                    <div class="text-[11px] text-ink-500 mt-0.5">{{ __('PDF, JPG o PNG · máx. 50 MB') }}</div>
+                    <input type="file" id="nr-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="nrReceiptSelected(this)">
+                </div>
+            </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
             <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>
@@ -171,10 +186,68 @@
             e.preventDefault();
             existingSearch.focus();
             alert('{{ __('Selecciona un cliente del listado.') }}');
+            return;
+        }
+        // No enviar mientras el comprobante aún se sube.
+        if (document.getElementById('nr-uploading')?.value === '1') {
+            e.preventDefault();
+            alert('{{ __('Esperá a que termine la subida del comprobante.') }}');
         }
     });
 
     btns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
     setMode('new');
 })();
+
+// Sube el comprobante de la seña por chunks (~512 KB) para evitar el 413.
+async function nrReceiptSelected(input) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+
+    var nameEl = document.getElementById('nr-receipt-name');
+    var pathEl = document.getElementById('nr-receipt-path');
+    var upEl   = document.getElementById('nr-uploading');
+    var csrf   = document.querySelector('form[data-nueva-reserva] input[name=_token]')?.value
+                 || document.querySelector('meta[name=csrf-token]')?.content || '';
+    var chunkSize = 512 * 1024;
+    var total    = Math.ceil(file.size / chunkSize) || 1;
+    var uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+    if (pathEl) pathEl.value = '';
+    if (upEl)   upEl.value = '1';
+
+    try {
+        for (var i = 0; i < total; i++) {
+            var fd = new FormData();
+            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
+            fd.append('upload_id', uploadId);
+            fd.append('index', i);
+            fd.append('total', total);
+            fd.append('name', file.name);
+            fd.append('_token', csrf);
+
+            var res = await fetch('{{ route('admin.crm.payment.receipt') }}', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: fd,
+                credentials: 'same-origin',
+            });
+            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413).');
+            var d = await res.json().catch(function () { return {}; });
+            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante.');
+
+            if (nameEl) nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
+            if (d.done) {
+                if (pathEl) pathEl.value = d.path || '';
+                if (nameEl) nameEl.textContent = file.name;
+            }
+        }
+    } catch (e) {
+        if (pathEl) pathEl.value = '';
+        if (nameEl) nameEl.textContent = 'Adjuntar recibo firmado y sellado';
+        alert(e.message || 'No se pudo subir el comprobante.');
+    } finally {
+        if (upEl) upEl.value = '';
+    }
+}
 </script>
