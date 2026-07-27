@@ -6,7 +6,12 @@
           $isHighDem   = !empty($unit->is_high_demand) || ($unit->demand_level ?? '') === 'high';
           $isSecond    = !empty($unit->is_second_chance);
           $hasDiscount = !empty($unit->discount) && $unit->discount > 0;
+          // Las villas usan el panel del mockup (eyebrow de fase, línea de
+          // specs en texto, barra de disponibilidad del modelo y CTA "Ver
+          // villa"); los departamentos conservan la tarjeta clásica.
+          $isVilla = strcasecmp((string) ($unit->type ?? ''), 'Villa') === 0;
           $cardCls = 'fg-card';
+          if ($isVilla)        $cardCls .= ' is-villa';
           if ($isSold)         $cardCls .= ' is-sold';
           elseif ($isReserved) $cardCls .= ' is-reserved';
           elseif ($isPending)  $cardCls .= ' is-pending';
@@ -32,6 +37,23 @@
               $unitId, $unit->name, $unit->floor, $unit->direction,
               $unit->outlook, $unit->type, $beds.' bed',
           ])));
+
+          // --- Villas: datos del panel del mockup -----------------------------
+          // Eyebrow = fase comercial; specs en texto plano (sin las 6 cajas de
+          // íconos); barra = cuántas villas de ese mismo modelo siguen libres.
+          $villaEyebrow = null;
+          $villaSpecs   = [];
+          $villaSupply  = null;
+
+          if ($isVilla) {
+              $villaEyebrow = trim((string) ($unit->phase ?? '')) ?: trim((string) ($unit->custom_1 ?? ''));
+              $villaSpecs = array_values(array_filter([
+                  $beds ? $beds.' '.__('habitaciones') : null,
+                  ($unit->total_area ?? 0) > 0 ? number_format($unit->total_area, 0).' m²' : null,
+                  ($unit->pools ?? 0) > 0 ? __('Piscina privada') : null,
+              ]));
+              $villaSupply = \App\Support\VillaSupply::forUnit($unit);
+          }
         @endphp
         <!--- unit - start  ---->
         <div class="{{ $cardCls }}"
@@ -127,12 +149,34 @@
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
-                  {{ ($floorRaw !== '' && strcasecmp($floorRaw, 'ground') !== 0)
-                        ? (isset($floorDisplay) ? $floorDisplay($unit->floor) : ucfirst($unit->floor)) . ' ' . __('Floor')
-                        : __('Ground Floor') }}
-                  @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
-                  @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
+                  @if($isVilla)
+                    {{ $villaEyebrow ?: __('Villa') }}
+                  @else
+                    {{ ($floorRaw !== '' && strcasecmp($floorRaw, 'ground') !== 0)
+                          ? (isset($floorDisplay) ? $floorDisplay($unit->floor) : ucfirst($unit->floor)) . ' ' . __('Floor')
+                          : __('Ground Floor') }}
+                    @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
+                    @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
+                  @endif
                 </div>
+
+                @if($isVilla && $villaSpecs)
+                  <!-- Villas: specs en una línea (reemplaza las 6 cajas de íconos) -->
+                  <div class="fg-card-specs">{{ implode(' · ', $villaSpecs) }}</div>
+                @endif
+
+                @if($villaSupply)
+                  <!-- Disponibilidad del modelo: barra de segmentos + "X de Y disponibles" -->
+                  <div class="fg-card-supply" title="{{ __('Villas disponibles de este modelo') }}">
+                    <span class="bar" aria-hidden="true">
+                      @for($i = 0; $i < $villaSupply['segments']; $i++)
+                        <i class="{{ $i < $villaSupply['filled'] ? 'on' : '' }}"></i>
+                      @endfor
+                    </span>
+                    <span class="txt">{{ __(':available de :total disponibles', ['available' => $villaSupply['available'], 'total' => $villaSupply['total']]) }}</span>
+                  </div>
+                @endif
+
                 <div class="fg-card-divider"></div>
                 <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
@@ -202,13 +246,16 @@
                   </div>
                 @else
                   <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
+                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">
+                      {{ $isVilla ? __('Ver villa') : __('More Info') }}
+                      @if($isVilla)<span class="arrow" aria-hidden="true">→</span>@endif
+                    </button>
                     <button class="fg-btn-cta" type="button" onclick="openMoreInfo('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="23 7 16 12 23 17 23 7" fill="currentColor"></polygon>
                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
                       </svg>
-                      {{ __('Book Video Call') }}
+                      {{ $isVilla ? __('Videollamada') : __('Book Video Call') }}
                     </button>
                   </div>
                   <div class="fg-card-availability advisor-live" role="button" tabindex="0" title="{{ __('Chat now with the administrator') }}" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">

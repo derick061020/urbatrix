@@ -1900,5 +1900,11 @@
   "¿Estás seguro de que deseas firmar este documento?": "¿Estás seguro de que deseas firmar este documento?",
   "¿Estás seguro de que deseas generar el plan de pagos?": "¿Estás seguro de que deseas generar el plan de pagos?",
   "¿Quitar de guardados?": "¿Quitar de guardados?",
-  "Progreso de la construcción": "Progreso de la construcción"
+  "Progreso de la construcción": "Progreso de la construcción",
+  "habitaciones": "habitaciones",
+  "Piscina privada": "Piscina privada",
+  ":available de :total disponibles": ":available de :total disponibles",
+  "Ver villa": "Ver villa",
+  "Villas disponibles de este modelo": "Villas disponibles de este modelo",
+  "Villa": "Villa"
 }

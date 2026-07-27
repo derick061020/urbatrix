@@ -1470,6 +1470,63 @@
     body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img-noimage{
       background:linear-gradient(135deg,#e9e6dd,#dfe3d6); color:#9ba095; font-size:13px;
     }
+
+    /* ---------------------------------------------------------------------
+       VILLAS · panel de información del mockup
+       ---------------------------------------------------------------------
+       Orden: eyebrow (fase) → nombre → specs en texto → barra de
+       disponibilidad del modelo → divisor → precio DESDE + CTAs a la derecha.
+
+       Para lograrlo sin tocar el DOM que usan la vista lista y el JS, el
+       .fg-card-head pasa a `display:contents`: sus hijos se convierten en
+       ítems del grid del panel y se reordenan con `order`. Sólo aplica a las
+       tarjetas .is-villa dentro de la banda.
+       --------------------------------------------------------------------- */
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-body{
+      display:grid; grid-template-columns:auto 1fr; align-items:center;
+      row-gap:9px; column-gap:18px;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-head{ display:contents; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-body > *,
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-head > *{ grid-column:1 / -1; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-subtitle { order:1; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-title-row{ order:2; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-specs    { order:3; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply   { order:4; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-discount      { order:5; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-divider  { order:6; margin:0; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-price{
+      order:7; grid-column:1; justify-self:start;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-actions{
+      order:8; grid-column:2; justify-self:end; align-items:flex-end; margin:0;
+    }
+    /* Las 6 cajas de íconos se reemplazan por la línea de specs en texto. */
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-stats{ display:none; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-specs{
+      color:var(--band-muted); font-size:13px; line-height:1.35;
+    }
+    /* Barra de disponibilidad del modelo ("6 de 8 disponibles"). */
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply{
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar{
+      display:inline-flex; gap:4px; flex:0 0 auto;
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar i{
+      width:13px; height:3px; border-radius:2px; background:rgba(11,28,10,.13);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar i.on{
+      background:var(--band-green);
+    }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .txt{
+      color:var(--band-green); font-size:12px; font-weight:600;
+    }
+    /* La línea "hay un asesor disponible" no entra en el panel del mockup;
+       los avisos de vendida / reservada sí se conservan. */
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-availability.advisor-live{ display:none; }
+    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-btn-info .arrow{ margin-left:2px; }
+
     /* Responsive: panel a todo el ancho, número más chico */
     @media (max-width:820px){
       body[data-view="grid"] .fg-units-grid{ padding:12px 14px 60px; }
@@ -1483,6 +1540,12 @@
         left:12px; right:12px; width:auto; bottom:12px; padding:18px 20px;
       }
       body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{ font-size:23px; }
+      /* Villas: precio y CTAs pasan a apilarse (no entran lado a lado). */
+      body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-body{ grid-template-columns:1fr; row-gap:8px; }
+      body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-price,
+      body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-actions{
+        grid-column:1; justify-self:start; align-items:flex-start;
+      }
     }
     /* PC / monitor grande → 2 columnas. Laptop y abajo → 1 columna (base). */
     @media (min-width:1600px){

@@ -47,6 +47,7 @@ class ImportVillasFromExcel extends Command
                             {--project= : Nombre del proyecto destino (por defecto las villas quedan sin proyecto)}
                             {--keep-existing : No borrar las villas actuales antes de importar}
                             {--price-per-m2= : Precio = $/m² × m² privativos, en vez de los estimados por tipología}
+                            {--no-images : No asignar el render de la tipología a cada villa}
                             {--private : Importa las villas como NO públicas (no se ven en el home)}
                             {--force : No pedir confirmación al borrar}
                             {--dry-run : Muestra lo que haría sin escribir en la base}';
@@ -69,6 +70,23 @@ class ImportVillasFromExcel extends Command
         'T2' => 750_000,
         'T3' => 620_000,
     ];
+
+    /**
+     * Render de referencia por tipología (public/images/seed-villas). Son los
+     * mismos que ya usaba el home; se asignan como imagen de la unidad para que
+     * las tarjetas no queden vacías, y se reemplazan subiendo los renders
+     * definitivos desde el panel. Se respeta cualquier imagen ya cargada.
+     */
+    private const RENDERS = [
+        'T1' => 'palma.jpg',   // 4 hab · el programa más grande
+        'T2' => 'marea.jpg',   // 3 hab
+        'T3' => 'coral.jpg',   // 2 hab
+        'T4' => 'brisa.jpg',
+        'T5' => 'arena.jpg',
+    ];
+
+    /** Carpeta pública de los renders. */
+    private const RENDER_DIR = '/images/seed-villas/';
 
     public function handle(): int
     {
@@ -169,17 +187,25 @@ class ImportVillasFromExcel extends Command
         // --- Alta -----------------------------------------------------------------
         $created = 0;
         $updated = 0;
+        $images  = 0;
 
-        DB::transaction(function () use ($payloads, &$created, &$updated) {
+        $withImages = ! $this->option('no-images');
+
+        DB::transaction(function () use ($payloads, $withImages, &$created, &$updated, &$images) {
             foreach ($payloads as $payload) {
                 $existing = Unit::where('custom_id', $payload['custom_id'])->first();
 
                 if ($existing) {
                     $existing->update($payload);
+                    $unit = $existing;
                     $updated++;
                 } else {
-                    Unit::create($payload);
+                    $unit = Unit::create($payload);
                     $created++;
+                }
+
+                if ($withImages && $this->attachRender($unit)) {
+                    $images++;
                 }
             }
         });
@@ -188,7 +214,7 @@ class ImportVillasFromExcel extends Command
         if ($deleted) {
             $this->warn("Villas anteriores eliminadas: {$deleted}");
         }
-        $this->info("Listo. Creadas: {$created} · Actualizadas: {$updated}");
+        $this->info("Listo. Creadas: {$created} · Actualizadas: {$updated}" . ($withImages ? " · Renders asignados: {$images}" : ''));
         $this->info('Total de villas en la base: ' . $this->existingVillasQuery()->count());
 
         if (! $this->option('price-per-m2')) {
@@ -258,6 +284,36 @@ class ImportVillasFromExcel extends Command
             'display_on_home_page' => false,
             'images_count'         => 0,
         ];
+    }
+
+    /**
+     * Asigna el render de la tipología como imagen de la villa. Si la unidad ya
+     * tiene imágenes (renders reales subidos desde el panel) no se toca.
+     *
+     * @return bool si se creó la imagen
+     */
+    private function attachRender(Unit $unit): bool
+    {
+        if (UnitImage::where('unit_id', $unit->id)->exists()) {
+            return false;
+        }
+
+        $render = self::RENDERS[$unit->layout] ?? null;
+        if (! $render || ! is_file(public_path(self::RENDER_DIR . $render))) {
+            return false;
+        }
+
+        UnitImage::create([
+            'unit_id'    => $unit->id,
+            'category'   => 'property',
+            'name'       => $unit->custom_1 ?: $unit->name,
+            'path'       => self::RENDER_DIR . $render,
+            'sort_order' => 0,
+        ]);
+
+        $unit->forceFill(['images_count' => 1])->save();
+
+        return true;
     }
 
     /** Precio de la villa: $/m² uniforme si se pasó la opción, si no el estimado. */
