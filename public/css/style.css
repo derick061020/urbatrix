@@ -488,7 +488,7 @@
     .fg-hero {
       position: relative;
       width: 100%;
-      aspect-ratio: 1366 / 620;
+      aspect-ratio: 1366 / 670;
       overflow: hidden;
       background: #cfe7f5; /* fallback sky tone in case image not yet loaded */
       isolation: isolate;
@@ -561,7 +561,8 @@
       font-size: 0.26em;
       letter-spacing: 0.30em;
       margin-bottom: 0.06em;
-      font-weight: 600;
+      font-weight: 700;
+          font-family: 'Antonio', sans-serif;
       color: rgba(255, 255, 255, 0.62);
       -webkit-text-fill-color: rgba(255, 255, 255, 0.62);
       background: none;
@@ -616,7 +617,7 @@
       margin-top: -10px;
     }
 
-    /* HERO — MOBILE: the 1366/620 ratio collapses the height on narrow
+    /* HERO — MOBILE: the 1366/670 ratio collapses the height on narrow
        screens and squishes the building. Give it a proper portrait height. */
     @media (max-width: 768px) {
       .fg-hero {
@@ -680,7 +681,7 @@
        desborda lateralmente. */
     .fg-stage.has-slider {
       overflow: hidden;
-      aspect-ratio: 1366 / 620;
+      aspect-ratio: 1366 / 670;
     }
     @media (max-width: 768px) {
       .fg-stage.has-slider { aspect-ratio: auto; height: 52vh; min-height: 380px; max-height: 560px; }
