@@ -407,7 +407,7 @@
 
 {{-- Full-screen hero background --}}
 <div class="auth-bg">
-    <img src="{{ asset('images/brand/login_hero.png') }}" alt="{{ __('Bahía Mar Residences') }}">
+    <img src="{{ asset('images/brand/login_hero.jpg') }}" alt="{{ __('Bahía Mar Residences') }}">
 </div>
 
 {{-- Floating panel --}}
