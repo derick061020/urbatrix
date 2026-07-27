@@ -537,7 +537,7 @@
       text-align: center;
       font-family: 'Antonio', sans-serif;
       font-weight: 700;
-      font-size: clamp(80px, 22vw, 250px);
+      font-size: clamp(80px, 22vw, 260px);
       line-height: 1;
       letter-spacing: 0.2em;
       background: linear-gradient(to bottom,
