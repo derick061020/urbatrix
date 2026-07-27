@@ -427,15 +427,28 @@ class ImportVillasFromExcel extends Command
     {
         $grid = $this->sheetGrid($file, $sheetName);
 
-        // Fila de encabezados = la primera que resuelve al menos la mitad de las claves.
+        // Fila de encabezados = la que resuelve MÁS claves (las hojas empiezan
+        // con títulos e instrucciones en una sola celda que también contienen
+        // los nombres de las columnas: "Llenar: N° de unidad, Código de
+        // tipología, Etapa, Nivel…"). Por eso se exige además que las claves
+        // caigan en columnas distintas y se cubra al menos la mitad.
         $headerRow = null;
         $columns   = [];
+        $best      = 0;
+        $minimum   = (int) ceil(count($patterns) / 2);
 
         foreach ($grid as $rowNumber => $cells) {
-            $map = $this->matchHeaders($cells, $patterns);
-            if (count($map) >= (int) ceil(count($patterns) / 2)) {
+            $map   = $this->matchHeaders($cells, $patterns);
+            $score = count($map);
+
+            if ($score > $best && $score >= $minimum && count(array_unique($map)) > 1) {
+                $best      = $score;
                 $headerRow = $rowNumber;
                 $columns   = $map;
+            }
+
+            // Encabezado completo: no hace falta seguir buscando.
+            if ($best === count($patterns)) {
                 break;
             }
         }
