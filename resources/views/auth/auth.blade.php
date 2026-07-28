@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('BAHÍA MAR · Landmass') }}</title>
+
+    {{-- Precarga del hero: el navegador la pide antes de parsear el resto del <head> --}}
+    <link rel="preload" as="image" type="image/webp"
+          href="{{ asset('images/brand/login_hero-1920.webp') }}"
+          imagesrcset="{{ asset('images/brand/login_hero-1280.webp') }} 1280w,
+                       {{ asset('images/brand/login_hero-1920.webp') }} 1920w,
+                       {{ asset('images/brand/login_hero-2560.webp') }} 2560w"
+          imagesizes="100vw" fetchpriority="high">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -428,6 +437,13 @@
              onload="this.classList.add('is-loaded')">
     </picture>
 </div>
+<script>
+  // Si viene de caché, el onload inline puede haber pasado ya.
+  (function () {
+    var img = document.querySelector('.auth-bg img');
+    if (img && img.complete) img.classList.add('is-loaded');
+  })();
+</script>
 
 {{-- Floating panel --}}
 <section id="auth-panel">
