@@ -33,16 +33,21 @@
       html, body { font-family: 'Inter', system-ui, sans-serif; overflow:hidden; }
 
       /* ---- Background hero (always full screen) ---- */
+      /* El placeholder inline (LQIP) pinta al instante y se difumina; la foto real
+         entra encima con fade cuando termina de descargar. */
       .auth-bg {
         position: fixed; inset: 0;
-        background: #efefef;
+        background: #0e2233 url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA8ADwAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAOABgDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABAAD/8QAIhAAAgEDBAIDAAAAAAAAAAAAAQIDABEhBAUSE0GxYYHR/8QAFQEBAQAAAAAAAAAAAAAAAAAABAX/xAAaEQADAQADAAAAAAAAAAAAAAAAAQISAxEx/9oADAMBAAIRAxEAPwA7bVLwv1P9C/qgz6bpJuRdfmpdK8YBlnkbAICsQK30YSVnJiEgFgObnH7S65Lw9INEw7ShsVtu2x6iBXl5cGOFAyc+aqVA0scQRQkaA4VST7qqS5ffpU0f/9k=") center / cover no-repeat;
         z-index: 0;
       }
       .auth-bg img {
         position: absolute; inset: 0;
         width: 100%; height: 100%;
         object-fit: cover; object-position: center;
+        opacity: 0;
+        transition: opacity .45s ease;
       }
+      .auth-bg img.is-loaded { opacity: 1; }
       
 
       /* ---- Floating panel ---- */
@@ -407,7 +412,21 @@
 
 {{-- Full-screen hero background --}}
 <div class="auth-bg">
-    <img src="{{ asset('images/brand/login_hero.jpg') }}" alt="{{ __('Bahía Mar Residences') }}">
+    <picture>
+        <source type="image/webp"
+                srcset="{{ asset('images/brand/login_hero-1280.webp') }} 1280w,
+                        {{ asset('images/brand/login_hero-1920.webp') }} 1920w,
+                        {{ asset('images/brand/login_hero-2560.webp') }} 2560w"
+                sizes="100vw">
+        <img src="{{ asset('images/brand/login_hero-1920.jpg') }}"
+             srcset="{{ asset('images/brand/login_hero-1280.jpg') }} 1280w,
+                     {{ asset('images/brand/login_hero-1920.jpg') }} 1920w,
+                     {{ asset('images/brand/login_hero-2560.jpg') }} 2560w"
+             sizes="100vw"
+             alt="{{ __('Bahía Mar Residences') }}"
+             fetchpriority="high" decoding="async"
+             onload="this.classList.add('is-loaded')">
+    </picture>
 </div>
 
 {{-- Floating panel --}}
