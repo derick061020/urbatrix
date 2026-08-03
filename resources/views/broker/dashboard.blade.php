@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Dashboard — Portal Broker')
-@section('page_title', 'Dashboard')
-@section('page_breadcrumb', 'Portal Broker · Resumen')
+@section('title', __('Dashboard — Portal Broker'))
+@section('page_title', __('Dashboard'))
+@section('page_breadcrumb', __('Portal Broker · Resumen'))
 
 @section('content')
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
@@ -14,12 +14,12 @@
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
         @php $cards = [
-            ['Comisión cobrada · mes', '$'.number_format($kpis['collected_month'], 0), '#1fc16b', 'liberada al pagar tus clientes'],
-            ['Comisión acumulada',     '$'.number_format($kpis['accumulated'], 0),     '#5c7c68', 'histórico'],
-            ['Por liberar',            '$'.number_format($kpis['pending'], 0),          '#fa7319', 'según avance del inicial'],
-            ['Clientes activos',       $kpis['clients'],                                '#335cff', 'en tu cartera'],
-            ['Ventas cerradas',        $kpis['closed'],                                 '#0EA5A4', 'este histórico'],
-            ['Conversión de cartera',  $kpis['conversion'].'%',                         '#6366F1', $kpis['closed'].' de '.max($kpis['clients'],1)],
+            [__('Comisión cobrada · mes'), '$'.number_format($kpis['collected_month'], 0), '#1fc16b', __('liberada al pagar tus clientes')],
+            [__('Comisión acumulada'),     '$'.number_format($kpis['accumulated'], 0),     '#5c7c68', __('histórico')],
+            [__('Por liberar'),            '$'.number_format($kpis['pending'], 0),          '#fa7319', __('según avance del inicial')],
+            [__('Clientes activos'),       $kpis['clients'],                                '#335cff', __('en tu cartera')],
+            [__('Ventas cerradas'),        $kpis['closed'],                                 '#0EA5A4', __('este histórico')],
+            [__('Conversión de cartera'),  $kpis['conversion'].'%',                         '#6366F1', __(':a de :b', ['a' => $kpis['closed'], 'b' => max($kpis['clients'],1)])],
         ]; @endphp
         @foreach($cards as [$label, $val, $color, $sub])
             <div class="brk-card p-4" style="border-top:3px solid {{ $color }}">
@@ -93,7 +93,7 @@
     function brkCopyRef(){
         var t = document.getElementById('brkRefLink').textContent.trim();
         navigator.clipboard && navigator.clipboard.writeText(t);
-        event.target.textContent = '¡Copiado!';
+        event.target.textContent = @json(__('¡Copiado!'));
         setTimeout(function(){ event.target.textContent = 'Copiar'; }, 1500);
     }
 </script>

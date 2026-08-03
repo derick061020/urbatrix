@@ -1,6 +1,6 @@
 @extends('layouts.admin_crm')
-@section('title', 'Editar unidad — CRM Duna Makai')
-@section('page_title', 'Editar unidad')
+@section('title', __('Editar unidad — CRM Duna Makai'))
+@section('page_title', __('Editar unidad'))
 @section('page_breadcrumb', 'Proyectos · Unidades · ' . ($unit->custom_id ?? $unit->name))
 @php $activeRoute = 'units'; @endphp
 
@@ -36,7 +36,7 @@
         <div class="flex items-center gap-2 flex-wrap">
             <span class="crm-pill bg-{{ $sp[1] }}-soft text-{{ $sp[1] }}">{{ strtoupper($sp[0]) }}</span>
             <button type="submit" form="unit-edit-form" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> {{ __('Guardar cambios') }}</button>
-            <button type="submit" form="unit-delete-form" onclick="return confirm('¿Eliminar esta unidad? Esta acción no se puede deshacer.');" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
+            <button type="submit" form="unit-delete-form" onclick="return confirm(@json(__('¿Eliminar esta unidad? Esta acción no se puede deshacer.')));" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
         </div>
     </div>
 
@@ -355,7 +355,7 @@ document.querySelectorAll('.unit-images-tbody').forEach(function (tbody) {
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); tr.remove();
             if (!tbody.querySelector('tr[data-image-id]')) {
                 tbody.insertAdjacentHTML('beforeend',
-                    '<tr class="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">Sin imágenes todavía.</td></tr>');
+                    '<tr class="unit-images-empty"><td colspan="4" class="text-center text-[12px] text-ink-500 py-6">{{ __('Sin imágenes todavía.') }}</td></tr>');
             }
         })
         .catch(err => { console.error('Delete failed', err); alert('{{ __("No se pudo eliminar la imagen.") }}'); });
@@ -455,7 +455,7 @@ document.querySelectorAll('.image-upload-container').forEach(function (uploadCon
             const tr = document.createElement('tr');
             tr.setAttribute('data-image-id', image.id);
             tr.innerHTML = `
-                <td><span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="Arrastrar para reordenar"><i class="pi pi-bars"></i></span></td>
+                <td><span class="image-drag-handle cursor-grab active:cursor-grabbing text-ink-400" title="{{ __('Arrastrar para reordenar') }}"><i class="pi pi-bars"></i></span></td>
                 <td><img src="${image.path}" alt="${image.name}" class="w-16 h-16 object-cover rounded-lg bg-ink-100 border border-ink-200"></td>
                 <td class="text-[12px] text-ink-700"><div class="max-w-xs truncate" title="${image.name}">${image.name}</div></td>
                 <td class="text-right"><button type="button" class="image-delete-btn inline-flex items-center gap-1 px-2 py-1 rounded-md text-err hover:bg-err-soft text-[11px] font-semibold"><i class="pi pi-trash text-[10px]"></i> Eliminar</button></td>

@@ -231,7 +231,7 @@ class HomeController extends Controller
     public function toggleWishlist(Request $request, $unitId)
     {
         if (! Auth::check()) {
-            return response()->json(['success' => false, 'message' => 'Necesitás iniciar sesión.'], 401);
+            return response()->json(['success' => false, 'message' => __('Necesitás iniciar sesión.')], 401);
         }
 
         $unit = Unit::where('public', true)->findOrFail($unitId);

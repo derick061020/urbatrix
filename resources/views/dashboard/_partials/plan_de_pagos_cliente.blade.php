@@ -27,11 +27,11 @@
             <div class="text-[14px] font-bold text-ink-950">{{ __('Plan de pagos propuesto') }}</div>
             <div class="text-[12px] text-ink-500">
                 @if($accepted)
-                    Aceptaste este plan. Estamos preparando los siguientes pasos.
+                    {{ __('Aceptaste este plan. Estamos preparando los siguientes pasos.') }}
                 @elseif($needsAdminAction)
-                    Tu asesor está revisando tu observación.
+                    {{ __('Tu asesor está revisando tu observación.') }}
                 @elseif($isSent)
-                    Revisalo, escribí tus observaciones o marcalo como conforme para continuar.
+                    {{ __('Revisalo, escribí tus observaciones o marcalo como conforme para continuar.') }}
                 @endif
             </div>
         </div>
@@ -131,7 +131,7 @@
         .then(r => r.json())
         .then(data => {
             if (data.success) window.location.href = data.redirect || '/dashboard';
-            else alert(data.message || 'No se pudo aceptar el plan.');
+            else alert(data.message || @json(__('No se pudo aceptar el plan.')));
         })
         .catch(() => alert('{{ __("Error al aceptar el plan. Intentá de nuevo.") }}'));
     }

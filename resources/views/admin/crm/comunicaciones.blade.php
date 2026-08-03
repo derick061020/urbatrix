@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Control de comunicaciones — CRM Duna Makai')
-@section('page_title', 'Control de comunicaciones')
-@section('page_breadcrumb', 'Comunicación · Por proyecto y canal')
+@section('title', __('Control de comunicaciones — CRM Duna Makai'))
+@section('page_title', __('Control de comunicaciones'))
+@section('page_breadcrumb', __('Comunicación · Por proyecto y canal'))
 @php $activeRoute = 'crm.comunicaciones'; @endphp
 
 @push('styles')
@@ -278,7 +278,7 @@
                     await post(ROUTES.toggle, { project_id: current, code, channel: chan, enabled: next });
                 } catch(e) {
                     cfg[code][chan] = !next; renderCatalog();
-                    toast('No se pudo guardar el cambio');
+                    toast(@json(__('No se pudo guardar el cambio')));
                 }
             };
         });
@@ -302,7 +302,7 @@
                     await Promise.all(affected.map(t =>
                         post(ROUTES.toggle, { project_id: current, code: t.code, channel: chan, enabled: target })
                     ));
-                } catch(e) { toast('No se pudieron guardar todos los cambios'); }
+                } catch(e) { toast(@json(__('No se pudieron guardar todos los cambios'))); }
             };
             cell.innerHTML = ''; cell.appendChild(sw);
         });
@@ -330,7 +330,7 @@
         p.active = next;
         renderAll();
         try { await post(ROUTES.master, { project_id: current, active: next }); }
-        catch(e){ p.active = !next; renderAll(); toast('No se pudo cambiar el estado'); }
+        catch(e){ p.active = !next; renderAll(); toast(@json(__('No se pudo cambiar el estado'))); }
     };
 
     $('#ccArranque').onchange = async (e) => {
@@ -338,25 +338,25 @@
         PROJECTS[current].arranque = val;
         renderCatalog();
         try { await post(ROUTES.arranque, { project_id: current, date: val || null }); }
-        catch(err){ toast('No se pudo guardar la fecha'); }
+        catch(err){ toast(@json(__('No se pudo guardar la fecha'))); }
     };
 
     /* ---------- Copiar configuración ---------- */
     $('#ccCopyBtn').onclick = async () => {
         const others = ids.filter(id => id !== current);
-        if(!others.length){ toast('No hay otro proyecto para copiar'); return; }
+        if(!others.length){ toast(@json(__('No hay otro proyecto para copiar'))); return; }
         const labels = others.map((id,i) => `${i+1}. ${PROJECTS[id].name}`).join('\n');
         const pick = prompt('Copiar configuración desde:\n' + labels + '\n\nEscribe el número:');
         if(!pick) return;
         const src = others[parseInt(pick,10)-1];
-        if(!src){ toast('Opción no válida'); return; }
+        if(!src){ toast(@json(__('Opción no válida'))); return; }
         try {
             await post(ROUTES.copy, { project_id: current, source_id: src });
             CONFIG[current] = JSON.parse(JSON.stringify(CONFIG[src]));
             PROJECTS[current].active = true;
             toast('Configuración copiada de ' + PROJECTS[src].name);
             renderAll();
-        } catch(e){ toast('No se pudo copiar la configuración'); }
+        } catch(e){ toast(@json(__('No se pudo copiar la configuración'))); }
     };
 
     /* ---------- Toast ---------- */

@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Aprobaciones — CRM Duna Makai')
-@section('page_title', 'Aprobaciones')
-@section('page_breadcrumb', 'Equipo · Cola de aprobaciones')
+@section('title', __('Aprobaciones — CRM Duna Makai'))
+@section('page_title', __('Aprobaciones'))
+@section('page_breadcrumb', __('Equipo · Cola de aprobaciones'))
 @php $activeRoute = 'crm.aprobaciones'; @endphp
 
 @section('content')
@@ -119,7 +119,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="text-[13px] font-semibold text-ink-900">{{ trim(($r?->first_name ?? '').' '.($r?->last_name ?? '')) ?: 'Cliente' }}</div>
                         <div class="text-[11px] text-ink-500 mt-0.5 truncate">
-                            Pago: {{ $p->label ?? 'Cuota' }} · ${{ number_format($p->amount, 2) }}
+                            Pago: {{ $p->display_label }} · ${{ number_format($p->amount, 2) }}
                             @if($r?->unit_name) · Unidad {{ $r->unit_name }} @endif
                             @if($p->receipt_path) · <i class="pi pi-paperclip"></i> comprobante @endif
                         </div>

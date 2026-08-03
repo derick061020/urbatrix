@@ -182,7 +182,7 @@
                                 @endif
                             </div>
                             <div>
-                                <div class="font-medium text-gray-900">{{ $payment->label }}</div>
+                                <div class="font-medium text-gray-900">{{ $payment->display_label }}</div>
                                 <div class="text-sm text-gray-600">Vencimiento: {{ $payment->due_date->format('d M Y') }}</div>
                                 @if($payment->receipt_path)
                                     <div class="text-xs text-green-600">{{ __('✓ Comprobante adjunto') }}</div>

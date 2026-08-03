@@ -1,5 +1,5 @@
 @extends('layouts.main_admin')
-@section('title', 'Postventa - Admin Panel')
+@section('title', __('Postventa - Admin Panel'))
 @php $activeRoute = 'crm.postventa'; @endphp
 
 @section('content')
@@ -11,7 +11,7 @@
         </div>
         <button type="button" onclick="document.getElementById('newAftersaleModal').classList.remove('hidden')"
             class="bg-[#667b6a] text-white rounded-md px-4 py-2 text-sm font-semibold hover:bg-[#5a6d5e]">
-            + Nuevo caso
+            {{ __('+ Nuevo caso') }}
         </button>
     </div>
 
@@ -104,7 +104,7 @@
                                     @if($p->reservation_id)
                                         <a href="/dashboard?reservation={{ $p->reservation_id }}" class="text-xs border border-[#cdd5cf] rounded px-2 py-1 text-[#667b6a] hover:bg-[rgba(102,123,106,0.05)]">{{ __('Ver') }}</a>
                                     @endif
-                                    <form method="POST" action="{{ route('admin.crm.postventa.delete', $p) }}" onsubmit="return confirm('¿Eliminar este caso?')">
+                                    <form method="POST" action="{{ route('admin.crm.postventa.delete', $p) }}" onsubmit="return confirm(@json(__('¿Eliminar este caso?')))">
                                         @csrf @method('DELETE')
                                         <button class="text-xs border border-[#eebcbc] text-[#a83838] rounded px-2 py-1 hover:bg-[#fdf6f6]">{{ __('Eliminar') }}</button>
                                     </form>
@@ -134,7 +134,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
                     <select name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#667b6a]">
                         <option value="Entrega">{{ __('Entrega') }}</option>
-                        <option value="Garantía">{{ __('Garantía') }}</option>
+                        <option value="{{ __('Garantía') }}">{{ __('Garantía') }}</option>
                         <option value="Escritura">{{ __('Escritura') }}</option>
                     </select>
                 </div>

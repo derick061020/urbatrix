@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Reservas y Contratos — CRM Duna Makai')
-@section('page_title', 'Reservas y Contratos')
-@section('page_breadcrumb', 'Gestión · Reservas y contratos')
+@section('title', __('Reservas y Contratos — CRM Duna Makai'))
+@section('page_title', __('Reservas y Contratos'))
+@section('page_breadcrumb', __('Gestión · Reservas y contratos'))
 @php $activeRoute = 'crm.contratos'; @endphp
 
 @section('content')
@@ -14,7 +14,7 @@
     @if(session('success'))<div class="px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="text-[14px] font-semibold text-ink-700">{{ $reservasCount }} contratos activos</div>
+        <div class="text-[14px] font-semibold text-ink-700">{{ __(':count contratos activos', ['count' => $reservasCount]) }}</div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-exportar-contratos').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
             <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva reserva') }}</button>
@@ -31,7 +31,7 @@
         ]; @endphp
         @foreach($kpi as $k)
             <div class="crm-card p-4 border-t-[3px]" style="border-top-color: {{ $k['c'] }}">
-                <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ $k['label'] }}</div>
+                <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __($k['label']) }}</div>
                 <div class="text-[28px] font-bold text-ink-900 leading-tight mt-1">{{ $k['n'] }}</div>
             </div>
         @endforeach
@@ -41,7 +41,7 @@
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                 @foreach (['todos' => 'Todos','reservas' => 'Reservas','contratos' => 'Contratos','por-firmar' => 'Por firmar','pago-vencido' => 'Pago vencido'] as $slug => $label)
-                    <a href="{{ route('admin.crm.contratos', array_merge(request()->except(['page', 'tab']), ['tab' => $slug])) }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ $label }}</a>
+                    <a href="{{ route('admin.crm.contratos', array_merge(request()->except(['page', 'tab']), ['tab' => $slug])) }}" class="crm-tab {{ $currentTab === $slug ? 'active' : '' }}">{{ __($label) }}</a>
                 @endforeach
             </div>
             <form method="GET" action="{{ route('admin.crm.contratos') }}" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto m-0">
@@ -57,7 +57,7 @@
                     @endforeach
                 </select>
                 <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Desde') }}">
-                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
+                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Hasta') }}">
                 <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
                 @if($hasFilters)
                     <a href="{{ route('admin.crm.contratos', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> {{ __('Limpiar') }}</a>
@@ -107,8 +107,8 @@
                                 <div class="text-[13px] text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
                                 <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
                             </td>
-                            <td><span class="crm-pill {{ $tipoColor[$tipo] }}">{{ $tipo }}</span></td>
-                            <td><span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }}">{{ $estado[0] }}</span></td>
+                            <td><span class="crm-pill {{ $tipoColor[$tipo] }}">{{ __($tipo) }}</span></td>
+                            <td><span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }}">{{ __($estado[0]) }}</span></td>
                             <td class="text-[13px] font-bold text-ok-dark">${{ number_format($paid) }}</td>
                             <td class="text-[13px] text-ink-700">${{ number_format($total) }}</td>
                             <td class="text-[12px] text-ink-700">{{ $fechaFirma }}</td>

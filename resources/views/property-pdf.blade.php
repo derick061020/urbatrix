@@ -32,7 +32,7 @@
   $finalAmt    = '$' . number_format($price * $finalPct / 100, 0, '.', ',');
 
   $now         = now();
-  $dateStr     = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') . ' · ' . $now->format('h:i A');
+  $dateStr     = $now->locale(app()->getLocale())->isoFormat(__('dddd, D [de] MMMM [de] YYYY')) . ' · ' . $now->format('h:i A');
   $ref         = 'REF ' . strtoupper(substr(md5($unit->id . $now->format('Ymd')), 0, 4)) . '-' . str_replace(' ', '', strtoupper($unitNum)) . '-' . $now->format('dm');
 
   $recipientName = request('to', 'Cliente');
@@ -48,7 +48,7 @@
   }
 @endphp
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

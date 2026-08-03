@@ -23,7 +23,7 @@ class DocumentController extends Controller
         $document = $this->prepareDocumentForAccess($document, true);
         $absolute = $this->resolveAbsolutePath($document->file_path);
         if (! $absolute) {
-            abort(404, 'Documento no encontrado');
+            abort(404, __('Documento no encontrado'));
         }
 
         if (auth()->check() && ! auth()->user()->is_admin) {
@@ -47,7 +47,7 @@ class DocumentController extends Controller
         $document = $this->prepareDocumentForAccess($document, false);
         $absolute = $this->resolveAbsolutePath($document->file_path);
         if (! $absolute) {
-            abort(404, 'Documento no encontrado');
+            abort(404, __('Documento no encontrado'));
         }
 
         if (auth()->check() && ! auth()->user()->is_admin) {
@@ -74,7 +74,7 @@ class DocumentController extends Controller
             $accepted = $reservation && ($reservation->budget_status === 'approved'
                 || in_array($reservation->status, ['contract_signed', 'signed']));
             if (! $accepted) {
-                abort(403, 'Tenés que marcar como conforme el plan de pagos antes de descargarlo.');
+                abort(403, __('Tenés que marcar como conforme el plan de pagos antes de descargarlo.'));
             }
         }
 
@@ -195,7 +195,7 @@ class DocumentController extends Controller
             ?: $this->convertWordWithPhpWord($absolutePath, $previewPath);
 
         if (! $convertedPath || ! is_file($convertedPath)) {
-            abort(500, 'No se pudo convertir el documento Word a PDF para previsualizarlo.');
+            abort(500, __('No se pudo convertir el documento Word a PDF para previsualizarlo.'));
         }
 
         if ($convertedPath !== $previewPath) {
@@ -295,13 +295,13 @@ class DocumentController extends Controller
             if (! $planDoc || ! in_array($planDoc->status, ['signed', 'approved'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Primero tenés que firmar el plan de pagos.',
+                    'message' => __('Primero tenés que firmar el plan de pagos.'),
                 ], 400);
             }
             if ($document->document_type === 'contract' && empty(data_get($document->metadata, 'accepted_at'))) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Aceptá el contrato antes de firmarlo.',
+                    'message' => __('Aceptá el contrato antes de firmarlo.'),
                 ], 400);
             }
         }
@@ -332,7 +332,7 @@ class DocumentController extends Controller
         if (!$document->isGenerated()) {
             return response()->json([
                 'success' => false,
-                'message' => 'El documento debe estar generado antes de poder firmarlo'
+                'message' => __('El documento debe estar generado antes de poder firmarlo')
             ], 400);
         }
 
@@ -365,7 +365,7 @@ class DocumentController extends Controller
 
             return response()->json([
                 'success'  => true,
-                'message'  => 'Documento firmado exitosamente',
+                'message'  => __('Documento firmado exitosamente'),
                 'provider' => 'local',
                 'status'   => $document->status,
             ]);
@@ -373,7 +373,7 @@ class DocumentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al firmar el documento: ' . $e->getMessage()
+                'message' => __('Error al firmar el documento: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -549,14 +549,14 @@ class DocumentController extends Controller
         $this->authorizeAccess($document);
 
         if (! \App\Services\SignNowService::isConfigured()) {
-            return response()->json(['success' => false, 'message' => 'SignNow no está configurado.'], 400);
+            return response()->json(['success' => false, 'message' => __('SignNow no está configurado.')], 400);
         }
         if ($document->isSigned()) {
             return response()->json(['success' => true, 'status' => 'signed', 'already' => true]);
         }
         $signnowDocId = data_get($document->metadata, 'signnow.document_id');
         if (! $signnowDocId) {
-            return response()->json(['success' => false, 'message' => 'Este documento no fue enviado a SignNow todavía.'], 400);
+            return response()->json(['success' => false, 'message' => __('Este documento no fue enviado a SignNow todavía.')], 400);
         }
 
         $path = \App\Services\SignNowService::downloadSignedFile($document);
@@ -581,7 +581,7 @@ class DocumentController extends Controller
             $signature = $request->header('X-Signnow-Signature');
             $expected = hash_hmac('sha256', $request->getContent(), $secret);
             if (! $signature || ! hash_equals($expected, $signature)) {
-                abort(401, 'Invalid SignNow signature');
+                abort(401, __('Invalid SignNow signature'));
             }
         }
 
@@ -611,7 +611,7 @@ class DocumentController extends Controller
 
         // Signed contracts go through DocumentService; pending KYC / requested docs are approved directly by admins.
         if (! $document->isSigned() && ! ($isAdmin && ($isKycReview || $isRequestedReview))) {
-            return back()->with('error', 'El documento debe estar firmado antes de poder aprobarlo');
+            return back()->with('error', __('El documento debe estar firmado antes de poder aprobarlo'));
         }
 
         try {
@@ -629,22 +629,22 @@ class DocumentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Documento aprobado exitosamente',
+                    'message' => __('Documento aprobado exitosamente'),
                     'document' => $document,
                     'status' => $document->status,
                 ]);
             }
 
-            return back()->with('success', 'Documento aprobado correctamente.');
+            return back()->with('success', __('Documento aprobado correctamente.'));
 
         } catch (\Exception $e) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al aprobar el documento: ' . $e->getMessage(),
+                    'message' => __('Error al aprobar el documento: ') . $e->getMessage(),
                 ], 500);
             }
-            return back()->with('error', 'Error al aprobar el documento: ' . $e->getMessage());
+            return back()->with('error', __('Error al aprobar el documento: ') . $e->getMessage());
         }
     }
 
@@ -654,7 +654,7 @@ class DocumentController extends Controller
     public function reject(Request $request, Document $document)
     {
         if (Auth::user()?->role !== 'admin') {
-            abort(403, 'Solo administradores pueden rechazar documentos.');
+            abort(403, __('Solo administradores pueden rechazar documentos.'));
         }
         $this->authorizeAccess($document);
 
@@ -680,12 +680,12 @@ class DocumentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'status' => $document->status]);
             }
-            return back()->with('success', 'Documento rechazado.');
+            return back()->with('success', __('Documento rechazado.'));
         } catch (\Exception $e) {
             if ($request->expectsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
-            return back()->with('error', 'Error al rechazar: ' . $e->getMessage());
+            return back()->with('error', __('Error al rechazar: ') . $e->getMessage());
         }
     }
 
@@ -796,10 +796,10 @@ class DocumentController extends Controller
             // Mark as generated since file is uploaded
             $document->markAsGenerated();
             
-            return redirect()->back()->with('success', 'Documento subido exitosamente.');
+            return redirect()->back()->with('success', __('Documento subido exitosamente.'));
             
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al subir el documento: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('Error al subir el documento: ') . $e->getMessage());
         }
     }
     
@@ -816,13 +816,13 @@ class DocumentController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Documento eliminado exitosamente'
+                'message' => __('Documento eliminado exitosamente')
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar el documento: ' . $e->getMessage()
+                'message' => __('Error al eliminar el documento: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -847,7 +847,7 @@ class DocumentController extends Controller
             if (!$contract) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Documento de contrato no encontrado'
+                    'message' => __('Documento de contrato no encontrado')
                 ], 404);
             }
             
@@ -865,14 +865,14 @@ class DocumentController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Contrato marcado como conforme exitosamente',
+                'message' => __('Contrato marcado como conforme exitosamente'),
                 'document' => $contract->fresh()
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al marcar como conforme: ' . $e->getMessage()
+                'message' => __('Error al marcar como conforme: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -890,14 +890,14 @@ class DocumentController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Documentos inicializados exitosamente',
+                'message' => __('Documentos inicializados exitosamente'),
                 'documents' => $documents
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al inicializar documentos: ' . $e->getMessage()
+                'message' => __('Error al inicializar documentos: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -919,7 +919,7 @@ class DocumentController extends Controller
         // Unlinked docs (e.g. KYC uploaded at register) — only the owning user may access
         $ownerId = data_get($document->metadata, 'user_id');
         if (! $ownerId || Auth::id() !== (int) $ownerId) {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
     }
     
@@ -943,7 +943,7 @@ class DocumentController extends Controller
             if (!$contract) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Documento no encontrado'
+                    'message' => __('Documento no encontrado')
                 ], 404);
             }
             
@@ -960,14 +960,14 @@ class DocumentController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Observaciones guardadas exitosamente',
+                'message' => __('Observaciones guardadas exitosamente'),
                 'document' => $contract->fresh()
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al guardar observaciones: ' . $e->getMessage()
+                'message' => __('Error al guardar observaciones: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -979,7 +979,7 @@ class DocumentController extends Controller
     {
         // For now, just check if user owns the reservation or is admin
         if (Auth::id() !== $reservation->user_id && Auth::user()?->role !== 'admin') {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
     }
 }

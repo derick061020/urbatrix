@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Mensajes — CRM Duna Makai')
-@section('page_title', 'Mensajes')
-@section('page_breadcrumb', 'Comunicación · Conversaciones')
+@section('title', __('Mensajes — CRM Duna Makai'))
+@section('page_title', __('Mensajes'))
+@section('page_breadcrumb', __('Comunicación · Conversaciones'))
 @php $activeRoute = 'communication'; @endphp
 
 @section('content')

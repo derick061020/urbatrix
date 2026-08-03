@@ -139,7 +139,7 @@ class CsvImporter
                     $summary['created']++;
                 }
             } catch (\Throwable $e) {
-                $summary['errors'][] = ['row' => $rowNumber, 'message' => 'Error al guardar: ' . $e->getMessage()];
+                $summary['errors'][] = ['row' => $rowNumber, 'message' => __('Error al guardar: ') . $e->getMessage()];
                 $summary['skipped']++;
             }
         }
@@ -207,7 +207,7 @@ class CsvImporter
         $handle = fopen($path, 'r');
 
         if ($handle === false) {
-            abort(500, 'No se pudo abrir el archivo CSV.');
+            abort(500, __('No se pudo abrir el archivo CSV.'));
         }
 
         return $handle;

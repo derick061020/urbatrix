@@ -98,6 +98,7 @@
                 },
             };
         </script>
+        @stack('styles')
     </head>
 
     <body id="app-root">
@@ -201,7 +202,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Dashboard
+                                            {{ __('Dashboard') }}
                                         </p>
                                     </a>
                                 </li>
@@ -210,7 +211,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Portal Cliente
+                                    {{ __('Portal Cliente') }}
                                 </li>
                                 <li>
                                     <a
@@ -234,7 +235,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Progreso
+                                            {{ __('Progreso') }}
                                         </p>
                                     </a>
                                 </li>
@@ -260,7 +261,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Documentos
+                                            {{ __('Documentos') }}
                                         </p>
                                     </a>
                                 </li>
@@ -286,7 +287,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Pagos
+                                            {{ __('Pagos') }}
                                         </p>
                                     </a>
                                 </li>
@@ -312,9 +313,13 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Mensajes
+                                            {{ __('Mensajes') }}
                                         </p>
                                     </a>
+                                </li>
+
+                                <li class="pt-4 mt-4 border-t border-gray-700 px-4">
+                                    @include('partials.language-toggle')
                                 </li>
 
                                 <li class="pt-4 mt-4 border-t border-gray-700">
@@ -325,7 +330,7 @@
                                                 <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"></path>
                                             </svg>
                                             <p class="nav-text text-sm font-medium transition-all duration-300 ease-in-out">
-                                                Cerrar sesión
+                                                {{ __('Cerrar sesión') }}
                                             </p>
                                         </button>
                                     </form>
@@ -490,5 +495,6 @@
             </main>
         </div>
         @include('partials.logout-modal')
+        @stack('scripts')
     </body>
 </html>

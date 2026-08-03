@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Calculadora — Portal Broker')
-@section('page_title', 'Calculadora de comisión')
-@section('page_breadcrumb', 'Portal Broker · Comisiones')
+@section('title', __('Calculadora — Portal Broker'))
+@section('page_title', __('Calculadora de comisión'))
+@section('page_breadcrumb', __('Portal Broker · Comisiones'))
 
 @push('styles')
 <style>

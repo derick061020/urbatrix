@@ -67,7 +67,7 @@ class GoogleController extends Controller
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error('Google OAuth Error: ' . $e->getMessage());
-            return redirect('/login')->with('error', 'Error al autenticar con Google. Por favor intenta nuevamente.');
+            return redirect('/login')->with('error', __('Error al autenticar con Google. Por favor intenta nuevamente.'));
         }
     }
 

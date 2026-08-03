@@ -72,7 +72,7 @@ class DataImportController extends Controller
             Storage::delete($path);
 
             return redirect()->route('admin.data-import')
-                ->withErrors(['file' => 'El CSV está vacío o no se pudo leer.']);
+                ->withErrors(['file' => __('El CSV está vacío o no se pudo leer.')]);
         }
 
         $preview     = $this->importer->previewRows($absolute, 5);
@@ -104,7 +104,7 @@ class DataImportController extends Controller
 
         if (! Storage::exists($path)) {
             return redirect()->route('admin.data-import')
-                ->withErrors(['file' => 'El archivo subido expiró. Volvé a subirlo.']);
+                ->withErrors(['file' => __('El archivo subido expiró. Volvé a subirlo.')]);
         }
 
         // Limpiar el mapeo: ignorar columnas marcadas vacías o con campos inexistentes.
@@ -121,7 +121,7 @@ class DataImportController extends Controller
         if (in_array($mode, ['update', 'upsert'], true)) {
             if (! $matchField || ! in_array($matchField, $mapping, true)) {
                 return back()->withErrors([
-                    'match_field' => 'Elegí un campo de coincidencia que esté mapeado a una columna del CSV.',
+                    'match_field' => __('Elegí un campo de coincidencia que esté mapeado a una columna del CSV.'),
                 ])->withInput();
             }
         }

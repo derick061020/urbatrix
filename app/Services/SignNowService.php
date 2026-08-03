@@ -75,14 +75,14 @@ class SignNowService
     public static function sendForSignature(Document $document, string $signerEmail, string $signerName): array
     {
         if (! self::isConfigured()) {
-            throw new \RuntimeException('SignNow no está configurado en este entorno.');
+            throw new \RuntimeException(__('SignNow no está configurado en este entorno.'));
         }
 
         $token = self::accessToken();
         $base  = self::workingBaseUrl();
         $absolutePath = self::resolveLocalPath($document);
         if (! $absolutePath) {
-            throw new \RuntimeException('No se encontró el archivo local del documento para enviarlo a firmar.');
+            throw new \RuntimeException(__('No se encontró el archivo local del documento para enviarlo a firmar.'));
         }
 
         // 1. Upload the file to SignNow (no field extraction — we'll use a freeform invite
@@ -93,7 +93,7 @@ class SignNowService
 
         if (! $uploaded->successful() || ! ($uploaded['id'] ?? null)) {
             Log::warning('SignNow upload failed', ['body' => $uploaded->body()]);
-            throw new \RuntimeException('Falló la subida del documento a SignNow.');
+            throw new \RuntimeException(__('Falló la subida del documento a SignNow.'));
         }
 
         $signnowDocId = (string) $uploaded['id'];
@@ -114,7 +114,7 @@ class SignNowService
 
         if (! $invite->successful()) {
             Log::warning('SignNow invite failed', ['body' => $invite->body()]);
-            throw new \RuntimeException('Falló el envío del correo de firma: '.$invite->body());
+            throw new \RuntimeException(__('Falló el envío del correo de firma: ').$invite->body());
         }
 
         // Persist the SignNow document id in metadata so we can retrieve status later
@@ -179,7 +179,7 @@ class SignNowService
         if (config('signnow.mode') === 'bearer') {
             $key = (string) config('signnow.api_key');
             if ($key === '') {
-                throw new \RuntimeException('SIGNNOW_API_KEY no está configurado.');
+                throw new \RuntimeException(__('SIGNNOW_API_KEY no está configurado.'));
             }
             return $key;
         }
@@ -202,7 +202,7 @@ class SignNowService
             ]);
         if (! $resp->successful() || ! ($resp['access_token'] ?? null)) {
             Log::error('SignNow token error', ['body' => $resp->body()]);
-            throw new \RuntimeException('No se pudo autenticar contra SignNow.');
+            throw new \RuntimeException(__('No se pudo autenticar contra SignNow.'));
         }
         return (string) $resp['access_token'];
     }
@@ -222,7 +222,7 @@ class SignNowService
             $resp = Http::withToken($token)->get(self::workingBaseUrl().'/user');
             if (! $resp->successful()) {
                 Log::warning('SignNow /user lookup failed', ['status' => $resp->status(), 'body' => $resp->body()]);
-                throw new \RuntimeException('No se pudo obtener el email de la cuenta SignNow (revisá el API key).');
+                throw new \RuntimeException(__('No se pudo obtener el email de la cuenta SignNow (revisá el API key).'));
             }
             // SignNow returns email in different shapes depending on plan;
             // try the common ones in order of preference.
@@ -231,7 +231,7 @@ class SignNowService
                    ?? data_get($resp->json(), 'emails.0');
             if (! $email) {
                 Log::error('SignNow /user response had no email', ['body' => $resp->body()]);
-                throw new \RuntimeException('La cuenta SignNow no tiene un email asociado.');
+                throw new \RuntimeException(__('La cuenta SignNow no tiene un email asociado.'));
             }
             return (string) $email;
         });

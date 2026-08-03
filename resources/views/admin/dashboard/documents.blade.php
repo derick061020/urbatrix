@@ -231,7 +231,7 @@
                                     <svg class="material-design-icon__svg w-4 h-4 mr-2" viewBox="0 0 24 24">
                                         <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path>
                                     </svg>
-                                    Contrato No Disponible
+                                    {{ __('Contrato No Disponible') }}
                                 </div>
                             @endif
                         @else    <!-- Botones para otros documentos -->
@@ -280,7 +280,7 @@
                             <div class="mb-6">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
                                     <div class="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
-                                    Detalles del Contrato
+                                    {{ __('Detalles del Contrato') }}
                                 </h4>
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                                     <div class="grid grid-cols-2 gap-4 text-sm">
@@ -367,7 +367,7 @@
                                         <svg class="material-design-icon__svg w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24">
                                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
                                         </svg>
-                                        Marcar como Conforme
+                                        {{ __('Marcar como Conforme') }}
                                     </button>
                                 @else
                                     <!-- Botón de firmar cuando está conforme -->

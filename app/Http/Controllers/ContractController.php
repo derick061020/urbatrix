@@ -24,14 +24,14 @@ class ContractController extends Controller
     {
         // Check authorization: must be owner or admin
         if ($reservation->user_id !== Auth::id() && Auth::user()?->role !== 'admin') {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
 
         if (!$reservation->isBudgetSent()) {
             if (request()->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Presupuesto no enviado aún.'], 422);
+                return response()->json(['success' => false, 'message' => __('Presupuesto no enviado aún.')], 422);
             }
-            return back()->with('error', 'El presupuesto aún no fue enviado por el equipo. Espera a que tu asesor lo confirme.');
+            return back()->with('error', __('El presupuesto aún no fue enviado por el equipo. Espera a que tu asesor lo confirme.'));
         }
 
         try {
@@ -40,9 +40,9 @@ class ContractController extends Controller
             
             if (!file_exists($templatePath)) {
                 if (request()->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Plantilla de contrato no encontrada'], 404);
+                    return response()->json(['success' => false, 'message' => __('Plantilla de contrato no encontrada')], 404);
                 }
-                return back()->with('error', 'Plantilla de contrato no encontrada');
+                return back()->with('error', __('Plantilla de contrato no encontrada'));
             }
 
             // Create TemplateProcessor
@@ -105,7 +105,7 @@ class ContractController extends Controller
             if (request()->expectsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
-            return back()->with('error', 'Error al generar el contrato: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar el contrato: ') . $e->getMessage());
         }
     }
 
@@ -574,18 +574,18 @@ class ContractController extends Controller
     {
         // Verify user owns this reservation or is admin
         if ($reservation->user_id !== Auth::id() && Auth::user()?->role !== 'admin') {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
 
         if (!$reservation->isBudgetSent()) {
-            return back()->with('error', 'El presupuesto aún no fue enviado por el equipo.');
+            return back()->with('error', __('El presupuesto aún no fue enviado por el equipo.'));
         }
 
         try {
             // Render the printable HTML view (open in browser → "Descargar PDF")
             return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'purchase_promise');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al generar la promesa de compraventa: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar la promesa de compraventa: ') . $e->getMessage());
         }
     }
 
@@ -596,18 +596,18 @@ class ContractController extends Controller
     {
         // Verify user owns this reservation
         if ($reservation->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
 
         if (!$reservation->isBudgetSent()) {
-            return back()->with('error', 'El presupuesto aún no fue enviado por el equipo. Espera a que tu asesor lo confirme.');
+            return back()->with('error', __('El presupuesto aún no fue enviado por el equipo. Espera a que tu asesor lo confirme.'));
         }
 
         try {
             // Render the printable HTML view (open in browser → "Descargar PDF")
             return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'payment_plan');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al generar el plan de pagos: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar el plan de pagos: ') . $e->getMessage());
         }
     }
 
@@ -618,13 +618,13 @@ class ContractController extends Controller
     {
         // Verify user owns this reservation
         if ($reservation->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
+            abort(403, __('Unauthorized'));
         }
 
         if (!$reservation->isBudgetSent()) {
             return response()->json([
                 'success' => false,
-                'message' => 'El presupuesto aún no fue enviado por el equipo. No se puede confirmar el contrato.',
+                'message' => __('El presupuesto aún no fue enviado por el equipo. No se puede confirmar el contrato.'),
             ], 422);
         }
 
@@ -660,7 +660,7 @@ class ContractController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Contrato firmado exitosamente',
+                'message' => __('Contrato firmado exitosamente'),
                 'status' => 'contract_signed',
                 'payments_generated' => $paymentsCount ?? 0
             ]);
@@ -668,7 +668,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al aprobar el contrato: ' . $e->getMessage()
+                'message' => __('Error al aprobar el contrato: ') . $e->getMessage()
             ], 500);
         }
     }

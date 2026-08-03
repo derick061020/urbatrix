@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Herramientas de venta — Portal Broker')
-@section('page_title', 'Herramientas de venta')
-@section('page_breadcrumb', 'Portal Broker · Ventas')
+@section('title', __('Herramientas de venta — Portal Broker'))
+@section('page_title', __('Herramientas de venta'))
+@section('page_breadcrumb', __('Portal Broker · Ventas'))
 
 @push('styles')
 <style>
@@ -67,7 +67,7 @@
                 <div class="brk-field">
                     <label>{{ __('Cliente') }}</label>
                     <select id="propClient">
-                        <option value="">— Selecciona —</option>
+                        <option value="">{{ __('— Selecciona —') }}</option>
                         @foreach($clients as $c)
                             <option>{{ $c->client_name }}</option>
                         @endforeach
@@ -76,7 +76,7 @@
                 <div class="brk-field">
                     <label>{{ __('Unidad') }}</label>
                     <select id="propUnit" onchange="brkBuildProp()">
-                        <option value="">— Selecciona —</option>
+                        <option value="">{{ __('— Selecciona —') }}</option>
                         @foreach($units as $u)
                             <option value="{{ (float)$u->price }}" data-label="{{ $u->custom_id ?? $u->name }}">{{ $u->custom_id ?? $u->name }} · ${{ number_format($u->price,0) }}</option>
                         @endforeach
@@ -92,7 +92,7 @@
                 </div>
                 <div class="p-4 space-y-1">
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Precio') }}</span><span class="font-semibold text-ink-900" id="propPrice">—</span></div>
-                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">Inicial 20%</span><span class="font-semibold text-ink-900" id="propIni">—</span></div>
+                    <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Inicial 20%') }}</span><span class="font-semibold text-ink-900" id="propIni">—</span></div>
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Saldo (construcción + entrega)') }}</span><span class="font-semibold text-ink-900" id="propRest">—</span></div>
                     <p class="text-[10.5px] text-ink-400 mt-2">{{ __('Simulación informativa, no vinculante. CONFOTUR aplica exención fiscal al comprador.') }}</p>
                 </div>
@@ -105,7 +105,7 @@
     function brkCopyTool(){
         var t=document.getElementById('brkToolRef').textContent.trim();
         navigator.clipboard && navigator.clipboard.writeText(t);
-        event.target.textContent='¡Copiado!'; setTimeout(function(){ event.target.textContent='Copiar'; },1500);
+        event.target.textContent=@json(__('¡Copiado!')); setTimeout(function(){ event.target.textContent='Copiar'; },1500);
     }
     function brkMoney(x){ return '$'+Math.round(x).toLocaleString('en-US'); }
     function brkBuildProp(force){
@@ -113,9 +113,9 @@
         var price=parseFloat(sel.value)||0;
         if(!price){ if(force) alert('{{ __("Selecciona una unidad.") }}'); return; }
         var label=sel.options[sel.selectedIndex].getAttribute('data-label')||'';
-        var client=document.getElementById('propClient').value||'tu cliente';
-        document.getElementById('propTitle').textContent='Propuesta · '+label;
-        document.getElementById('propFor').textContent='Para '+client+' · preparada por {{ auth()->user()->name }}';
+        var client=document.getElementById('propClient').value||@json(__('tu cliente'));
+        document.getElementById('propTitle').textContent=@json(__('Propuesta'))+' · '+label;
+        document.getElementById('propFor').textContent=@json(__('Para :client · preparada por :agent', ['client' => '__C__', 'agent' => auth()->user()->name])).replace('__C__', client);
         document.getElementById('propPrice').textContent=brkMoney(price);
         document.getElementById('propIni').textContent=brkMoney(price*0.2);
         document.getElementById('propRest').textContent=brkMoney(price*0.8);

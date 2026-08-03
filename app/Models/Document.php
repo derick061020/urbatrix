@@ -136,12 +136,12 @@ class Document extends Model
     public function getStatusLabelAttribute()
     {
         return match($this->status) {
-            'pending' => '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">Pendiente</span>',
-            'generated' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Generado</span>',
-            'signed' => '<span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Firmado</span>',
-            'approved' => '<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Aprobado</span>',
-            'rejected' => '<span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Rechazado</span>',
-            default => '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">Desconocido</span>',
+            'pending' => '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">'.__('Pendiente').'</span>',
+            'generated' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">'.__('Generado').'</span>',
+            'signed' => '<span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">'.__('Firmado').'</span>',
+            'approved' => '<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">'.__('Aprobado').'</span>',
+            'rejected' => '<span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">'.__('Rechazado').'</span>',
+            default => '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">'.__('Desconocido').'</span>',
         };
     }
 

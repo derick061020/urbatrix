@@ -126,7 +126,7 @@ class DashboardController extends Controller
 
         \App\Support\ActivityLogger::log(Auth::id(), 'document_upload', 'Subió '.($document->title ?: 'un documento solicitado'), $document);
 
-        return back()->with('success', 'Documento subido. Quedó en revisión por nuestro equipo.');
+        return back()->with('success', __('Documento subido. Quedó en revisión por nuestro equipo.'));
     }
 
     public function payments(Request $request)
@@ -165,7 +165,7 @@ class DashboardController extends Controller
     public function sendMessage(Request $request)
     {
         $reservation = $this->resolveReservation($request);
-        if (! $reservation) abort(404, 'No tenés un expediente activo.');
+        if (! $reservation) abort(404, __('No tenés un expediente activo.'));
         if ($reservation->user_id !== Auth::id()) abort(403);
 
         $data = $request->validate(['body' => 'required|string|max:5000']);
@@ -192,7 +192,7 @@ class DashboardController extends Controller
         if ($reservation->user_id !== Auth::id()) abort(403);
 
         if (!$reservation->isBudgetSent()) {
-            return redirect()->route('dashboard')->with('error', 'Presupuesto aún no disponible.');
+            return redirect()->route('dashboard')->with('error', __('Presupuesto aún no disponible.'));
         }
 
         $breakdown = \App\Helpers\PaymentPlanHelper::calculatePaymentBreakdown($reservation);
@@ -209,10 +209,10 @@ class DashboardController extends Controller
     public function submitBudgetObservation(Request $request, Reservation $reservation)
     {
         if ($reservation->user_id !== Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+            return response()->json(['success' => false, 'message' => __('No autorizado.')], 403);
         }
         if (! $reservation->isBudgetSent()) {
-            return response()->json(['success' => false, 'message' => 'No hay un plan de pagos pendiente que observar.'], 422);
+            return response()->json(['success' => false, 'message' => __('No hay un plan de pagos pendiente que observar.')], 422);
         }
 
         $data = $request->validate([
@@ -236,7 +236,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tu observación fue enviada. El asesor revisará el plan y te enviará una nueva propuesta.'
+            'message' => __('Tu observación fue enviada. El asesor revisará el plan y te enviará una nueva propuesta.')
         ]);
     }
 
@@ -249,7 +249,7 @@ class DashboardController extends Controller
         $reservation = $document->reservation;
         if (! $reservation || $reservation->user_id !== Auth::id()) abort(403);
         if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
-            abort(404, 'No es un contrato.');
+            abort(404, __('No es un contrato.'));
         }
 
         $data = $request->validate(['message' => 'required|string|max:2000']);
@@ -272,7 +272,7 @@ class DashboardController extends Controller
             'status'   => 'pending',
         ]);
 
-        return back()->with('success', 'Tu observación fue enviada. Tu asesor revisará el contrato.');
+        return back()->with('success', __('Tu observación fue enviada. Tu asesor revisará el contrato.'));
     }
 
     /**
@@ -283,12 +283,12 @@ class DashboardController extends Controller
         $reservation = $document->reservation;
         if (! $reservation || $reservation->user_id !== Auth::id()) abort(403);
         if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
-            abort(404, 'No es un contrato.');
+            abort(404, __('No es un contrato.'));
         }
         // Gate: the payment plan must be signed before any contract can be accepted/signed
         $planDoc = $reservation->documents->firstWhere('document_type', 'payment_plan');
         if (! $planDoc || ! in_array($planDoc->status, ['signed', 'approved'])) {
-            return back()->with('error', 'Primero tenés que firmar el plan de pagos.');
+            return back()->with('error', __('Primero tenés que firmar el plan de pagos.'));
         }
 
         $meta = $document->metadata ?? [];
@@ -296,7 +296,7 @@ class DashboardController extends Controller
         $obs[] = [
             'from'    => 'client',
             'author'  => trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) ?: Auth::user()?->name,
-            'message' => 'Conforme con el contrato. Listo para firmar.',
+            'message' => __('Conforme con el contrato. Listo para firmar.'),
             'kind'    => 'accept',
             'at'      => now()->toIso8601String(),
         ];
@@ -308,7 +308,7 @@ class DashboardController extends Controller
             'status'   => 'generated',
         ]);
 
-        return back()->with('success', 'Contrato aceptado. Podés proceder a firmarlo.');
+        return back()->with('success', __('Contrato aceptado. Podés proceder a firmarlo.'));
     }
 
     public function acceptBudget(Request $request, Reservation $reservation)
@@ -319,7 +319,7 @@ class DashboardController extends Controller
         if (!$reservation->isBudgetSent()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Presupuesto aún no disponible.'
+                'message' => __('Presupuesto aún no disponible.')
             ], 422);
         }
 
@@ -330,7 +330,7 @@ class DashboardController extends Controller
             $observations[] = [
                 'from'    => 'client',
                 'author'  => trim(($reservation->first_name ?? '').' '.($reservation->last_name ?? '')) ?: Auth::user()?->name,
-                'message' => 'Acepto el plan de pagos.',
+                'message' => __('Acepto el plan de pagos.'),
                 'kind'    => 'accept',
                 'at'      => now()->toIso8601String(),
             ];
@@ -372,14 +372,14 @@ class DashboardController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Presupuesto aceptado. Bienvenido a Makai Residences.',
+                'message' => __('Presupuesto aceptado. Bienvenido a Makai Residences.'),
                 'redirect' => route('dashboard')
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al aceptar presupuesto: ' . $e->getMessage()
+                'message' => __('Error al aceptar presupuesto: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -391,7 +391,7 @@ class DashboardController extends Controller
     {
         // Only the owner of the reservation can submit payments
         if ($reservation->user_id !== Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+            return response()->json(['success' => false, 'message' => __('No autorizado.')], 403);
         }
 
         $request->validate([
@@ -407,7 +407,7 @@ class DashboardController extends Controller
 
             // Verify payment belongs to this reservation
             if ($payment->reservation_id !== $reservation->id) {
-                return response()->json(['success' => false, 'message' => 'Pago no pertenece a esta reserva.'], 403);
+                return response()->json(['success' => false, 'message' => __('Pago no pertenece a esta reserva.')], 403);
             }
 
             // Handle file upload
@@ -428,13 +428,13 @@ class DashboardController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Comprobante enviado para aprobación. Te notificaremos cuando sea revisado.'
+                'message' => __('Comprobante enviado para aprobación. Te notificaremos cuando sea revisado.')
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al enviar comprobante: ' . $e->getMessage()
+                'message' => __('Error al enviar comprobante: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -606,7 +606,7 @@ class DashboardController extends Controller
 
         if (!empty($data['password'])) {
             if (!$user->password || !Hash::check($data['current_password'] ?? '', $user->password)) {
-                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.'])->withInput();
+                return back()->withErrors(['current_password' => __('La contraseña actual no es correcta.')])->withInput();
             }
             $user->password = $data['password']; // hashed via casts
         }

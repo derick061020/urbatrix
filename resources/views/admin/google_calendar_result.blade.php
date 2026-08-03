@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <title>{{ __('Google Calendar — Refresh Token') }}</title>
@@ -25,7 +25,7 @@
         <ol>
             <li>{{ __('Copiá ese valor.') }}</li>
             <li>Pegalo en <code>.env</code> reemplazando <code>GOOGLE_CALENDAR_REFRESH_TOKEN=…</code></li>
-            <li>Corré en la terminal:<br><code>php artisan cache:forget google_calendar_access_token &amp;&amp; php artisan config:clear</code></li>
+            <li>{{ __('Corré en la terminal:') }}<br><code>php artisan cache:forget google_calendar_access_token &amp;&amp; php artisan config:clear</code></li>
             <li>{{ __('Probá agendar una videollamada de nuevo.') }}</li>
         </ol>
         <details>

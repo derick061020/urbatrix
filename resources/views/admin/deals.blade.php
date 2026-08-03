@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Deals - Admin Panel')
+@section('title', __('Deals - Admin Panel'))
 
 @php
     $activeRoute = 'deals';
