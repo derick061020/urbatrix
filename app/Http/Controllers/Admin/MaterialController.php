@@ -34,7 +34,7 @@ class MaterialController extends Controller
 
         BrokerMaterial::create($data);
 
-        return back()->with('success', 'Material agregado correctamente.');
+        return back()->with('success', __('Material agregado correctamente.'));
     }
 
     public function update(Request $request, BrokerMaterial $material)
@@ -56,14 +56,14 @@ class MaterialController extends Controller
 
         $material->update($data);
 
-        return back()->with('success', 'Material actualizado.');
+        return back()->with('success', __('Material actualizado.'));
     }
 
     public function toggleVisible(BrokerMaterial $material)
     {
         $material->update(['visible' => ! $material->visible]);
 
-        return back()->with('success', $material->visible ? 'Material visible para brokers.' : 'Material oculto.');
+        return back()->with('success', $material->visible ? __('Material visible para brokers.') : 'Material oculto.');
     }
 
     public function destroy(BrokerMaterial $material)
@@ -73,7 +73,7 @@ class MaterialController extends Controller
         }
         $material->delete();
 
-        return back()->with('success', 'Material eliminado.');
+        return back()->with('success', __('Material eliminado.'));
     }
 
     private function validateData(Request $request): array

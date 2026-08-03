@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Guardados — BAHÍA MAR')
-@section('page_title', 'Mi Propiedad')
-@section('page_breadcrumb', 'Mi Propiedad · Guardados')
+@section('title', __('Guardados — BAHÍA MAR'))
+@section('page_title', __('Mi Propiedad'))
+@section('page_breadcrumb', __('Mi Propiedad · Guardados'))
 @php $activeRoute = 'guardados'; @endphp
 
 @push('styles')

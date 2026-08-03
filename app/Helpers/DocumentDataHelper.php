@@ -227,13 +227,13 @@ class DocumentDataHelper
                 'view'   => 'documents.plan-de-pagos',
                 'data'   => fn () => self::paymentPlan($reservation),
                 'prefix' => 'plan_de_pagos',
-                'title'  => 'Plan de Pagos',
+                'title'  => __('Plan de Pagos'),
             ],
             'purchase_promise' => [
                 'view'   => 'documents.promesa-compraventa',
                 'data'   => fn () => self::purchasePromise($reservation),
                 'prefix' => 'promesa_compraventa',
-                'title'  => 'Promesa de Compraventa',
+                'title'  => __('Promesa de Compraventa'),
             ],
         ][$type];
 

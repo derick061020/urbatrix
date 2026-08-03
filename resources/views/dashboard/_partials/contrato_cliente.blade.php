@@ -17,7 +17,7 @@
         && ($lastObs['kind'] ?? null) !== 'accept'
         && ! $accepted;
 
-    $title = $d->document_type === 'purchase_promise' ? 'Promesa de compraventa' : 'Contrato';
+    $title = $d->document_type === 'purchase_promise' ? __('Promesa de compraventa') : __('Contrato');
     $obsRoute = route('dashboard.contract.observation', $d->id);
     $acceptRoute = route('dashboard.contract.accept', $d->id);
 @endphp
@@ -29,13 +29,13 @@
             <div class="text-[14px] font-bold text-ink-950">{{ $title }}</div>
             <div class="text-[12px] text-ink-500">
                 @if($signed)
-                    Documento firmado. Podés descargarlo.
+                    {{ __('Documento firmado. Podés descargarlo.') }}
                 @elseif($accepted)
-                    Aceptaste el contrato. Ahora podés firmarlo.
+                    {{ __('Aceptaste el contrato. Ahora podés firmarlo.') }}
                 @elseif($awaitingAdmin)
-                    Tu asesor está revisando tu observación.
+                    {{ __('Tu asesor está revisando tu observación.') }}
                 @else
-                    Revisá el contrato y enviá observaciones o aceptalo para firmar.
+                    {{ __('Revisá el contrato y enviá observaciones o aceptalo para firmar.') }}
                 @endif
             </div>
         </div>

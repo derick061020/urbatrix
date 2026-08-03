@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Dashboard - Admin Panel')
+@section('title', __('Dashboard - Admin Panel'))
 
 @php
     $activeRoute = 'dashboard';
@@ -232,7 +232,7 @@
                             @if($recentDeals->isEmpty())
                             <tr>
                                 <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                                    No recent deals found
+                                    {{ __('No recent deals found') }}
                                 </td>
                             </tr>
                             @endif

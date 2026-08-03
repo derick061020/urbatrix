@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Social Chat - Admin Panel')
+@section('title', __('Social Chat - Admin Panel'))
 
 @php
     $activeRoute = 'social-chat';

@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         if (! $user || ! $user->password || ! Hash::check($credentials['password'], $user->password)) {
             return back()->withErrors([
-                'email' => 'Las credenciales no coinciden.',
+                'email' => __('Las credenciales no coinciden.'),
             ])->onlyInput('email');
         }
 
@@ -105,7 +105,7 @@ class AuthController extends Controller
     public function registerResend(Request $request)
     {
         $reg = $request->session()->get('register');
-        if (! $reg) return response()->json(['message' => 'Sesión expirada'], 422);
+        if (! $reg) return response()->json(['message' => __('Sesión expirada')], 422);
 
         $code = (string) random_int(100000, 999999);
         $reg['code'] = $code;
@@ -125,10 +125,10 @@ class AuthController extends Controller
     {
         $data = $request->validate(['code' => 'required|digits:6']);
         $reg  = $request->session()->get('register');
-        if (! $reg) return response()->json(['message' => 'Sesión expirada'], 422);
+        if (! $reg) return response()->json(['message' => __('Sesión expirada')], 422);
 
         if ($data['code'] !== $reg['code']) {
-            return response()->json(['message' => 'Código incorrecto'], 422);
+            return response()->json(['message' => __('Código incorrecto')], 422);
         }
         $reg['verified'] = true;
         $request->session()->put('register', $reg);
@@ -141,7 +141,7 @@ class AuthController extends Controller
     {
         $reg = $request->session()->get('register');
         if (! $reg || ! ($reg['verified'] ?? false)) {
-            return response()->json(['message' => 'Verifica tu email antes de continuar'], 422);
+            return response()->json(['message' => __('Verifica tu email antes de continuar')], 422);
         }
 
         $data = $request->validate([
@@ -283,21 +283,21 @@ class AuthController extends Controller
 
         $reset = $request->session()->get('password_reset');
         if (! $reset || empty($reset['email'])) {
-            return response()->json(['message' => 'Sesión expirada'], 422);
+            return response()->json(['message' => __('Sesión expirada')], 422);
         }
 
         $row = DB::table('password_reset_tokens')->where('email', $reset['email'])->first();
         if (! $row) {
-            return response()->json(['message' => 'Código inválido o expirado'], 422);
+            return response()->json(['message' => __('Código inválido o expirado')], 422);
         }
 
         // Expire codes after 60 minutes (matches config/auth.php passwords.expire).
         if (now()->diffInMinutes($row->created_at) > 60) {
-            return response()->json(['message' => 'El código ha expirado'], 422);
+            return response()->json(['message' => __('El código ha expirado')], 422);
         }
 
         if (! Hash::check($data['code'], $row->token)) {
-            return response()->json(['message' => 'Código incorrecto'], 422);
+            return response()->json(['message' => __('Código incorrecto')], 422);
         }
 
         $reset['verified'] = true;
@@ -311,7 +311,7 @@ class AuthController extends Controller
     {
         $reset = $request->session()->get('password_reset');
         if (! $reset || empty($reset['verified'])) {
-            return response()->json(['message' => 'Verifica tu email antes de continuar'], 422);
+            return response()->json(['message' => __('Verifica tu email antes de continuar')], 422);
         }
 
         $data = $request->validate([
@@ -320,7 +320,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $reset['email'])->first();
         if (! $user) {
-            return response()->json(['message' => 'Usuario no encontrado'], 422);
+            return response()->json(['message' => __('Usuario no encontrado')], 422);
         }
 
         $user->update(['password' => bcrypt($data['password'])]);
@@ -381,7 +381,7 @@ class AuthController extends Controller
         $email = (string) $request->query('email', $request->input('email', ''));
 
         if (! $this->invitationTokenIsValid($email, $token)) {
-            return response()->json(['message' => 'El enlace ha caducado o no es válido.'], 422);
+            return response()->json(['message' => __('El enlace ha caducado o no es válido.')], 422);
         }
 
         $data = $request->validate([
@@ -390,7 +390,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $email)->first();
         if (! $user) {
-            return response()->json(['message' => 'Usuario no encontrado.'], 422);
+            return response()->json(['message' => __('Usuario no encontrado.')], 422);
         }
 
         $update = ['password' => bcrypt($data['password'])];

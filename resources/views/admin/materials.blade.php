@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Material de Brokers — CRM Landmass Bahía Mar')
-@section('page_title', 'Material de Brokers')
-@section('page_breadcrumb', 'Brokers · Gestión de materiales')
+@section('title', __('Material de Brokers — CRM Landmass Bahía Mar'))
+@section('page_title', __('Material de Brokers'))
+@section('page_breadcrumb', __('Brokers · Gestión de materiales'))
 @php $activeRoute = 'materials'; @endphp
 
 @push('styles')
@@ -202,7 +202,7 @@
                     <input type="number" name="sort_order" id="matInputOrder" value="0" min="0" class="mat-field">
                 </div>
                 <label class="flex items-center gap-2 text-[13px] text-ink-700 h-10 px-1">
-                    <input type="checkbox" name="visible" id="matInputVisible" value="1" checked class="accent-brand w-4 h-4"> Visible para brokers
+                    <input type="checkbox" name="visible" id="matInputVisible" value="1" checked class="accent-brand w-4 h-4"> {{ __('Visible para brokers') }}
                 </label>
             </div>
         </div>
@@ -252,7 +252,7 @@
     const matDropName = document.getElementById('matDropName');
 
     matFileInput.addEventListener('change', () => {
-        matDropName.textContent = matFileInput.files.length ? matFileInput.files[0].name : 'Subir un archivo';
+        matDropName.textContent = matFileInput.files.length ? matFileInput.files[0].name : @json(__('Subir un archivo'));
     });
 
     // Selector de icono
@@ -284,7 +284,7 @@
         document.getElementById('matInputOrder').value = m.sort_order ?? 0;
         document.getElementById('matInputVisible').checked = !!m.visible;
         matFileInput.value = '';
-        matDropName.textContent = 'Subir un archivo';
+        matDropName.textContent = @json(__('Subir un archivo'));
         document.getElementById('matModal').showModal();
     }
 
@@ -293,7 +293,7 @@
         document.getElementById('matMethod').value = 'POST';
         matForm.action = storeAction;
         matForm.reset();
-        matDropName.textContent = 'Subir un archivo';
+        matDropName.textContent = @json(__('Subir un archivo'));
         setMaterialIcon('');
         document.getElementById('matInputVisible').checked = true;
         document.getElementById('matModal').showModal();
@@ -320,7 +320,7 @@
         } else {
             body.innerHTML = '<div class="text-center py-10">'
                 + '<div class="w-14 h-14 mx-auto rounded-xl bg-ink-100 flex items-center justify-center text-ink-500 mb-3"><i class="pi pi-file text-[22px]"></i></div>'
-                + '<div class="text-[13px] text-ink-600">Este formato no admite vista previa.</div>'
+                + '<div class="text-[13px] text-ink-600">{{ __('Este formato no admite vista previa.') }}</div>'
                 + '<div class="text-[12px] text-ink-400 mt-1">Usá el botón <b>Descargar</b> para abrir el recurso.</div>'
                 + '</div>';
         }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -98,6 +98,7 @@
                 },
             };
         </script>
+        @stack('styles')
     </head>
 
     <body id="app-root">
@@ -196,7 +197,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Dashboard
+                                            {{ __('Dashboard') }}
                                         </p>
                                     </a>
                                 </li>
@@ -221,7 +222,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Launch Experience
+                                            {{ __('Launch Experience') }}
                                         </p>
                                     </div>
                                 </li>
@@ -230,7 +231,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Units
+                                    {{ __('Units') }}
                                 </li>
                                 <li>
                                     <a
@@ -254,7 +255,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Units
+                                            {{ __('Units') }}
                                         </p>
                                     </a>
                                 </li>
@@ -263,7 +264,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Deals
+                                    {{ __('Deals') }}
                                 </li>
                                 <li>
                                     <a
@@ -287,7 +288,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Deals
+                                            {{ __('Deals') }}
                                         </p>
                                     </a>
                                 </li>
@@ -306,7 +307,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Transactions Report
+                                            {{ __('Transactions Report') }}
                                         </p>
                                     </a>
                                 </li>
@@ -315,7 +316,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Clients
+                                    {{ __('Clients') }}
                                 </li>
                                 <li>
                                     <a
@@ -339,7 +340,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Profiles
+                                            {{ __('Profiles') }}
                                         </p>
                                     </a>
                                 </li>
@@ -366,7 +367,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Agents
+                                            {{ __('Agents') }}
                                         </p>
                                     </a>
                                 </li>
@@ -375,7 +376,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Communication
+                                    {{ __('Communication') }}
                                 </li>
                                 <li>
                                     <a
@@ -392,7 +393,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Communication
+                                            {{ __('Communication') }}
                                         </p>
                                     </a>
                                 </li>
@@ -401,7 +402,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    CRM Operativo
+                                    {{ __('CRM Operativo') }}
                                 </li>
                                 <li>
                                     <a href="/admin/crm/dashboard" class="lb-admin-main-nav-link {{ ($activeRoute ?? '') === 'crm.dashboard' ? 'bg-[rgba(155,172,158,0.2)] rounded shadow-sm' : '' }}">
@@ -473,7 +474,7 @@
                                 <li
                                     class="lb-admin-man-nav-section-heading text-text-primary-inverse !mt-6"
                                 >
-                                    Management
+                                    {{ __('Management') }}
                                 </li>
                                 <li>
                                     <a
@@ -497,7 +498,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Settings
+                                            {{ __('Settings') }}
                                         </p>
                                     </a>
                                 </li>
@@ -523,7 +524,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Extras
+                                            {{ __('Extras') }}
                                         </p>
                                     </a>
                                 </li>
@@ -549,7 +550,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Data Export
+                                            {{ __('Data Export') }}
                                         </p>
                                     </a>
                                 </li>
@@ -575,7 +576,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Importar datos
+                                            {{ __('Importar datos') }}
                                         </p>
                                     </a>
                                 </li>
@@ -601,7 +602,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Email Templates
+                                            {{ __('Email Templates') }}
                                         </p>
                                     </a>
                                 </li>
@@ -627,7 +628,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Registration Fields
+                                            {{ __('Registration Fields') }}
                                         </p>
                                     </a>
                                 </li>
@@ -653,7 +654,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Menu
+                                            {{ __('Menu') }}
                                         </p>
                                     </a>
                                 </li>
@@ -679,7 +680,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Landing
+                                            {{ __('Landing') }}
                                         </p>
                                     </a>
                                 </li>
@@ -705,7 +706,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Social Chat
+                                            {{ __('Social Chat') }}
                                         </p>
                                     </a>
                                 </li>
@@ -731,7 +732,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Survey
+                                            {{ __('Survey') }}
                                         </p>
                                     </a>
                                 </li>
@@ -757,7 +758,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            CTA Cards
+                                            {{ __('CTA Cards') }}
                                         </p>
                                     </a>
                                 </li>
@@ -783,7 +784,7 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Theme
+                                            {{ __('Theme') }}
                                         </p>
                                     </a>
                                 </li>
@@ -809,9 +810,14 @@
                                         <p
                                             class="nav-text ml-2 text-12 font-semibold text-text-primary-inverse uppercase tracking-wide-sm transition-all duration-300 ease-in-out"
                                         >
-                                            Account
+                                            {{ __('Account') }}
                                         </p>
                                     </a>
+                                </li>
+
+                                <!-- Idioma -->
+                                <li class="mt-5 px-2">
+                                    @include('partials.language-toggle')
                                 </li>
 
                                 <!-- Log Out -->
@@ -991,5 +997,6 @@
         
         @include('partials.logout-modal')
         @yield('scripts')
+        @stack('scripts')
     </body>
 </html>

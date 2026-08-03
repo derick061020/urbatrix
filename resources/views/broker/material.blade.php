@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Material de ventas — Portal Broker')
-@section('page_title', 'Material de ventas')
-@section('page_breadcrumb', 'Portal Broker · Recursos de venta')
+@section('title', __('Material de ventas — Portal Broker'))
+@section('page_title', __('Material de ventas'))
+@section('page_breadcrumb', __('Portal Broker · Recursos de venta'))
 
 @section('content')
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">

@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Data Export - Admin Panel')
+@section('title', __('Data Export - Admin Panel'))
 
 @php
     $activeRoute = 'data-export';

@@ -1,7 +1,7 @@
 @extends('layouts.main_admin')
 
 
-@section('title', 'Registration Fields - Admin Panel')
+@section('title', __('Registration Fields - Admin Panel'))
 
 @php
     $activeRoute = 'registration-fields';

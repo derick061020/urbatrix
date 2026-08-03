@@ -1088,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function () {
             setStep(1);
             startResendTimer();
         } catch (err) {
-            document.getElementById('step0-error').textContent = 'Error de red. Intenta de nuevo.';
+            document.getElementById('step0-error').textContent = @json(__('Error de red. Intenta de nuevo.'));
             document.getElementById('step0-error').classList.remove('hidden');
         }
         return false;
@@ -1148,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const code = Array.from(document.querySelectorAll('#code-row .code-input')).map(i => i.value).join('');
         if (code.length !== 6) {
-            document.getElementById('step1-error').textContent = 'Introduce los 6 dígitos.';
+            document.getElementById('step1-error').textContent = @json(__('Introduce los 6 dígitos.'));
             document.getElementById('step1-error').classList.remove('hidden');
             return false;
         }
@@ -1249,8 +1249,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const p2 = document.getElementById('reg-pw2').value;
         const ok = /[A-Z]/.test(p1) && /\d/.test(p1) && p1.length >= 8;
         const errBox = document.getElementById('step4-error');
-        if (!ok)       { errBox.textContent = 'La contraseña no cumple las reglas.'; errBox.classList.remove('hidden'); return false; }
-        if (p1 !== p2) { errBox.textContent = 'Las contraseñas no coinciden.';       errBox.classList.remove('hidden'); return false; }
+        if (!ok)       { errBox.textContent = @json(__('La contraseña no cumple las reglas.')); errBox.classList.remove('hidden'); return false; }
+        if (p1 !== p2) { errBox.textContent = @json(__('Las contraseñas no coinciden.'));       errBox.classList.remove('hidden'); return false; }
         errBox.classList.add('hidden');
         state.password = p1;
         setStep(5);
@@ -1284,7 +1284,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             window.location.href = json.redirect || '/dashboard';
         } catch (err) {
-            document.getElementById('step5-error').textContent = 'Error de red. Intenta de nuevo.';
+            document.getElementById('step5-error').textContent = @json(__('Error de red. Intenta de nuevo.'));
             document.getElementById('step5-error').classList.remove('hidden');
         }
         return false;

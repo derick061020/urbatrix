@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Expediente — CRM Landmass Bahía Mar')
-@section('page_title', 'Expedientes')
-@section('page_breadcrumb', 'Gestión · Expedientes de clientes · Detalle')
+@section('title', __('Expediente — CRM Landmass Bahía Mar'))
+@section('page_title', __('Expedientes'))
+@section('page_breadcrumb', __('Gestión · Expedientes de clientes · Detalle'))
 @php $activeRoute = 'crm.expedientes'; @endphp
 
 @section('content')
@@ -248,7 +248,7 @@
                                             <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                         @endif
                                         @if($isRequested)
-                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm('¿Eliminar esta solicitud de documento?');">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
+                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm(@json(__('¿Eliminar esta solicitud de documento?')));">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
                                         @endif
                                     </td>
                                 </tr>
@@ -280,7 +280,7 @@
                         @foreach($pendingApprovals as $p)
                             <div class="px-5 py-4 flex items-center gap-4">
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-[13px] font-semibold text-ink-900">{{ $p->label ?? $p->payment_type }} · ${{ number_format((float) $p->amount, 2) }}</div>
+                                    <div class="text-[13px] font-semibold text-ink-900">{{ $p->display_label }} · ${{ number_format((float) $p->amount, 2) }}</div>
                                     <div class="text-[11px] text-ink-500 mt-0.5 truncate">
                                         {{ __('Subido') }} {{ $p->created_at?->diffForHumans() }}
                                         @if($p->payment_method) · {{ $p->payment_method_label }} @endif
@@ -301,7 +301,7 @@
                                     @endif
                                     <form method="POST" action="{{ route('admin.payments.approve', $p->id) }}" class="flex items-center gap-1 m-0">@csrf
                                         <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3" title="{{ __('Aprobar pago') }}"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>
-                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm('¿Rechazar este pago?');"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
+                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm(@json(__('¿Rechazar este pago?')));"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
                                     </form>
                                 </div>
                             </div>
@@ -362,7 +362,7 @@
                                     $st = $p->isPartial() ? ['Parcial','warn'] : ($statusPay[$p->status] ?? ['—','ink-500']);
                                 @endphp
                                 <tr>
-                                    <td class="text-[13px] font-semibold text-ink-900">{{ $p->label ?? $p->payment_type }}</td>
+                                    <td class="text-[13px] font-semibold text-ink-900">{{ $p->display_label }}</td>
                                     <td class="text-[12px] text-ink-700">{{ optional($p->due_date)->format('Y-m-d') }}</td>
                                     <td class="text-[13px] text-ink-700">${{ number_format($p->amount) }}</td>
                                     <td class="text-[13px] font-bold {{ $p->paid_amount > 0 ? 'text-ok-dark' : 'text-ink-400' }}">
@@ -382,7 +382,7 @@
                                             @endif
                                             @if($p->status !== 'paid')
                                                 <button type="button"
-                                                        onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->label ?? $p->payment_type))"
+                                                        onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->display_label))"
                                                         class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
                                             @endif
                                             {{-- Pago ya registrado: adjuntar o reemplazar el recibo firmado/sellado --}}
@@ -542,13 +542,13 @@
                                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="flex-1 m-0">@csrf
                                     <input type="hidden" name="reservation_id" value="{{ $reservation->id }}">
                                     <input type="hidden" name="channel" value="email">
-                                    <input type="hidden" name="message" value="Email enviado al cliente desde acción rápida.">
+                                    <input type="hidden" name="message" value="{{ __('Email enviado al cliente desde acción rápida.') }}">
                                     <button class="crm-btn crm-btn-ghost text-[11px] w-full justify-center"><i class="pi pi-envelope"></i> {{ __('Email') }}</button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.crm.message.send') }}" class="flex-1 m-0">@csrf
                                     <input type="hidden" name="reservation_id" value="{{ $reservation->id }}">
                                     <input type="hidden" name="channel" value="whatsapp">
-                                    <input type="hidden" name="message" value="WhatsApp enviado al cliente desde acción rápida.">
+                                    <input type="hidden" name="message" value="{{ __('WhatsApp enviado al cliente desde acción rápida.') }}">
                                     <button class="crm-btn crm-btn-ghost text-[11px] w-full justify-center"><i class="pi pi-whatsapp"></i> WhatsApp</button>
                                 </form>
                             </div>
@@ -649,7 +649,7 @@ function openWireTransferModal() {
     const content = document.getElementById('wireTransferContent');
 
     modal.classList.remove('hidden');
-    content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="Datos para transferencia en USD" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
+    content.innerHTML = `<iframe id="wire-iframe" src="${wireTransferUrl}" title="{{ __('Datos para transferencia en USD') }}" style="width:794px;max-width:90vw;height:72vh;border:0;display:block;background:#fff"></iframe>`;
 }
 
 // Close wire transfer modal
@@ -692,7 +692,7 @@ function syncSignNow(docId, btn) {
         }
     })
     .catch(err => {
-        alert('Error de red: ' + err.message);
+        alert(@json(__('Error de red: ')) + err.message);
         btn.innerHTML = original;
         btn.disabled = false;
     });

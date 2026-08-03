@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Tareas — CRM Landmass Bahía Mar')
-@section('page_title', 'Tareas')
-@section('page_breadcrumb', 'Equipo · Tareas del día')
+@section('title', __('Tareas — CRM Landmass Bahía Mar'))
+@section('page_title', __('Tareas'))
+@section('page_breadcrumb', __('Equipo · Tareas del día'))
 @php $activeRoute = 'crm.tareas'; @endphp
 
 @section('content')
@@ -14,7 +14,7 @@
     @if(session('success'))<div class="px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="text-[14px] font-semibold text-ink-700">{{ $pendientes->count() }} tareas pendientes</div>
+        <div class="text-[14px] font-semibold text-ink-700">{{ __(':count tareas pendientes', ['count' => $pendientes->count()]) }}</div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-nueva-tarea').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nueva tarea') }}</button>
         </div>
@@ -22,7 +22,7 @@
 
     <div class="flex items-center gap-2">
         @foreach (['todos' => 'Todos','alta' => 'Alta prioridad','media' => 'Media','baja' => 'Baja'] as $slug => $label)
-            <a href="?filtro={{ $slug }}" class="crm-tab {{ (($filtro ?? 'todos') === $slug) ? 'active' : '' }}">{{ $label }}</a>
+            <a href="?filtro={{ $slug }}" class="crm-tab {{ (($filtro ?? 'todos') === $slug) ? 'active' : '' }}">{{ __($label) }}</a>
         @endforeach
     </div>
 
@@ -44,7 +44,7 @@
                     <span class="dot bg-{{ $c }}"></span>
                     <div class="flex-1">
                         <div class="text-[13px] font-medium text-ink-900">{{ $t->title }}</div>
-                        <div class="text-[11px] text-ink-500 mt-0.5"><i class="pi pi-user text-[9px]"></i> {{ $t->responsible ?? 'Sin asignar' }}</div>
+                        <div class="text-[11px] text-ink-500 mt-0.5"><i class="pi pi-user text-[9px]"></i> {{ $t->responsible ?? __('Sin asignar') }}</div>
                     </div>
                     <span class="text-[11px] text-ink-500">{{ $t->due_label ?? optional($t->due_date)->format('d/m') }}</span>
                     <form method="POST" action="{{ route('admin.crm.tareas.delete', $t->id) }}" class="m-0">@csrf @method('DELETE')
@@ -70,7 +70,7 @@
                     <span class="dot bg-ink-300"></span>
                     <div class="flex-1">
                         <div class="text-[13px] font-medium text-ink-400 line-through">{{ $t->title }}</div>
-                        <div class="text-[11px] text-ink-400 mt-0.5"><i class="pi pi-user text-[9px]"></i> {{ $t->responsible ?? 'Para mí' }}</div>
+                        <div class="text-[11px] text-ink-400 mt-0.5"><i class="pi pi-user text-[9px]"></i> {{ $t->responsible ?? __('Para mí') }}</div>
                     </div>
                     <span class="text-[11px] text-ink-400">{{ __('Completado') }}</span>
                 </div>
@@ -91,7 +91,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Fecha límite') }}</label><input type="date" name="due_date" required value="{{ now()->toDateString() }}" class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Prioridad') }}</label><select name="priority" required class="crm-input pl-3 mt-1"><option value="alta">Alta</option><option value="media" selected>{{ __('Media') }}</option><option value="baja">{{ __('Baja') }}</option></select></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Prioridad') }}</label><select name="priority" required class="crm-input pl-3 mt-1"><option value="alta">{{ __('Alta') }}</option><option value="media" selected>{{ __('Media') }}</option><option value="baja">{{ __('Baja') }}</option></select></div>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>

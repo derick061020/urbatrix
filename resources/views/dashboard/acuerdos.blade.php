@@ -23,7 +23,7 @@
             'pseudo' => true,
             'id' => 'budget-'.$reservation->id,
             'document_type' => 'budget',
-            'title' => 'Presupuesto y plan de pagos',
+            'title' => __('Presupuesto y plan de pagos'),
             'status' => $budgetAccepted ? 'approved' : 'pending',
             'created_at' => $reservation->budget_sent_at ?? $reservation->updated_at,
             'signed_at' => null,
@@ -229,7 +229,7 @@
                     @php
                         $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
                         [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
-                        $createdAt = (is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale('es')->isoFormat('D MMM YYYY') : '';
+                        $createdAt = (is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : '';
                         $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
                         $docId = is_object($doc) ? $doc->id : $doc['id'];
 
@@ -293,7 +293,7 @@
                     @php
                         $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
                         [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
-                        $signedAt = (is_object($doc) ? ($doc->signed_at ?? '') : ($doc['signed_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->signed_at : $doc['signed_at'])->locale('es')->isoFormat('D MMM YYYY') : ((is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale('es')->isoFormat('D MMM YYYY') : '');
+                        $signedAt = (is_object($doc) ? ($doc->signed_at ?? '') : ($doc['signed_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->signed_at : $doc['signed_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : ((is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : '');
                         $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
                         $docId = is_object($doc) ? $doc->id : $doc['id'];
                     @endphp
@@ -651,10 +651,10 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
         && (($lastObs['from'] ?? '') === 'client')
         && (($lastObs['kind'] ?? null) !== 'accept');
 
-    if ($signed) $statusLabel = ($isBudget ? 'Aceptado' : 'Firmado');
-    elseif ($accepted) $statusLabel = 'Aceptado · pendiente firma';
-    elseif ($awaitingAdmin) $statusLabel = 'Pendiente de respuesta del asesor';
-    else $statusLabel = 'Pendiente de tu respuesta';
+    if ($signed) $statusLabel = ($isBudget ? __('Aceptado') : __('Firmado'));
+    elseif ($accepted) $statusLabel = __('Aceptado · pendiente firma');
+    elseif ($awaitingAdmin) $statusLabel = __('Pendiente de respuesta del asesor');
+    else $statusLabel = __('Pendiente de tu respuesta');
 
     /* Can-accept / can-sign / can-observe
        La promesa de compraventa se firma directamente: la firma implica la aceptación,
@@ -668,9 +668,9 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     if (!$signed && $isContract) {
         $planDoc = $reservation?->documents->firstWhere('document_type', 'payment_plan');
         if (!$planDoc || !in_array($planDoc->status, ['signed','approved'])) {
-            $signBlocked = 'Primero tenés que firmar el plan de pagos. Una vez firmado, podrás continuar con este contrato.';
+            $signBlocked = __('Primero tenés que firmar el plan de pagos. Una vez firmado, podrás continuar con este contrato.');
         } elseif (!$isPromise && !$accepted) {
-            $signBlocked = 'Aceptá el contrato antes de firmarlo (botón "Aceptar contrato" en Revisar).';
+            $signBlocked = __('Aceptá el contrato antes de firmarlo (botón "Aceptar contrato" en Revisar).');
         }
     }
 
@@ -679,11 +679,11 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     if (($isBudget || $isPayment) && $reservation && $breakdown) {
         $bk = [
             'initial'           => (float) ($breakdown['pago_inicial'] ?? 0),
-            'initial_meta'      => ($reservation->payment_initial_percentage ?? 0).'% + $'.number_format((float)($reservation->legal_costs ?? 0)).' legales',
+            'initial_meta'      => ($reservation->payment_initial_percentage ?? 0).'% + $'.number_format((float)($reservation->legal_costs ?? 0)).' '.__('legales'),
             'construction'      => (float) ($breakdown['pago_construccion'] ?? 0),
             'construction_meta' => ($reservation->payment_construction_percentage ?? 0).'%'
                 . (($reservation->payment_installments ?? 0) > 0
-                    ? ' · '.$reservation->payment_installments.' cuotas de $'.number_format((float)($breakdown['cuota'] ?? 0))
+                    ? ' · '.__(':n cuotas de :amount', ['n' => $reservation->payment_installments, 'amount' => '$'.number_format((float)($breakdown['cuota'] ?? 0))])
                     : ''),
             'delivery'          => (float) ($breakdown['pago_entrega'] ?? 0),
             'delivery_meta'     => ($reservation->payment_delivery_percentage ?? 0).'%',
@@ -703,16 +703,16 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
         'signed'       => $signed,
         'accepted'     => $accepted,
         'awaiting_admin' => $awaitingAdmin,
-        'created'      => ($d['created_at'] ?? '') ? \Carbon\Carbon::parse($d['created_at'])->locale('es')->isoFormat('D MMM YYYY · h:mm A') : '',
+        'created'      => ($d['created_at'] ?? '') ? \Carbon\Carbon::parse($d['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY · h:mm A') : '',
         'advisor'      => $advisorName,
-        'advisor_msg'  => $advisorMsg ?: 'Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.',
+        'advisor_msg'  => $advisorMsg ?: __('Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.'),
         'observations' => collect($observations)->map(function($o) {
             return [
                 'from'    => $o['from'] ?? 'admin',
                 'author'  => $o['author'] ?? null,
                 'message' => $o['message'] ?? ($o['text'] ?? ''),
                 'kind'    => $o['kind'] ?? null,
-                'at'      => isset($o['at']) ? \Carbon\Carbon::parse($o['at'])->locale('es')->isoFormat('D MMM YYYY · h:mm A') : '',
+                'at'      => isset($o['at']) ? \Carbon\Carbon::parse($o['at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY · h:mm A') : '',
             ];
         })->values(),
         'breakdown'    => $bk,
@@ -842,9 +842,9 @@ function acmBuildResumen() {
 function acmGoResumen() {
     const name = document.getElementById('acm-sig-name').value.trim();
     const accept = document.getElementById('acm-sig-accept').checked;
-    if (name.length < 3) { acmToast('Escribí tu nombre completo.', 'err'); return; }
-    if (!acmHasStroke)   { acmToast('Falta tu firma manuscrita.', 'err'); return; }
-    if (!accept)         { acmToast('Aceptá los términos para continuar.', 'err'); return; }
+    if (name.length < 3) { acmToast(@json(__('Escribí tu nombre completo.')), 'err'); return; }
+    if (!acmHasStroke)   { acmToast(@json(__('Falta tu firma manuscrita.')), 'err'); return; }
+    if (!accept)         { acmToast(@json(__('Aceptá los términos para continuar.')), 'err'); return; }
     acmGoTab('resumen');
 }
 
@@ -924,7 +924,7 @@ function openAcuerdoModal(id) {
     const obs = doc.observations || [];
     document.getElementById('acm-conv-count').textContent = obs.length + ' ' + (obs.length === 1 ? 'mensaje' : 'mensajes');
     if (obs.length === 0) {
-        hist.innerHTML = `<div class="text-[11px] text-ink-400">Sin actividad registrada todavía.</div>`;
+        hist.innerHTML = `<div class="text-[11px] text-ink-400">${@json(__('Sin actividad registrada todavía.'))}</div>`;
     } else {
         obs.forEach(o => {
             const isClient = (o.from || '') === 'client';
@@ -1131,9 +1131,9 @@ function submitSignAcuerdo() {
     if (!acmCurrentDoc || !acmCurrentDoc.sign_url) return;
     const name = document.getElementById('acm-sig-name').value.trim();
     const accept = document.getElementById('acm-sig-accept').checked;
-    if (name.length < 3) { acmToast('Escribí tu nombre completo.', 'err'); return; }
-    if (!acmHasStroke)   { acmToast('Falta tu firma manuscrita.', 'err'); return; }
-    if (!accept)         { acmToast('Aceptá los términos para continuar.', 'err'); return; }
+    if (name.length < 3) { acmToast(@json(__('Escribí tu nombre completo.')), 'err'); return; }
+    if (!acmHasStroke)   { acmToast(@json(__('Falta tu firma manuscrita.')), 'err'); return; }
+    if (!accept)         { acmToast(@json(__('Aceptá los términos para continuar.')), 'err'); return; }
 
     const canvas = document.getElementById('acm-sig-canvas');
     const sigData = canvas.toDataURL('image/png');

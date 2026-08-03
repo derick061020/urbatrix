@@ -29,7 +29,7 @@ class GoogleCalendarService
         ?string $organizerEmail = null
     ): array {
         if (! $this->isConfigured()) {
-            throw new RuntimeException('Google Calendar no está configurado en .env');
+            throw new RuntimeException(__('Google Calendar no está configurado en .env'));
         }
 
         $calendarId = config('services.google.calendar_id', 'primary');
@@ -116,7 +116,7 @@ class GoogleCalendarService
 
             $token = $response->json('access_token');
             if (! $token) {
-                throw new RuntimeException('Respuesta inválida de Google al refrescar token.');
+                throw new RuntimeException(__('Respuesta inválida de Google al refrescar token.'));
             }
 
             return $token;

@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Plantillas y Automatizaciones — CRM Landmass Bahía Mar')
-@section('page_title', 'Plantillas y Automatizaciones')
-@section('page_breadcrumb', 'Comunicación · Plantillas y flujo de automatización')
+@section('title', __('Plantillas y Automatizaciones — CRM Landmass Bahía Mar'))
+@section('page_title', __('Plantillas y Automatizaciones'))
+@section('page_breadcrumb', __('Comunicación · Plantillas y flujo de automatización'))
 @php $activeRoute = 'crm.plantillas'; @endphp
 
 @push('styles')
@@ -435,7 +435,7 @@
                     </p>
                     <div id="pa-steps-list" class="space-y-3"></div>
                     <button type="button" class="crm-btn crm-btn-ghost text-[12px] mt-3" onclick="paAddStep()">
-                        <i class="pi pi-plus"></i> Añadir fase
+                        <i class="pi pi-plus"></i> {{ __('Añadir fase') }}
                     </button>
                 </div>
             </div>
@@ -575,7 +575,7 @@
         url.searchParams.set('tab', tab);
         window.history.replaceState({}, '', url);
         const newLabel = document.getElementById('pa-new-label');
-        if (newLabel) newLabel.textContent = tab === 'automatizaciones' ? 'Nueva automatización' : 'Nueva plantilla';
+        if (newLabel) newLabel.textContent = tab === 'automatizaciones' ? @json(__('Nueva automatización')) : @json(__('Nueva plantilla'));
     };
 
     // ---------- Category filters ----------
@@ -637,7 +637,7 @@
         tplForm.reset();
         document.getElementById('pa-tpl-method').value = 'POST';
         tplForm.action = '{{ route('admin.crm.plantillas.store') }}';
-        document.getElementById('pa-tpl-title').textContent = 'Nueva plantilla';
+        document.getElementById('pa-tpl-title').textContent = @json(__('Nueva plantilla'));
         tplForm.querySelectorAll('input[name="channels[]"]').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change')); });
     }
 
@@ -733,7 +733,7 @@
     }
 
     function templateOptionsHtml(selectedId) {
-        let html = '<option value="">— Sin plantilla —</option>';
+        let html = '<option value="">{{ __('— Sin plantilla —') }}</option>';
         TEMPLATE_OPTS.forEach(t => {
             const sel = String(t.id) === String(selectedId) ? ' selected' : '';
             html += `<option value="${t.id}"${sel}>${t.name.replace(/</g,'&lt;')}</option>`;
@@ -767,7 +767,7 @@
                     <select class="pa-select" name="steps[${idx}][template_id]">${templateOptionsHtml(data.template_id)}</select>
                 </div>
                 <div class="pa-field">
-                    <label>Canales de envío *</label>
+                    <label>{{ __('Canales de envío *') }}</label>
                     <div class="flex flex-wrap gap-2">${channelChipsHtml(idx, channels)}</div>
                 </div>
             </div>`;
@@ -802,10 +802,10 @@
             const suffix = card.querySelector('.pa-delay-suffix');
             if (i === 0) {
                 prefix.textContent = 'Esperar';
-                suffix.textContent = 'tras el disparo del evento';
+                suffix.textContent = @json(__('tras el disparo del evento'));
             } else {
                 prefix.textContent = 'Esperar';
-                suffix.textContent = 'tras la fase anterior';
+                suffix.textContent = @json(__('tras la fase anterior'));
             }
             // No permitir eliminar si solo queda una fase
             card.querySelector('.pa-step-remove').style.display = cards.length <= 1 ? 'none' : '';
@@ -823,7 +823,7 @@
         autoForm.reset();
         document.getElementById('pa-auto-method').value = 'POST';
         autoForm.action = '{{ route('admin.crm.automatizaciones.store') }}';
-        document.getElementById('pa-auto-title').textContent = 'Nueva automatización';
+        document.getElementById('pa-auto-title').textContent = @json(__('Nueva automatización'));
         document.getElementById('pa-auto-active').checked = true;
         document.getElementById('pa-auto-active').dispatchEvent(new Event('change'));
         setSteps([{ delay_minutes: 0, channels: ['email'] }]);
@@ -842,7 +842,7 @@
             resetAutoForm();
             document.getElementById('pa-auto-method').value = 'PUT';
             autoForm.action = `${AUTO_BASE}/${id}`;
-            document.getElementById('pa-auto-title').textContent = 'Editar automatización';
+            document.getElementById('pa-auto-title').textContent = @json(__('Editar automatización'));
             document.getElementById('pa-auto-name').value = a.name || '';
             document.getElementById('pa-auto-description').value = a.description || '';
             document.getElementById('pa-auto-trigger').value = a.trigger_event || '';

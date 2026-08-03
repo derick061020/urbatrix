@@ -66,7 +66,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Concepto') }}</label>
-                    <input type="text" name="label" id="rp-label" required value="Cuota 1/24 - Plan de Pagos" class="crm-input pl-3 mt-1">
+                    <input type="text" name="label" id="rp-label" required value="{{ __('Cuota 1/24 - Plan de Pagos') }}" class="crm-input pl-3 mt-1">
                 </div>
             </div>
 
@@ -169,7 +169,7 @@
     function rpBeforeSubmit(form) {
         var upEl = document.getElementById('rp-uploading');
         if (upEl && upEl.value === '1') {
-            alert('Esperá a que termine la subida del comprobante.');
+            alert(@json(__('Esperá a que termine la subida del comprobante.')));
             return false;
         }
         return true;

@@ -28,6 +28,6 @@
     <div style="font-size:14px;font-weight:700;color:#171717;font-family:monospace;letter-spacing:.04em;padding:8px 0;border-top:1px solid #eaecf0;border-bottom:1px solid #eaecf0">{{ $bank['account_number'] }}</div>
 
     <div style="margin-top:16px;padding:10px 12px;background:#fff3eb;border:1px solid #fbd3b4;border-radius:6px;font-size:9px;color:#b45309;line-height:1.55">
-        <span style="font-weight:700">{{ __('Referencia obligatoria:') }}</span> Incluir nombre del cliente y número de unidad en el campo de referencia para evitar la devolución de fondos.
+        <span style="font-weight:700">{{ __('Referencia obligatoria:') }}</span> {{ __('Incluir nombre del cliente y número de unidad en el campo de referencia para evitar la devolución de fondos.') }}
     </div>
 </div>

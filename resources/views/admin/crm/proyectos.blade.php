@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Proyectos — CRM Landmass Bahía Mar')
-@section('page_title', 'Proyectos')
-@section('page_breadcrumb', 'Proyectos · Gestión de proyectos')
+@section('title', __('Proyectos — CRM Landmass Bahía Mar'))
+@section('page_title', __('Proyectos'))
+@section('page_breadcrumb', __('Proyectos · Gestión de proyectos'))
 @php $activeRoute = 'crm.proyectos'; @endphp
 
 @push('styles')
@@ -134,7 +134,7 @@
                 <i class="pi pi-upload text-[11px]"></i> Exportar
             </button>
             <button type="button" onclick="document.getElementById('modal-nuevo-proyecto').showModal()" class="pr-btn pr-btn-primary">
-                <i class="pi pi-plus text-[11px]"></i> Nuevo proyecto
+                <i class="pi pi-plus text-[11px]"></i> {{ __('Nuevo proyecto') }}
             </button>
         </div>
     </div>

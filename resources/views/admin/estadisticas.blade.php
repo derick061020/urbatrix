@@ -224,7 +224,7 @@
                 <div class="px-5 py-3 flex items-center gap-3">
                     <div class="flex-1 min-w-0">
                         <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $client ?: '—' }}</div>
-                        <div class="text-[11px] text-ink-400">{{ $pay->label ?? $pay->payment_type }}{{ optional(optional($r)->unit)->custom_id ? ' · '.$r->unit->custom_id : '' }}</div>
+                        <div class="text-[11px] text-ink-400">{{ $pay->display_label }}{{ optional(optional($r)->unit)->custom_id ? ' · '.$r->unit->custom_id : '' }}</div>
                     </div>
                     <span class="text-[13px] font-bold text-ink-900">${{ number_format((float)$pay->amount, 0) }}</span>
                     <span class="text-[11px] font-bold text-err whitespace-nowrap">{{ $days }} d</span>

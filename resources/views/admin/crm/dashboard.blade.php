@@ -63,7 +63,7 @@
         'tarea'     => 'background:#e8f0ef;color:#053330;',
         'noadv'     => 'background:#ffebec;color:#fb3748;',
     ];
-    $pillShort = ['kyc' => 'KYC', 'documento' => __('Doc.'), 'contrato' => __('Contrato'), 'broker' => 'Broker', 'tarea' => __('Tarea'), 'noadv' => 'S/Asesor'];
+    $pillShort = ['kyc' => 'KYC', 'documento' => __('Doc.'), 'contrato' => __('Contrato'), 'broker' => 'Broker', 'tarea' => __('Tarea'), 'noadv' => __('S/Asesor')];
 
     $bandeja      = $bandeja      ?? collect();
     $bandejaTotal = $bandejaTotal ?? $bandeja->count();
@@ -313,7 +313,7 @@
                                 <div class="crm-progress flex-1">
                                     <span class="{{ ($c->count / $maxCarga) >= 0.85 ? 'bg-warn' : 'bg-brand' }}" style="width:{{ $maxCarga > 0 ? round(($c->count / $maxCarga) * 100) : 0 }}%"></span>
                                 </div>
-                                <span class="text-[12px] font-bold text-ink-500 w-14 text-right shrink-0">{{ $c->count }} exp.</span>
+                                <span class="text-[12px] font-bold text-ink-500 w-14 text-right shrink-0">{{ __(':n exp.', ['n' => $c->count]) }}</span>
                             </div>
                         @empty
                             <div class="py-3 text-center text-[12px] text-ink-500">{{ __('Sin asesores activos.') }}</div>
@@ -360,7 +360,7 @@
                         @php $r = $p->reservation; @endphp
                         <div class="flex items-center gap-3 py-2 border-b border-dashed border-ink-100 last:border-b-0 text-[12px]">
                             <span class="font-bold text-ink-950 w-12 shrink-0">{{ optional($p->due_date)->format('d M') }}</span>
-                            <span class="flex-1 text-ink-500 truncate">{{ $p->label ?? __('Cuota') }} · {{ $r ? trim(($r->first_name ?? '').' '.($r->last_name ?? '')) : '—' }}</span>
+                            <span class="flex-1 text-ink-500 truncate">{{ $p->display_label }} · {{ $r ? trim(($r->first_name ?? '').' '.($r->last_name ?? '')) : '—' }}</span>
                             <span class="font-bold text-ink-900 shrink-0">${{ number_format((float) $p->amount, 0) }}</span>
                         </div>
                     @empty

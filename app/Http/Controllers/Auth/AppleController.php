@@ -71,7 +71,7 @@ class AppleController extends Controller
         } catch (\Throwable $e) {
             Log::error('Apple OAuth Error: ' . $e->getMessage());
 
-            return redirect('/login')->with('error', 'Error al autenticar con Apple. Por favor intenta nuevamente.');
+            return redirect('/login')->with('error', __('Error al autenticar con Apple. Por favor intenta nuevamente.'));
         }
     }
 

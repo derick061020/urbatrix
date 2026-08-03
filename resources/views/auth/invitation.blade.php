@@ -169,8 +169,8 @@
         const p2 = document.getElementById('pw2').value;
         const errBox = document.getElementById('err-box');
         const ok = /[A-Z]/.test(p1) && /\d/.test(p1) && p1.length >= 8;
-        if (!ok)       { errBox.textContent = 'La contraseña no cumple las reglas.'; errBox.classList.remove('hidden'); return false; }
-        if (p1 !== p2) { errBox.textContent = 'Las contraseñas no coinciden.';       errBox.classList.remove('hidden'); return false; }
+        if (!ok)       { errBox.textContent = @json(__('La contraseña no cumple las reglas.')); errBox.classList.remove('hidden'); return false; }
+        if (p1 !== p2) { errBox.textContent = @json(__('Las contraseñas no coinciden.'));       errBox.classList.remove('hidden'); return false; }
 
         const fd = new FormData();
         fd.append('password', p1);
@@ -186,7 +186,7 @@
             errBox.classList.add('hidden');
             window.location.href = json.redirect || '/dashboard';
         } catch (err) {
-            errBox.textContent = 'Error de red. Intenta de nuevo.';
+            errBox.textContent = @json(__('Error de red. Intenta de nuevo.'));
             errBox.classList.remove('hidden');
         }
         return false;

@@ -38,7 +38,7 @@ class ReservationController extends Controller
             \Log::error('Validation failed: ' . json_encode($e->errors()));
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => __('Validation failed'),
                 'errors' => $e->errors()
             ], 422);
         }
@@ -58,7 +58,7 @@ class ReservationController extends Controller
             if (! $myActive) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Esta unidad está reservada hasta '.$unit->reserved_until->format('Y-m-d H:i'),
+                    'message' => __('Esta unidad está reservada hasta ').$unit->reserved_until->format('Y-m-d H:i'),
                 ], 409);
             }
         }
@@ -104,7 +104,7 @@ class ReservationController extends Controller
         // Return JSON response instead of redirect — go to checkout (payment) first
         return response()->json([
             'success' => true,
-            'message' => 'Reservation created successfully',
+            'message' => __('Reservation created successfully'),
             'reservation_code' => $reservation->reservation_code,
             'redirect_to' => '/checkout'
         ]);
@@ -151,10 +151,10 @@ class ReservationController extends Controller
         $reservation = $this->currentReservation();
 
         if (!$reservation) {
-            return redirect('/')->with('error', 'No reservation found. Please start a new reservation.');
+            return redirect('/')->with('error', __('No reservation found. Please start a new reservation.'));
         }
         if ($reservation->isExpired() && $reservation->status === 'pending_payment') {
-            return redirect('/')->with('error', 'Reservation expired. Please start a new reservation.');
+            return redirect('/')->with('error', __('Reservation expired. Please start a new reservation.'));
         }
         // If it was already paid, skip straight to the KYC form
         if ($reservation->paid_at) {
@@ -175,24 +175,24 @@ class ReservationController extends Controller
     {
         $reservation = $this->currentReservation();
         if (!$reservation || $reservation->status !== 'pending_payment') {
-            return response()->json(['success' => false, 'message' => 'Reserva no encontrada o ya procesada.'], 422);
+            return response()->json(['success' => false, 'message' => __('Reserva no encontrada o ya procesada.')], 422);
         }
 
         $secret = config('services.stripe.secret');
         if (empty($secret)) {
-            return response()->json(['success' => false, 'message' => 'Stripe no está configurado. Falta STRIPE_SECRET.'], 500);
+            return response()->json(['success' => false, 'message' => __('Stripe no está configurado. Falta STRIPE_SECRET.')], 500);
         }
 
         // Make sure the unit is still grabbable (not held by someone else / sold)
         Unit::releaseExpiredHolds();
         $unit = Unit::find($reservation->unit_id);
         if (!$unit) {
-            return response()->json(['success' => false, 'message' => 'La unidad ya no está disponible.'], 409);
+            return response()->json(['success' => false, 'message' => __('La unidad ya no está disponible.')], 409);
         }
         if (in_array(strtoupper($unit->status), ['RESERVED', 'SOLD']) && $unit->isOnHold()) {
             $mine = $unit->reserved_by_reservation_id == $reservation->id;
             if (!$mine) {
-                return response()->json(['success' => false, 'message' => 'Esta unidad acaba de ser reservada por otra persona.'], 409);
+                return response()->json(['success' => false, 'message' => __('Esta unidad acaba de ser reservada por otra persona.')], 409);
             }
         }
 
@@ -222,7 +222,7 @@ class ReservationController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::error('Stripe PaymentIntent error: '.$e->getMessage());
-            return response()->json(['success' => false, 'message' => 'No se pudo iniciar el pago. Intenta de nuevo.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo iniciar el pago. Intenta de nuevo.')], 500);
         }
     }
 
@@ -234,7 +234,7 @@ class ReservationController extends Controller
     {
         $reservation = $this->currentReservation();
         if (!$reservation) {
-            return response()->json(['success' => false, 'message' => 'Reserva no encontrada.'], 422);
+            return response()->json(['success' => false, 'message' => __('Reserva no encontrada.')], 422);
         }
 
         // Idempotent: already paid → just succeed
@@ -248,12 +248,12 @@ class ReservationController extends Controller
 
         $secret = config('services.stripe.secret');
         if (empty($secret)) {
-            return response()->json(['success' => false, 'message' => 'Stripe no está configurado.'], 500);
+            return response()->json(['success' => false, 'message' => __('Stripe no está configurado.')], 500);
         }
 
         $intentId = $request->input('payment_intent_id') ?: $reservation->stripe_payment_intent;
         if (!$intentId) {
-            return response()->json(['success' => false, 'message' => 'Falta el identificador de pago.'], 422);
+            return response()->json(['success' => false, 'message' => __('Falta el identificador de pago.')], 422);
         }
 
         try {
@@ -261,11 +261,11 @@ class ReservationController extends Controller
             $intent = \Stripe\PaymentIntent::retrieve($intentId);
 
             if (!$intent || $intent->status !== 'succeeded') {
-                return response()->json(['success' => false, 'message' => 'El pago no se completó.'], 402);
+                return response()->json(['success' => false, 'message' => __('El pago no se completó.')], 402);
             }
             // Guard: the intent must belong to this reservation
             if (($intent->metadata->reservation_id ?? null) != $reservation->id) {
-                return response()->json(['success' => false, 'message' => 'El pago no corresponde a esta reserva.'], 422);
+                return response()->json(['success' => false, 'message' => __('El pago no corresponde a esta reserva.')], 422);
             }
 
             // Mark reservation paid and ready for KYC. Keep 'pending' so the
@@ -330,7 +330,7 @@ class ReservationController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::error('Stripe confirm error: '.$e->getMessage());
-            return response()->json(['success' => false, 'message' => 'No se pudo verificar el pago.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo verificar el pago.')], 500);
         }
     }
 
@@ -348,7 +348,7 @@ class ReservationController extends Controller
         }
 
         if (!$reservationData) {
-            return redirect('/')->with('error', 'No reservation found. Please start a new reservation.');
+            return redirect('/')->with('error', __('No reservation found. Please start a new reservation.'));
         }
 
         // Convert array to Reservation object if needed
@@ -364,7 +364,7 @@ class ReservationController extends Controller
         // La expiración solo bloquea reservas que aún están pendientes de confirmar;
         // una reserva confirmada (KYC en curso) sigue siendo accesible.
         if ($reservation->status === 'pending' && $reservation->isExpired()) {
-            return redirect('/')->with('error', 'Reservation expired. Please start a new reservation.');
+            return redirect('/')->with('error', __('Reservation expired. Please start a new reservation.'));
         }
 
         // Get unit information for display
@@ -698,7 +698,7 @@ class ReservationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Reservation confirmed successfully',
+                'message' => __('Reservation confirmed successfully'),
                 'reservation' => $reservation
             ]);
 
@@ -706,7 +706,7 @@ class ReservationController extends Controller
             \Log::error('Error updating reservation: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating reservation: ' . $e->getMessage()
+                'message' => __('Error updating reservation: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -726,7 +726,7 @@ class ReservationController extends Controller
         if ($reservation->isExpired()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Reservation has expired'
+                'message' => __('Reservation has expired')
             ]);
         }
 
@@ -743,7 +743,7 @@ class ReservationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Reservation confirmed successfully',
+            'message' => __('Reservation confirmed successfully'),
             'reservation' => $reservation
         ]);
     }

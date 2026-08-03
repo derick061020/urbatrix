@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Mi Perfil — CRM Landmass Bahía Mar')
-@section('page_title', 'Mi Perfil')
-@section('page_breadcrumb', 'Cuenta · Editar perfil')
+@section('title', __('Mi Perfil — CRM Landmass Bahía Mar'))
+@section('page_title', __('Mi Perfil'))
+@section('page_breadcrumb', __('Cuenta · Editar perfil'))
 @php $activeRoute = 'crm.profile'; @endphp
 
 @section('content')
@@ -54,7 +54,7 @@
 
                 <div class="flex flex-col gap-2">
                     <label class="crm-btn crm-btn-primary cursor-pointer">
-                        <i class="pi pi-upload"></i> Subir nueva foto
+                        <i class="pi pi-upload"></i> {{ __('Subir nueva foto') }}
                         <input type="file" name="avatar" id="avatar-input" accept="image/png,image/jpeg,image/webp" class="hidden">
                     </label>
                     @if($user->avatar)

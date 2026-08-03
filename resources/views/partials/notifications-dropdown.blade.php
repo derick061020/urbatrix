@@ -146,7 +146,7 @@
 
     function render() {
         if (!cache.items || cache.items.length === 0) {
-            list.innerHTML = '<div class="notif-empty"><i class="pi pi-inbox"></i>No tienes notificaciones</div>';
+            list.innerHTML = '<div class="notif-empty"><i class="pi pi-inbox"></i>'+@json(__('No tienes notificaciones'))+'</div>';
             return;
         }
         let html = '';
@@ -174,7 +174,7 @@
             if (panel.classList.contains('open')) render();
             else if (initial) render();
         } catch (e) {
-            if (initial) list.innerHTML = '<div class="notif-empty"><i class="pi pi-exclamation-triangle"></i>No se pudieron cargar</div>';
+            if (initial) list.innerHTML = '<div class="notif-empty"><i class="pi pi-exclamation-triangle"></i>'+@json(__('No se pudieron cargar'))+'</div>';
         }
     }
 

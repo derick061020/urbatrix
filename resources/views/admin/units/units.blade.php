@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Unidades — CRM Landmass Bahía Mar')
-@section('page_title', 'Unidades')
-@section('page_breadcrumb', 'Proyectos · Gestión de unidades')
+@section('title', __('Unidades — CRM Landmass Bahía Mar'))
+@section('page_title', __('Unidades'))
+@section('page_breadcrumb', __('Proyectos · Gestión de unidades'))
 @php $activeRoute = 'units'; @endphp
 
 @section('content')
@@ -580,7 +580,7 @@
     bulkBtn?.addEventListener('click', function () {
         const ids = selectedIds();
         if (ids.length === 0) return;
-        if (!confirm('¿Eliminar ' + ids.length + ' unidad(es) seleccionada(s)? Esta acción no se puede deshacer.')) return;
+        if (!confirm(@json(__('¿Eliminar :count unidad(es) seleccionada(s)? Esta acción no se puede deshacer.')).replace(':count', ids.length))) return;
         bulkForm.querySelectorAll('input[name="ids[]"]').forEach(n => n.remove());
         ids.forEach(id => {
             const h = document.createElement('input');

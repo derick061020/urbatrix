@@ -247,7 +247,7 @@ class BrokerController extends Controller
 
         if ($exists) {
             return back()->withInput()->with('error',
-                'Este cliente ya figura en la base de datos. El registro se bloquea; puedes solicitar revisión al administrador.');
+                __('Este cliente ya figura en la base de datos. El registro se bloquea; puedes solicitar revisión al administrador.'));
         }
 
         $unit  = $data['unit_id'] ? Unit::find($data['unit_id']) : null;

@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Mi Contrato — Portal Broker')
-@section('page_title', 'Mi Contrato')
-@section('page_breadcrumb', 'Portal Broker · Mi contrato')
+@section('title', __('Mi Contrato — Portal Broker'))
+@section('page_title', __('Mi Contrato'))
+@section('page_breadcrumb', __('Portal Broker · Mi contrato'))
 
 @section('content')
 @php $c = config('company'); @endphp

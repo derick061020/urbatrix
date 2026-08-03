@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Mi cartera — Portal Broker')
-@section('page_title', 'Mi cartera de clientes')
-@section('page_breadcrumb', 'Portal Broker · Clientes')
+@section('title', __('Mi cartera — Portal Broker'))
+@section('page_title', __('Mi cartera de clientes'))
+@section('page_breadcrumb', __('Portal Broker · Clientes'))
 
 @section('content')
 @php
@@ -40,14 +40,14 @@
                 @empty
                     <tr><td colspan="5" class="px-5 py-12 text-center text-[12px] text-ink-400">
                         <i class="pi pi-users text-[26px] text-ink-300 block mb-3"></i>
-                        Aún no tienes clientes en tu cartera. Registra el primero para empezar.
+                        {{ __('Aún no tienes clientes en tu cartera. Registra el primero para empezar.') }}
                     </td></tr>
                 @endforelse
             </tbody>
         </table>
         @if($clients->count())
             <div class="px-5 py-3 border-t border-ink-100 text-[11px] text-ink-400">
-                La reserva va aparte y no genera comisión. La comisión se libera al ritmo en que el cliente paga su inicial.
+                {{ __('La reserva va aparte y no genera comisión. La comisión se libera al ritmo en que el cliente paga su inicial.') }}
             </div>
         @endif
     </div>

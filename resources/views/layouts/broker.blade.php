@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Portal Broker — BAHÍA MAR · Landmass')</title>
+    <title>@yield('title', __('Portal Broker').' — BAHÍA MAR · Landmass')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -65,49 +65,53 @@
 
         <nav class="flex-1 overflow-y-auto pt-3 pb-3 pr-1">
             <a href="{{ route('broker.dashboard') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'dashboard' ? 'active' : '' }}">
-                <i class="pi pi-th-large"></i> Dashboard
+                <i class="pi pi-th-large"></i> {{ __('Dashboard') }}
             </a>
 
             <div class="brk-nav-section">{{ __('Clientes') }}</div>
             <a href="{{ route('broker.cartera') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'cartera' ? 'active' : '' }}">
-                <i class="pi pi-users"></i> Mi cartera
+                <i class="pi pi-users"></i> {{ __('Mi cartera') }}
             </a>
             <a href="{{ route('broker.registro') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'registro' ? 'active' : '' }}">
-                <i class="pi pi-user-plus"></i> Registrar cliente
+                <i class="pi pi-user-plus"></i> {{ __('Registrar cliente') }}
             </a>
 
             <div class="brk-nav-section">{{ __('Ventas') }}</div>
             <a href="{{ route('broker.inventario') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'inventario' ? 'active' : '' }}">
-                <i class="pi pi-building"></i> Inventario en vivo
+                <i class="pi pi-building"></i> {{ __('Inventario en vivo') }}
             </a>
             <a href="{{ route('broker.herramientas') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'herramientas' ? 'active' : '' }}">
-                <i class="pi pi-wrench"></i> Herramientas de venta
+                <i class="pi pi-wrench"></i> {{ __('Herramientas de venta') }}
             </a>
             <a href="{{ route('broker.material') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'material' ? 'active' : '' }}">
-                <i class="pi pi-folder-open"></i> Material de ventas
+                <i class="pi pi-folder-open"></i> {{ __('Material de ventas') }}
             </a>
 
             <div class="brk-nav-section">{{ __('Comisiones') }}</div>
             <a href="{{ route('broker.comisiones') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'comisiones' ? 'active' : '' }}">
-                <i class="pi pi-dollar"></i> Estado de cuenta
+                <i class="pi pi-dollar"></i> {{ __('Estado de cuenta') }}
             </a>
             <a href="{{ route('broker.calculadora') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'calculadora' ? 'active' : '' }}">
-                <i class="pi pi-calculator"></i> Calculadora
+                <i class="pi pi-calculator"></i> {{ __('Calculadora') }}
             </a>
             <a href="{{ route('broker.simulador') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'simulador' ? 'active' : '' }}">
-                <i class="pi pi-chart-line"></i> Simulador de cobro
+                <i class="pi pi-chart-line"></i> {{ __('Simulador de cobro') }}
             </a>
 
             <div class="brk-nav-section">{{ __('Crecimiento') }}</div>
             <a href="{{ route('broker.metas') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'metas' ? 'active' : '' }}">
-                <i class="pi pi-star"></i> Metas e incentivos
+                <i class="pi pi-star"></i> {{ __('Metas e incentivos') }}
             </a>
 
             <div class="brk-nav-section">{{ __('Cuenta') }}</div>
             <a href="{{ route('broker.contrato') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'contrato' ? 'active' : '' }}">
-                <i class="pi pi-file-edit"></i> Mi contrato
+                <i class="pi pi-file-edit"></i> {{ __('Mi contrato') }}
             </a>
         </nav>
+
+        <div class="rounded-xl bg-white border border-ink-200 p-2 mb-2 flex justify-center">
+            @include('partials.language-toggle')
+        </div>
 
         <div class="rounded-xl bg-white border border-ink-200 p-3 flex items-center gap-2.5">
             <span class="brk-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'B', 0, 1)) }}</span>
@@ -125,8 +129,8 @@
     <div class="flex-1 min-w-0 flex flex-col">
         <header id="brk-topbar" class="rounded-xl bg-white border border-ink-200 px-4 sm:px-6 py-3 flex items-center gap-4 mb-3">
             <div class="min-w-0">
-                <div class="font-display text-[16px] font-bold text-ink-950 leading-tight">@yield('page_title', 'Portal Broker')</div>
-                <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', 'Landmass')</div>
+                <div class="font-display text-[16px] font-bold text-ink-950 leading-tight">@yield('page_title', __('Portal Broker'))</div>
+                <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', __('Landmass'))</div>
             </div>
             @if(($previewAdmin ?? false))
                 <span class="ml-auto brk-pill bg-warn-soft text-warn-dark">{{ __('Vista admin') }}</span>

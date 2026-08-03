@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Calendario — BAHÍA MAR')
-@section('page_title', 'Mi Propiedad')
-@section('page_breadcrumb', 'Mi Propiedad · Calendario')
+@section('title', __('Calendario — BAHÍA MAR'))
+@section('page_title', __('Mi Propiedad'))
+@section('page_breadcrumb', __('Mi Propiedad · Calendario'))
 @php $activeRoute = 'calendario'; @endphp
 
 @section('content')
@@ -73,9 +73,9 @@
         <div class="flex items-baseline gap-2 mr-1">
             <h2 class="text-[18px] font-bold text-ink-950 leading-none" id="date-range-label">
                 @if($start->isSameMonth($end))
-                    {{ $start->locale('es')->isoFormat('D') }} – {{ $end->locale('es')->isoFormat('D MMMM YYYY') }}
+                    {{ $start->locale(app()->getLocale())->isoFormat('D') }} – {{ $end->locale(app()->getLocale())->isoFormat('D MMMM YYYY') }}
                 @else
-                    {{ $start->locale('es')->isoFormat('D MMM') }} – {{ $end->locale('es')->isoFormat('D MMM YYYY') }}
+                    {{ $start->locale(app()->getLocale())->isoFormat('D MMM') }} – {{ $end->locale(app()->getLocale())->isoFormat('D MMM YYYY') }}
                 @endif
             </h2>
         </div>
@@ -118,7 +118,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="text-[13px] font-bold text-ink-950">{{ __('¡Videollamada agendada!') }}</div>
                     <div class="text-[12px] text-ink-500">
-                        {{ $highlightMeeting->start->locale('es')->isoFormat('ddd D [de] MMMM, HH:mm') }} hs · Este es tu link de Google Meet
+                        {{ $highlightMeeting->start->locale(app()->getLocale())->isoFormat(__('ddd D [de] MMMM, HH:mm')) }} {{ __('hs · Este es tu link de Google Meet') }}
                     </div>
                     @if($highlightMeeting->meet_link)
                         <div class="text-[11px] text-ok-dark truncate mt-0.5">{{ $highlightMeeting->meet_link }}</div>
@@ -142,7 +142,7 @@
             @foreach($topCards as $e)
                 @php
                     [$bg, $fg] = $typeColors[$e->type] ?? ['#f2f5f8', '#525866'];
-                    $whenLabel = $e->start->isToday() ? 'Hoy' : $e->start->locale('es')->isoFormat('D MMM YYYY');
+                    $whenLabel = $e->start->isToday() ? 'Hoy' : $e->start->locale(app()->getLocale())->isoFormat('D MMM YYYY');
                     $statusColor = match(true) {
                         $e->start->isToday()    => '#1fc16b',
                         $e->start->isPast()     => '#fb3748',
@@ -187,7 +187,7 @@
                             @if($d->isToday())
                                 <span class="dot" style="background:#1fc16b"></span>
                             @endif
-                            <span>{{ $d->locale('es')->isoFormat('ddd DD') }}</span>
+                            <span>{{ $d->locale(app()->getLocale())->isoFormat('ddd DD') }}</span>
                         </div>
                     </div>
                 @endforeach

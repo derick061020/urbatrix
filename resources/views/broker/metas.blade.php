@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Metas e incentivos — Portal Broker')
-@section('page_title', 'Metas e incentivos')
-@section('page_breadcrumb', 'Portal Broker · Crecimiento')
+@section('title', __('Metas e incentivos — Portal Broker'))
+@section('page_title', __('Metas e incentivos'))
+@section('page_breadcrumb', __('Portal Broker · Crecimiento'))
 
 @section('content')
 @php

@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Mi Perfil — BAHÍA MAR')
-@section('page_title', 'Mi Perfil')
-@section('page_breadcrumb', 'Mi portal · Editar perfil')
+@section('title', __('Mi Perfil — BAHÍA MAR'))
+@section('page_title', __('Mi Perfil'))
+@section('page_breadcrumb', __('Mi portal · Editar perfil'))
 @php $activeRoute = 'profile'; @endphp
 
 @section('content')

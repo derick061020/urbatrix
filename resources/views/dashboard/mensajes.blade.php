@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Mensajes — BAHÍA MAR')
-@section('page_title', 'Mensajes')
-@section('page_breadcrumb', 'Mi portal · Mensajes')
+@section('title', __('Mensajes — BAHÍA MAR'))
+@section('page_title', __('Mensajes'))
+@section('page_breadcrumb', __('Mi portal · Mensajes'))
 @php $activeRoute = 'messages'; @endphp
 
 @section('content')
@@ -49,7 +49,7 @@
             @foreach($messages as $m)
                 @php
                     $created = $m->created_at;
-                    $day = $created->isSameDay($today) ? 'HOY' : ($created->isSameDay($yesterday) ? 'AYER' : $created->locale('es')->isoFormat('D MMM YYYY'));
+                    $day = $created->isSameDay($today) ? 'HOY' : ($created->isSameDay($yesterday) ? 'AYER' : $created->locale(app()->getLocale())->isoFormat('D MMM YYYY'));
                     $showHeader = $day !== $lastDay;
                     $lastDay = $day;
                     $isClient = $m->sender_role === 'client';

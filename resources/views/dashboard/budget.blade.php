@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Presupuesto — BAHÍA MAR')
-@section('page_title', 'Presupuesto')
-@section('page_breadcrumb', 'Mi Propiedad · Presupuesto')
+@section('title', __('Presupuesto — BAHÍA MAR'))
+@section('page_title', __('Presupuesto'))
+@section('page_breadcrumb', __('Mi Propiedad · Presupuesto'))
 @php $activeRoute = 'mi-propiedad'; @endphp
 
 @section('content')
@@ -209,17 +209,17 @@ async function sendObservation(e) {
         });
         const data = await res.json();
         if (data.success) {
-            btn.innerHTML = '<i class="pi pi-check"></i> ¡Enviado!';
+            btn.innerHTML = '<i class="pi pi-check"></i> ' + @json(__('¡Enviado!'));
             setTimeout(() => { window.location.reload(); }, 1000);
         } else {
             alert(data.message || 'Error al enviar observación.');
             btn.disabled = false;
-            btn.innerHTML = '<i class="pi pi-send"></i> Enviar observación';
+            btn.innerHTML = '<i class="pi pi-send"></i> ' + @json(__('Enviar observación'));
         }
     } catch (err) {
         alert('{{ __("Error de red. Intenta de nuevo.") }}');
         btn.disabled = false;
-        btn.innerHTML = '<i class="pi pi-send"></i> Enviar observación';
+        btn.innerHTML = '<i class="pi pi-send"></i> ' + @json(__('Enviar observación'));
     }
     return false;
 }
@@ -247,7 +247,7 @@ async function acceptBudget(e) {
         });
         const data = await res.json();
         if (data.success) {
-            btn.innerHTML = '<i class="pi pi-check-circle"></i> ¡Aceptado!';
+            btn.innerHTML = '<i class="pi pi-check-circle"></i> ' + @json(__('¡Aceptado!'));
             btn.className = 'cli-btn bg-ok text-white shrink-0';
             setTimeout(() => { window.location.href = data.redirect || '{{ route("dashboard") }}'; }, 1500);
         } else {

@@ -21,7 +21,7 @@ class BrokerMiddleware
         }
 
         if ($user->role !== 'broker' && ! $user->is_admin) {
-            abort(403, 'Acceso exclusivo para brokers.');
+            abort(403, __('Acceso exclusivo para brokers.'));
         }
 
         return $next($request);

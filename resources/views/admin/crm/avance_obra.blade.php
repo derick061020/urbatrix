@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Avance de Obra — CRM Landmass Bahía Mar')
-@section('page_title', 'Avance de Obra')
-@section('page_breadcrumb', 'Proyectos · Avance de obra')
+@section('title', __('Avance de Obra — CRM Landmass Bahía Mar'))
+@section('page_title', __('Avance de Obra'))
+@section('page_breadcrumb', __('Proyectos · Avance de obra'))
 @php $activeRoute = 'crm.avance-obra'; @endphp
 
 @section('content')

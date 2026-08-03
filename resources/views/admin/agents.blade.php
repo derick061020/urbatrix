@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Brokers — CRM Landmass Bahía Mar')
-@section('page_title', 'Brokers')
-@section('page_breadcrumb', 'Equipo · Brokers con acceso al panel')
+@section('title', __('Brokers — CRM Landmass Bahía Mar'))
+@section('page_title', __('Brokers'))
+@section('page_breadcrumb', __('Equipo · Brokers con acceso al panel'))
 @php $activeRoute = 'agents'; @endphp
 
 @section('content')
@@ -126,7 +126,7 @@
                             </td>
                             <td class="text-right">
                                 <form method="POST" action="{{ route('admin.agents.delete', $b->id) }}" class="m-0 inline"
-                                      onsubmit="return confirm('¿Eliminar broker {{ $b->name }}?');">
+                                      onsubmit="return confirm({{ Js::from(__('¿Eliminar broker :name?', ['name' => $b->name])) }});">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-[12px] text-err font-semibold hover:underline">{{ __('Eliminar') }}</button>
                                 </form>
@@ -241,7 +241,7 @@
         } else {
             body.innerHTML = '<div class="text-center py-10">'
                 + '<div class="w-14 h-14 mx-auto rounded-xl bg-ink-100 flex items-center justify-center text-ink-500 mb-3"><i class="pi pi-file text-[22px]"></i></div>'
-                + '<div class="text-[13px] text-ink-600">Este formato no admite vista previa.</div>'
+                + '<div class="text-[13px] text-ink-600">{{ __('Este formato no admite vista previa.') }}</div>'
                 + '<div class="text-[12px] text-ink-400 mt-1">Usá el botón <b>Descargar</b> para abrirlo.</div></div>';
         }
         document.getElementById('brkDocPreview').showModal();

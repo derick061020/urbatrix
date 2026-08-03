@@ -49,7 +49,7 @@ class AdminMiddleware
         if (auth()->user()->role === 'broker') {
             $routeName = $request->route()?->getName();
             if ($routeName && ! in_array($routeName, self::BROKER_ALLOWED_ROUTES, true)) {
-                abort(403, 'No tienes acceso a esta sección.');
+                abort(403, __('No tienes acceso a esta sección.'));
             }
         }
 

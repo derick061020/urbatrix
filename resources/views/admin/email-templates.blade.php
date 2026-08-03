@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Email Templates - Admin Panel')
+@section('title', __('Email Templates - Admin Panel'))
 
 @php
     $activeRoute = 'email-templates';
