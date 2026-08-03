@@ -37,7 +37,7 @@ class PaymentService
         $payments[] = [
             'payment_type' => 'initial',
             'installment_number' => null,
-            'label' => 'Pago Inicial (' . $breakdown['porcentaje_inicial'] . '% + $' . number_format($breakdown['costos_legales'], 0) . ' legales)',
+            'label' => __('Pago inicial').' ('.$breakdown['porcentaje_inicial'].'% + $'.number_format($breakdown['costos_legales'], 0).' '.__('legales').')',
             'amount' => $breakdown['pago_inicial'],
             'due_date' => $startDate->format('Y-m-d'),
             'status' => 'pending',
@@ -54,7 +54,7 @@ class PaymentService
                 $payments[] = [
                     'payment_type' => 'installment',
                     'installment_number' => $i,
-                    'label' => 'Cuota ' . $i . ' de ' . $breakdown['cantidad_cuotas'],
+                    'label' => __('Cuota :n de :total', ['n' => $i, 'total' => $breakdown['cantidad_cuotas']]),
                     'amount' => $breakdown['cuota'],
                     'due_date' => $fecha->format('Y-m-d'),
                     'status' => 'pending',
@@ -67,7 +67,7 @@ class PaymentService
             $payments[] = [
                 'payment_type' => 'construction',
                 'installment_number' => null,
-                'label' => 'Pago en Construcción (' . $breakdown['porcentaje_construccion'] . '%)',
+                'label' => __('Pago en construcción').' ('.$breakdown['porcentaje_construccion'].'%)',
                 'amount' => $breakdown['pago_construccion'],
                 'due_date' => $dueDate->format('Y-m-d'),
                 'status' => 'pending',
@@ -81,7 +81,7 @@ class PaymentService
             $payments[] = [
                 'payment_type' => 'delivery',
                 'installment_number' => null,
-                'label' => 'Pago en Entrega (' . $breakdown['porcentaje_entrega'] . '%)',
+                'label' => __('Pago en entrega').' ('.$breakdown['porcentaje_entrega'].'%)',
                 'amount' => $breakdown['pago_entrega'],
                 'due_date' => $dueDate->format('Y-m-d'),
                 'status' => 'pending',
@@ -132,7 +132,7 @@ class PaymentService
     public static function processPayment(Payment $payment, $receiptFile, $paymentMethod = 'transfer')
     {
         if (!$receiptFile) {
-            throw new \Exception('Debe adjuntar un comprobante de pago');
+            throw new \Exception(__('Debe adjuntar un comprobante de pago'));
         }
         
         // Upload receipt

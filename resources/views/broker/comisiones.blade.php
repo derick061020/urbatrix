@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Estado de cuenta — Portal Broker')
-@section('page_title', 'Estado de cuenta')
-@section('page_breadcrumb', 'Portal Broker · Comisiones')
+@section('title', __('Estado de cuenta — Portal Broker'))
+@section('page_title', __('Estado de cuenta'))
+@section('page_breadcrumb', __('Portal Broker · Comisiones'))
 
 @section('content')
 @php
@@ -24,10 +24,10 @@
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $cards = [
-            ['Cobradas',        $kpis['paid'],    '#1fc16b', $kpis['paid']['count'].' liquidaciones'],
-            ['Por cobrar',      $kpis['pending'], '#fa7319', $kpis['pending']['count'].' en proceso'],
-            ['Vencidas',        $kpis['overdue'], '#fb3748', $kpis['overdue']['count'].' en mora'],
-            ['Total acumulado', $kpis['total'],   '#cacfd8', $kpis['total']['count'].' pagos'],
+            [__('Cobradas'),        $kpis['paid'],    '#1fc16b', __(':n liquidaciones', ['n' => $kpis['paid']['count']])],
+            [__('Por cobrar'),      $kpis['pending'], '#fa7319', __(':n en proceso', ['n' => $kpis['pending']['count']])],
+            [__('Vencidas'),        $kpis['overdue'], '#fb3748', __(':n en mora', ['n' => $kpis['overdue']['count']])],
+            [__('Total acumulado'), $kpis['total'],   '#cacfd8', __(':n pagos', ['n' => $kpis['total']['count']])],
         ]; @endphp
         @foreach($cards as [$label, $data, $color, $sub])
             <div class="brk-card p-4" style="border-top:3px solid {{ $color }}">
@@ -86,9 +86,9 @@
                 @empty
                     <tr><td colspan="5" class="px-5 py-10 text-center text-[12px] text-ink-400">
                         @if(!$agent)
-                            Tu usuario aún no está vinculado a un perfil de agente. Contacta a Duna para activar tus comisiones.
+                            {{ __('Tu usuario aún no está vinculado a un perfil de agente. Contacta a Duna para activar tus comisiones.') }}
                         @else
-                            Todavía no tienes cierres registrados.
+                            {{ __('Todavía no tienes cierres registrados.') }}
                         @endif
                     </td></tr>
                 @endforelse

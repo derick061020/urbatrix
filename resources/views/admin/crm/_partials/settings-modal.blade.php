@@ -302,7 +302,7 @@
         <aside class="st-sidebar">
             <div class="st-section-label">{{ __('Configuración Personal') }}</div>
             <button type="button" class="st-nav-item active" data-st-pane="profile">
-                <i class="pi pi-user"></i> Información Personal
+                <i class="pi pi-user"></i> {{ __('Información Personal') }}
                 <i class="pi pi-angle-right chev"></i>
             </button>
             <button type="button" class="st-nav-item" data-st-pane="security">
@@ -332,7 +332,7 @@
 
             {{-- Cerrar sesión — anclado al fondo del sidebar --}}
             <button type="button" class="st-nav-item st-logout" onclick="(window.openLogoutModal ? openLogoutModal() : document.getElementById('stLogoutFallback')?.submit())">
-                <i class="pi pi-sign-out"></i> Cerrar sesión
+                <i class="pi pi-sign-out"></i> {{ __('Cerrar sesión') }}
             </button>
             <form id="stLogoutFallback" method="POST" action="{{ route($stLogoutRoute) }}" class="hidden">@csrf</form>
         </aside>
@@ -586,7 +586,7 @@
                     <div class="st-row compact">
                         <div>
                             <div class="st-row-label">
-                                Autenticación 2FA
+                                {{ __('Autenticación 2FA') }}
                                 <span id="st2faBadge" class="st-2fa-badge {{ $st2faOn ? 'on' : '' }}">{{ $st2faOn ? 'Activa' : 'Inactiva' }}</span>
                             </div>
                             <div class="st-row-desc">{{ __('Agrega una capa extra de protección a tu cuenta.') }}</div>
@@ -737,7 +737,7 @@
                         {{-- Entidad / cargo --}}
                         <div style="margin-bottom:6px;">
                             <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Entidad / representación') }}</div>
-                            <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="Ej: En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L."
+                            <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="{{ __('Ej: En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L.') }}"
                                    style="width:100%; max-width:420px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
                             <div class="st-row-desc" style="margin-top:6px;">{{ __('Si dejás estos campos vacíos, el contrato usa los datos por defecto del documento.') }}</div>
                         </div>
@@ -1120,7 +1120,7 @@
             if (window.QRCode) {
                 new QRCode(qrBox, { text: data.otpauth_uri, width: 152, height: 152, correctLevel: QRCode.CorrectLevel.M });
             } else {
-                qrBox.innerHTML = '<span style="font-size:11px;color:#99a0ae;text-align:center;">No se pudo cargar el QR. Usá la clave manual.</span>';
+                qrBox.innerHTML = '<span style="font-size:11px;color:#99a0ae;text-align:center;">' + @json(__('No se pudo cargar el QR. Usá la clave manual.')) + '</span>';
             }
         } catch (e) { stShowAlert(e.message, 'err'); }
     };
@@ -1642,8 +1642,8 @@
             card.innerHTML =
                 '<img src="' + src + '" alt="">' +
                 '<div class="hs-card-actions">' +
-                    '<button type="button" title="Mover a la izquierda" data-hs-move="-1" ' + (i === 0 ? 'disabled' : '') + '><i class="pi pi-arrow-left"></i></button>' +
-                    '<button type="button" title="Mover a la derecha" data-hs-move="1" ' + (i === hsData.length - 1 ? 'disabled' : '') + '><i class="pi pi-arrow-right"></i></button>' +
+                    '<button type="button" title="{{ __('Mover a la izquierda') }}" data-hs-move="-1" ' + (i === 0 ? 'disabled' : '') + '><i class="pi pi-arrow-left"></i></button>' +
+                    '<button type="button" title="{{ __('Mover a la derecha') }}" data-hs-move="1" ' + (i === hsData.length - 1 ? 'disabled' : '') + '><i class="pi pi-arrow-right"></i></button>' +
                     '<button type="button" class="hs-del" title="Quitar imagen" data-hs-del><i class="pi pi-trash"></i></button>' +
                 '</div>';
             card.querySelector('[data-hs-del]').addEventListener('click', () => {

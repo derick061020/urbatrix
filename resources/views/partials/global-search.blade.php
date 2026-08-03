@@ -28,7 +28,7 @@
         activeIdx = -1;
 
         if (!groups || groups.length === 0) {
-            dropdown.innerHTML = '<div class="search-dropdown__empty">Sin resultados para “'+escapeHtml(q)+'”</div>';
+            dropdown.innerHTML = '<div class="search-dropdown__empty">'+@json(__('Sin resultados para “:q”')).replace(':q', escapeHtml(q))+'</div>';
             return;
         }
 
@@ -63,7 +63,7 @@
 
     async function runSearch(q) {
         if (q.length < 2) {
-            dropdown.innerHTML = '<div class="search-dropdown__empty">Escribe al menos 2 caracteres…</div>';
+            dropdown.innerHTML = '<div class="search-dropdown__empty">'+@json(__('Escribe al menos 2 caracteres…'))+'</div>';
             open();
             return;
         }
@@ -86,7 +86,7 @@
             render(json.groups || [], q);
         } catch (err) {
             if (err.name === 'AbortError') return;
-            dropdown.innerHTML = '<div class="search-dropdown__empty">Error al buscar. Intenta de nuevo.</div>';
+            dropdown.innerHTML = '<div class="search-dropdown__empty">'+@json(__('Error al buscar. Intenta de nuevo.'))+'</div>';
         }
     }
 

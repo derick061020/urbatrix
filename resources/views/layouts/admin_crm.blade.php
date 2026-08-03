@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'CRM Duna - Makai')</title>
+    <title>@yield('title', __('CRM Duna - Makai'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -450,11 +450,11 @@
                 <i class="pi pi-bars"></i>
             </button>
             <div class="flex-1 min-w-0">
-                <h1 class="font-display text-[18px] sm:text-[22px] font-semibold text-ink-950 leading-tight tracking-tight truncate">@yield('page_title', 'Dashboard')</h1>
-                <p class="text-[11px] sm:text-[12px] text-ink-500 leading-tight mt-0.5 truncate">@yield('page_breadcrumb', 'Vista general')</p>
+                <h1 class="font-display text-[18px] sm:text-[22px] font-semibold text-ink-950 leading-tight tracking-tight truncate">@yield('page_title', __('Dashboard'))</h1>
+                <p class="text-[11px] sm:text-[12px] text-ink-500 leading-tight mt-0.5 truncate">@yield('page_breadcrumb', __('Vista general'))</p>
             </div>
             <div class="topbar-date hidden md:flex items-center text-[12px] text-ink-500 whitespace-nowrap">
-                {{ \Carbon\Carbon::now()->locale(app()->getLocale())->isoFormat(app()->getLocale() === 'es' ? 'dddd, D [de] MMMM [de] YYYY' : 'dddd, MMMM D, YYYY') }}
+                {{ \Carbon\Carbon::now()->locale(app()->getLocale())->isoFormat(__('dddd, D [de] MMMM [de] YYYY')) }}
             </div>
             <div class="topbar-search-wrap relative w-64 hidden md:block" data-search="admin">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>

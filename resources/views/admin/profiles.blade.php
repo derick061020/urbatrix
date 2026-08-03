@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Usuarios — CRM Duna Makai')
-@section('page_title', 'Usuarios')
-@section('page_breadcrumb', 'Equipo · Usuarios del sistema')
+@section('title', __('Usuarios — CRM Duna Makai'))
+@section('page_title', __('Usuarios'))
+@section('page_breadcrumb', __('Equipo · Usuarios del sistema'))
 @php $activeRoute = 'profiles'; @endphp
 
 @section('content')
@@ -355,7 +355,7 @@
             body.innerHTML = data.html;
             if (tab !== 'info') switchUserTab(tab);
         } catch (e) {
-            body.innerHTML = '<div class="py-16 text-center text-[13px] text-err">No se pudo cargar el detalle.</div>';
+            body.innerHTML = '<div class="py-16 text-center text-[13px] text-err">'+@json(__('No se pudo cargar el detalle.'))+'</div>';
         }
     }
 

@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Inventario en vivo — Portal Broker')
-@section('page_title', 'Inventario en vivo')
-@section('page_breadcrumb', 'Portal Broker · Ventas')
+@section('title', __('Inventario en vivo — Portal Broker'))
+@section('page_title', __('Inventario en vivo'))
+@section('page_breadcrumb', __('Portal Broker · Ventas'))
 
 @section('content')
 @php

@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Transacciones — CRM Duna Makai')
-@section('page_title', 'Transacciones')
-@section('page_breadcrumb', 'Gestión · Transacciones y pagos')
+@section('title', __('Transacciones — CRM Duna Makai'))
+@section('page_title', __('Transacciones'))
+@section('page_breadcrumb', __('Gestión · Transacciones y pagos'))
 @php $activeRoute = 'transactions-report'; @endphp
 
 @section('content')
@@ -65,7 +65,7 @@
                     @endforeach
                 </select>
                 <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Desde') }}">
-                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="Hasta">
+                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="crm-input pl-3 w-full sm:w-36" title="{{ __('Hasta') }}">
                 <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
                 @if($hasFilters)
                     <a href="{{ route('admin.transactions-report', ['tab' => $currentTab]) }}" class="crm-btn crm-btn-ghost"><i class="pi pi-times"></i> {{ __('Limpiar') }}</a>
@@ -102,7 +102,7 @@
                                 <div class="text-[13px] text-ink-900">{{ $r?->unit?->name ?? $r?->unit?->custom_id ?? '—' }}</div>
                                 <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
                             </td>
-                            <td class="text-[13px] text-ink-700">{{ $p->label ?? $p->payment_type }}</td>
+                            <td class="text-[13px] text-ink-700">{{ $p->display_label }}</td>
                             <td class="text-[13px] font-bold text-ok-dark">${{ number_format($p->amount, 0) }}</td>
                             <td><span class="crm-pill bg-{{ $st[1] }}-soft text-{{ $st[1] }}">{{ $st[0] }}</span></td>
                             <td class="text-[12px] text-ink-700">{{ optional($p->paid_at ?? $p->due_date)->format('Y-m-d') }}</td>

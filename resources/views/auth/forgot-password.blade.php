@@ -460,7 +460,7 @@ window.setAuthLocale = function (lang) {
                 if (first) first.focus();
             }, 250);
         } catch (err) {
-            errBox.textContent = 'Error de red. Intenta de nuevo.';
+            errBox.textContent = @json(__('Error de red. Intenta de nuevo.'));
             errBox.classList.remove('hidden');
         }
         return false;
@@ -523,7 +523,7 @@ window.setAuthLocale = function (lang) {
         const code = Array.from(document.querySelectorAll('#code-row .code-input')).map(i => i.value).join('');
         const errBox = document.getElementById('step2-error');
         if (code.length !== 6) {
-            errBox.textContent = 'Introduce los 6 dígitos.';
+            errBox.textContent = @json(__('Introduce los 6 dígitos.'));
             errBox.classList.remove('hidden');
             return false;
         }
@@ -545,7 +545,7 @@ window.setAuthLocale = function (lang) {
             setStep(3);
             setTimeout(() => document.getElementById('fp-pw1').focus(), 250);
         } catch (err) {
-            errBox.textContent = 'Error de red. Intenta de nuevo.';
+            errBox.textContent = @json(__('Error de red. Intenta de nuevo.'));
             errBox.classList.remove('hidden');
         }
         return false;
@@ -588,8 +588,8 @@ window.setAuthLocale = function (lang) {
         const p2 = document.getElementById('fp-pw2').value;
         const errBox = document.getElementById('step3-error');
         const ok = /[A-Z]/.test(p1) && /\d/.test(p1) && p1.length >= 8;
-        if (!ok)       { errBox.textContent = 'La contraseña no cumple las reglas.'; errBox.classList.remove('hidden'); return false; }
-        if (p1 !== p2) { errBox.textContent = 'Las contraseñas no coinciden.';       errBox.classList.remove('hidden'); return false; }
+        if (!ok)       { errBox.textContent = @json(__('La contraseña no cumple las reglas.')); errBox.classList.remove('hidden'); return false; }
+        if (p1 !== p2) { errBox.textContent = @json(__('Las contraseñas no coinciden.'));       errBox.classList.remove('hidden'); return false; }
 
         const fd = new FormData();
         fd.append('password', p1);
@@ -610,7 +610,7 @@ window.setAuthLocale = function (lang) {
             errBox.classList.add('hidden');
             setStep(4);
         } catch (err) {
-            errBox.textContent = 'Error de red. Intenta de nuevo.';
+            errBox.textContent = @json(__('Error de red. Intenta de nuevo.'));
             errBox.classList.remove('hidden');
         }
         return false;

@@ -1,6 +1,6 @@
 @extends('layouts.main_admin')
 
-@section('title', 'Mapear columnas - Admin Panel')
+@section('title', __('Mapear columnas - Admin Panel'))
 
 @php
     $activeRoute = 'data-import';

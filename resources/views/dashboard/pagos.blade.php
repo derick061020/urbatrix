@@ -220,7 +220,7 @@
                             <div class="flex items-center gap-3">
                                 <span class="dot {{ $bullet }} shrink-0"></span>
                                 <div>
-                                    <div class="text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Reserva (5%)') }}</div>
+                                    <div class="text-[13px] font-semibold text-ink-950">{{ $p->display_label }}</div>
                                     <div class="text-[11px] text-ink-500">{{ __('Pago inicial de reserva') }}</div>
                                 </div>
                             </div>
@@ -289,7 +289,7 @@
             <tbody class="divide-y divide-ink-100">
                 @forelse($pagados as $p)
                     <tr>
-                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->label ?? __('Cuota inicial — Reserva') }}</td>
+                        <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->display_label }}</td>
                         <td class="px-3 py-3.5 text-[13px] font-bold text-ok-dark">${{ number_format($p->amount, 0) }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
@@ -747,7 +747,7 @@ document.getElementById('paymentForm').addEventListener('submit', async function
         alert('{{ __("Error de red. Intenta de nuevo.") }}');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="pi pi-check"></i> Enviar para aprobación';
+        btn.innerHTML = '<i class="pi pi-check"></i> ' + @json(__('Enviar para aprobación'));
     }
 });
 </script>

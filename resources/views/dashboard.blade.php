@@ -1,6 +1,6 @@
 @extends('layouts.main_user')
 
-@section('title', 'Dashboard - Portal Cliente')
+@section('title', __('Dashboard - Portal Cliente'))
 
 @php
     $activeRoute = 'dashboard';
@@ -18,7 +18,7 @@
         <div class="bg-white rounded-lg shadow p-6 mb-6">
             <h2 class="text-xl font-semibold text-surface-700 mb-4">{{ __('Test de Sidebar Colapsable') }}</h2>
             <p class="text-surface-600 mb-4">
-                Haz clic en la X (o menú hamburguesa cuando está colapsado) en la esquina superior derecha del sidebar para probar la funcionalidad de colapsar.
+                {{ __('Haz clic en la X (o menú hamburguesa cuando está colapsado) en la esquina superior derecha del sidebar para probar la funcionalidad de colapsar.') }}
             </p>
             <div class="bg-blue-50 border border-blue-200 rounded p-4">
                 <p class="text-blue-800">

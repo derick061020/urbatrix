@@ -177,7 +177,7 @@
             @if($isSent)
                 <form method="POST" action="{{ route('admin.crm.budget.revert', $r->id) }}" class="m-0" onclick="event.stopPropagation();">
                     @csrf
-                    <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm('¿Revertir a borrador? El cliente dejará de verlo.');"><i class="pi pi-undo"></i> {{ __('Revertir') }}</button>
+                    <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm(@json(__('¿Revertir a borrador? El cliente dejará de verlo.')));"><i class="pi pi-undo"></i> {{ __('Revertir') }}</button>
                 </form>
             @endif
         </div>
@@ -219,8 +219,8 @@ window.submitSignedPlan = async function (btn) {
 
     if (!file) {
         document.getElementById('manual-plan-fields-' + '{{ $r->id }}')?.classList.remove('hidden');
-        if (window.crmToast) crmToast('Seleccioná el archivo firmado.', 'err');
-        else if (progress) progress.textContent = 'Seleccioná el archivo firmado.';
+        if (window.crmToast) crmToast(@json(__('Seleccioná el archivo firmado.')), 'err');
+        else if (progress) progress.textContent = @json(__('Seleccioná el archivo firmado.'));
         return;
     }
     const okConfirm = window.crmConfirm
@@ -230,7 +230,7 @@ window.submitSignedPlan = async function (btn) {
             ok: 'Subir y aprobar',
             icon: 'pi-upload',
         })
-        : confirm('¿Subir el plan de pagos firmado con esta configuración y aprobarlo sin la confirmación del cliente?');
+        : confirm(@json(__('¿Subir el plan de pagos firmado con esta configuración y aprobarlo sin la confirmación del cliente?')));
     if (!okConfirm) return;
 
     // Campos de configuración que deben guardarse junto al archivo.

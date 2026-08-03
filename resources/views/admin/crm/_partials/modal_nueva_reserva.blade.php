@@ -15,7 +15,7 @@
             <div class="grid grid-cols-2 gap-1 p-1 bg-ink-100 rounded-xl text-[12px] font-semibold">
                 <button type="button" data-mode-btn="new"
                         class="py-2 rounded-lg transition-colors bg-white text-ink-900 shadow-sm">
-                    <i class="pi pi-user-plus text-[11px] mr-1"></i> Cliente nuevo
+                    <i class="pi pi-user-plus text-[11px] mr-1"></i> {{ __('Cliente nuevo') }}
                 </button>
                 <button type="button" data-mode-btn="existing"
                         class="py-2 rounded-lg transition-colors text-ink-500 hover:text-ink-800">

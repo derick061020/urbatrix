@@ -58,11 +58,11 @@ class MeetingController extends Controller
 
         $client = Auth::user();
         if (! $client) {
-            return response()->json(['error' => 'Tenés que iniciar sesión para agendar.'], 401);
+            return response()->json(['error' => __('Tenés que iniciar sesión para agendar.')], 401);
         }
 
         if (! $client->email) {
-            return response()->json(['error' => 'Tu cuenta no tiene un email asociado.'], 422);
+            return response()->json(['error' => __('Tu cuenta no tiene un email asociado.')], 422);
         }
 
         $unit      = $this->resolveUnit($request->input('unit_id'));
@@ -72,19 +72,19 @@ class MeetingController extends Controller
         );
 
         if ($startsAt->isPast()) {
-            return response()->json(['error' => 'No podés agendar en una fecha pasada.'], 422);
+            return response()->json(['error' => __('No podés agendar en una fecha pasada.')], 422);
         }
 
         $advisor = $this->findAvailableAdvisor($unit, $startsAt);
         if (! $advisor) {
             return response()->json([
-                'error' => 'Ese horario ya no está disponible. Elegí otro horario o fecha.',
+                'error' => __('Ese horario ya no está disponible. Elegí otro horario o fecha.'),
             ], 409);
         }
 
         if (! $this->calendar->isConfigured()) {
             return response()->json([
-                'error' => 'La integración con Google Calendar no está configurada. Avisá al administrador.',
+                'error' => __('La integración con Google Calendar no está configurada. Avisá al administrador.'),
             ], 503);
         }
 
@@ -116,7 +116,7 @@ class MeetingController extends Controller
         } catch (Throwable $e) {
             Log::error('Google Calendar createEvent failed', ['error' => $e->getMessage()]);
             return response()->json([
-                'error' => 'No pudimos crear la videollamada en Google. Probá de nuevo en unos minutos.',
+                'error' => __('No pudimos crear la videollamada en Google. Probá de nuevo en unos minutos.'),
             ], 502);
         }
 

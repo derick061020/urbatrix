@@ -175,7 +175,7 @@ class CrmTemplateRenderer
         $delivery = '—';
         if ($rep->estimated_delivery) {
             try {
-                $delivery = Carbon::parse($rep->estimated_delivery)->locale('es')->isoFormat('MMMM YYYY');
+                $delivery = Carbon::parse($rep->estimated_delivery)->locale(app()->getLocale())->isoFormat('MMMM YYYY');
             } catch (\Exception $e) {
                 $delivery = $rep->estimated_delivery;
             }
@@ -185,7 +185,7 @@ class CrmTemplateRenderer
             'proyecto'           => $rep->project->name ?? config('company.project'),
             'pct_obra'           => (string) ($rep->overall_progress ?? 0),
             'fecha_entrega'      => ucfirst($delivery),
-            'mes_reporte'        => $rep->period ?: optional($rep->published_at)->locale('es')->isoFormat('MMMM YYYY'),
+            'mes_reporte'        => $rep->period ?: optional($rep->published_at)->locale(app()->getLocale())->isoFormat('MMMM YYYY'),
             'num_fotos'          => (string) (is_array($rep->photos) ? count($rep->photos) : 0),
             'hitos_actualizados' => (string) (is_array($rep->phases) ? count($rep->phases) : 0),
         ];

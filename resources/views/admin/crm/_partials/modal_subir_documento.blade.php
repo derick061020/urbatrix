@@ -139,11 +139,11 @@
         var upEl   = document.getElementById('sd-uploading');
         var pathEl = document.getElementById('sd-file-path');
         if (upEl && upEl.value === '1') {
-            alert('Esperá a que termine la subida del documento.');
+            alert(@json(__('Esperá a que termine la subida del documento.')));
             return false;
         }
         if (!pathEl || !pathEl.value) {
-            alert('Seleccioná un archivo para subir.');
+            alert(@json(__('Seleccioná un archivo para subir.')));
             return false;
         }
         return true;

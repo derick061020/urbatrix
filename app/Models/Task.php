@@ -32,8 +32,8 @@ class Task extends Model
     {
         if (!$this->due_date) return '—';
         $d = $this->due_date;
-        if ($d->isToday()) return 'Hoy';
-        if ($d->isTomorrow()) return 'Mañana';
+        if ($d->isToday()) return __('Hoy');
+        if ($d->isTomorrow()) return __('Mañana');
         return $d->format('d M');
     }
 

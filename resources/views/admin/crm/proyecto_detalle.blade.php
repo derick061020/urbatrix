@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
 @section('title', $proyecto->name . ' — CRM Duna Makai')
-@section('page_title', 'Ficha de Proyecto')
-@section('page_breadcrumb', 'Proyectos · Ficha completa')
+@section('page_title', __('Ficha de Proyecto'))
+@section('page_breadcrumb', __('Proyectos · Ficha completa'))
 @php $activeRoute = 'crm.proyectos'; @endphp
 
 @section('content')
@@ -94,7 +94,7 @@
                 </div>
                 <div class="text-right">
                     @php $updatedAt = optional($latestReport)->published_at ?? $proyecto->updated_at; @endphp
-                    <div class="text-[11px] opacity-80">Actualizado: <span class="font-semibold">{{ optional($updatedAt)->locale('es')->isoFormat('D MMM YYYY') ?? '—' }}</span></div>
+                    <div class="text-[11px] opacity-80">Actualizado: <span class="font-semibold">{{ optional($updatedAt)->locale(app()->getLocale())->isoFormat('D MMM YYYY') ?? '—' }}</span></div>
                     <span class="crm-pill bg-ok-soft text-ok-dark mt-2 inline-flex"><span class="dot bg-ok"></span> {{ __('FASE ACTIVA') }}</span>
                 </div>
             </div>
@@ -193,7 +193,7 @@
                     </li>
                 @empty
                     <li class="text-[12px] text-ink-400 py-3 text-center">
-                        Aún no hay reportes de obra publicados.
+                        {{ __('Aún no hay reportes de obra publicados.') }}
                         <a href="{{ route('admin.crm.avance-obra') }}" class="text-brand font-semibold hover:underline">{{ __('Publicar avance →') }}</a>
                     </li>
                 @endforelse
@@ -236,7 +236,7 @@
             <div class="crm-card p-5 border-2 border-ok/40 bg-ok-soft/40">
                 <div class="text-[11px] uppercase tracking-wider font-semibold text-ok-dark">{{ __('Descuento de lanzamiento') }}</div>
                 <div class="font-display text-[36px] font-bold text-ok-dark leading-none mt-2">${{ number_format($launchDiscount, 0) }}</div>
-                <div class="text-[11px] text-ink-700 mt-1">Ahorro en precio de compra · Válido hasta {{ now()->addMonths(3)->locale('es')->isoFormat('MMM YYYY') }}</div>
+                <div class="text-[11px] text-ink-700 mt-1">Ahorro en precio de compra · Válido hasta {{ now()->addMonths(3)->locale(app()->getLocale())->isoFormat('MMM YYYY') }}</div>
                 <a href="{{ route('admin.units') }}" class="mt-3 inline-flex w-full justify-center crm-btn crm-btn-ghost text-[12px] bg-white">{{ __('Editar descuento') }}</a>
             </div>
 

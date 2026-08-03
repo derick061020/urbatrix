@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Registrar cliente — Portal Broker')
-@section('page_title', 'Registrar cliente')
-@section('page_breadcrumb', 'Portal Broker · Clientes')
+@section('title', __('Registrar cliente — Portal Broker'))
+@section('page_title', __('Registrar cliente'))
+@section('page_breadcrumb', __('Portal Broker · Clientes'))
 
 @push('styles')
 <style>

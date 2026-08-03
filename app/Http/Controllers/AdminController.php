@@ -100,7 +100,7 @@ class AdminController extends Controller
             UnitOptions::put($category, $clean);
         }
 
-        return redirect()->route('admin.units')->with('success', 'Configuración de opciones guardada.');
+        return redirect()->route('admin.units')->with('success', __('Configuración de opciones guardada.'));
     }
 
     /**
@@ -149,7 +149,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Planos de pisos actualizados.',
+            'message' => __('Planos de pisos actualizados.'),
             'plans'   => $clean,
         ]);
     }
@@ -174,7 +174,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir = storage_path('app/tmp-floor-plans');
@@ -187,7 +187,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar la imagen.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -196,7 +196,7 @@ class AdminController extends Controller
         // Tope de 20 MB acumulado.
         if (filesize($tmpPath) > 20971520) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'La imagen supera los 20 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('La imagen supera los 20 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -209,7 +209,7 @@ class AdminController extends Controller
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'Formato de imagen no permitido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Formato de imagen no permitido.')], 422);
         }
 
         $finalRel = 'units/floor-plans/' . $uploadId . '.' . $ext;
@@ -276,7 +276,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Slider de portada actualizado.',
+            'message' => __('Slider de portada actualizado.'),
             'images'  => $clean,
         ]);
     }
@@ -301,7 +301,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir = storage_path('app/tmp-home-slider');
@@ -314,7 +314,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar la imagen.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -323,7 +323,7 @@ class AdminController extends Controller
         // Tope de 30 MB acumulado.
         if (filesize($tmpPath) > 31457280) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'La imagen supera los 30 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('La imagen supera los 30 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -336,7 +336,7 @@ class AdminController extends Controller
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'Formato de imagen no permitido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Formato de imagen no permitido.')], 422);
         }
 
         $finalRel = 'home-slider/' . $uploadId . '.' . $ext;
@@ -404,7 +404,7 @@ class AdminController extends Controller
         $unit = Unit::create($request->except(['_token', '_method']));
 
         return redirect()->route('admin.units.edit', $unit->id)
-            ->with('success', 'Unidad creada. Ahora podés subir imágenes y completar el resto de la información.');
+            ->with('success', __('Unidad creada. Ahora podés subir imágenes y completar el resto de la información.'));
     }
 
     public function updateUnit(Request $request, Unit $unit)
@@ -485,20 +485,20 @@ class AdminController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'ok'      => true,
-                'message' => 'Unit updated successfully!',
+                'message' => __('Unit updated successfully!'),
                 'saved_at' => now()->format('H:i:s'),
             ]);
         }
 
         return redirect()->route('admin.units.edit', $unit->id)
-            ->with('success', 'Unit updated successfully!');
+            ->with('success', __('Unit updated successfully!'));
     }
 
     public function deleteUnit(Unit $unit)
     {
         $unit->delete();
         return redirect()->route('admin.units')
-            ->with('success', 'Unit deleted successfully!');
+            ->with('success', __('Unit deleted successfully!'));
     }
 
     /**
@@ -554,7 +554,7 @@ class AdminController extends Controller
         $value = (float) ($data['value'] ?? 0);
 
         if ($data['mode'] === 'percent' && $value > 100) {
-            return back()->with('error', 'El porcentaje de descuento no puede superar 100%.');
+            return back()->with('error', __('El porcentaje de descuento no puede superar 100%.'));
         }
 
         $query = Unit::query();
@@ -683,7 +683,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir = storage_path('app/tmp-unit-images');
@@ -696,7 +696,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar la imagen.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar la imagen.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -705,7 +705,7 @@ class AdminController extends Controller
         // Tope acumulado por imagen (10 MB).
         if (filesize($tmpPath) > 10485760) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'La imagen supera los 10 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('La imagen supera los 10 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -718,7 +718,7 @@ class AdminController extends Controller
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (! in_array($ext, $allowed, true) || @getimagesize($tmpPath) === false) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'El archivo no es una imagen válida.'], 422);
+            return response()->json(['success' => false, 'message' => __('El archivo no es una imagen válida.')], 422);
         }
 
         $filename = $uploadId . '.' . $ext;
@@ -848,7 +848,7 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.agents')
-            ->with('success', 'Broker actualizado.');
+            ->with('success', __('Broker actualizado.'));
     }
 
     public function deleteAgent($agent)
@@ -856,7 +856,7 @@ class AdminController extends Controller
         $broker = User::where('role', 'broker')->findOrFail($agent);
         $broker->delete();
         return redirect()->route('admin.agents')
-            ->with('success', 'Broker eliminado.');
+            ->with('success', __('Broker eliminado.'));
     }
 
     public function assignBrokerUnits(Request $request, $agent)
@@ -912,7 +912,7 @@ class AdminController extends Controller
         $doc->delete();
 
         return redirect()->route('admin.agents')
-            ->with('success', 'Documento eliminado.');
+            ->with('success', __('Documento eliminado.'));
     }
 
     public function deals()
@@ -949,7 +949,7 @@ class AdminController extends Controller
         Deal::create($dealData);
 
         return redirect()->route('admin.deals')
-            ->with('success', 'Deal created successfully!');
+            ->with('success', __('Deal created successfully!'));
     }
 
     public function updateDeal(Request $request, Deal $deal)
@@ -975,14 +975,14 @@ class AdminController extends Controller
         $deal->update($request->all());
 
         return redirect()->route('admin.deals')
-            ->with('success', 'Deal updated successfully!');
+            ->with('success', __('Deal updated successfully!'));
     }
 
     public function deleteDeal(Deal $deal)
     {
         $deal->delete();
         return redirect()->route('admin.deals')
-            ->with('success', 'Deal deleted successfully!');
+            ->with('success', __('Deal deleted successfully!'));
     }
 
     public function profiles()
@@ -1631,7 +1631,7 @@ class AdminController extends Controller
         $reservation->delete();
 
         return redirect()->route('admin.crm.expedientes')
-            ->with('success', 'Expediente eliminado correctamente.');
+            ->with('success', __('Expediente eliminado correctamente.'));
     }
 
     /**
@@ -1912,7 +1912,7 @@ class AdminController extends Controller
 
         if ($validated['payment_construction_percentage'] == 0 && $validated['payment_installments'] > 0) {
             return back()->withErrors([
-                'payment_installments' => 'No puede haber cuotas si el porcentaje de construcción es 0%.',
+                'payment_installments' => __('No puede haber cuotas si el porcentaje de construcción es 0%.'),
             ])->withInput();
         }
 
@@ -1958,7 +1958,7 @@ class AdminController extends Controller
     public function uploadModifiedContract(Request $request, Document $document)
     {
         if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
-            return back()->with('error', 'Tipo de documento inválido.');
+            return back()->with('error', __('Tipo de documento inválido.'));
         }
 
         $data = $request->validate([
@@ -1985,7 +1985,7 @@ class AdminController extends Controller
         $obs[] = [
             'from'    => 'admin',
             'author'  => Auth::user()?->name ?? 'Asesor',
-            'message' => 'Subió una versión modificada del contrato: '.$file->getClientOriginalName(),
+            'message' => __('Subió una versión modificada del contrato: ').$file->getClientOriginalName(),
             'kind'    => 'upload',
             'at'      => now()->toIso8601String(),
         ];
@@ -2000,7 +2000,7 @@ class AdminController extends Controller
             'metadata'  => $meta,
         ]);
 
-        return back()->with('success', 'Contrato modificado subido. El cliente lo revisará nuevamente.');
+        return back()->with('success', __('Contrato modificado subido. El cliente lo revisará nuevamente.'));
     }
 
     /**
@@ -2009,7 +2009,7 @@ class AdminController extends Controller
     public function replyContractObservation(Request $request, Document $document)
     {
         if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
-            return back()->with('error', 'Tipo de documento inválido.');
+            return back()->with('error', __('Tipo de documento inválido.'));
         }
 
         $data = $request->validate(['admin_reply' => 'required|string|max:2000']);
@@ -2025,7 +2025,7 @@ class AdminController extends Controller
         $meta['observations'] = $obs;
         $document->update(['metadata' => $meta]);
 
-        return back()->with('success', 'Mensaje enviado al cliente.');
+        return back()->with('success', __('Mensaje enviado al cliente.'));
     }
 
     /**
@@ -2051,7 +2051,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return ['status' => 'error', 'message' => 'Identificador de subida inválido.'];
+            return ['status' => 'error', 'message' => __('Identificador de subida inválido.')];
         }
 
         $tmpDir = storage_path('app/tmp-signed-docs');
@@ -2064,7 +2064,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return ['status' => 'error', 'message' => 'No se pudo procesar el archivo.'];
+            return ['status' => 'error', 'message' => __('No se pudo procesar el archivo.')];
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -2073,7 +2073,7 @@ class AdminController extends Controller
         // Tope de 50 MB acumulado.
         if (filesize($tmpPath) > 52428800) {
             @unlink($tmpPath);
-            return ['status' => 'error', 'message' => 'El archivo supera los 50 MB.'];
+            return ['status' => 'error', 'message' => __('El archivo supera los 50 MB.')];
         }
 
         // Chunks intermedios: esperar el siguiente.
@@ -2086,7 +2086,7 @@ class AdminController extends Controller
         $allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
         if (! in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return ['status' => 'error', 'message' => 'Formato de archivo no permitido.'];
+            return ['status' => 'error', 'message' => __('Formato de archivo no permitido.')];
         }
 
         return ['status' => 'complete', 'tmpPath' => $tmpPath, 'ext' => $ext, 'name' => (string) $request->input('name')];
@@ -2139,7 +2139,7 @@ class AdminController extends Controller
         }
 
         if ($cfg['payment_construction_percentage'] == 0 && $cfg['payment_installments'] > 0) {
-            return response()->json(['success' => false, 'message' => 'No puede haber cuotas si el porcentaje de construcción es 0%.'], 422);
+            return response()->json(['success' => false, 'message' => __('No puede haber cuotas si el porcentaje de construcción es 0%.')], 422);
         }
 
         $res = $this->receiveSignedDocChunk($request);
@@ -2191,7 +2191,7 @@ class AdminController extends Controller
         $observations[] = [
             'from'    => 'admin',
             'author'  => Auth::user()?->name ?? 'Asesor',
-            'message' => 'Subió el plan de pagos firmado manualmente (se saltó la confirmación del cliente).',
+            'message' => __('Subió el plan de pagos firmado manualmente (se saltó la confirmación del cliente).'),
             'kind'    => 'accept',
             'at'      => now()->toIso8601String(),
         ];
@@ -2204,7 +2204,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'done'    => true,
-            'message' => 'Plan de pagos firmado subido y aprobado.',
+            'message' => __('Plan de pagos firmado subido y aprobado.'),
         ]);
     }
 
@@ -2215,7 +2215,7 @@ class AdminController extends Controller
     public function uploadSignedContract(Request $request, Document $document)
     {
         if (! in_array($document->document_type, ['purchase_promise', 'contract'])) {
-            return response()->json(['success' => false, 'message' => 'Tipo de documento inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Tipo de documento inválido.')], 422);
         }
 
         $res = $this->receiveSignedDocChunk($request);
@@ -2232,7 +2232,7 @@ class AdminController extends Controller
         $obs[] = [
             'from'    => 'admin',
             'author'  => Auth::user()?->name ?? 'Asesor',
-            'message' => 'Subió la versión firmada manualmente (se saltó la confirmación del cliente): '.$res['name'],
+            'message' => __('Subió la versión firmada manualmente (se saltó la confirmación del cliente): ').$res['name'],
             'kind'    => 'upload',
             'at'      => now()->toIso8601String(),
         ];
@@ -2272,7 +2272,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'done'    => true,
-            'message' => 'Documento firmado subido y aprobado.',
+            'message' => __('Documento firmado subido y aprobado.'),
         ]);
     }
 
@@ -2283,7 +2283,7 @@ class AdminController extends Controller
             'budget_sent_at' => null,
         ]);
 
-        return back()->with('success', 'Presupuesto revertido a borrador. El cliente ya no lo verá.');
+        return back()->with('success', __('Presupuesto revertido a borrador. El cliente ya no lo verá.'));
     }
 
     public function crmTareas(Request $request)
@@ -2321,7 +2321,7 @@ class AdminController extends Controller
         if (Auth::user()->role === 'broker') {
             $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
             if (! in_array((string) $reservation->unit_id, $allowed, true)) {
-                abort(403, 'No tienes acceso a este expediente.');
+                abort(403, __('No tienes acceso a este expediente.'));
             }
         }
 
@@ -2483,7 +2483,7 @@ class AdminController extends Controller
         $validated['icon'] = $validated['icon'] ?: 'file';
         $validated['is_active'] = true;
         CrmTemplate::create($validated);
-        return back()->with('success', 'Plantilla creada.');
+        return back()->with('success', __('Plantilla creada.'));
     }
 
     public function updateTemplate(Request $request, CrmTemplate $template)
@@ -2501,13 +2501,13 @@ class AdminController extends Controller
         ]);
         $validated['icon'] = $validated['icon'] ?: 'file';
         $template->update($validated);
-        return back()->with('success', 'Plantilla actualizada.');
+        return back()->with('success', __('Plantilla actualizada.'));
     }
 
     public function deleteTemplate(CrmTemplate $template)
     {
         $template->delete();
-        return back()->with('success', 'Plantilla eliminada.');
+        return back()->with('success', __('Plantilla eliminada.'));
     }
 
     public function duplicateTemplate(CrmTemplate $template)
@@ -2517,7 +2517,7 @@ class AdminController extends Controller
         $copy->last_used_at = null;
         $copy->usage_count = 0;
         $copy->save();
-        return back()->with('success', 'Plantilla duplicada.');
+        return back()->with('success', __('Plantilla duplicada.'));
     }
 
     public function getTemplate(CrmTemplate $template)
@@ -2553,7 +2553,7 @@ class AdminController extends Controller
             \Illuminate\Support\Facades\Mail::to($validated['to'])
                 ->send(new \App\Mail\CrmTemplateMail('[PRUEBA] ' . $rendered['subject'], $rendered['html']));
         } catch (\Throwable $e) {
-            return back()->with('error', 'No se pudo enviar la prueba: ' . $e->getMessage());
+            return back()->with('error', __('No se pudo enviar la prueba: ') . $e->getMessage());
         }
 
         $template->forceFill([
@@ -2561,7 +2561,7 @@ class AdminController extends Controller
             'usage_count'  => ($template->usage_count ?? 0) + 1,
         ])->save();
 
-        return back()->with('success', 'Prueba enviada a ' . $validated['to'] . '.');
+        return back()->with('success', __('Prueba enviada a ') . $validated['to'] . '.');
     }
 
     /* ───── CRM: Automations CRUD ───── */
@@ -2575,7 +2575,7 @@ class AdminController extends Controller
             $this->syncAutomationSteps($automation, $validated['steps']);
         });
 
-        return back()->with('success', 'Automatización creada.');
+        return back()->with('success', __('Automatización creada.'));
     }
 
     public function updateAutomation(Request $request, CrmAutomation $automation)
@@ -2587,7 +2587,7 @@ class AdminController extends Controller
             $this->syncAutomationSteps($automation, $validated['steps']);
         });
 
-        return back()->with('success', 'Automatización actualizada.');
+        return back()->with('success', __('Automatización actualizada.'));
     }
 
     /** Valida nombre/disparador + la cadena de pasos del flujo. */
@@ -2647,7 +2647,7 @@ class AdminController extends Controller
     public function deleteAutomation(CrmAutomation $automation)
     {
         $automation->delete();
-        return back()->with('success', 'Automatización eliminada.');
+        return back()->with('success', __('Automatización eliminada.'));
     }
 
     public function runAutomation(CrmAutomation $automation)
@@ -2656,7 +2656,7 @@ class AdminController extends Controller
             ->filter(fn ($s) => $s->template);
 
         if ($steps->isEmpty()) {
-            return back()->with('error', 'El flujo no tiene ninguna fase con plantilla asignada.');
+            return back()->with('error', __('El flujo no tiene ninguna fase con plantilla asignada.'));
         }
 
         // Ejecución manual: envía una muestra de cada fase de la cadena al correo
@@ -2691,7 +2691,7 @@ class AdminController extends Controller
                 ])->save();
             }
         } catch (\Throwable $e) {
-            return back()->with('error', 'No se pudo ejecutar el flujo: ' . $e->getMessage());
+            return back()->with('error', __('No se pudo ejecutar el flujo: ') . $e->getMessage());
         }
 
         $automation->forceFill([
@@ -2734,7 +2734,7 @@ class AdminController extends Controller
             $setting->save();
         }
 
-        return back()->with('success', 'Configuración de canales guardada.');
+        return back()->with('success', __('Configuración de canales guardada.'));
     }
     public function crmAnuncios()        { return view('admin.crm.anuncios'); }
 
@@ -2779,7 +2779,7 @@ class AdminController extends Controller
         ]);
 
         if (!$this->commTypeSupportsChannel($data['code'], $data['channel'])) {
-            return response()->json(['ok' => false, 'message' => 'Canal no soportado para este tipo.'], 422);
+            return response()->json(['ok' => false, 'message' => __('Canal no soportado para este tipo.')], 422);
         }
 
         ProjectCommunication::updateOrCreate(
@@ -2881,7 +2881,7 @@ class AdminController extends Controller
         if (Auth::user()->role === 'broker') {
             $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
             if (! in_array((string) $reservation->unit_id, $allowed, true)) {
-                abort(403, 'No tienes acceso a este expediente.');
+                abort(403, __('No tienes acceso a este expediente.'));
             }
         }
 
@@ -2896,7 +2896,7 @@ class AdminController extends Controller
         $user = User::findOrFail($userId);
 
         if (! \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) {
-            return back()->with('error', 'verification_status column is missing.');
+            return back()->with('error', __('verification_status column is missing.'));
         }
 
         $user->update(['verification_status' => $data['decision']]);
@@ -3109,7 +3109,7 @@ class AdminController extends Controller
         }
 
         if (! $path) {
-            return back()->with('error', 'Debes seleccionar un archivo.');
+            return back()->with('error', __('Debes seleccionar un archivo.'));
         }
 
         Document::create([
@@ -3122,7 +3122,7 @@ class AdminController extends Controller
             'generated_at'   => $data['generated_at'] ?? now(),
         ]);
 
-        return back()->with('success', 'Documento subido correctamente.');
+        return back()->with('success', __('Documento subido correctamente.'));
     }
 
     /**
@@ -3146,7 +3146,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir = storage_path('app/tmp-documents');
@@ -3159,7 +3159,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar el archivo.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar el archivo.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -3168,7 +3168,7 @@ class AdminController extends Controller
         // Tope de 50 MB acumulado.
         if (filesize($tmpPath) > 52428800) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'El archivo supera los 50 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('El archivo supera los 50 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -3181,7 +3181,7 @@ class AdminController extends Controller
         $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
         if (! in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'Formato de archivo no permitido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Formato de archivo no permitido.')], 422);
         }
 
         $finalRel = 'documents/' . $uploadId . '.' . $ext;
@@ -3211,7 +3211,7 @@ class AdminController extends Controller
         if (Auth::user()->role === 'broker') {
             $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
             if (! in_array((string) $reservation->unit_id, $allowed, true)) {
-                abort(403, 'No tienes acceso a este expediente.');
+                abort(403, __('No tienes acceso a este expediente.'));
             }
         }
 
@@ -3237,7 +3237,7 @@ class AdminController extends Controller
             ],
         ]);
 
-        return back()->with('success', 'Documento solicitado al cliente.');
+        return back()->with('success', __('Documento solicitado al cliente.'));
     }
 
     /**
@@ -3250,13 +3250,13 @@ class AdminController extends Controller
         if ($reservation && Auth::user()->role === 'broker') {
             $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
             if (! in_array((string) $reservation->unit_id, $allowed, true)) {
-                abort(403, 'No tienes acceso a este expediente.');
+                abort(403, __('No tienes acceso a este expediente.'));
             }
         }
 
         \App\Services\DocumentService::deleteDocument($document);
 
-        return back()->with('success', 'Documento eliminado.');
+        return back()->with('success', __('Documento eliminado.'));
     }
 
     public function createPaymentQuick(Request $request)
@@ -3315,7 +3315,7 @@ class AdminController extends Controller
                 'notes'          => $data['notes'] ?? null,
             ]);
 
-            return back()->with('success', 'Pago registrado correctamente.');
+            return back()->with('success', __('Pago registrado correctamente.'));
         }
 
         // Reparte el monto recibido: cubre cuotas completas y deja saldo (deuda)
@@ -3402,7 +3402,7 @@ class AdminController extends Controller
     {
         $user = Auth::user();
         if (! $user || ! $user->is_admin) {
-            abort(403, 'Solo el administrador puede exportar sin código de autorización.');
+            abort(403, __('Solo el administrador puede exportar sin código de autorización.'));
         }
 
         $resource = $request->get('resource', 'expedientes');
@@ -3427,7 +3427,7 @@ class AdminController extends Controller
         if ($user->is_admin) {
             return response()->json([
                 'ok' => false,
-                'message' => 'El administrador no necesita código de autorización.',
+                'message' => __('El administrador no necesita código de autorización.'),
             ], 422);
         }
 
@@ -3486,7 +3486,7 @@ class AdminController extends Controller
         if (! $auth) {
             return response()->json([
                 'ok'      => false,
-                'message' => 'El código es inválido o ya caducó. Solicita uno nuevo.',
+                'message' => __('El código es inválido o ya caducó. Solicita uno nuevo.'),
             ], 422);
         }
 
@@ -3588,7 +3588,7 @@ class AdminController extends Controller
             'channel'        => $data['channel'] ?? 'chat',
         ]);
 
-        return back()->with('success', 'Mensaje enviado.');
+        return back()->with('success', __('Mensaje enviado.'));
     }
 
     // API Methods for Payment Management
@@ -3618,7 +3618,7 @@ class AdminController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+            return response()->json(['message' => __('Validation failed'), 'errors' => $validator->errors()], 422);
         }
 
         try {
@@ -3636,7 +3636,7 @@ class AdminController extends Controller
 
             return response()->json($payment, 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error creating payment: ' . $e->getMessage()], 500);
+            return response()->json(['message' => __('Error creating payment: ') . $e->getMessage()], 500);
         }
     }
 
@@ -3655,7 +3655,7 @@ class AdminController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+            return response()->json(['message' => __('Validation failed'), 'errors' => $validator->errors()], 422);
         }
 
         try {
@@ -3670,7 +3670,7 @@ class AdminController extends Controller
 
             return response()->json($payment);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error updating payment: ' . $e->getMessage()], 500);
+            return response()->json(['message' => __('Error updating payment: ') . $e->getMessage()], 500);
         }
     }
 
@@ -3700,9 +3700,9 @@ class AdminController extends Controller
             $payment = Payment::findOrFail($id);
             $payment->delete();
 
-            return response()->json(['message' => 'Payment deleted successfully']);
+            return response()->json(['message' => __('Payment deleted successfully')]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error deleting payment: ' . $e->getMessage()], 500);
+            return response()->json(['message' => __('Error deleting payment: ') . $e->getMessage()], 500);
         }
     }
 
@@ -3712,7 +3712,7 @@ class AdminController extends Controller
             $payment = Payment::findOrFail($id);
             
             if ($payment->status === 'paid') {
-                return response()->json(['message' => 'Payment is already marked as paid'], 400);
+                return response()->json(['message' => __('Payment is already marked as paid')], 400);
             }
 
             $payment->update([
@@ -3723,9 +3723,9 @@ class AdminController extends Controller
 
             $this->sendPaymentReceipt($payment);
 
-            return response()->json(['message' => 'Payment marked as paid successfully', 'payment' => $payment]);
+            return response()->json(['message' => __('Payment marked as paid successfully'), 'payment' => $payment]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error marking payment as paid: ' . $e->getMessage()], 500);
+            return response()->json(['message' => __('Error marking payment as paid: ') . $e->getMessage()], 500);
         }
     }
 
@@ -3763,7 +3763,7 @@ class AdminController extends Controller
 
         try {
             if ($payment->approval_status !== 'pending') {
-                return back()->with('error', 'Este pago ya fue procesado.');
+                return back()->with('error', __('Este pago ya fue procesado.'));
             }
 
             if ($request->decision === 'approved') {
@@ -3776,7 +3776,7 @@ class AdminController extends Controller
                     'approved_at' => now(),
                 ]);
                 $this->sendPaymentReceipt($payment);
-                return back()->with('success', 'Pago aprobado exitosamente.');
+                return back()->with('success', __('Pago aprobado exitosamente.'));
             } else {
                 $payment->update([
                     'approval_status' => 'rejected',
@@ -3784,10 +3784,10 @@ class AdminController extends Controller
                     'approved_at' => now(),
                     'rejection_reason' => $request->rejection_reason,
                 ]);
-                return back()->with('success', 'Pago rechazado.');
+                return back()->with('success', __('Pago rechazado.'));
             }
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al procesar el pago: ' . $e->getMessage());
+            return back()->with('error', __('Error al procesar el pago: ') . $e->getMessage());
         }
     }
 
@@ -3797,7 +3797,7 @@ class AdminController extends Controller
     public function generateContract(Reservation $reservation)
     {
         if (!$reservation->isBudgetSent()) {
-            return back()->with('error', 'El presupuesto aún no fue enviado. No se puede generar el contrato.');
+            return back()->with('error', __('El presupuesto aún no fue enviado. No se puede generar el contrato.'));
         }
 
         try {
@@ -3805,7 +3805,7 @@ class AdminController extends Controller
             $templatePath = storage_path('app/templates/contract_template.docx');
             
             if (!file_exists($templatePath)) {
-                return back()->with('error', 'Plantilla de contrato no encontrada');
+                return back()->with('error', __('Plantilla de contrato no encontrada'));
             }
 
             // Create TemplateProcessor
@@ -3865,7 +3865,7 @@ class AdminController extends Controller
             return response()->download($outputPath, $filename)->deleteFileAfterSend(true);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al generar el contrato: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar el contrato: ') . $e->getMessage());
         }
     }
 
@@ -3880,7 +3880,7 @@ class AdminController extends Controller
             // Render the printable HTML view (open in browser → "Descargar PDF")
             return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'payment_plan');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al generar el plan de pagos: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar el plan de pagos: ') . $e->getMessage());
         }
     }
 
@@ -3894,7 +3894,7 @@ class AdminController extends Controller
             // Render the printable HTML view (open in browser → "Descargar PDF")
             return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'purchase_promise');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al generar la promesa de compraventa: ' . $e->getMessage());
+            return back()->with('error', __('Error al generar la promesa de compraventa: ') . $e->getMessage());
         }
     }
 
@@ -3991,7 +3991,7 @@ class AdminController extends Controller
         ]);
         $validated['status'] = 'pendiente';
         Task::create($validated);
-        return back()->with('success', 'Tarea creada.');
+        return back()->with('success', __('Tarea creada.'));
     }
 
     public function updateTaskStatus(Request $request, Task $task)
@@ -4000,19 +4000,19 @@ class AdminController extends Controller
             'status' => 'required|in:pendiente,en_proceso,completada,vencida',
         ]);
         $task->update(['status' => $validated['status']]);
-        return back()->with('success', 'Tarea actualizada.');
+        return back()->with('success', __('Tarea actualizada.'));
     }
 
     public function completeTask(Task $task)
     {
         $task->update(['status' => 'completada']);
-        return back()->with('success', 'Tarea completada.');
+        return back()->with('success', __('Tarea completada.'));
     }
 
     public function deleteTask(Task $task)
     {
         $task->delete();
-        return back()->with('success', 'Tarea eliminada.');
+        return back()->with('success', __('Tarea eliminada.'));
     }
 
     /* ───── CRM: Aprobaciones CRUD ───── */
@@ -4029,7 +4029,7 @@ class AdminController extends Controller
         ]);
         $validated['status'] = 'pendiente';
         Approval::create($validated);
-        return back()->with('success', 'Solicitud creada.');
+        return back()->with('success', __('Solicitud creada.'));
     }
 
     public function decideApproval(Request $request, Approval $approval)
@@ -4041,13 +4041,13 @@ class AdminController extends Controller
             'status'      => $validated['decision'],
             'decided_at'  => now(),
         ]);
-        return back()->with('success', 'Solicitud ' . $validated['decision'] . '.');
+        return back()->with('success', __('Solicitud ') . $validated['decision'] . '.');
     }
 
     public function deleteApproval(Approval $approval)
     {
         $approval->delete();
-        return back()->with('success', 'Solicitud eliminada.');
+        return back()->with('success', __('Solicitud eliminada.'));
     }
 
     /* ───── CRM: Postventa CRUD ───── */
@@ -4065,7 +4065,7 @@ class AdminController extends Controller
             'notes'          => 'nullable|string|max:2000',
         ]);
         Aftersale::create($validated);
-        return back()->with('success', 'Caso de postventa creado.');
+        return back()->with('success', __('Caso de postventa creado.'));
     }
 
     public function updateAftersale(Request $request, Aftersale $aftersale)
@@ -4076,13 +4076,13 @@ class AdminController extends Controller
             'notes'          => 'nullable|string|max:2000',
         ]);
         $aftersale->update($validated);
-        return back()->with('success', 'Caso actualizado.');
+        return back()->with('success', __('Caso actualizado.'));
     }
 
     public function deleteAftersale(Aftersale $aftersale)
     {
         $aftersale->delete();
-        return back()->with('success', 'Caso eliminado.');
+        return back()->with('success', __('Caso eliminado.'));
     }
 
     /* ───── CRM: Proyectos CRUD ───── */
@@ -4100,7 +4100,7 @@ class AdminController extends Controller
             'description' => 'nullable|string|max:2000',
         ]);
         Project::create($validated);
-        return back()->with('success', 'Proyecto creado.');
+        return back()->with('success', __('Proyecto creado.'));
     }
 
     public function updateProject(Request $request, Project $project)
@@ -4116,13 +4116,13 @@ class AdminController extends Controller
             'description' => 'nullable|string|max:2000',
         ]);
         $project->update($validated);
-        return back()->with('success', 'Proyecto actualizado.');
+        return back()->with('success', __('Proyecto actualizado.'));
     }
 
     public function deleteProject(Project $project)
     {
         $project->delete();
-        return back()->with('success', 'Proyecto eliminado.');
+        return back()->with('success', __('Proyecto eliminado.'));
     }
 
     /* ─────────────── Profile (admin) ─────────────── */
@@ -4157,7 +4157,7 @@ class AdminController extends Controller
 
         if (!empty($data['password'])) {
             if (!$user->password || !Hash::check($data['current_password'] ?? '', $user->password)) {
-                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.'])->withInput();
+                return back()->withErrors(['current_password' => __('La contraseña actual no es correcta.')])->withInput();
             }
             $user->password = $data['password'];
         }
@@ -4223,9 +4223,9 @@ class AdminController extends Controller
         } elseif (!empty($data['signature_image'])) {
             if (!preg_match('#^data:image/(png|jpe?g);base64,#', $data['signature_image'])) {
                 if ($request->wantsJson() || $request->ajax()) {
-                    return response()->json(['success' => false, 'message' => 'Formato de firma no válido.'], 422);
+                    return response()->json(['success' => false, 'message' => __('Formato de firma no válido.')], 422);
                 }
-                return back()->withErrors(['signature_image' => 'Formato de firma no válido.']);
+                return back()->withErrors(['signature_image' => __('Formato de firma no válido.')]);
             }
             $current['signature_image'] = $data['signature_image'];
         }
@@ -4240,7 +4240,7 @@ class AdminController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Firma del proyecto guardada correctamente.',
+                'message' => __('Firma del proyecto guardada correctamente.'),
                 'has_image' => !empty($current['signature_image']),
             ]);
         }
@@ -4314,7 +4314,7 @@ class AdminController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Menú del cliente guardado correctamente.',
+                'message' => __('Menú del cliente guardado correctamente.'),
                 'items'   => $clean,
             ]);
         }
@@ -4345,7 +4345,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir  = storage_path('app/tmp-client-menu');
@@ -4358,7 +4358,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar el archivo.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar el archivo.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -4367,7 +4367,7 @@ class AdminController extends Controller
         // Tope de 50 MB acumulado.
         if (filesize($tmpPath) > 52428800) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'El archivo supera los 50 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('El archivo supera los 50 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -4380,7 +4380,7 @@ class AdminController extends Controller
         $allowed = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
         if (!in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'Formato de archivo no permitido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Formato de archivo no permitido.')], 422);
         }
 
         $finalRel = 'client-menu/' . $uploadId . '.' . $ext;
@@ -4423,7 +4423,7 @@ class AdminController extends Controller
         $total    = (int) $request->input('total');
 
         if ($uploadId === '') {
-            return response()->json(['success' => false, 'message' => 'Identificador de subida inválido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Identificador de subida inválido.')], 422);
         }
 
         $tmpDir = storage_path('app/tmp-receipts');
@@ -4436,7 +4436,7 @@ class AdminController extends Controller
         $in  = fopen($request->file('chunk')->getRealPath(), 'rb');
         $out = fopen($tmpPath, $index === 0 ? 'wb' : 'ab');
         if ($in === false || $out === false) {
-            return response()->json(['success' => false, 'message' => 'No se pudo procesar el archivo.'], 500);
+            return response()->json(['success' => false, 'message' => __('No se pudo procesar el archivo.')], 500);
         }
         stream_copy_to_stream($in, $out);
         fclose($in);
@@ -4445,7 +4445,7 @@ class AdminController extends Controller
         // Tope de 50 MB acumulado.
         if (filesize($tmpPath) > 52428800) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'El archivo supera los 50 MB.'], 422);
+            return response()->json(['success' => false, 'message' => __('El archivo supera los 50 MB.')], 422);
         }
 
         // Chunks intermedios: confirmar y esperar el siguiente.
@@ -4458,7 +4458,7 @@ class AdminController extends Controller
         $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
         if (! in_array($ext, $allowed, true)) {
             @unlink($tmpPath);
-            return response()->json(['success' => false, 'message' => 'Formato de archivo no permitido.'], 422);
+            return response()->json(['success' => false, 'message' => __('Formato de archivo no permitido.')], 422);
         }
 
         $finalRel = 'receipts/' . $uploadId . '.' . $ext;

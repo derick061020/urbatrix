@@ -49,7 +49,7 @@
             <div>
                 <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Fecha y hora') }}</div>
                 <div class="text-[13px] font-semibold text-ink-900 mt-0.5">
-                    {{ $sigWhen ? \Carbon\Carbon::parse($sigWhen)->locale('es')->isoFormat('D MMM YYYY · HH:mm') . ' hs' : '—' }}
+                    {{ $sigWhen ? \Carbon\Carbon::parse($sigWhen)->locale(app()->getLocale())->isoFormat('D MMM YYYY · HH:mm') . ' hs' : '—' }}
                 </div>
             </div>
             <div>

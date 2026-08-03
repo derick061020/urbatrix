@@ -1,7 +1,7 @@
 @extends('layouts.broker')
-@section('title', 'Simulador de cobro — Portal Broker')
-@section('page_title', 'Simulador de cobro')
-@section('page_breadcrumb', 'Portal Broker · Comisiones')
+@section('title', __('Simulador de cobro — Portal Broker'))
+@section('page_title', __('Simulador de cobro'))
+@section('page_breadcrumb', __('Portal Broker · Comisiones'))
 
 @push('styles')
 <style>

@@ -1,5 +1,5 @@
 @extends('layouts.main_admin')
-@section('title', 'Selector de Pagos - Admin Panel')
+@section('title', __('Selector de Pagos - Admin Panel'))
 @php 
     $activeRoute = 'crm.pagos'; 
     
@@ -659,7 +659,7 @@ function removeReceipt() {
             if (data.success) {
                 location.reload();
             } else {
-                alert('Error al eliminar comprobante: ' + data.message);
+                alert(@json(__('Error al eliminar comprobante: ')) + data.message);
             }
         })
         .catch(error => {

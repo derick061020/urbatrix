@@ -82,7 +82,7 @@ class SearchController extends Controller
                 'icon'    => 'pi-user',
                 'url'     => route('admin.profiles').'?q='.urlencode($u->name ?: $u->email),
             ])->all();
-            if ($clientItems) $groups[] = ['title' => 'Clientes', 'items' => $clientItems];
+            if ($clientItems) $groups[] = ['title' => __('Clientes'), 'items' => $clientItems];
         }
 
         /* --------- Expedientes (reservations) --------- */
@@ -108,7 +108,7 @@ class SearchController extends Controller
                 'url'   => route('admin.crm.expediente.detalle', $r->id),
             ];
         })->all();
-        if ($resItems) $groups[] = ['title' => 'Expedientes', 'items' => $resItems];
+        if ($resItems) $groups[] = ['title' => __('Expedientes'), 'items' => $resItems];
 
         /* --------- Unidades --------- */
         $unitQuery = Unit::query()
@@ -122,16 +122,16 @@ class SearchController extends Controller
         $units = $unitQuery->limit(6)->get(['id', 'name', 'plot', 'type', 'status']);
 
         $unitItems = $units->map(fn ($u) => [
-            'label' => $u->name ?: ('Unidad #'.$u->id),
+            'label' => $u->name ?: __('Unidad #:id', ['id' => $u->id]),
             'sub'   => trim(($u->type ? ucfirst($u->type) : '').($u->plot ? ' · '.$u->plot : '')) ?: ($u->status ?? ''),
             'icon'  => 'pi-home',
             'url'   => $isBroker ? route('admin.crm.contratos') : route('admin.units.edit', $u->id),
         ])->all();
-        if ($unitItems) $groups[] = ['title' => 'Unidades', 'items' => $unitItems];
+        if ($unitItems) $groups[] = ['title' => __('Unidades'), 'items' => $unitItems];
 
         /* --------- Páginas (nav) --------- */
         $pages = $this->filterPages(self::ADMIN_PAGES, $q, $isBroker);
-        if ($pages) $groups[] = ['title' => 'Páginas', 'items' => $pages];
+        if ($pages) $groups[] = ['title' => __('Páginas'), 'items' => $pages];
 
         return response()->json(['groups' => $groups]);
     }
@@ -158,7 +158,7 @@ class SearchController extends Controller
             })
             ->first();
         if ($reservation) {
-            $groups[] = ['title' => 'Mi reserva', 'items' => [[
+            $groups[] = ['title' => __('Mi reserva'), 'items' => [[
                 'label' => 'Reserva '.($reservation->reservation_code ? '#'.$reservation->reservation_code : '').' — '.($reservation->unit_name ?: ''),
                 'sub'   => 'Ir a Mi propiedad',
                 'icon'  => 'pi-key',
@@ -188,7 +188,7 @@ class SearchController extends Controller
             'icon'  => 'pi-file',
             'url'   => route('dashboard.documents'),
         ])->all();
-        if ($docItems) $groups[] = ['title' => 'Documentos', 'items' => $docItems];
+        if ($docItems) $groups[] = ['title' => __('Documentos'), 'items' => $docItems];
 
         /* --------- Pagos --------- */
         $payments = Payment::query()
@@ -204,12 +204,12 @@ class SearchController extends Controller
             ->get(['id', 'label', 'payment_type', 'amount', 'status']);
 
         $paymentItems = $payments->map(fn ($p) => [
-            'label' => $p->label ?: ($p->payment_type ?: ('Pago #'.$p->id)),
+            'label' => $p->label ?: ($p->payment_type ?: __('Pago #:id', ['id' => $p->id])),
             'sub'   => 'RD$ '.number_format((float) $p->amount, 2).' · '.$p->status,
             'icon'  => 'pi-credit-card',
             'url'   => route('dashboard.payments'),
         ])->all();
-        if ($paymentItems) $groups[] = ['title' => 'Pagos', 'items' => $paymentItems];
+        if ($paymentItems) $groups[] = ['title' => __('Pagos'), 'items' => $paymentItems];
 
         /* --------- Guardados (wishlist) --------- */
         $wishlistUnitIds = Wishlist::where('user_id', $userId)->pluck('unit_id');
@@ -224,17 +224,17 @@ class SearchController extends Controller
                 ->get(['id', 'name', 'type', 'plot', 'price']);
 
             $savedItems = $savedUnits->map(fn ($u) => [
-                'label' => $u->name ?: ('Unidad #'.$u->id),
+                'label' => $u->name ?: __('Unidad #:id', ['id' => $u->id]),
                 'sub'   => trim(($u->type ? ucfirst($u->type) : '').($u->plot ? ' · '.$u->plot : '')),
                 'icon'  => 'pi-heart',
                 'url'   => route('dashboard.guardados'),
             ])->all();
-            if ($savedItems) $groups[] = ['title' => 'Guardados', 'items' => $savedItems];
+            if ($savedItems) $groups[] = ['title' => __('Guardados'), 'items' => $savedItems];
         }
 
         /* --------- Páginas (nav) --------- */
         $pages = $this->filterPages(self::CLIENT_PAGES, $q, false);
-        if ($pages) $groups[] = ['title' => 'Páginas', 'items' => $pages];
+        if ($pages) $groups[] = ['title' => __('Páginas'), 'items' => $pages];
 
         return response()->json(['groups' => $groups]);
     }
@@ -244,12 +244,16 @@ class SearchController extends Controller
         $needle = $this->normalize($q);
         $brokerHidden = ['admin.communication','admin.crm.plantillas','admin.crm.anuncios','admin.profiles','admin.agents','admin.crm.aprobaciones','admin.crm.tareas','admin.crm.proyectos','admin.units','admin.crm.avance-obra'];
 
+        // Las constantes guardan el label en español (la clave de traducción).
+        // Buscamos contra la clave y contra su traducción para que la búsqueda
+        // funcione igual escribiendo "Payments" o "Pagos".
         return collect($pages)
-            ->filter(fn ($p) => str_contains($this->normalize($p['label']), $needle))
+            ->filter(fn ($p) => str_contains($this->normalize($p['label']), $needle)
+                || str_contains($this->normalize(__($p['label'])), $needle))
             ->reject(fn ($p) => $isBroker && in_array($p['route'], $brokerHidden, true))
             ->map(fn ($p) => [
-                'label' => $p['label'],
-                'sub'   => 'Ir a la sección',
+                'label' => __($p['label']),
+                'sub'   => __('Ir a la sección'),
                 'icon'  => $p['icon'],
                 'url'   => route($p['route']),
             ])

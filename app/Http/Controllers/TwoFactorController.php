@@ -24,7 +24,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if ($user->hasTwoFactorEnabled()) {
-            return response()->json(['message' => 'La 2FA ya está activada.'], 422);
+            return response()->json(['message' => __('La 2FA ya está activada.')], 422);
         }
 
         $secret = Totp::generateSecret();
@@ -55,13 +55,13 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if (! $user->two_factor_secret) {
-            return response()->json(['message' => 'Primero generá el código QR.'], 422);
+            return response()->json(['message' => __('Primero generá el código QR.')], 422);
         }
         if ($user->hasTwoFactorEnabled()) {
-            return response()->json(['message' => 'La 2FA ya está confirmada.'], 422);
+            return response()->json(['message' => __('La 2FA ya está confirmada.')], 422);
         }
         if (! Totp::verify($user->two_factor_secret, $data['code'])) {
-            return response()->json(['message' => 'El código no es válido. Probá de nuevo.'], 422);
+            return response()->json(['message' => __('El código no es válido. Probá de nuevo.')], 422);
         }
 
         $codes = User::generateRecoveryCodes();
@@ -85,7 +85,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if ($user->password && ! Hash::check($data['password'], $user->password)) {
-            return response()->json(['message' => 'La contraseña no es correcta.'], 422);
+            return response()->json(['message' => __('La contraseña no es correcta.')], 422);
         }
 
         $user->forceFill([
@@ -104,7 +104,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if (! $user->hasTwoFactorEnabled()) {
-            return response()->json(['message' => 'Activá la 2FA para generar códigos de respaldo.'], 422);
+            return response()->json(['message' => __('Activá la 2FA para generar códigos de respaldo.')], 422);
         }
 
         return response()->json(['recovery_codes' => $user->recoveryCodes()]);
@@ -117,7 +117,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if (! $user->hasTwoFactorEnabled()) {
-            return response()->json(['message' => 'Activá la 2FA para generar códigos de respaldo.'], 422);
+            return response()->json(['message' => __('Activá la 2FA para generar códigos de respaldo.')], 422);
         }
 
         $codes = User::generateRecoveryCodes();
@@ -142,7 +142,7 @@ class TwoFactorController extends Controller
     {
         $pending = $request->session()->get('login.2fa');
         if (! $pending || empty($pending['id'])) {
-            return redirect()->route('login')->withErrors(['email' => 'La sesión expiró. Iniciá sesión de nuevo.']);
+            return redirect()->route('login')->withErrors(['email' => __('La sesión expiró. Iniciá sesión de nuevo.')]);
         }
 
         $request->validate([
@@ -165,7 +165,7 @@ class TwoFactorController extends Controller
         }
 
         if (! $passed) {
-            return back()->withErrors(['code' => 'El código no es válido.']);
+            return back()->withErrors(['code' => __('El código no es válido.')]);
         }
 
         $request->session()->forget('login.2fa');

@@ -1,7 +1,7 @@
 @extends('layouts.admin_crm')
-@section('title', 'Documentos — CRM Duna Makai')
-@section('page_title', 'Documentos')
-@section('page_breadcrumb', 'Gestión · Documentos y archivos')
+@section('title', __('Documentos — CRM Duna Makai'))
+@section('page_title', __('Documentos'))
+@section('page_breadcrumb', __('Gestión · Documentos y archivos'))
 @php $activeRoute = 'crm.documentos'; @endphp
 
 @section('content')
