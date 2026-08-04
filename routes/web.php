@@ -411,3 +411,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 });
 
 
+
+// TEMP-DEV-LOGIN (borrar)
+Route::get('/__dev_login', function () {
+    abort_unless(app()->environment('local'), 404);
+    \Illuminate\Support\Facades\Auth::loginUsingId(2);
+    return redirect('/');
+});
