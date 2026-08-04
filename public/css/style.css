@@ -383,6 +383,10 @@
       --brand-soft-3:  rgba(7, 69, 64, 0.18);
       --brand-ring:    rgba(7, 69, 64, 0.45);
       --brand-overlay: rgba(7, 69, 64, 0.78);
+      /* Alturas del grupo fijo (nav flotante + barra de filtros). Las mide
+         updateStickyOffsets() en home.blade.php; estos son los fallbacks. */
+      --fg-nav-h:    88px;
+      --fg-filter-h: 0px;
       transition:
         --brand         0.9s ease,
         --brand-soft    0.9s ease,
@@ -787,7 +791,9 @@
     /* Nota: NO se desactiva la transición del track bajo prefers-reduced-motion,
        porque el deslizamiento lateral del carrusel es parte intencional del diseño. */
 
-    /* FILTER BAR (v2) — sits below the toggle, aligned with the cards grid */
+    /* FILTER BAR (v2) — sits below the toggle, aligned with the cards grid.
+       Se fija bajo el nav flotante al hacer scroll; el toggle se ancla justo
+       debajo (ver .fg-toggle-bar). */
     .fg-filter-bar {
       background: #f2f5f8;
       display: flex;
@@ -797,7 +803,8 @@
       max-width: 1760px;
       margin: 0 auto;
       padding: 8px 24px 20px;
-      position: relative;
+      position: sticky;
+      top: var(--fg-nav-h, 88px);
       z-index: 30;
     }
     .fg-filter-bar > .fg-filters-left {
@@ -979,6 +986,8 @@
       background: #f2f5f8;
       border: 1px solid #eaecf0;
       border-radius: 100px;
+      /* Al quedar fijo flota sobre las tarjetas: sombra suave para despegarlo. */
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.06);
     }
     .fg-toggle {
       display: inline-flex;
@@ -1083,14 +1092,23 @@
       flex: 1;
       padding: 20px;
     }
+    /* Grid/List/Plano — arranca en su posición natural (sobre el arranque de
+       la lista) y al hacer scroll queda fijo justo debajo de la barra de
+       filtros. Fondo transparente para que flote como píldora sobre lo que
+       pasa por detrás; sólo la píldora captura clics. */
     .fg-toggle-bar {
       display: flex;
       justify-content: center;
       padding: 28px 24px 16px;
       padding-top: 0px;
-      background: #f2f5f8;
+      background: transparent;
+      position: sticky;
+      top: calc(var(--fg-nav-h, 88px) + var(--fg-filter-h, 0px));
+      z-index: 28;
+      pointer-events: none;
     }
-    
+    .fg-toggle-bar > .fg-toggle-container { pointer-events: auto; }
+
     .fg-toggle-container {
       display: flex;
       align-items: center;
@@ -1099,7 +1117,9 @@
     
     /* Floating round map-pin button — sits inside container next to toggle */
     .fg-location-button {
-      background: transparent;
+      background: #ffffff;
+      border: 1px solid #eaecf0;
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.06);
       border-radius: 100px;
       padding: 4px;
       display: inline-flex;

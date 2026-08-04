@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=26">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=27">
 </head>
 
 <body data-view="grid">
@@ -5890,6 +5890,34 @@
     }
     window.addEventListener('resize', positionToggleBg);
 
+    // Grupo fijo al hacer scroll: nav flotante → barra de filtros → toggle.
+    // Las alturas se miden porque el nav y los filtros cambian de alto según
+    // el breakpoint y el idioma (y los filtros no existen en list/plano).
+    function updateStickyOffsets() {
+      const nav       = document.querySelector('nav');
+      const filterBar = document.querySelector('.fg-filter-bar');
+      const navH      = nav ? Math.round(nav.getBoundingClientRect().height) : 88;
+      // offsetParent === null ⇒ está oculta (vista lista/plano o proyecto sin unidades)
+      const filterH = (filterBar && filterBar.offsetParent !== null)
+        ? Math.round(filterBar.getBoundingClientRect().height)
+        : 0;
+      const root = document.documentElement;
+      root.style.setProperty('--fg-nav-h', navH + 'px');
+      root.style.setProperty('--fg-filter-h', filterH + 'px');
+    }
+    window.addEventListener('resize', updateStickyOffsets);
+    window.addEventListener('load', updateStickyOffsets);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateStickyOffsets);
+    updateStickyOffsets();
+    // Los filtros se envuelven en varias líneas al cambiar el ancho: reobserva.
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(updateStickyOffsets);
+      const navEl = document.querySelector('nav');
+      const fbEl  = document.querySelector('.fg-filter-bar');
+      if (navEl) ro.observe(navEl);
+      if (fbEl)  ro.observe(fbEl);
+    }
+
     function setViewMode(view) {
       const allButtons = document.querySelectorAll('.fg-toggle button[data-view], .fg-location-btn[data-view]');
       allButtons.forEach(b => {
@@ -5915,6 +5943,9 @@
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
+      // En lista/plano la barra de filtros desaparece: el toggle pasa a fijarse
+      // directamente bajo el nav.
+      updateStickyOffsets();
       // The mobile map needs its pan/zoom recomputed now that the canvas has
       // real dimensions (it was hidden, so width/height were 0 before).
       if (view === 'plan' && typeof window.__planFit === 'function') window.__planFit();
