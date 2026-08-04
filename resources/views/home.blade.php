@@ -6009,11 +6009,12 @@
     }
     window.addEventListener('resize', positionToggleBg);
 
-    // La píldora Grid/Lista/Plano sube con la página y, en cuanto llega a la
-    // línea flotante (el borde inferior de .fg-float-probe), se engancha ahí:
-    // se fija exactamente donde ya estaba, sin salto ni parpadeo, y se queda
-    // por encima de lo que venga debajo del listado. El hueco lo conserva
-    // .fg-toggle-spacer. Los filtros NO se fijan: scrollean con la página.
+    // La píldora Grid/Lista/Plano nace en su sitio, justo debajo de los filtros,
+    // y sube con la página. Sólo cuando ese sitio se va por encima del borde
+    // superior se engancha a la línea flotante (el borde inferior de
+    // .fg-float-probe), para seguir a mano mientras se recorre el listado; al
+    // volver a subir, aterriza otra vez donde nació. El hueco mientras flota lo
+    // conserva .fg-toggle-spacer. Los filtros NO se fijan: scrollean con la página.
     (function initFloatingToggle() {
       const bar    = document.querySelector('.fg-toggle-bar');
       const spacer = document.querySelector('.fg-toggle-spacer');
@@ -6048,14 +6049,17 @@
 
       function sync() {
         ticking = false;
-        // En la portada (bandas de tipos) la barra está oculta y todas las
-        // medidas valen 0: no hay nada que enganchar. `getClientRects` es la
-        // prueba fiable — `offsetParent` es null cuando la barra ya flota.
+        // Si la barra está oculta todas las medidas valen 0: no hay nada que
+        // enganchar. `getClientRects` es la prueba fiable — `offsetParent` es
+        // null cuando la barra ya flota.
         if (bar.getClientRects().length === 0) {
           if (floating) { floating = false; bar.classList.remove('is-floating'); spacer.style.height = ''; }
           return;
         }
-        const shouldFloat = naturalPillBottom() <= floatLine()
+        // Se engancha sólo cuando su sitio natural ya se fue por arriba: así la
+        // posición inicial es la de siempre (bajo los filtros) y no se reserva
+        // hueco —ni queda espacio en blanco— mientras la píldora está a la vista.
+        const shouldFloat = naturalPillBottom() <= 0
           && (floating || hasRoomBelow());
         if (shouldFloat === floating) return;
         if (shouldFloat) {
