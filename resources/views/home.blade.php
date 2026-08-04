@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=28">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=29">
 </head>
 
 <body data-view="grid">
@@ -2549,8 +2549,10 @@
         </button>
       </div>
 
-      <!-- Grid/List/Planta Toggle — debajo de los filtros; al hacer scroll se
-           despega y flota centrado abajo (ver .fg-toggle-bar.is-floating). -->
+      <!-- Grid/List/Planta Toggle — debajo de los filtros; al llegar a la línea
+           inferior se engancha ahí y flota (ver .fg-toggle-bar.is-floating).
+           La sonda marca esa línea para que el JS mida sin duplicar la fórmula. -->
+      <div class="fg-float-probe" aria-hidden="true"></div>
       <div class="fg-toggle-spacer" aria-hidden="true"></div>
       <div class="fg-toggle-bar">
         <div class="fg-toggle-container" role="tablist" aria-label="{{ __('View mode') }}">
@@ -5897,50 +5899,57 @@
     }
     window.addEventListener('resize', positionToggleBg);
 
-    // La píldora Grid/Lista/Plano se despega cuando su sitio natural (debajo
-    // de los filtros) se va por encima de la pantalla y flota centrada abajo.
-    // El hueco lo conserva .fg-toggle-spacer para que nada salte al cambiar.
-    // Los filtros NO se fijan: scrollean con la página.
+    // La píldora Grid/Lista/Plano sube con la página y, en cuanto llega a la
+    // línea flotante (el borde inferior de .fg-float-probe), se engancha ahí:
+    // se fija exactamente donde ya estaba, sin salto ni parpadeo, y se queda
+    // por encima de lo que venga debajo del listado. El hueco lo conserva
+    // .fg-toggle-spacer. Los filtros NO se fijan: scrollean con la página.
     (function initFloatingToggle() {
       const bar    = document.querySelector('.fg-toggle-bar');
       const spacer = document.querySelector('.fg-toggle-spacer');
-      if (!bar || !spacer) return;
+      const probe  = document.querySelector('.fg-float-probe');
+      const pill   = bar && bar.querySelector('.fg-toggle-container');
+      if (!bar || !spacer || !probe || !pill) return;
 
-      let floating = false;
-      let ticking  = false;
+      let floating  = false;
+      let ticking   = false;
+      let padBottom = 0;   // padding inferior de la barra en flujo
 
-      function navHeight() {
-        const nav = document.querySelector('nav');
-        const h = nav ? nav.getBoundingClientRect().height : 88;
-        document.documentElement.style.setProperty('--fg-nav-h', Math.round(h) + 'px');
-        return h;
+      // Línea de enganche: la resuelve el navegador (incluye safe-area y el
+      // media query de móvil), así el JS no duplica la fórmula del CSS.
+      function floatLine() {
+        return probe.getBoundingClientRect().bottom;
       }
 
-      // ¿Sigue habiendo listado debajo de la píldora? Si no, se esconde para no
-      // quedar flotando sobre el footer (sin salir del modo flotante: sacarla
-      // del flujo aquí movería la página).
-      function overList() {
+      // Dónde caería el borde inferior de la píldora si no estuviera flotando.
+      // Con la barra flotando, su caja en flujo es exactamente la del hueco.
+      function naturalPillBottom() {
+        return floating
+          ? spacer.getBoundingClientRect().bottom - padBottom
+          : pill.getBoundingClientRect().bottom;
+      }
+
+      // ¿Queda listado por debajo de la línea? Evita enganchar la píldora
+      // cuando el listado es tan corto que ya se ve entero.
+      function hasRoomBelow() {
         const section = document.getElementById('main-unit-reserve-list');
-        if (!section) return true;
-        const barH = parseFloat(spacer.style.height) || bar.offsetHeight || 60;
-        return section.getBoundingClientRect().bottom > window.innerHeight - 24 - barH;
+        return !section || section.getBoundingClientRect().bottom > floatLine();
       }
 
       function sync() {
         ticking = false;
-        // Flotando, el hueco mantiene el alto de la barra: el umbral se mide
-        // siempre sobre el mismo punto de la página, sin rebotes.
-        const anchor = floating ? spacer : bar;
-        const shouldFloat = anchor.getBoundingClientRect().bottom < navHeight() + 8;
-        if (shouldFloat !== floating) {
-          if (shouldFloat) spacer.style.height = bar.offsetHeight + 'px';
-          floating = shouldFloat;
-          bar.classList.toggle('is-floating', floating);
-          if (!floating) spacer.style.height = '';
-          // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
-          positionToggleBg();
+        const shouldFloat = naturalPillBottom() <= floatLine()
+          && (floating || hasRoomBelow());
+        if (shouldFloat === floating) return;
+        if (shouldFloat) {
+          padBottom = parseFloat(getComputedStyle(bar).paddingBottom) || 0;
+          spacer.style.height = bar.offsetHeight + 'px';
         }
-        bar.classList.toggle('is-tucked', floating && !overList());
+        floating = shouldFloat;
+        bar.classList.toggle('is-floating', floating);
+        if (!floating) spacer.style.height = '';
+        // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
+        positionToggleBg();
       }
 
       function schedule() {
