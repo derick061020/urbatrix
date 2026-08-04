@@ -1518,24 +1518,28 @@
     /* ---------------------------------------------------------------------
        Portada (tipos de villa) ↔ catálogo (grid/lista/planta de siempre)
        ---------------------------------------------------------------------
-       Una sola clase en <body> conmuta las dos caras de la home. Sin ella se
-       ven las bandas; con `is-catalog` se ven los filtros y el grid normal,
-       encabezados por la cinta de "volver".
+       La barra de filtros y el toggle Grid/Lista/Planta se ven SIEMPRE, también
+       en la portada: lo único que cambia es qué ocupa el lugar del listado.
+
+         · sin `is-catalog` (vista Grid, sin modelo ni filtros) → bandas de tipos
+         · con `is-catalog`                                     → grid/lista/planta
+
+       El propio toggle y los filtros encienden `is-catalog` (ver
+       syncCatalogMode en el JS), así pasar a Lista/Planta o filtrar muestra el
+       catálogo sin que el usuario tenga que entrar por un tipo.
        --------------------------------------------------------------------- */
-    body.is-catalog .fg-types-section{ display:none; }
+    body.is-catalog .fg-types-section,
+    body:not([data-view="grid"]) .fg-types-section{ display:none; }
     /* Proyectos sin unidades (Naviva / Liv): la portada de tipos se esconde
        junto con el resto del catálogo, sólo queda el estado vacío. */
     body[data-active-project="naviva"] #main-unit-reserve-list .fg-types-section,
     body[data-active-project="naviva"] #main-unit-reserve-list .fg-catalog-head,
     body[data-active-project="liv"]    #main-unit-reserve-list .fg-types-section,
     body[data-active-project="liv"]    #main-unit-reserve-list .fg-catalog-head{ display:none !important; }
-    body:not(.is-catalog) .fg-filter-bar,
-    body:not(.is-catalog) .fg-toggle-bar,
-    body:not(.is-catalog) .fg-toggle-spacer,
-    body:not(.is-catalog) .fg-float-probe,
+    /* En la portada, las bandas sustituyen al grid de unidades (y a su
+       centinela de scroll infinito). La cinta de "volver" sólo tiene sentido
+       dentro del catálogo. */
     body:not(.is-catalog) .fg-units-grid,
-    body:not(.is-catalog) .fg-list-wrap,
-    body:not(.is-catalog) .fg-plan-wrap,
     body:not(.is-catalog) .fg-lazy-more,
     body:not(.is-catalog) .fg-catalog-head{ display:none !important; }
 
@@ -2350,18 +2354,7 @@
         </div>
       </div>
 
-      <!-- ================= PORTADA: tipos de villa =========================
-           Una banda por modelo (Villa A / Villa B / …). "Ver villas" pasa a la
-           vista catálogo con el grid filtrado por ese modelo. -->
       @if(($villaTypes ?? collect())->isNotEmpty())
-        <div class="fg-types-section" id="fgTypesSection">
-          <div class="fg-types-grid">
-            @foreach($villaTypes as $type)
-              @include('partials.home-villa-type', ['type' => $type])
-            @endforeach
-          </div>
-        </div>
-
         <!-- Cinta de "volver": sólo visible dentro del catálogo de un modelo -->
         <div class="fg-catalog-head">
           <button type="button" class="fg-catalog-back" onclick="backToVillaTypes()">
@@ -2576,6 +2569,21 @@
           </div>
         </div>
       </div>
+
+      <!-- ================= PORTADA: tipos de villa =========================
+           Ocupa el lugar del grid mientras no haya modelo abierto ni filtros:
+           una banda por modelo (Villa A / Villa B / …). "Ver villas" abre el
+           grid filtrado por ese modelo. Va aquí, y no antes de los filtros,
+           para que la barra de filtros y el toggle encabecen las dos caras. -->
+      @if(($villaTypes ?? collect())->isNotEmpty())
+        <div class="fg-types-section" id="fgTypesSection">
+          <div class="fg-types-grid">
+            @foreach($villaTypes as $type)
+              @include('partials.home-villa-type', ['type' => $type])
+            @endforeach
+          </div>
+        </div>
+      @endif
 
       <!-- Cards Grid -->
       <div class="fg-units-grid">
@@ -4926,12 +4934,25 @@
       }
     }
 
+    // ¿Portada o catálogo? La barra de filtros y el toggle están siempre a la
+    // vista; lo que cambia es el listado. Manda el catálogo en cuanto hay un
+    // modelo abierto, un filtro activo o una vista distinta de Grid (Lista y
+    // Planta no tienen versión "tipos"). Si no, se ven las bandas.
+    function syncCatalogMode() {
+      const view = document.body.getAttribute('data-view') || 'grid';
+      const on = !document.getElementById('fgTypesSection')   // proyecto sin villas
+              || !!currentFilters.model
+              || view !== 'grid'
+              || hasActiveFilters();
+      document.body.classList.toggle('is-catalog', on);
+      setCatalogHeading(currentFilters.model);
+      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
+    }
+
     function openVillaType(modelKey) {
       currentFilters.model = modelKey || null;
-      document.body.classList.add('is-catalog');
-      setCatalogHeading(currentFilters.model);
       applyPlanModelFilter();
-      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
+      syncCatalogMode();
       reloadUnits({ onDone: () => {
         const anchor = document.querySelector('.fg-catalog-head') || document.querySelector('.fg-filter-bar');
         if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -4939,14 +4960,17 @@
     }
 
     function backToVillaTypes() {
+      // Volver a la portada limpia el modelo y los filtros, y recarga el
+      // catálogo completo por detrás: si desde aquí se pasa a Lista/Planta, lo
+      // que se ve coincide con la barra de filtros (vacía).
       currentFilters.model = null;
-      document.body.classList.remove('is-catalog');
-      setCatalogHeading(null);
+      if (typeof resetFiltersState === 'function') resetFiltersState();
       applyPlanModelFilter();
       // Volver a Grid deja la URL limpia (setViewMode borra `view`), así la
       // próxima visita entra otra vez por las bandas de tipos.
       if (typeof setViewMode === 'function') setViewMode('grid');
-      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
+      syncCatalogMode();
+      reloadUnits({ skipUrl: true });
       syncFiltersToUrl();
       const types = document.getElementById('fgTypesSection');
       if (types) types.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -5376,6 +5400,9 @@
       delete currentFilters._beds;
       currentFilters._available = false;
       currentFilters._exclude = null;
+      // Filtrar desde la portada muestra los resultados: el catálogo sustituye
+      // a las bandas (y al limpiar los filtros, vuelven).
+      if (typeof syncCatalogMode === 'function') syncCatalogMode();
       clearTimeout(_filterDebounce);
       _filterDebounce = setTimeout(() => reloadUnits(options), 250);
     }
@@ -5450,8 +5477,7 @@
     // Restore filter state from URL on first load.
     function applyFiltersFromUrl() {
       const p = new URLSearchParams(window.location.search);
-      // Sin bandas de portada (proyecto sin villas) el catálogo es la home.
-      if (!document.getElementById('fgTypesSection')) document.body.classList.add('is-catalog');
+      syncCatalogMode();
       if (!CATALOG_PARAMS.some(k => p.get(k))) {
         // No URL params — keep the fast server-rendered first page as-is and
         // just initialise the tab + counters (the full catalog count). The rest
@@ -5473,8 +5499,7 @@
       currentFilters.sort       = p.get('sort')  || 'custom_id';
 
       // Un enlace con filtros (o con ?model=) entra directo al catálogo.
-      document.body.classList.add('is-catalog');
-      setCatalogHeading(currentFilters.model);
+      syncCatalogMode();
       applyPlanModelFilter();
 
       // Reflect into the UI controls
@@ -6084,6 +6109,9 @@
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
+      // Lista y Planta no tienen versión "tipos": muestran el catálogo. Al
+      // volver a Grid, si no hay modelo ni filtros, reaparecen las bandas.
+      if (typeof syncCatalogMode === 'function') syncCatalogMode();
       // En lista/plano la barra de filtros desaparece: el hueco del toggle
       // cambia de sitio, hay que reevaluar si debe flotar.
       if (window.__syncFloatingToggle) window.__syncFloatingToggle();
