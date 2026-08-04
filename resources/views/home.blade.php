@@ -1523,6 +1523,12 @@
        encabezados por la cinta de "volver".
        --------------------------------------------------------------------- */
     body.is-catalog .fg-types-section{ display:none; }
+    /* Proyectos sin unidades (Naviva / Liv): la portada de tipos se esconde
+       junto con el resto del catálogo, sólo queda el estado vacío. */
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-types-section,
+    body[data-active-project="naviva"] #main-unit-reserve-list .fg-catalog-head,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-types-section,
+    body[data-active-project="liv"]    #main-unit-reserve-list .fg-catalog-head{ display:none !important; }
     body:not(.is-catalog) .fg-filter-bar,
     body:not(.is-catalog) .fg-toggle-bar,
     body:not(.is-catalog) .fg-toggle-spacer,
@@ -4937,6 +4943,9 @@
       document.body.classList.remove('is-catalog');
       setCatalogHeading(null);
       applyPlanModelFilter();
+      // Volver a Grid deja la URL limpia (setViewMode borra `view`), así la
+      // próxima visita entra otra vez por las bandas de tipos.
+      if (typeof setViewMode === 'function') setViewMode('grid');
       if (window.__syncFloatingToggle) window.__syncFloatingToggle();
       syncFiltersToUrl();
       const types = document.getElementById('fgTypesSection');
@@ -5430,12 +5439,20 @@
       window.history.replaceState({}, '', url);
     }
 
+    // Parámetros que SÍ describen un catálogo (un modelo o un filtro activo) y
+    // por tanto justifican saltarse la portada de tipos. `view` y `unit` no
+    // entran: la vista lista/planta y los enlaces a una unidad dejan rastro en
+    // la URL (history.replaceState), y contarlos escondía las bandas para
+    // siempre en cuanto el usuario tocaba el toggle una vez.
+    const CATALOG_PARAMS = ['model', 'q', 'min', 'max', 'type', 'dir', 'out', 'floor', 'sort',
+                            'beds', 'available', 'exclude'];
+
     // Restore filter state from URL on first load.
     function applyFiltersFromUrl() {
       const p = new URLSearchParams(window.location.search);
       // Sin bandas de portada (proyecto sin villas) el catálogo es la home.
       if (!document.getElementById('fgTypesSection')) document.body.classList.add('is-catalog');
-      if (!p.toString()) {
+      if (!CATALOG_PARAMS.some(k => p.get(k))) {
         // No URL params — keep the fast server-rendered first page as-is and
         // just initialise the tab + counters (the full catalog count). The rest
         // streams in via infinite scroll. No refetch, no flash.
