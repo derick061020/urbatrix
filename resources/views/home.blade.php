@@ -1543,43 +1543,6 @@
     body:not(.is-catalog) .fg-lazy-more,
     body:not(.is-catalog) .fg-catalog-head{ display:none !important; }
 
-    /* ---------------------------------------------------------------------
-       Toggle Cuadrícula / Lista / Planta
-       ---------------------------------------------------------------------
-       La píldora se superpone al arranque del listado: la barra mide 0 de alto
-       (no ocupa fila propia), así entre los filtros y el listado no queda aire
-       y la píldora se lee ENCIMA de las bandas / tarjetas.
-
-       El enganche es `position:sticky`, no JS: sube con la página y se queda a
-       la misma altura bajo el nav mientras se recorre el listado — un
-       movimiento continuo, sin saltos ni apariciones súbitas al pie. Como
-       siempre vive sobre el contenido, lleva de fijo el tratamiento
-       translúcido que antes sólo tenía al flotar.
-       --------------------------------------------------------------------- */
-    #main-unit-reserve-list .fg-toggle-bar{
-      position:sticky; top:var(--fg-toggle-top, 96px); bottom:auto;
-      height:0; padding:0; overflow:visible;
-      display:flex; justify-content:center; align-items:flex-start;
-      z-index:28; pointer-events:none;
-    }
-    #main-unit-reserve-list .fg-toggle-bar > .fg-toggle-container{ pointer-events:auto; }
-    #main-unit-reserve-list .fg-toggle-container{
-      background:rgba(255,255,255,.92);
-      -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
-      border-color:rgba(234,236,240,.9);
-      box-shadow:0 18px 40px -12px rgba(10,13,20,.28), 0 4px 12px rgba(10,13,20,.10);
-    }
-    #main-unit-reserve-list .fg-toggle-bar .fg-location-button{
-      box-shadow:0 8px 20px -6px rgba(10,13,20,.22);
-    }
-    /* Con el bottom-sheet de filtros abierto la píldora estorba. */
-    body.filters-sheet-open #main-unit-reserve-list .fg-toggle-bar{
-      opacity:0; visibility:hidden; transform:translateY(14px);
-    }
-    @media (max-width:900px){
-      #main-unit-reserve-list .fg-toggle-bar{ --fg-toggle-top:84px; }
-    }
-
     .fg-catalog-head{
       display:flex; align-items:center; gap:14px; flex-wrap:wrap;
       padding:26px 24px 0; max-width:1440px; margin:0 auto;
@@ -2558,9 +2521,11 @@
         </button>
       </div>
 
-      <!-- Grid/List/Planta Toggle — se superpone al arranque del listado (la
-           barra mide 0 de alto) y lo acompaña con position:sticky bajo el nav.
-           Ver el bloque "Toggle Cuadrícula / Lista / Planta" del <style>. -->
+      <!-- Grid/List/Planta Toggle — debajo de los filtros; al llegar a la línea
+           inferior se engancha ahí y flota (ver .fg-toggle-bar.is-floating).
+           La sonda marca esa línea para que el JS mida sin duplicar la fórmula. -->
+      <div class="fg-float-probe" aria-hidden="true"></div>
+      <div class="fg-toggle-spacer" aria-hidden="true"></div>
       <div class="fg-toggle-bar">
         <div class="fg-toggle-container" role="tablist" aria-label="{{ __('View mode') }}">
           <div class="fg-toggle" data-node-id="171:10199">
@@ -6044,15 +6009,79 @@
     }
     window.addEventListener('resize', positionToggleBg);
 
-    // El enganche de la píldora Cuadrícula/Lista/Planta es CSS puro
-    // (`position:sticky` sobre el listado, ver el bloque "Toggle" en el <style>):
-    // acompaña el scroll de forma continua, sin saltos ni hueco reservado. Aquí
-    // sólo queda el hook que usaban los llamantes: recolocar la barra activa
-    // cuando cambia la vista o el ancho.
-    (function initStickyToggle() {
-      window.__syncFloatingToggle = positionToggleBg;
-      window.addEventListener('resize', positionToggleBg);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionToggleBg);
+    // La píldora Grid/Lista/Plano sube con la página y, en cuanto llega a la
+    // línea flotante (el borde inferior de .fg-float-probe), se engancha ahí:
+    // se fija exactamente donde ya estaba, sin salto ni parpadeo, y se queda
+    // por encima de lo que venga debajo del listado. El hueco lo conserva
+    // .fg-toggle-spacer. Los filtros NO se fijan: scrollean con la página.
+    (function initFloatingToggle() {
+      const bar    = document.querySelector('.fg-toggle-bar');
+      const spacer = document.querySelector('.fg-toggle-spacer');
+      const probe  = document.querySelector('.fg-float-probe');
+      const pill   = bar && bar.querySelector('.fg-toggle-container');
+      if (!bar || !spacer || !probe || !pill) return;
+
+      let floating  = false;
+      let ticking   = false;
+      let padBottom = 0;   // padding inferior de la barra en flujo
+
+      // Línea de enganche: la resuelve el navegador (incluye safe-area y el
+      // media query de móvil), así el JS no duplica la fórmula del CSS.
+      function floatLine() {
+        return probe.getBoundingClientRect().bottom;
+      }
+
+      // Dónde caería el borde inferior de la píldora si no estuviera flotando.
+      // Con la barra flotando, su caja en flujo es exactamente la del hueco.
+      function naturalPillBottom() {
+        return floating
+          ? spacer.getBoundingClientRect().bottom - padBottom
+          : pill.getBoundingClientRect().bottom;
+      }
+
+      // ¿Queda listado por debajo de la línea? Evita enganchar la píldora
+      // cuando el listado es tan corto que ya se ve entero.
+      function hasRoomBelow() {
+        const section = document.getElementById('main-unit-reserve-list');
+        return !section || section.getBoundingClientRect().bottom > floatLine();
+      }
+
+      function sync() {
+        ticking = false;
+        // En la portada (bandas de tipos) la barra está oculta y todas las
+        // medidas valen 0: no hay nada que enganchar. `getClientRects` es la
+        // prueba fiable — `offsetParent` es null cuando la barra ya flota.
+        if (bar.getClientRects().length === 0) {
+          if (floating) { floating = false; bar.classList.remove('is-floating'); spacer.style.height = ''; }
+          return;
+        }
+        const shouldFloat = naturalPillBottom() <= floatLine()
+          && (floating || hasRoomBelow());
+        if (shouldFloat === floating) return;
+        if (shouldFloat) {
+          padBottom = parseFloat(getComputedStyle(bar).paddingBottom) || 0;
+          spacer.style.height = bar.offsetHeight + 'px';
+        }
+        floating = shouldFloat;
+        bar.classList.toggle('is-floating', floating);
+        if (!floating) spacer.style.height = '';
+        // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
+        positionToggleBg();
+      }
+
+      function schedule() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(sync);
+      }
+
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      window.addEventListener('load', schedule);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+      // Cambiar de vista oculta/muestra los filtros y mueve el hueco.
+      window.__syncFloatingToggle = schedule;
+      sync();
     })();
 
     function setViewMode(view) {
