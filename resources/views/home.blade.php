@@ -5916,12 +5916,21 @@
         return h;
       }
 
+      // Deja de flotar al terminar el listado, para no quedar sobre el footer.
+      function overList() {
+        const section = document.getElementById('main-unit-reserve-list');
+        if (!section) return true;
+        const barH = parseFloat(spacer.style.height) || bar.offsetHeight || 60;
+        return section.getBoundingClientRect().bottom > window.innerHeight - 24 - barH;
+      }
+
       function sync() {
         ticking = false;
         // Flotando, el hueco mantiene el alto de la barra: el umbral se mide
         // siempre sobre el mismo punto de la página, sin rebotes.
         const anchor = floating ? spacer : bar;
-        const shouldFloat = anchor.getBoundingClientRect().bottom < navHeight() + 8;
+        const shouldFloat =
+          anchor.getBoundingClientRect().bottom < navHeight() + 8 && overList();
         if (shouldFloat === floating) return;
         if (shouldFloat) spacer.style.height = bar.offsetHeight + 'px';
         floating = shouldFloat;
