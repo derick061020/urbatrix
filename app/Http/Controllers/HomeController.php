@@ -67,7 +67,61 @@ class HomeController extends Controller
         // Admin shown on the unit modal advisor card ("Chat" with an admin)
         $admin = \App\Models\User::where('role', 'admin')->orderBy('id')->first();
 
-        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds', 'admin'));
+        // Portada del catálogo: una banda por TIPO de villa. El grid de
+        // unidades sueltas aparece después, al pulsar "Ver villas".
+        $villaTypes = $this->villaTypes($units);
+
+        return view('home', compact('units', 'gridUnits', 'villaTypes', 'soldCount', 'totalUnits', 'wishlistIds', 'admin'));
+    }
+
+    /**
+     * Agrupa las villas públicas por modelo (la tipología guardada en `layout`:
+     * T1, T2, T3…) para las bandas de portada de la home. Cada banda muestra la
+     * fase, el nombre del modelo, sus specs y el precio "desde"; el botón "Ver
+     * villas" abre el grid normal filtrado por ese modelo.
+     *
+     * Se calcula sobre la colección ya cargada en {@see index()} — no dispara
+     * consultas extra.
+     *
+     * @param  \Illuminate\Support\Collection<int, Unit>  $units
+     * @return \Illuminate\Support\Collection<int, object>
+     */
+    private function villaTypes($units)
+    {
+        /** Estados que no cuentan como disponibles en el contador del modelo. */
+        $taken = ['sold', 'reserved', 'pending', 'held'];
+
+        return $units
+            ->filter(fn (Unit $u) => strcasecmp((string) $u->type, 'Villa') === 0)
+            // Sin tipología, cada villa es su propio "modelo".
+            ->groupBy(fn (Unit $u) => trim((string) $u->layout) ?: ('#' . $u->id))
+            ->map(function ($group, $key) use ($taken) {
+                $first = $group->first();
+
+                // "Villa A 001" → "Villa A": el número de lote es de la unidad,
+                // no del modelo.
+                $model = trim((string) preg_replace('/[\s\-–_]*\d+\s*$/u', '', (string) $first->name));
+
+                $withImage = $group->first(fn (Unit $u) => $u->images->isNotEmpty()) ?? $first;
+                $priced    = $group->where('price', '>', 0);
+
+                return (object) [
+                    'key'           => (string) $key,
+                    'name'          => $model !== '' ? $model : (string) $first->name,
+                    'eyebrow'       => trim((string) ($first->phase ?? '')) ?: trim((string) ($first->outlook ?? '')),
+                    'bedrooms'      => (int) $first->bedrooms,
+                    'internal_area' => (float) $first->internal_area,
+                    'pools'         => (int) $first->pools,
+                    'price_from'    => (float) ($priced->min('price') ?? 0),
+                    'total'         => $group->count(),
+                    'available'     => $group->reject(
+                        fn (Unit $u) => in_array(strtolower((string) $u->status), $taken, true)
+                    )->count(),
+                    'image'         => optional($withImage->images->first())->path,
+                ];
+            })
+            ->sortBy('key')
+            ->values();
     }
 
     /**
@@ -151,6 +205,14 @@ class HomeController extends Controller
         }
         if ($floors = $this->csvParam($request, 'floor')) {
             $query->whereIn('floor', $floors);
+        }
+
+        // Modelo de villa (tipología `layout`): lo fija el botón "Ver villas"
+        // de las bandas de portada, para abrir el grid de ese modelo. Los
+        // departamentos comparten el espacio de tipologías (T1, T4, T5A…), así
+        // que el filtro se acota además a las villas.
+        if ($models = $this->csvParam($request, 'model')) {
+            $query->where('type', 'Villa')->whereIn('layout', $models);
         }
 
         // "View similar units" helpers (sold-card → other matching units).

@@ -1339,275 +1339,223 @@
     }
 
     /* =====================================================================
-       GRID → BANDAS PARTIDAS  ·  Figma "Homepage - Landmass" 999:24175
+       TIPOS DE VILLA · bandas de portada  ·  Figma "Homepage - Landmass" 999:24175
        ---------------------------------------------------------------------
-       Cada .fg-card del grid se convierte en una banda a sangre partida en
-       dos mitades de 544px: una mitad es la foto y la otra un panel claro
-       (color de página) con eyebrow → nombre → specs → divisor → CTAs. Las
-       mitades se alternan por fila (impar: panel izquierda / par: panel
-       derecha), el precio se lee como chip blanco sobre la foto y el número
-       de orden queda de fondo, detrás del panel.
+       La home NO abre con las villas sueltas: abre con una banda a sangre por
+       MODELO de villa, partida en dos mitades de 544px — una es la foto y la
+       otra un panel claro (color de página) con eyebrow → nombre → specs →
+       CTAs. Las mitades se alternan por fila (impar: panel a la izquierda /
+       par: panel a la derecha), el precio "desde" se lee como chip blanco
+       sobre la foto y el número de orden queda de fondo, detrás del panel.
 
-       Sólo re-maqueta vía CSS: conserva TODOS los hooks JS existentes
-       (data-filter-*, .price[data-usd], wishlist, openMoreInfo,
-       openAdvisorVideoCall…).
+       "Ver villas" pasa a la vista catálogo (body.is-catalog): se esconden las
+       bandas y aparecen los filtros + el grid/lista/planta de siempre,
+       filtrados por ese modelo (ver el bloque "Portada ↔ catálogo" al final).
        ===================================================================== */
-    body[data-view="grid"] .fg-units-grid{
+    .fg-types-grid{
       --band-page:#f2f5f8;
       display:flex; flex-direction:column; gap:0;
-      grid-template-columns:none;
-      width:100%; max-width:none; margin:0; padding:0 0 72px;
+      width:100%; margin:0; padding:0 0 72px;
       background:var(--band-page);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card{
+    .fg-type-band{
       --band-page:#f2f5f8; --band-ink:#171717; --band-muted:#6d7268;
-      --band-faint:#a3a3a3; --band-line:#ebebeb; --band-green:#82b870;
-      position:relative; height:544px; border-radius:0; overflow:hidden;
-      background:var(--band-page); box-shadow:none;
+      --band-faint:#a3a3a3; --band-line:#ebebeb;
+      position:relative; height:544px; overflow:hidden;
+      background:var(--band-page);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:hover{ transform:none; }
 
     /* Rejilla de la banda: 2 columnas iguales. Las filas 1fr de arriba y
        abajo centran verticalmente el contenido del panel. `isolation` crea el
        contexto de apilamiento que necesita el número de fondo (z-index:-1)
        para quedar por detrás del texto pero por delante del fondo. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-inner{
+    .fg-type-band .fg-card-inner{
       position:relative; isolation:isolate;
       height:100%; padding:0; gap:0; border-radius:0; background:transparent;
       display:grid; grid-template-columns:1fr 1fr;
-      grid-template-rows:1fr auto auto auto 1fr;
+      grid-template-rows:1fr auto auto 1fr;
     }
 
     /* --- Mitad foto (a sangre) ------------------------------------------ */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img{
+    .fg-type-band .fg-card-img{
       position:relative; inset:auto; grid-row:1 / -1;
       width:100%; height:100%; border-radius:0; overflow:hidden; background:#e6e9ec;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-img{ grid-column:2; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-img{ grid-column:1; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img > img{
+    .fg-type-band:nth-child(odd)  .fg-card-img{ grid-column:2; }
+    .fg-type-band:nth-child(even) .fg-card-img{ grid-column:1; }
+    .fg-type-band .fg-card-img > img{
       position:absolute; inset:0; left:0; top:0; transform:none;
       width:100%; height:100%; aspect-ratio:auto; object-fit:cover;
     }
-    /* Scrim superior del mockup: oscurece el arranque de la foto para que el
-       chip de precio se lea siempre. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img::before{
+    /* Scrim superior: oscurece el arranque de la foto para que el chip de
+       precio se lea siempre. */
+    .fg-type-band .fg-card-img::before{
       content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
       background:linear-gradient(180deg,rgba(11,28,10,.28),rgba(11,28,10,0) 34%);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img-noimage{
+    .fg-type-band .fg-card-img-noimage{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
       background:linear-gradient(135deg,#e9ecef,#dfe3e6); color:#9ba0a5; font-size:13px;
     }
-    /* Chips (estado + wishlist) al pie de la foto: el mockup reserva la
-       esquina superior para el chip de precio. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-chip-row{
-      position:absolute; top:auto; bottom:16px; left:16px; right:16px; z-index:5; padding:0;
-    }
-    /* En la banda ocultamos la cinta de reserva y la tira de estado inferior:
-       el estado ya lo comunican el chip + la línea de disponibilidad. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-reserve-banner,
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-status-strip{ display:none !important; }
 
-    /* --- Chip de precio sobre la foto ----------------------------------- */
-    /* Se saca del flujo del panel (position:absolute) y se ancla al borde
-       exterior de la banda, como en el mockup. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price{
+    /* --- Chip de precio "desde" sobre la foto --------------------------- */
+    .fg-type-band .fg-card-price{
       position:absolute; top:16px; z-index:6; display:block; margin:0;
       background:#fff; border-radius:4px; padding:12px 14px 10px; line-height:1;
       box-shadow:0 1px 3px rgba(14,18,27,.12);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-price{ right:16px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-price{ left:16px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price::before{
+    .fg-type-band:nth-child(odd)  .fg-card-price{ right:16px; }
+    .fg-type-band:nth-child(even) .fg-card-price{ left:16px; }
+    .fg-type-band .fg-card-price::before{
       content:"DESDE"; display:block; margin-bottom:4px;
       font-family:'Poppins',sans-serif; font-weight:600; font-size:9px;
       letter-spacing:1.62px; color:var(--band-faint);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price .price{
+    .fg-type-band .fg-card-price .price{
       font-family:'Poppins',sans-serif; font-weight:700; font-size:25px; color:var(--band-ink);
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-price .sqft{
-      display:block; margin-top:4px; font-size:11px; font-weight:400; color:var(--band-faint);
     }
 
     /* --- Número de orden de fondo --------------------------------------- */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-band-num{
+    .fg-type-band .fg-band-num{
       position:absolute; top:-20px; z-index:-1; mix-blend-mode:normal;
       font-family:'Poppins',sans-serif; font-weight:700; line-height:1;
       font-size:clamp(150px,19vw,259px); letter-spacing:-.05em;
       color:rgba(0,0,0,.03); text-align:right;
       user-select:none; pointer-events:none;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-band-num{ right:50%; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-band-num{ right:0; }
+    .fg-type-band:nth-child(odd)  .fg-band-num{ right:50%; }
+    .fg-type-band:nth-child(even) .fg-band-num{ right:0; }
 
     /* --- Panel de información (mitad restante) -------------------------- */
     /* `position:static` es intencional: deja que .fg-card-price resuelva su
        posicionamiento contra .fg-card-inner y aterrice sobre la foto. */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body{
+    .fg-type-band .fg-card-body{
       position:static; grid-row:2; width:auto;
       display:flex; flex-direction:column; align-items:flex-start; gap:0;
       padding:0 30px; background:transparent; border-radius:0; box-shadow:none;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stats{
-      grid-row:3; margin-top:14px; padding:0 30px; background:transparent;
-      gap:8px; flex-wrap:wrap;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-actions{
-      grid-row:4; margin-top:16px; padding:0 30px; gap:10px;
+    .fg-type-band .fg-card-actions{
+      grid-row:3; margin-top:28px; padding:0 30px; gap:10px;
       display:flex; flex-direction:column; align-items:flex-start;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-body,
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-stats,
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-actions{ grid-column:1; }
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-body,
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-stats,
-    body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-actions{ grid-column:2; }
+    .fg-type-band:nth-child(odd)  .fg-card-body,
+    .fg-type-band:nth-child(odd)  .fg-card-actions{ grid-column:1; }
+    .fg-type-band:nth-child(even) .fg-card-body,
+    .fg-type-band:nth-child(even) .fg-card-actions{ grid-column:2; }
 
-    /* Cabecera: subtítulo → eyebrow espaciado; nombre grande */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-head{
-      display:flex; flex-direction:column; align-items:flex-start; gap:0; width:100%;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-subtitle{
-      order:-1; margin:0; color:rgba(0,0,0,.36);
+    /* Eyebrow (fase o zona) → nombre del modelo → specs en una línea. */
+    .fg-type-band .fg-card-subtitle{
+      margin:0; color:rgba(0,0,0,.36);
       font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; line-height:1.7;
       letter-spacing:2.64px; text-transform:uppercase;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{
-      font-family:'Poppins',sans-serif; font-weight:600; font-size:36px; line-height:1.25; color:var(--band-ink);
+    .fg-type-band .fg-card-title-row{ margin:0; }
+    .fg-type-band .fg-card-title-row .name{
+      font-family:'Poppins',sans-serif; font-weight:600; font-size:36px;
+      line-height:1.25; color:var(--band-ink); white-space:normal;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .furnished{
-      background:rgba(0,0,0,.05); color:var(--band-muted);
+    .fg-type-band .fg-card-specs{
+      margin-top:10px; font-family:'Poppins',sans-serif; font-weight:300;
+      font-size:14px; line-height:1.5; color:var(--band-muted);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-divider{
-      background:var(--band-line); height:1px; width:100%; margin:16px 0 0;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-discount{
-      align-self:flex-start; font-size:11px; padding:5px 10px; margin-top:12px;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat{ color:var(--band-muted); font-size:12px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat svg{ color:var(--band-muted); }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-stat-divider{ background:rgba(0,0,0,.12); }
 
-    /* --- CTAs: "Ver villa" (blanco) + "Videollamada" (verde de marca) ---- */
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-buttons{
+    /* --- CTAs: "Ver villas" (blanco) + "Agendar videollamada" (verde) ---- */
+    .fg-type-band .fg-card-buttons{
       display:flex; gap:12px; align-items:center; flex-wrap:wrap;
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info,
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info-similar{
+    .fg-type-band .fg-btn-info{
       background:#fff; color:#5c5c5c; border:none; border-radius:10px;
       padding:10px 14px; font-weight:500; font-size:14px; letter-spacing:-.084px;
       box-shadow:0 1px 3px rgba(14,18,27,.12), 0 0 0 1px var(--band-line);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info:hover,
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-info-similar:hover{
-      background:#fafafa; color:var(--band-ink);
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta{
+    .fg-type-band .fg-btn-info:hover{ background:#fafafa; color:var(--band-ink); }
+    .fg-type-band .fg-btn-cta{
       display:inline-flex; align-items:center; justify-content:center; gap:4px;
-      min-width:220px; padding:10px 14px; border-radius:10px;
+      flex:0 0 auto; min-width:220px; padding:10px 14px; border-radius:10px;
       border:1px solid rgba(255,255,255,.12); color:#fff;
       background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0)), var(--brand,#074540);
       font-weight:500; font-size:14px; letter-spacing:-.084px;
       box-shadow:0 1px 2px rgba(14,18,27,.24), 0 0 0 1px var(--brand,#074540);
     }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta:hover{ color:#fff; filter:brightness(1.08); }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta svg{ display:block; width:20px; height:20px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-availability{
-      color:var(--band-muted); font-size:11.5px; margin-top:2px;
-    }
-    /* Neutraliza los aros de color (box-shadow de is-reserved /
-       is-high-demand / is-pending / is-second-chance): en la banda a sangre se
-       leían como franjas rosadas o azules a lo ancho de la página. */
-    body[data-view="grid"] .fg-units-grid > .fg-card,
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-reserved,
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-high-demand,
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-pending,
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-second-chance{ box-shadow:none; }
-
-    /* ---------------------------------------------------------------------
-       VILLAS · panel del mockup
-       ---------------------------------------------------------------------
-       Orden: eyebrow (fase) → nombre → specs en texto → barra de
-       disponibilidad del modelo → divisor. El precio ya vive sobre la foto.
-
-       Para lograrlo sin tocar el DOM que usan la vista lista y el JS, el
-       .fg-card-head pasa a `display:contents`: sus hijos se convierten en
-       ítems del panel y se reordenan con `order`.
-       --------------------------------------------------------------------- */
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-head{ display:contents; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-subtitle{ order:1; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-title-row{ order:2; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-specs{
-      order:3; font-family:'Poppins',sans-serif; font-weight:300; font-size:12.5px;
-      line-height:1.5; color:var(--band-muted);
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply{ order:4; margin-top:10px; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-discount{ order:5; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-divider{ order:6; }
-    /* Las 6 cajas de íconos se reemplazan por la línea de specs en texto. */
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-stats{ display:none; }
-    /* Barra de disponibilidad del modelo ("6 de 8 disponibles"). */
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply{
-      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar{
-      display:inline-flex; gap:4px; flex:0 0 auto;
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar i{
-      width:13px; height:3px; border-radius:2px; background:rgba(0,0,0,.13);
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .bar i.on{
-      background:var(--band-green);
-    }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-supply .txt{
-      color:var(--band-green); font-size:12px; font-weight:600;
-    }
-    /* La línea "hay un asesor disponible" no entra en el panel del mockup;
-       los avisos de vendida / reservada sí se conservan. */
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-card-availability.advisor-live{ display:none; }
-    body[data-view="grid"] .fg-units-grid > .fg-card.is-villa .fg-btn-info .arrow{ margin-left:2px; }
+    .fg-type-band .fg-btn-cta:hover{ color:#fff; filter:brightness(1.08); }
+    .fg-type-band .fg-btn-cta svg{ display:block; width:20px; height:20px; }
 
     /* Responsive: la banda se apila (foto arriba, panel abajo). */
     @media (max-width:900px){
-      body[data-view="grid"] .fg-units-grid{ padding-bottom:60px; }
-      body[data-view="grid"] .fg-units-grid > .fg-card{ height:auto; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-inner{
-        grid-template-columns:1fr; grid-template-rows:auto auto auto auto;
+      .fg-types-grid{ padding-bottom:60px; }
+      .fg-type-band{ height:auto; }
+      .fg-type-band .fg-card-inner{
+        grid-template-columns:1fr; grid-template-rows:auto auto auto;
       }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-img,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-img,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-img{
+      .fg-type-band .fg-card-img,
+      .fg-type-band:nth-child(odd)  .fg-card-img,
+      .fg-type-band:nth-child(even) .fg-card-img{
         grid-column:1; grid-row:1; height:260px;
       }
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-body,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-body,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-stats,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-stats,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-actions,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-actions{ grid-column:1; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body{ padding:22px 20px 0; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-stats{ padding:0 20px; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-actions{ padding:0 20px 26px; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-title-row .name{ font-size:28px; }
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd)  .fg-card-price,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-card-price{
-        top:16px; left:16px; right:auto;
-      }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-band-num,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(odd) .fg-band-num,
-      body[data-view="grid"] .fg-units-grid > .fg-card:nth-child(even) .fg-band-num{
+      .fg-type-band:nth-child(odd)  .fg-card-body,
+      .fg-type-band:nth-child(even) .fg-card-body,
+      .fg-type-band:nth-child(odd)  .fg-card-actions,
+      .fg-type-band:nth-child(even) .fg-card-actions{ grid-column:1; }
+      .fg-type-band .fg-card-body{ padding:22px 20px 0; }
+      .fg-type-band .fg-card-actions{ padding:0 20px 26px; }
+      .fg-type-band .fg-card-title-row .name{ font-size:28px; }
+      .fg-type-band:nth-child(odd)  .fg-card-price,
+      .fg-type-band:nth-child(even) .fg-card-price{ top:16px; left:16px; right:auto; }
+      .fg-type-band .fg-band-num,
+      .fg-type-band:nth-child(odd) .fg-band-num,
+      .fg-type-band:nth-child(even) .fg-band-num{
         top:auto; bottom:-14px; right:12px; font-size:120px;
       }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-btn-cta{ min-width:0; }
+      .fg-type-band .fg-btn-cta{ min-width:0; }
     }
     /* Monitor grande: la banda sigue a sangre, sólo respira más alto. */
     @media (min-width:1600px){
-      body[data-view="grid"] .fg-units-grid > .fg-card{ height:620px; }
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-body,
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-stats,
-      body[data-view="grid"] .fg-units-grid > .fg-card .fg-card-actions{ padding-inline:56px; }
+      .fg-type-band{ height:620px; }
+      .fg-type-band .fg-card-body,
+      .fg-type-band .fg-card-actions{ padding-inline:56px; }
+    }
+
+    /* ---------------------------------------------------------------------
+       Portada (tipos de villa) ↔ catálogo (grid/lista/planta de siempre)
+       ---------------------------------------------------------------------
+       Una sola clase en <body> conmuta las dos caras de la home. Sin ella se
+       ven las bandas; con `is-catalog` se ven los filtros y el grid normal,
+       encabezados por la cinta de "volver".
+       --------------------------------------------------------------------- */
+    body.is-catalog .fg-types-section{ display:none; }
+    body:not(.is-catalog) .fg-filter-bar,
+    body:not(.is-catalog) .fg-toggle-bar,
+    body:not(.is-catalog) .fg-toggle-spacer,
+    body:not(.is-catalog) .fg-float-probe,
+    body:not(.is-catalog) .fg-units-grid,
+    body:not(.is-catalog) .fg-list-wrap,
+    body:not(.is-catalog) .fg-plan-wrap,
+    body:not(.is-catalog) .fg-lazy-more,
+    body:not(.is-catalog) .fg-catalog-head{ display:none !important; }
+
+    .fg-catalog-head{
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+      padding:26px 24px 0; max-width:1440px; margin:0 auto;
+    }
+    .fg-catalog-back{
+      display:inline-flex; align-items:center; gap:8px;
+      background:#fff; border:none; border-radius:10px; cursor:pointer;
+      padding:9px 14px; font-family:'Poppins',sans-serif; font-weight:500;
+      font-size:13px; color:#5c5c5c; letter-spacing:-.084px;
+      box-shadow:0 1px 3px rgba(14,18,27,.12), 0 0 0 1px #ebebeb;
+      transition:background .2s ease, color .2s ease;
+    }
+    .fg-catalog-back:hover{ background:#fafafa; color:#171717; }
+    .fg-catalog-back svg{ width:16px; height:16px; }
+    .fg-catalog-title{
+      font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:#171717;
+    }
+    .fg-catalog-title .eyebrow{
+      display:block; font-weight:600; font-size:11px; letter-spacing:2.2px;
+      text-transform:uppercase; color:rgba(0,0,0,.36);
+    }
+    @media (max-width:900px){
+      .fg-catalog-head{ padding:18px 16px 0; }
     }
 
     /* =====================================================================
@@ -2395,6 +2343,31 @@
           <button type="button" class="fg-project-empty-cta" onclick="toggleProjects()">{{ __('Ver otros proyectos') }}</button>
         </div>
       </div>
+
+      <!-- ================= PORTADA: tipos de villa =========================
+           Una banda por modelo (Villa A / Villa B / …). "Ver villas" pasa a la
+           vista catálogo con el grid filtrado por ese modelo. -->
+      @if(($villaTypes ?? collect())->isNotEmpty())
+        <div class="fg-types-section" id="fgTypesSection">
+          <div class="fg-types-grid">
+            @foreach($villaTypes as $type)
+              @include('partials.home-villa-type', ['type' => $type])
+            @endforeach
+          </div>
+        </div>
+
+        <!-- Cinta de "volver": sólo visible dentro del catálogo de un modelo -->
+        <div class="fg-catalog-head">
+          <button type="button" class="fg-catalog-back" onclick="backToVillaTypes()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            {{ __('Tipos de villa') }}
+          </button>
+          <div class="fg-catalog-title">
+            <span class="eyebrow">{{ __('Villas disponibles') }}</span>
+            <span data-catalog-model-name>{{ __('Todas las unidades') }}</span>
+          </div>
+        </div>
+      @endif
 
       <!-- Filter Bar — encabeza la lista, visible sólo en la vista Grid -->
       <div class="fg-filter-bar" data-grid-only>
@@ -4886,8 +4859,48 @@
       directions: [],
       outlooks: [],
       floors: [],
+      // Modelo de villa (tipología). Lo fija "Ver villas" desde las bandas de
+      // portada; null = catálogo completo.
+      model: null,
       sort: 'custom_id'
     };
+
+    // ============================
+    // PORTADA (tipos de villa) ↔ CATÁLOGO
+    // ============================
+    // La home abre con una banda por modelo de villa. "Ver villas" esconde las
+    // bandas, muestra los filtros + grid/lista/planta de siempre y recarga el
+    // catálogo filtrado por ese modelo; la cinta de "volver" deshace el paso.
+    function setCatalogHeading(modelKey) {
+      const el = document.querySelector('[data-catalog-model-name]');
+      if (!el) return;
+      const band = modelKey
+        ? document.querySelector('.fg-type-band[data-model="' + CSS.escape(modelKey) + '"]')
+        : null;
+      el.textContent = band ? (band.dataset.modelName || modelKey)
+                            : '{{ __('Todas las unidades') }}';
+    }
+
+    function openVillaType(modelKey) {
+      currentFilters.model = modelKey || null;
+      document.body.classList.add('is-catalog');
+      setCatalogHeading(currentFilters.model);
+      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
+      reloadUnits({ onDone: () => {
+        const anchor = document.querySelector('.fg-catalog-head') || document.querySelector('.fg-filter-bar');
+        if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }});
+    }
+
+    function backToVillaTypes() {
+      currentFilters.model = null;
+      document.body.classList.remove('is-catalog');
+      setCatalogHeading(null);
+      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
+      syncFiltersToUrl();
+      const types = document.getElementById('fgTypesSection');
+      if (types) types.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     // Toggle filter dropdown
     // Mobile filters bottom-sheet
@@ -5166,6 +5179,7 @@
       if (f.minPrice != null || f.maxPrice != null) return true;
       if ((f.types && f.types.length) || (f.directions && f.directions.length)
           || (f.outlooks && f.outlooks.length) || (f.floors && f.floors.length)) return true;
+      if (f.model) return true;
       if (f.sort && f.sort !== 'custom_id') return true;
       if (f._beds != null) return true;
       return false;
@@ -5183,6 +5197,7 @@
       if (f.directions && f.directions.length) p.set('dir',   f.directions.join(','));
       if (f.outlooks && f.outlooks.length)     p.set('out',   f.outlooks.join(','));
       if (f.floors && f.floors.length)         p.set('floor', f.floors.join(','));
+      if (f.model)                             p.set('model', f.model);
       if (f.sort && f.sort !== 'custom_id')    p.set('sort',  f.sort);
       // "View similar units" transient criteria (cleared on the next filter change).
       if (f._beds != null)     p.set('beds', f._beds);
@@ -5363,6 +5378,7 @@
       if (f.directions?.length)     params.set('dir',  f.directions.join(','));
       if (f.outlooks?.length)       params.set('out',  f.outlooks.join(','));
       if (f.floors?.length)         params.set('floor', f.floors.join(','));
+      if (f.model)                  params.set('model', f.model);
       if (f.sort && f.sort !== 'custom_id') params.set('sort', f.sort);
       // Preserve `unit` and `view` if already in URL
       const existing = new URLSearchParams(window.location.search);
@@ -5376,6 +5392,8 @@
     // Restore filter state from URL on first load.
     function applyFiltersFromUrl() {
       const p = new URLSearchParams(window.location.search);
+      // Sin bandas de portada (proyecto sin villas) el catálogo es la home.
+      if (!document.getElementById('fgTypesSection')) document.body.classList.add('is-catalog');
       if (!p.toString()) {
         // No URL params — keep the fast server-rendered first page as-is and
         // just initialise the tab + counters (the full catalog count). The rest
@@ -5393,7 +5411,12 @@
       currentFilters.directions = p.get('dir')   ? p.get('dir').split(',').filter(Boolean)   : [];
       currentFilters.outlooks   = p.get('out')   ? p.get('out').split(',').filter(Boolean)   : [];
       currentFilters.floors     = p.get('floor') ? p.get('floor').split(',').filter(Boolean) : [];
+      currentFilters.model      = p.get('model') || null;
       currentFilters.sort       = p.get('sort')  || 'custom_id';
+
+      // Un enlace con filtros (o con ?model=) entra directo al catálogo.
+      document.body.classList.add('is-catalog');
+      setCatalogHeading(currentFilters.model);
 
       // Reflect into the UI controls
       const setCheckGroup = (selector, values) => {
@@ -5589,6 +5612,9 @@
         directions: [],
         outlooks: [],
         floors: [],
+        // El modelo NO es un filtro de la barra: es el tipo de villa que se
+        // abrió desde la portada, así que sobrevive al "restablecer".
+        model: currentFilters.model || null,
         sort: 'custom_id'
       };
 
@@ -5938,6 +5964,13 @@
 
       function sync() {
         ticking = false;
+        // En la portada (bandas de tipos) la barra está oculta y todas las
+        // medidas valen 0: no hay nada que enganchar. `getClientRects` es la
+        // prueba fiable — `offsetParent` es null cuando la barra ya flota.
+        if (bar.getClientRects().length === 0) {
+          if (floating) { floating = false; bar.classList.remove('is-floating'); spacer.style.height = ''; }
+          return;
+        }
         const shouldFloat = naturalPillBottom() <= floatLine()
           && (floating || hasRoomBelow());
         if (shouldFloat === floating) return;

@@ -2754,7 +2754,7 @@
   "habitaciones": "habitaciones",
   "Piscina privada": "Piscina privada",
   ":available de :total disponibles": ":available de :total disponibles",
-  "Ver villa": "Ver villa",
+  "Ver villas": "Ver villas",
   "Villas disponibles de este modelo": "Villas disponibles de este modelo",
   "Villa": "Villa",
   "Anuncios — CRM Landmass Bahía Mar": "Anuncios — CRM Landmass Bahía Mar",
@@ -2814,5 +2814,7 @@
   "BAHÍA MAR": "BAHÍA MAR",
   "BAHÍA MAR · Confidencial": "BAHÍA MAR · Confidencial",
   "BAHÍA MAR · KYC — Verificación de Identidad": "BAHÍA MAR · KYC — Verificación de Identidad",
-  "Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Landmass tiene acceso a tus archivos.": "Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Landmass tiene acceso a tus archivos."
+  "Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Landmass tiene acceso a tus archivos.": "Tus documentos están protegidos con cifrado de extremo a extremo. Solo el equipo legal de Landmass tiene acceso a tus archivos.",
+  "Tipos de villa": "Tipos de villa",
+  "Villas disponibles": "Villas disponibles"
 }
