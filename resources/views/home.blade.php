@@ -2763,6 +2763,9 @@
                       <button type="button"
                               class="fg-lot is-{{ $state }}"
                               data-more-id="{{ $moreId }}"
+                              {{-- Modelo de villa: deja que el masterplan se
+                                   acote al tipo abierto desde la portada. --}}
+                              data-model="{{ strcasecmp((string) ($unit->type ?? ''), 'Villa') === 0 ? ($unit->layout ?? '') : '' }}"
                               data-lot="{{ $lotLbl }}"
                               data-name="{{ $unit->name ?? $lotLbl }}"
                               data-floor="{{ $floorDisplay($floorLabel) }}"
@@ -4881,10 +4884,47 @@
                             : '{{ __('Todas las unidades') }}';
     }
 
+    // El masterplan (vista Planta) se pinta entero en el servidor y no pasa por
+    // /api/home-units, así que el modelo abierto desde la portada se aplica
+    // aquí: se ocultan los lotes de otros modelos, las filas que quedan vacías
+    // y se recalculan los contadores de cada fila y de la leyenda.
+    const PLAN_AVAIL_LABEL = '{{ __('disp.') }}';
+    function applyPlanModelFilter() {
+      const wrap = document.getElementById('fgPlanWrap');
+      if (!wrap) return;
+      const model = currentFilters.model || null;
+      let disp = 0, res = 0, sold = 0;
+
+      wrap.querySelectorAll('.fg-master-row').forEach(row => {
+        let shown = 0, avail = 0;
+        row.querySelectorAll('.fg-lot').forEach(lot => {
+          const ok = !model || lot.dataset.model === model;
+          lot.style.display = ok ? '' : 'none';
+          if (!ok) return;
+          shown++;
+          const st = lot.dataset.state;
+          if (st === 'sold')          sold++;
+          else if (st === 'reserved') res++;
+          else                      { disp++; avail++; }
+        });
+        row.style.display = shown ? '' : 'none';
+        const meta = row.querySelector('.fg-master-rowmeta');
+        if (meta) meta.textContent = avail + ' / ' + shown + ' ' + PLAN_AVAIL_LABEL;
+      });
+
+      const totals = wrap.querySelectorAll('.fg-master-legend b');
+      if (totals.length === 3) {
+        totals[0].textContent = disp;
+        totals[1].textContent = res;
+        totals[2].textContent = sold;
+      }
+    }
+
     function openVillaType(modelKey) {
       currentFilters.model = modelKey || null;
       document.body.classList.add('is-catalog');
       setCatalogHeading(currentFilters.model);
+      applyPlanModelFilter();
       if (window.__syncFloatingToggle) window.__syncFloatingToggle();
       reloadUnits({ onDone: () => {
         const anchor = document.querySelector('.fg-catalog-head') || document.querySelector('.fg-filter-bar');
@@ -4896,6 +4936,7 @@
       currentFilters.model = null;
       document.body.classList.remove('is-catalog');
       setCatalogHeading(null);
+      applyPlanModelFilter();
       if (window.__syncFloatingToggle) window.__syncFloatingToggle();
       syncFiltersToUrl();
       const types = document.getElementById('fgTypesSection');
@@ -5417,6 +5458,7 @@
       // Un enlace con filtros (o con ?model=) entra directo al catálogo.
       document.body.classList.add('is-catalog');
       setCatalogHeading(currentFilters.model);
+      applyPlanModelFilter();
 
       // Reflect into the UI controls
       const setCheckGroup = (selector, values) => {
