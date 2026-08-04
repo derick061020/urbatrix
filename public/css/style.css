@@ -1138,13 +1138,16 @@
     @media (prefers-reduced-motion: reduce) {
       .fg-toggle-bar.is-floating { animation: none; }
     }
-    /* Con el bottom-sheet de filtros abierto la píldora estorba (y vive fuera
-       de su stacking context): se retira. */
+    /* Se retira al acabar el listado (para no flotar sobre el footer) y
+       mientras el bottom-sheet de filtros está abierto (la píldora vive fuera
+       de su stacking context y quedaría por encima). */
+    .fg-toggle-bar.is-floating.is-tucked,
     body.filters-sheet-open .fg-toggle-bar.is-floating {
       animation: none;   /* si no, el fill del keyframe gana sobre opacity */
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
+      transform: translateY(14px);
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
     }
     /* En pantallas estrechas la píldora centrada chocaría con el botón
        flotante de WhatsApp (56px, abajo a la derecha): se sube por encima. */

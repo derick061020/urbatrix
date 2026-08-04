@@ -5916,7 +5916,9 @@
         return h;
       }
 
-      // Deja de flotar al terminar el listado, para no quedar sobre el footer.
+      // ¿Sigue habiendo listado debajo de la píldora? Si no, se esconde para no
+      // quedar flotando sobre el footer (sin salir del modo flotante: sacarla
+      // del flujo aquí movería la página).
       function overList() {
         const section = document.getElementById('main-unit-reserve-list');
         if (!section) return true;
@@ -5929,15 +5931,16 @@
         // Flotando, el hueco mantiene el alto de la barra: el umbral se mide
         // siempre sobre el mismo punto de la página, sin rebotes.
         const anchor = floating ? spacer : bar;
-        const shouldFloat =
-          anchor.getBoundingClientRect().bottom < navHeight() + 8 && overList();
-        if (shouldFloat === floating) return;
-        if (shouldFloat) spacer.style.height = bar.offsetHeight + 'px';
-        floating = shouldFloat;
-        bar.classList.toggle('is-floating', floating);
-        if (!floating) spacer.style.height = '';
-        // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
-        positionToggleBg();
+        const shouldFloat = anchor.getBoundingClientRect().bottom < navHeight() + 8;
+        if (shouldFloat !== floating) {
+          if (shouldFloat) spacer.style.height = bar.offsetHeight + 'px';
+          floating = shouldFloat;
+          bar.classList.toggle('is-floating', floating);
+          if (!floating) spacer.style.height = '';
+          // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
+          positionToggleBg();
+        }
+        bar.classList.toggle('is-tucked', floating && !overList());
       }
 
       function schedule() {
