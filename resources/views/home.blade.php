@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=27">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=28">
 </head>
 
 <body data-view="grid">
@@ -2396,52 +2396,7 @@
         </div>
       </div>
 
-      <!-- Grid/List/Planta Toggle -->
-      <div class="fg-toggle-bar">
-        <div class="fg-toggle-container" role="tablist" aria-label="{{ __('View mode') }}">
-          <div class="fg-toggle" data-node-id="171:10199">
-            <button type="button" class="active" data-view="grid" role="tab" aria-selected="true">
-              <div class="fg-icon-grid">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="7" height="7"></rect>
-                  <rect x="14" y="3" width="7" height="7"></rect>
-                  <rect x="3" y="14" width="7" height="7"></rect>
-                  <rect x="14" y="14" width="7" height="7"></rect>
-                </svg>
-              </div>
-              <span>{{ __('Grid') }}</span>
-            </button>
-            <button type="button" data-view="list" role="tab" aria-selected="false">
-              <div class="fg-icon-list">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="8" y1="6" x2="21" y2="6"></line>
-                  <line x1="8" y1="12" x2="21" y2="12"></line>
-                  <line x1="8" y1="18" x2="21" y2="18"></line>
-                  <line x1="4" y1="6" x2="4" y2="6"></line>
-                  <line x1="4" y1="12" x2="4" y2="12"></line>
-                  <line x1="4" y1="18" x2="4" y2="18"></line>
-                </svg>
-              </div>
-              <span>{{ __('List') }}</span>
-            </button>
-            <div class="fg-toggle-bg-active" aria-hidden="true"></div>
-          </div>
-
-          <!-- Floating Map-Pin (Planta) Button -->
-          <div class="fg-location-button">
-            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="{{ __('Planta view') }}">
-              <div class="fg-icon-location">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filter Bar — placed below the view toggle, visible only in Grid view -->
+      <!-- Filter Bar — encabeza la lista, visible sólo en la vista Grid -->
       <div class="fg-filter-bar" data-grid-only>
         <div class="fg-filters-left">
           <label class="fg-search">
@@ -2593,6 +2548,54 @@
           {{ __('Mostrando :shown de :total unidades', ['shown' => $units->count(), 'total' => $units->count()]) }}
         </button>
       </div>
+
+      <!-- Grid/List/Planta Toggle — debajo de los filtros; al hacer scroll se
+           despega y flota centrado abajo (ver .fg-toggle-bar.is-floating). -->
+      <div class="fg-toggle-spacer" aria-hidden="true"></div>
+      <div class="fg-toggle-bar">
+        <div class="fg-toggle-container" role="tablist" aria-label="{{ __('View mode') }}">
+          <div class="fg-toggle" data-node-id="171:10199">
+            <button type="button" class="active" data-view="grid" role="tab" aria-selected="true">
+              <div class="fg-icon-grid">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                </svg>
+              </div>
+              <span>{{ __('Grid') }}</span>
+            </button>
+            <button type="button" data-view="list" role="tab" aria-selected="false">
+              <div class="fg-icon-list">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="4" y1="6" x2="4" y2="6"></line>
+                  <line x1="4" y1="12" x2="4" y2="12"></line>
+                  <line x1="4" y1="18" x2="4" y2="18"></line>
+                </svg>
+              </div>
+              <span>{{ __('List') }}</span>
+            </button>
+            <div class="fg-toggle-bg-active" aria-hidden="true"></div>
+          </div>
+
+          <!-- Floating Map-Pin (Planta) Button -->
+          <div class="fg-location-button">
+            <button type="button" class="fg-location-btn" data-view="plan" role="tab" aria-selected="false" aria-label="{{ __('Planta view') }}">
+              <div class="fg-icon-location">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Cards Grid -->
       <div class="fg-units-grid">
         @foreach($gridUnits as $unit)
@@ -4891,6 +4894,9 @@
       const backdrop = document.querySelector('.fg-filters-backdrop');
       if (group) group.classList.add('is-open');
       if (backdrop) backdrop.classList.add('is-open');
+      // La píldora flotante vive fuera del stacking context del sheet: se
+      // oculta mientras éste está abierto para que no quede por encima.
+      document.body.classList.add('filters-sheet-open');
       document.body.style.overflow = 'hidden';
     }
     function closeFiltersSheet() {
@@ -4900,6 +4906,7 @@
       if (backdrop) backdrop.classList.remove('is-open');
       // Collapse any open dropdown inside the sheet
       document.querySelectorAll('#filtersGroup .filter-dropdown').forEach(d => d.style.display = 'none');
+      document.body.classList.remove('filters-sheet-open');
       document.body.style.overflow = '';
     }
 
@@ -5890,33 +5897,54 @@
     }
     window.addEventListener('resize', positionToggleBg);
 
-    // Grupo fijo al hacer scroll: nav flotante → barra de filtros → toggle.
-    // Las alturas se miden porque el nav y los filtros cambian de alto según
-    // el breakpoint y el idioma (y los filtros no existen en list/plano).
-    function updateStickyOffsets() {
-      const nav       = document.querySelector('nav');
-      const filterBar = document.querySelector('.fg-filter-bar');
-      const navH      = nav ? Math.round(nav.getBoundingClientRect().height) : 88;
-      // offsetParent === null ⇒ está oculta (vista lista/plano o proyecto sin unidades)
-      const filterH = (filterBar && filterBar.offsetParent !== null)
-        ? Math.round(filterBar.getBoundingClientRect().height)
-        : 0;
-      const root = document.documentElement;
-      root.style.setProperty('--fg-nav-h', navH + 'px');
-      root.style.setProperty('--fg-filter-h', filterH + 'px');
-    }
-    window.addEventListener('resize', updateStickyOffsets);
-    window.addEventListener('load', updateStickyOffsets);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateStickyOffsets);
-    updateStickyOffsets();
-    // Los filtros se envuelven en varias líneas al cambiar el ancho: reobserva.
-    if (window.ResizeObserver) {
-      const ro = new ResizeObserver(updateStickyOffsets);
-      const navEl = document.querySelector('nav');
-      const fbEl  = document.querySelector('.fg-filter-bar');
-      if (navEl) ro.observe(navEl);
-      if (fbEl)  ro.observe(fbEl);
-    }
+    // La píldora Grid/Lista/Plano se despega cuando su sitio natural (debajo
+    // de los filtros) se va por encima de la pantalla y flota centrada abajo.
+    // El hueco lo conserva .fg-toggle-spacer para que nada salte al cambiar.
+    // Los filtros NO se fijan: scrollean con la página.
+    (function initFloatingToggle() {
+      const bar    = document.querySelector('.fg-toggle-bar');
+      const spacer = document.querySelector('.fg-toggle-spacer');
+      if (!bar || !spacer) return;
+
+      let floating = false;
+      let ticking  = false;
+
+      function navHeight() {
+        const nav = document.querySelector('nav');
+        const h = nav ? nav.getBoundingClientRect().height : 88;
+        document.documentElement.style.setProperty('--fg-nav-h', Math.round(h) + 'px');
+        return h;
+      }
+
+      function sync() {
+        ticking = false;
+        // Flotando, el hueco mantiene el alto de la barra: el umbral se mide
+        // siempre sobre el mismo punto de la página, sin rebotes.
+        const anchor = floating ? spacer : bar;
+        const shouldFloat = anchor.getBoundingClientRect().bottom < navHeight() + 8;
+        if (shouldFloat === floating) return;
+        if (shouldFloat) spacer.style.height = bar.offsetHeight + 'px';
+        floating = shouldFloat;
+        bar.classList.toggle('is-floating', floating);
+        if (!floating) spacer.style.height = '';
+        // La barra activa se posiciona midiendo el botón: recolocar tras cambiar.
+        positionToggleBg();
+      }
+
+      function schedule() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(sync);
+      }
+
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      window.addEventListener('load', schedule);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+      // Cambiar de vista oculta/muestra los filtros y mueve el hueco.
+      window.__syncFloatingToggle = schedule;
+      sync();
+    })();
 
     function setViewMode(view) {
       const allButtons = document.querySelectorAll('.fg-toggle button[data-view], .fg-location-btn[data-view]');
@@ -5943,9 +5971,9 @@
       if (view === 'grid' || view === 'list') positionToggleBg();
       // Drive show/hide via body[data-view] for grid/list/plan
       document.body.setAttribute('data-view', view);
-      // En lista/plano la barra de filtros desaparece: el toggle pasa a fijarse
-      // directamente bajo el nav.
-      updateStickyOffsets();
+      // En lista/plano la barra de filtros desaparece: el hueco del toggle
+      // cambia de sitio, hay que reevaluar si debe flotar.
+      if (window.__syncFloatingToggle) window.__syncFloatingToggle();
       // The mobile map needs its pan/zoom recomputed now that the canvas has
       // real dimensions (it was hidden, so width/height were 0 before).
       if (view === 'plan' && typeof window.__planFit === 'function') window.__planFit();

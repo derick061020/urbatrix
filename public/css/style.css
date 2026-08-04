@@ -383,10 +383,9 @@
       --brand-soft-3:  rgba(7, 69, 64, 0.18);
       --brand-ring:    rgba(7, 69, 64, 0.45);
       --brand-overlay: rgba(7, 69, 64, 0.78);
-      /* Alturas del grupo fijo (nav flotante + barra de filtros). Las mide
-         updateStickyOffsets() en home.blade.php; estos son los fallbacks. */
-      --fg-nav-h:    88px;
-      --fg-filter-h: 0px;
+      /* Alto del nav flotante — lo mide measureNavHeight() en home.blade.php.
+         Se usa como umbral para soltar la píldora Grid/Lista/Plano. */
+      --fg-nav-h: 88px;
       transition:
         --brand         0.9s ease,
         --brand-soft    0.9s ease,
@@ -791,9 +790,8 @@
     /* Nota: NO se desactiva la transición del track bajo prefers-reduced-motion,
        porque el deslizamiento lateral del carrusel es parte intencional del diseño. */
 
-    /* FILTER BAR (v2) — sits below the toggle, aligned with the cards grid.
-       Se fija bajo el nav flotante al hacer scroll; el toggle se ancla justo
-       debajo (ver .fg-toggle-bar). */
+    /* FILTER BAR (v2) — encabeza la lista, alineada con la cuadrícula.
+       Scrollea con la página (NO es sticky). */
     .fg-filter-bar {
       background: #f2f5f8;
       display: flex;
@@ -803,8 +801,7 @@
       max-width: 1760px;
       margin: 0 auto;
       padding: 8px 24px 20px;
-      position: sticky;
-      top: var(--fg-nav-h, 88px);
+      position: relative;
       z-index: 30;
     }
     .fg-filter-bar > .fg-filters-left {
@@ -1092,22 +1089,70 @@
       flex: 1;
       padding: 20px;
     }
-    /* Grid/List/Plano — arranca en su posición natural (sobre el arranque de
-       la lista) y al hacer scroll queda fijo justo debajo de la barra de
-       filtros. Fondo transparente para que flote como píldora sobre lo que
-       pasa por detrás; sólo la píldora captura clics. */
+    /* Grid/List/Plano — arranca en su posición natural (justo debajo de los
+       filtros) y, cuando esa posición se va por arriba de la pantalla, la
+       píldora se despega y flota centrada en la parte inferior. El hueco lo
+       conserva .fg-toggle-spacer, así el contenido no salta.
+       Sólo la píldora captura clics: la barra es transparente. */
     .fg-toggle-bar {
       display: flex;
       justify-content: center;
       padding: 28px 24px 16px;
       padding-top: 0px;
       background: transparent;
-      position: sticky;
-      top: calc(var(--fg-nav-h, 88px) + var(--fg-filter-h, 0px));
+      position: relative;
       z-index: 28;
       pointer-events: none;
     }
     .fg-toggle-bar > .fg-toggle-container { pointer-events: auto; }
+
+    /* Reserva el alto de la barra mientras ésta flota (lo fija el JS). */
+    .fg-toggle-spacer { height: 0; }
+
+    .fg-toggle-bar.is-floating {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      padding: 0;
+      z-index: 60;
+      animation: fg-toggle-float-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    /* Flotando sobre las tarjetas necesita más contraste y elevación. */
+    .fg-toggle-bar.is-floating .fg-toggle-container {
+      background: rgba(255, 255, 255, 0.92);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border-color: rgba(234, 236, 240, 0.9);
+      box-shadow:
+        0 18px 40px -12px rgba(10, 13, 20, 0.28),
+        0 4px 12px rgba(10, 13, 20, 0.10);
+    }
+    .fg-toggle-bar.is-floating .fg-location-button {
+      box-shadow: 0 8px 20px -6px rgba(10, 13, 20, 0.22);
+    }
+    @keyframes fg-toggle-float-in {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fg-toggle-bar.is-floating { animation: none; }
+    }
+    /* Con el bottom-sheet de filtros abierto la píldora estorba (y vive fuera
+       de su stacking context): se retira. */
+    body.filters-sheet-open .fg-toggle-bar.is-floating {
+      animation: none;   /* si no, el fill del keyframe gana sobre opacity */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    /* En pantallas estrechas la píldora centrada chocaría con el botón
+       flotante de WhatsApp (56px, abajo a la derecha): se sube por encima. */
+    @media (max-width: 480px) {
+      .fg-toggle-bar.is-floating {
+        bottom: calc(24px + 56px + 12px + env(safe-area-inset-bottom, 0px));
+      }
+    }
 
     .fg-toggle-container {
       display: flex;
@@ -3021,7 +3066,7 @@
     }
 
     @media (max-width: 900px) {
-      .fg-toggle-bar { padding: 20px 16px 12px; }
+      .fg-toggle-bar:not(.is-floating) { padding: 20px 16px 12px; }
       .fg-filter-bar { padding: 4px 16px 16px; gap: 8px; }
       .fg-units-grid { padding: 0 16px 32px 16px; gap: 12px; }
       .fg-stat svg { width: 18px; height: 18px; }
