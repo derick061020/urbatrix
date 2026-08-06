@@ -219,9 +219,12 @@
         position: absolute;
         left: 0; right: 0; bottom: 0;
         padding: 3px;
-        background: rgba(205, 150, 0, 0.12);
+        background: rgb(255 255 255 / 50%);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        /* mismo redondeo inferior que el marco de la imagen (.fg-card-img) */
+        border-bottom-left-radius: 24px;
+        border-bottom-right-radius: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -230,7 +233,7 @@
         font-size: 12px;
         line-height: 24px;
         letter-spacing: 0.96px;
-        color: #cd9600;
+        color: #ffffff;
         text-transform: uppercase;
     }
 
