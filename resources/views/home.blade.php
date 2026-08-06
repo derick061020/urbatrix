@@ -1785,6 +1785,21 @@
     }
   </style>
 
+  {{--
+    CAPA ECO / NATURALEZA · v7  (repo samuelurbi/bahia-mar-eco)
+    -------------------------------------------------------------------------
+    Sombra vegetal en el recuadro claro de cada tipología, banda de compromiso
+    verde en el medio de la lista, grano de papel en los paneles y contador en
+    el header. El detalle técnico —y las seis trampas que no hay que
+    reintroducir— está en public/css/bahia-mar-eco.css.
+
+    ⚠️ Va DESPUÉS del <style> de arriba, no en el <head>. La capa sobreescribe
+    `.fg-type-band .fg-card-inner` (fondo arena, §4) con la MISMA especificidad
+    que la regla del sitio: cargada en el head perdería el desempate por orden
+    de documento y el panel se quedaría en el azul de página.
+  --}}
+  <link rel="stylesheet" href="{{ asset('css/bahia-mar-eco.css') }}?v=7">
+
   <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Agendar Videollamada') }}" onclick="if(event.target===this) closeAdvisorVideoCall()">
     <div class="vc-modal">
       <div class="vc-header">
@@ -6348,6 +6363,35 @@
     setTimeout(function(){ kick(0); }, 8000);
   })();
 </script>
+
+{{--
+  CAPA ECO · copy traducible
+  ---------------------------------------------------------------------------
+  El texto de la banda de compromiso y del contador NO vive en el JS: el sitio
+  tiene selector ES/EN, así que pasa por __() y viaja en `window.ECO_COPY`.
+  bahia-mar-eco.js lo lee de ahí y solo cae a su copia interna si este bloque
+  no llegara a pintarse.
+
+  ⚠️ LAS MÉTRICAS SON PLACEHOLDER. Salieron del prototipo para que se viera el
+  diseño; Bahía Mar tiene que confirmar el % de terreno preservado, el número
+  de árboles nativos y la gestión del agua antes de publicar. Publicar datos
+  ambientales inventados es justo el problema que esta capa pretende evitar.
+--}}
+<script>
+  window.ECO_COPY = {
+    compromiso: {
+      eyebrow: @json(__('Compromiso')),
+      titulo:  @json(__('El proyecto se adapta al terreno. No al revés.')),
+      stats: [
+        { valor: '68%',   label: @json(__('Del terreno preservado')) },
+        { valor: '1.240', label: @json(__('Árboles nativos conservados')) },
+        { valor: '100%',  label: @json(__('Agua de lluvia captada')) }
+      ]
+    },
+    contador: @json(__('<b>68%</b> del terreno preservado · <b>1.240</b> árboles nativos'))
+  };
+</script>
+<script src="{{ asset('js/bahia-mar-eco.js') }}?v=7"></script>
 </body>
 
 </html>

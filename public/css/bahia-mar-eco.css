@@ -1,0 +1,579 @@
+/* ============================================================================
+   BAHÍA MAR — Capa "eco / naturaleza"  ·  v7
+   Validado en vivo sobre https://landmass.urbatrix.com — 2026-08-05
+
+   ── EL PRINCIPIO ──────────────────────────────────────────────────────────
+   Una sombra es información sobre algo que está FUERA del cuadro.
+   Un PNG recortado es un objeto DENTRO del cuadro, compitiendo con la villa.
+
+   En un dashboard de venta todo lo que compite con la foto resta. Por eso la
+   v7 se queda solo con sombras: la naturaleza entra como luz filtrada, no
+   como elementos colocados.
+
+   v7 cambia respecto a v6:
+     · FUERA todos los PNG recortados: las frondas del hero, las enredaderas de
+       las villas y el filodendro de la banda verde. Se leían como sticker
+       pegado por muy bien alineados que estuvieran
+     · el panel de texto de cada villa recibe una sombra vegetal contenida
+     · la banda verde cambia el filodendro flotante por follaje de fondo con
+       máscara de degradado
+     · el HERO se queda sin capa: `.fg-hero::after` es del sitio y la capa lo
+       llevaba rompiendo desde la v5 sin que se viera nada a cambio (sección 1)
+     · se fija UNA dirección de luz para todo el sitio (--eco-sol-x)
+     · grano de papel en los paneles (SVG inline, 0 peticiones, 0 KB)
+
+   Assets huérfanos tras la v7 — se conservan por si se recupera algo, pero
+   ya no los usa nadie: eco-fronda, eco-hiedra, eco-corazones, eco-potos.
+
+   ── ASSETS ────────────────────────────────────────────────────────────────
+   Van en /images/eco/.
+
+     eco-sombra-fronda.webp    1400×1056  sombra de palma    → villas 1, 3 y 5
+     eco-sombra-monstera.webp  1400×1056  sombra de monstera → villas 2 y 4
+     eco-sombra-palma.webp     1600×900   palmera densa      → banda verde
+     eco-follaje-banda.webp    1536×768   follaje denso      → banda verde
+
+   Las dos sombras nuevas salen de Magnific y se procesan antes de entrar:
+   a gris (una sombra tiene que ser neutra) y con el blanco empujado a 255
+   puro. Eso último NO es opcional — ver trampa 3.
+
+   ── SELECTORES REALES ─────────────────────────────────────────────────────
+     .fg-hero          hero (¡ojo! vive dentro de un slider — ver trampa 6)
+     .fg-type-band     cada banda de tipología (Villa A…E)
+     .fg-card-inner    contenedor de la banda (grid 2 columnas, overflow:hidden)
+     .fg-card-img      mitad foto
+     .nav-center       bloque "0 OF 248 UNITS SOLD" del header
+   ============================================================================ */
+
+:root{
+  --eco-ease:  cubic-bezier(.16, 1, .3, 1);
+  --eco-deep:  #1E3D33;
+  --eco-green: #2F5D50;
+  --eco-sand:  #EFEAE0;
+
+  /* ── EL SOL DEL PROYECTO ─────────────────────────────────────────────────
+     Alto y por la izquierda: las sombras caen hacia abajo y a la derecha.
+     TODO lo que proyecte sombra tiene que caer con esta misma inclinación. Si
+     cada sombra sugiere un sol distinto, el conjunto se lee como collage
+     aunque nadie sepa decir por qué — y eso es lo que separa "premium" de
+     "banco de imágenes".
+
+     Es la fracción de la altura de la sombra que se desplaza a la derecha:
+     0.4 ≈ un sol a unos 68° sobre el horizonte.
+
+     ⚠️ Va en el ASSET además de en el CSS: las dos sombras nuevas se generaron
+     pidiendo luz desde arriba-izquierda. Si regeneras una, pídelo igual o
+     apuntará a otro sol.                                                    */
+  --eco-sol-x: .4;
+
+  /* Grano de papel. feTurbulence inline: ni peticiones ni bytes de imagen.
+     Convierte el blanco plano en papel de algodón, que es el material que
+     asocias con lo natural y lo caro a la vez. */
+  --eco-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  --eco-sombra:          url("/images/eco/eco-sombra-palma.webp");
+  --eco-sombra-fronda:   url("/images/eco/eco-sombra-fronda.webp");
+  --eco-sombra-monstera: url("/images/eco/eco-sombra-monstera.webp");
+  --eco-follaje:         url("/images/eco/eco-follaje-banda.webp");
+}
+
+
+/* ══ 1. EL HERO NO LLEVA CAPA — Y NO PUEDE LLEVARLA EN `::after` ═══════════
+   ⚠️ `.fg-hero::after` ES DEL SITIO. Lo usa para el difuminado blanco que
+   funde el hero con el contenido de abajo (style.css: `bottom:-1px;
+   height:6%; linear-gradient(to top, #fff ...)`).
+
+   La capa lo estuvo pisando desde la v5 y el resultado fue doble:
+
+     · la sombra NUNCA se vio. El sitio declara `height:6%` y la capa solo
+       `inset:-8%`; en la cascada sobrevive el height del sitio, así que el
+       pseudo-elemento acababa midiendo 42px colocado en top:-56px, o sea
+       fuera de la caja y recortado por el overflow:hidden del hero
+     · y el difuminado del sitio desaparecía sin que nadie lo notara
+
+   Medido: 0,0% de los píxeles del hero cambiaban al activar o desactivar la
+   capa. Ni pintándolo de rojo sólido a opacidad 1.
+
+   Es la trampa 4 otra vez. Si algún día se quiere efecto en el hero, va en un
+   ELEMENTO PROPIO inyectado por el JS, nunca en este pseudo-elemento.
+
+   Dicho lo cual, tampoco tiene mucho sentido: el hero es 60% cielo, y una
+   sombra proyectada sobre el cielo no existe. Las sombras caen sobre
+   superficies. El resto es la villa, que es el activo de venta.            */
+
+/* Deriva mínima y lentísima: es lo que convierte "textura de fondo" en "hay
+   un árbol ahí fuera". Cada sombra lleva un ritmo distinto y NINGUNO es
+   múltiplo de otro (29/31/37/41/43 son primos), así que no se sincronizan
+   nunca y el ojo no llega a detectar el loop. */
+@keyframes ecoDeriva{
+  from{ transform:translate3d(0, 0, 0) scale(1); }
+  to  { transform:translate3d(-1.4%, 1%, 0) scale(1.04); }
+}
+
+
+/* ══ 2. SOMBRA VEGETAL EN EL PANEL DE LA VILLA ═════════════════════════════
+   Cae sobre el recuadro claro, nunca sobre la foto.
+
+   Va como ITEM DEL GRID, en la columna del texto — el mismo mecanismo que
+   usaban las enredaderas de la v6 y por la misma razón: el sitio maqueta la
+   banda con `grid-template-columns:1fr 1fr` y mete el texto en la columna 1
+   o 2 según la paridad. Pidiendo esa columna, la sombra no puede invadir la
+   foto ni hace falta calcular un solo píxel. El lado lo escribe el JS en
+   `data-eco-side`.
+
+   ⚠️ `z-index:-1` la deja DETRÁS del texto. Sin eso se pinta encima: el body
+   del sitio es `position:static`, así que un hermano posicionado con z-index
+   auto o 0 le gana en orden de pintado.                                    */
+.fg-type-band{ --eco-sombra-fuerza:.07; }
+
+/* ⚠️ DOS CAPAS, y no es decorativo.
+
+   La caja exterior es el grid item y NO se mueve: marca el límite de la
+   celda y recorta. La interior es la que lleva la imagen y la deriva.
+
+   Si se anima el grid item directamente, el `scale(1.04)` del balanceo
+   ensancha su bounding box ~28px y la sombra se mete en la columna de la
+   foto. Con `z-index:-1` no llega a verse —queda detrás del render— pero
+   `invadeFoto` salta, y con razón: basta que alguien suba el z-index para
+   que aparezca encima de la villa.
+
+   El `mix-blend-mode` y la opacidad van en la capa EXTERIOR a propósito: así
+   se compone el grupo entero de una vez y se mezcla con el fondo del panel.
+   Puestos en la interior, el multiply se resolvería contra el contenedor
+   transparente y perdería el fondo arena.                                  */
+/* ⚠️ `position:relative` NO es opcional. Sin él, `.eco-shade i` se posiciona
+   y se dimensiona contra `.fg-card-inner` —que es la BANDA entera, 1425px—
+   en vez de contra el panel. Los porcentajes salen del doble de lo que
+   parecen: `52%` daba 741px en un panel de 713.
+
+   El `overflow:hidden` lo tapaba, así que la sombra no se salía; solo salía
+   al doble de escala. De ahí la mancha que ocupaba todo el cuadro.         */
+.eco-shade{
+  position:relative;
+  grid-row:1 / -1;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+  mix-blend-mode:multiply;
+  opacity:var(--eco-sombra-fuerza);
+}
+
+/* ⚠️ LA CAJA INTERIOR **ES** LA SOMBRA, no el panel.
+
+   Con `inset:0` + `background-size:cover` la imagen se estiraba hasta cubrir
+   un panel de 843×620: cada hoja medía medio recuadro y el conjunto dejaba de
+   leerse como "hay una planta ahí fuera" para leerse como una mancha que
+   ocupaba el cuadro entero.
+
+   Y hay una segunda razón, menos obvia: si la caja es el panel, **la máscara
+   también se calcula sobre el panel**. Una sombra que ocupa el 38% cae
+   entonces dentro de la zona ya desvanecida y desaparece. Pasó con la
+   monstera de Villa B: reducida al tamaño correcto, no se veía.
+
+   Dimensionando la caja a la sombra, la máscara opera sobre la sombra y la
+   escala se controla con un solo número: --eco-sombra-ancho.               */
+.eco-shade i{
+  display:block;
+  position:absolute;
+  top:var(--eco-sombra-y, 0);
+  left:var(--eco-sombra-x, 0);
+  width:var(--eco-sombra-ancho, 46%);
+  aspect-ratio:1.3258;                 /* ratio de los dos assets: 1400×1056 */
+
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+
+  /* Desvanece la salida de la sombra en diagonal, siguiendo al sol. Va sobre
+     la caja de la sombra, así que los porcentajes son de la sombra. */
+  mask-image:linear-gradient(145deg, #000 0%, rgba(0,0,0,.82) 48%, transparent 94%);
+
+  animation:ecoDeriva var(--eco-ritmo, 37s) ease-in-out infinite alternate;
+  will-change:transform;
+}
+
+[data-eco-side="left"]  .eco-shade{ grid-column:1; }
+[data-eco-side="right"] .eco-shade{ grid-column:2; }
+
+/* La sombra entra por la esquina superior, que es el borde por el que la corta
+   el encuadre: así se lee como que viene de fuera y deja el resto limpio.
+
+   No se espeja según el lado, a propósito: espejarla movería el sol al otro
+   lado en media página. Lo único que cambia entre bandas es escala y posición. */
+/* ⚠️ La fuerza va por especie, no global. A la misma opacidad la monstera pesa
+   bastante más que la fronda: son masas sólidas frente a líneas finas con
+   mucho aire entre ellas. Igualadas al 7% la fronda casi desaparecía y la
+   monstera se leía bien. Lo que hay que igualar es el peso PERCIBIDO. */
+[data-eco-shade="fronda"] .eco-shade{ --eco-sombra-fuerza:.11; }
+[data-eco-shade="fronda"] .eco-shade i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:52%;
+}
+
+[data-eco-shade="monstera"] .eco-shade{ --eco-sombra-fuerza:.07; }
+[data-eco-shade="monstera"] .eco-shade i{
+  background-image:var(--eco-sombra-monstera);
+  --eco-sombra-ancho:50%;
+}
+
+/* Tercera banda: mismo asset que la primera, más pequeña y desplazada. Con dos
+   sombras y cinco villas, esto —escala + corte + fuerza— es lo único que
+   distingue una banda de otra. Al ser menor necesita algo más de fuerza para
+   pesar lo mismo.
+
+   ⚠️ LOS OFFSETS SOLO PUEDEN SER 0 O NEGATIVOS. El asset trae la sombra ya
+   cortada por sus bordes superior e izquierdo —se generó así, entrando desde
+   la esquina— y ese corte es lo que la hace leerse como que viene de fuera del
+   cuadro. Un offset positivo la mete hacia dentro del panel y deja el corte a
+   la vista, flotando: con `--eco-sombra-x:8%` quedaban 57px de hueco contra el
+   borde izquierdo y la sombra parecía un recorte pegado.
+
+   En negativo entra MÁS cortada, que es justo lo que diferencia esta banda de
+   la primera sin necesidad de otro asset.                                    */
+[data-eco-shade="fronda-alt"] .eco-shade{ --eco-sombra-fuerza:.13; }
+[data-eco-shade="fronda-alt"] .eco-shade i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:48%;
+  --eco-sombra-x:-7%;
+  --eco-sombra-y:-11%;
+}
+
+/* Cuarta banda: la monstera, más pequeña y entrando cortada por la esquina.
+   Sube menos que la fronda al hacerse pequeña (.07 → .085 frente a .11 → .13)
+   porque es masa sólida: satura antes y a poco que se le suba ensucia el arena.
+
+   ⚠️ Ojo con el eje del recorte: `x` es un % del ANCHO del panel y `y` un % de
+   su ALTO, así que el mismo número corta distinto en cada eje. Estos dos (-9/-8)
+   quitan ~20% de la sombra por cada lado; parecen asimétricos y no lo son. */
+[data-eco-shade="monstera-alt"] .eco-shade{ --eco-sombra-fuerza:.085; }
+[data-eco-shade="monstera-alt"] .eco-shade i{
+  background-image:var(--eco-sombra-monstera);
+  --eco-sombra-ancho:46%;
+  --eco-sombra-x:-9%;
+  --eco-sombra-y:-8%;
+}
+
+/* Quinta banda: la fronda más pequeña de las tres, y la que entra más metida
+   por el lateral. El corte va casi todo en `x` —al revés que fronda-alt, que
+   lo lleva en `y`— y ese cambio de eje es lo que las separa: a escalas tan
+   parecidas, dos frondas cortadas igual se leen como la misma sombra repetida.
+
+   Offsets negativos, como en fronda-alt y por lo mismo. Y no bajar más del 44%
+   de ancho: por debajo, la parte densa cae ya dentro de la zona que desvanece
+   la máscara y la sombra se apaga entera. */
+[data-eco-shade="fronda-corta"] .eco-shade{ --eco-sombra-fuerza:.13; }
+[data-eco-shade="fronda-corta"] .eco-shade i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:45%;
+  --eco-sombra-x:-11%;
+  --eco-sombra-y:-4%;
+}
+
+
+/* ══ 3. GRANO DE PAPEL ═════════════════════════════════════════════════════
+   Al 3,5% no se ve; se nota. Quita el plano digital del fondo claro sin
+   añadir un solo elemento ni una petición.
+
+   Va en `.fg-card-inner::after` — comprobado que el sitio no lo usa (sí usa
+   `.fg-card-img::before` para su degradado, ver trampa 4).                 */
+.fg-type-band .fg-card-inner{ overflow:hidden; }
+
+.fg-type-band .fg-card-inner::after{
+  content:"";
+  position:absolute; inset:0; z-index:-1;
+  pointer-events:none;
+  background-image:var(--eco-grano);
+  background-size:180px 180px;
+  mix-blend-mode:multiply;
+  opacity:.035;
+}
+
+
+/* ══ 4. NEUTRO ARENA ═══════════════════════════════════════════════════════ */
+.fg-type-band .fg-card-inner{
+  background:linear-gradient(150deg, var(--eco-sand) 0%, #F7F4EE 48%, rgba(247,244,238,0) 78%);
+}
+
+
+/* ══ 5. BANDA DE COMPROMISO ════════════════════════════════════════════════ */
+.eco-band{
+  position:relative; overflow:hidden;
+  background:linear-gradient(115deg, #16302A 0%, var(--eco-deep) 55%, #27503F 100%);
+  color:#F2EFE7;
+  padding:64px 7% 68px;
+  margin:0;
+}
+/* Aquí sigue el asset denso: sobre el verde funciona como textura de fondo,
+   no como sombra direccional, así que no pelea con el sol del proyecto.
+
+   Va girado 180°: el render original tiene la masa de palmera abajo a la
+   derecha y las frondas abriéndose hacia arriba. Girado, nace arriba a la
+   izquierda y cae hacia el centro, que es por donde entra la luz en el resto
+   de la capa (--eco-sol-x) y por donde entran también las sombras de las
+   villas. `scale(-1,-1)` es lo mismo que `rotate(180deg)` en un rectángulo. */
+.eco-band::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background-image:var(--eco-sombra); background-size:cover;
+  transform:scale(-1, -1);
+  mix-blend-mode:overlay; opacity:.22;
+}
+/* Follaje de fondo, denso a la derecha y disuelto hacia la izquierda.
+
+   Antes esto era un filodendro recortado apoyado abajo a la derecha, y tenía
+   el mismo problema que las enredaderas de las villas: un PNG flotando —a
+   `bottom:4%`, suspendido sin apoyarse en nada— que se leía como objeto
+   pegado. Es la última pieza donde quedaba ese patrón.
+
+   El asset ya viene medio resuelto: se generó pidiendo que la masa vegetal se
+   disolviera en negro hacia la izquierda, así que la máscara solo remata un
+   degradado que ya existe en la imagen. Por eso puede ser tan suave sin que
+   se vea el corte.
+
+   ⚠️ LLENA EL ALTO DE LA BANDA (`auto 100%`), y eso condiciona el asset.
+
+   El tamaño al que se ven las hojas y la cobertura vertical son la misma
+   variable: bajando el `background-size` las hojas encogen pero dejan hueco
+   arriba y abajo, y el borde de la imagen se ve como un corte recto contra el
+   verde. Se intentó taparlo con una segunda máscara y `mask-composite:
+   intersect` —que además falla en silencio si `-webkit-mask-composite` va
+   después, porque en Chrome es la misma propiedad con valores legacy y pisa
+   `intersect` con `source-in`— y luego con alpha desvanecido en el propio
+   asset. Ninguna de las dos cierra el borde de forma limpia.
+
+   La solución no estaba en el CSS: **el plano lo decide el prompt**. El asset
+   se regeneró como plano general, con las hojas ya pequeñas dentro del
+   encuadre, y así llena el alto al 100% sin ampliarse. Si regeneras la imagen
+   y las hojas salen en primer plano, no lo arregles con `background-size` —
+   vuelve a pedir el plano general.
+
+   `background-repeat:no-repeat` es obligatorio: con `auto 100%` la imagen no
+   llena la caja a lo ancho y sin eso se tesela.
+
+   ⚠️ La máscara horizontal deja el 58% izquierdo limpio. El titular llega al
+   36% y los stats al 62%, así que estos rozan la zona degradada — pero ahí la
+   imagen es casi negra y el texto claro, o sea que el contraste SUBE. Medido
+   sobre píxeles reales. El mínimo exigible es 4,5.                          */
+.eco-band-foliage{
+  position:absolute; inset:0;
+  pointer-events:none;
+  background-image:var(--eco-follaje);
+  background-size:auto 100%;
+  background-position:right center;
+  background-repeat:no-repeat;
+
+  /* Opaca en el borde derecho, transparente al 42%: el follaje ocupa poco más
+     de la mitad derecha y el titular se queda en zona limpia. */
+  mask-image:linear-gradient(to left, #000 0%, rgba(0,0,0,.9) 14%, transparent 42%);
+}
+.eco-band-eyebrow{
+  font-size:11px; letter-spacing:.24em; text-transform:uppercase;
+  opacity:.72; margin:0 0 14px; font-weight:600;
+}
+.eco-band-title{
+  font-size:clamp(24px, 3.4vw, 42px); line-height:1.15; font-weight:400;
+  max-width:15ch; margin:0 0 40px;
+  position:relative; z-index:2;
+}
+.eco-band-stats{
+  display:flex; gap:clamp(28px, 4vw, 56px); flex-wrap:wrap;
+  position:relative; z-index:2;
+  max-width:64%;                       /* los deja en la zona degradada, no en la densa */
+}
+.eco-band-stat b{
+  display:block;
+  font-size:clamp(30px, 4.4vw, 52px); font-weight:300; line-height:1;
+  letter-spacing:-.02em; margin-bottom:8px;
+}
+.eco-band-stat span{
+  font-size:11px; letter-spacing:.13em; text-transform:uppercase; opacity:.7;
+}
+
+
+/* ══ 6. CONTADOR ECO EN EL HEADER ══════════════════════════════════════════ */
+.eco-counter{
+  display:block;
+  font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  font-weight:600; white-space:nowrap;
+  color:var(--eco-green); opacity:.78;
+  margin-top:3px;
+}
+.eco-counter b{ font-weight:800; }
+
+
+/* ══ 7. SOMBRAS DEL SITIO, ALINEADAS AL MISMO SOL ══════════════════════════
+   Solo se tocan las sombras GRANDES. En una sombra de 1-3px de desenfoque el
+   ángulo no se percibe y desplazarla solo la ensucia; donde sí se lee es en
+   el pill del header, que flota 20px sobre la página.
+
+   Es lo único que esta capa le sobreescribe al sitio. Si molesta, se borra
+   este bloque entero y no se rompe nada.                                   */
+nav > div{
+  box-shadow:
+    calc( 5px * var(--eco-sol-x))  5px  5px   rgba(0,0,0,.04),
+    calc(18px * var(--eco-sol-x)) 18px 16px   rgba(0,0,0,.05),
+    calc(41px * var(--eco-sol-x)) 41px 22.5px rgba(0,0,0,.04),
+    calc(73px * var(--eco-sol-x)) 73px 30px   rgba(0,0,0,.02) !important;
+}
+
+
+/* ══ 8. RESPONSIVE ═════════════════════════════════════════════════════════
+   La sombra vive en la columna del grid, así que encoge y crece con él sola.
+   No hay ni un número que replicar: al desaparecer las plantas desaparece
+   también todo el problema de gutters que arrastraba la capa desde la v3.  */
+@media (max-width:900px){
+  .eco-band-stats{ max-width:100%; }
+  .eco-band-foliage{ opacity:.35; }
+
+  /* El grid colapsa a una columna y la fila 1 pasa a ser la FOTO. La sombra
+     pide `grid-row:1/-1`, o sea que cubriría también el render de la villa.
+     Se limita a la fila del texto y se baja la fuerza. */
+  .eco-shade{ grid-row:2 / -1; grid-column:1; --eco-sombra-fuerza:.05; }
+}
+
+
+/* ══ 9. COHERENCIA ═════════════════════════════════════════════════════════
+   Un sitio "eco" que quema batería es una contradicción. No es opcional.   */
+@media (prefers-reduced-motion:reduce){
+  .eco-shade i{ animation:none; }
+}
+
+
+/* ============================================================================
+   AUDITORÍA — pegar en la consola tras cualquier cambio.
+   Pásalo al menos a 1440 px y a 1700 px: el sitio cambia el padding y la
+   altura de la banda en 1600. Todo tiene que cumplirse a la vez:
+
+     invadeFoto  == 0     la sombra se queda en el recuadro claro
+     recorta     == true  la caja exterior sigue conteniendo el balanceo
+     naceDelBorde== true  entra desde el borde, no empieza dentro del panel
+     detrasTexto == true  no se pinta por encima del contenido
+     contraste   >= 4.5   el título sigue siendo legible sobre la sombra
+                          (hoy da 11-12; los 4,8 / 5,2 de antes eran el bug
+                          del regex que se arregla más abajo, no una medida)
+     zigzag      == ok    el sitio alterna foto/texto y sigue alternando
+     ritmos      == ok    ninguna animación es múltiplo de otra
+     heroIntacto == true  la capa no ha pisado el ::after del sitio. En el
+                          index.html de este repo sale `n/a`: la página se quedó
+                          solo con la sección de tipologías y ahí no hay hero.
+                          Donde importa —el sitio real y el demo de consola— se
+                          sigue midiendo
+
+   (() => {
+     // ⚠️ El regex lleva el punto DENTRO. El arena oscurecido se calcula a mano
+     // y sale con decimales — y con coma flotante, con muchos: 239*(1-.07) da
+     // 222.26999999999998. Con /\d+/ eso se parte en "222" y "26999999999998",
+     // el segundo entra como canal G y la luminancia se va a 1e27. Con .085
+     // salia un 125 igual de falso. Los contrastes de 4,8 y 5,2 que se venian
+     // leyendo eran ESO, no una medida: los reales rondan 11-12.
+     const out = {}, lum = c => {
+       const [r,g,b] = c.match(/[\d.]+/g).slice(0,3).map(v => {
+         v /= 255; return v <= .03928 ? v/12.92 : ((v+.055)/1.055) ** 2.4;
+       });
+       return .2126*r + .7152*g + .0722*b;
+     };
+
+     document.querySelectorAll('.eco-shade').forEach(sh => {
+       const band  = sh.closest('.fg-type-band');
+       const foto  = band.querySelector('.fg-card-img').getBoundingClientRect();
+       const nombre = band.querySelector('.fg-card-title-row .name');
+       const hijo = sh.querySelector('i');
+
+       // medir en los DOS extremos del balanceo, no en un instante suelto, y
+       // sobre la caja EXTERIOR: es la que marca el limite de la celda. Si el
+       // recorte de .eco-shade desapareciera, aqui es donde se veria.
+       let invade = 0;
+       ['none', 'translate3d(-1.4%,1%,0) scale(1.04)'].forEach(t => {
+         hijo.style.animation = 'none'; hijo.style.transform = t;
+         const r = sh.getBoundingClientRect();
+         if (Math.min(r.right,foto.right) - Math.max(r.left,foto.left) > 1 &&
+             Math.min(r.bottom,foto.bottom) - Math.max(r.top,foto.top) > 1) invade = 1;
+       });
+       hijo.style.animation = ''; hijo.style.transform = '';
+
+       // Contraste del titulo en el PEOR punto: sobre el fondo arena ya
+       // oscurecido por la parte mas densa de la sombra. Medir contra el arena
+       // limpio daria un 15 que no significa nada — el texto no cae ahi.
+       const fuerza = parseFloat(getComputedStyle(sh).opacity);
+       const arena = [239, 234, 224].map(c => c * (1 - fuerza));   // multiply con negro
+       const L1 = lum(getComputedStyle(nombre).color);
+       // concatenacion en vez de template literal: este bloque viaja dentro de
+       // un String.raw en demo-consola.js, donde una interpolacion romperia el
+       // literal. generar-demo.py lo comprueba y se planta si aparece una.
+       const L2 = lum('rgb(' + arena.join(',') + ')');
+       const ratio = (Math.max(L1,L2) + .05) / (Math.min(L1,L2) + .05);
+
+       // la sombra tiene que ENTRAR desde el borde, no empezar dentro del panel:
+       // el asset viene cortado por arriba y por la izquierda y ese corte solo
+       // se lee bien si coincide con el borde. Offsets positivos lo dejan a la
+       // vista — paso con --eco-sombra-x:8% en Villa C, 57px de hueco.
+       const ri = hijo.getBoundingClientRect(), rs = sh.getBoundingClientRect();
+
+       out[band.dataset.modelName] = {
+         sombra: band.dataset.ecoShade,
+         lado: band.dataset.ecoSide,
+         invadeFoto: invade,
+         recorta: getComputedStyle(sh).overflow === 'hidden',
+         detrasTexto: getComputedStyle(sh).zIndex === '-1',
+         naceDelBorde: Math.round(ri.left - rs.left) <= 0 &&
+                       Math.round(ri.top  - rs.top)  <= 0,
+         contraste: +ratio.toFixed(1),
+         opacidad: getComputedStyle(sh).opacity
+       };
+     });
+
+     const lados = [...document.querySelectorAll('.fg-type-band')].map(b =>
+       getComputedStyle(b.querySelector('.fg-card-img')).gridColumnStart);
+     out.zigzag = lados.every((l, i) => !i || l !== lados[i-1])
+       ? 'ok' : 'ROTO — columnas: ' + lados.join(', ');
+
+     // ritmos: si uno es multiplo de otro, acaban sincronizandose y se ve el loop.
+     // ⚠️ La animacion vive en `.eco-shade i`. La exterior NO se mueve nunca —es
+     // la que recorta, seccion 2— asi que leyendola a ella salian 0s en todas,
+     // 0 % 0 = NaN, y el check cantaba SE SINCRONIZAN pasara lo que pasara.
+     // Filtra los 0 porque con prefers-reduced-motion no hay animacion y eso no
+     // es un fallo.
+     const rit = [...document.querySelectorAll('.eco-shade i')]
+       .map(s => parseFloat(getComputedStyle(s).animationDuration)).filter(d => d > 0);
+     out.ritmos = !rit.length ? 'sin animacion (reduced-motion)'
+       : rit.every((a, i) => rit.every((b, j) =>
+           i === j || (Math.max(a,b) % Math.min(a,b)) > .01)) ? 'ok' : 'SE SINCRONIZAN: ' + rit.join(', ');
+
+     // el ::after del hero es del SITIO (difuminado blanco inferior, height:6%).
+     // Si la capa vuelve a pisarlo, se rompe en silencio — ver seccion 1.
+     //
+     // ⚠️ El guard NO sobra. index.html se quedo solo con la seccion de
+     // tipologias, o sea que AQUI no hay hero, y getComputedStyle(null,'::after')
+     // lanza TypeError y se lleva por delante el `return out` — la auditoria
+     // entera dejaba de dar resultado por una comprobacion que en esta pagina ni
+     // aplica. Donde si hay hero (el sitio real, el demo de consola) se mide
+     // exactamente igual que antes.
+     const hero = document.querySelector('.fg-hero');
+     if (hero) {
+       const ha = getComputedStyle(hero, '::after');
+       out.heroIntacto = ha.backgroundImage.includes('gradient') &&
+                         !ha.backgroundImage.includes('eco-sombra');
+     } else {
+       out.heroIntacto = 'n/a — esta pagina no tiene hero';
+     }
+
+     // El follaje de la banda: el titular tiene que caber en la zona que la
+     // mascara deja limpia (58% izquierdo). Que los stats rocen el degradado SI
+     // vale — ahi la imagen es casi negra y el texto claro, asi que el
+     // contraste sube. Medido sobre pixeles reales: 9.3 bajo el titular y 8.4
+     // bajo el stat de la derecha, el peor. El minimo exigible es 4.5.
+     const fol = document.querySelector('.eco-band-foliage');
+     if (fol) {
+       const b = document.querySelector('.eco-band').getBoundingClientRect();
+       const t = document.querySelector('.eco-band-title').getBoundingClientRect();
+       const cs = getComputedStyle(fol);
+       out.follajeBanda = {
+         tieneMascara: cs.maskImage !== 'none',
+         // sin no-repeat se tesela: la imagen ya no llena la caja
+         noSeRepite: cs.backgroundRepeat === 'no-repeat',
+         titularEnZonaLimpia: (t.right - b.left) / b.width <= 0.58
+       };
+     }
+     return out;
+   })()
+   ============================================================================ */
