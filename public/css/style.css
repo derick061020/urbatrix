@@ -1540,14 +1540,12 @@
     }
     .fg-card-img > img {
       position: absolute;
-      left: 50%;
-      top: 5.33%;
-      bottom: 5.33%;
-      transform: translateX(-50%);
-      height: 89.34%;
-      aspect-ratio: 768 / 561;
-      width: auto;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      /* cover: llena todo el marco sin deformar (recorta por los lados) */
       object-fit: cover;
+      object-position: center;
       display: block;
     }
     .fg-card-img-noimage {
@@ -1705,8 +1703,8 @@
       left: 0; right: 0; bottom: 0;
       padding: 6px 10px;
       background: rgba(205, 150, 0, 0.12);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
       justify-content: center;
