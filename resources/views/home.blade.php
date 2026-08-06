@@ -2354,7 +2354,11 @@
     <div class="fg-hero-spacer" aria-hidden="true"></div>
 
     <!-- Main Content -->
-    <div id="main-unit-reserve-list" style="min-height:100vh;background:#f2f5f8;">
+    {{-- El fondo va con fallback a propósito: la capa eco (sección 10) define
+         --eco-page y lo pasa a arena; sin la capa, el listado recupera el azul
+         del sitio solo. Es inline porque lo era ya, y desde una hoja de estilos
+         no se le gana a un inline sin !important. --}}
+    <div id="main-unit-reserve-list" style="min-height:100vh;background:var(--eco-page,#f2f5f8);">
 
       <!-- Empty state for projects without units (Naviva / Liv) -->
       <div class="fg-project-empty" aria-hidden="true">

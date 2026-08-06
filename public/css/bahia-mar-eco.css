@@ -51,6 +51,25 @@
   --eco-green: #2F5D50;
   --eco-sand:  #EFEAE0;
 
+  /* ── EL FONDO DE LA PÁGINA ───────────────────────────────────────────────
+     El sitio venía con #f2f5f8, un gris azulado frío. Con el panel de las
+     villas en arena, ese azul se lee como otro material: el recuadro claro
+     deja de parecer parte de la página y parece un cartón pegado encima.
+
+     Esto NO es un tono nuevo: es el MISMO #f2f5f8 en la familia cálida. La
+     luminancia es la de siempre (~96%), lo único que cambia es el matiz, así
+     que todo lo que estaba calculado sobre el fondo —contrastes de texto,
+     bordes, las sombras de las tarjetas blancas— sigue valiendo igual.
+
+     ⚠️ Tiene que quedar entre los dos extremos del degradado del panel
+     (#EFEAE0 → #F7F4EE): un pelo más claro que el arranque y un pelo más
+     oscuro que el final. Esa es la relación que la sección 4 dio por buena —
+     panel ligeramente más profundo que la página, disolviéndose en ella. Si
+     lo igualas al #F7F4EE, el panel desaparece y las bandas pierden el
+     recuadro; si lo bajas al #EFEAE0, el degradado se invierte y el panel se
+     lee más claro que la página, que es justo al revés de lo diseñado.      */
+  --eco-page: #F5F1E9;
+
   /* ── EL SOL DEL PROYECTO ─────────────────────────────────────────────────
      Alto y por la izquierda: las sombras caen hacia abajo y a la derecha.
      TODO lo que proyecte sombra tiene que caer con esta misma inclinación. Si
@@ -437,6 +456,78 @@ nav > div{
 @media (prefers-reduced-motion:reduce){
   .eco-shade i{ animation:none; }
 }
+
+
+/* ══ 10. HOMOLOGACIÓN DEL FONDO ════════════════════════════════════════════
+   La sección 4 puso el panel de las villas en arena y dejó el resto de la
+   página en el #f2f5f8 azulado del sitio. Con las bandas a sangre, el salto
+   se ve en el borde exacto donde acaba el degradado del panel: la mitad
+   cálida contra la mitad fría, y el recuadro claro leyéndose como un cartón
+   pegado sobre otra página.
+
+   Aquí se arregla al revés de como se rompió: en vez de enfriar el panel, se
+   pasa la PÁGINA a la misma familia. Son cuatro superficies —el fondo del
+   listado, la barra de filtros, las bandas y el pie— más el difuminado del
+   hero, que es lo que cose el cielo con lo que viene debajo.
+
+   ⚠️ Lo que NO entra aquí, y no es olvido: los #f2f5f8 de los chips, los
+   hover, el pill del toggle, los botones de "vendido" y los bordes. Ésos no
+   son fondo de página, son gris neutro SOBRE tarjeta blanca, y la tarjeta
+   sigue siendo blanca. Calentarlos los volvería beige sucio sobre blanco.
+   Regla para saber cuál es cuál: si al elemento le puedes ver el borde
+   contra la página, es chrome y se queda; si es la página, entra.          */
+
+/* Fondo del listado. El valor vive en un `style=""` inline del blade —
+   `background:var(--eco-page,#f2f5f8)`— porque una hoja de estilos no le gana
+   a un inline sin `!important`. Escrito con fallback, así que si esta capa se
+   quita, el listado recupera el azul del sitio él solo. */
+
+.fg-filter-bar{ background:var(--eco-page); }
+
+.fg-types-grid,
+.fg-type-band{ --band-page:var(--eco-page); }
+
+/* El pie es la última superficie de página. En blanco contra arena se lee
+   frío justo donde el ojo ya venía en cálido; el borde superior sigue siendo
+   quien lo separa, así que no pierde su función. */
+.fg-footer{ background:var(--eco-page); }
+
+/* ⚠️ `.fg-hero::after` ES DEL SITIO — y esto NO contradice la sección 1.
+   Lo que allí se prohíbe es SECUESTRARLO: la v5 lo usó para meter una sombra,
+   se llevó por delante el difuminado del sitio y encima la sombra no se veía.
+
+   Aquí no se le cambia el trabajo: sigue siendo el mismo difuminado, en el
+   mismo sitio y con la misma altura. Sólo se le cambia el COLOR hacia el que
+   funde, porque fundir a blanco cuando lo que hay debajo es arena deja una
+   banda clara a lo ancho del hero.
+
+   Se sobreescribe únicamente `background`. `height`, `bottom` y `z-index`
+   siguen siendo del sitio: la trampa 2 era precisamente que la capa declaraba
+   `inset` y el `height:6%` del sitio le ganaba en la cascada, dejando el
+   pseudo-elemento fuera de la caja. Toca una propiedad y ninguna geometría.
+
+   La auditoría sigue en verde: `heroIntacto` pide que sea un gradient y que
+   no lleve `eco-sombra` dentro. Las dos se cumplen.
+
+   ⚠️ SON DOS, no uno. El hero vive dentro de un slider (`.fg-stage.has-slider`)
+   que alterna la celda del hero con celdas de imagen, y cada tipo de celda
+   trae SU PROPIO difuminado: `.fg-hero::after` (6% de alto) y
+   `.hs-cell-img::after` (8%). Recolorear sólo el primero deja el defecto
+   exactamente igual de visible, porque el hero pasa buena parte del tiempo
+   fuera de pantalla y lo que se ve es la otra celda. Se detectó midiendo la
+   costura: el píxel llegaba a 255,255,255 justo encima del arena.          */
+.fg-hero::after,
+.hs-cell-img::after{
+  background:linear-gradient(to top,
+    var(--eco-page)          0%,
+    rgba(245,241,233,.92)   35%,
+    rgba(245,241,233,.45)   70%,
+    rgba(245,241,233,0)    100%);
+}
+
+/* El espaciador iba de blanco a #f2f5f8 para coser el hero con el listado.
+   Con los dos extremos ya en arena no tiene nada que degradar: plano. */
+.fg-hero-spacer{ background:var(--eco-page); }
 
 
 /* ============================================================================
