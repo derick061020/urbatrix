@@ -974,27 +974,36 @@
     .fg-filters-sheet-head,
     .fg-filters-sheet-apply { display: none; }
 
-    /* GRID/LIST TOGGLE — outer slate container with 2 pills + floating map-pin button */
+    /* GRID/LIST TOGGLE — dos piezas SUELTAS, no una caja que las envuelva:
+       la píldora blanca (Grid + List, con el activo en verde) y, separado por
+       el hueco, el botón redondo del mapa flotando a su costado.
+       El contenedor es solo la fila que las separa: sin fondo ni borde, o
+       volvería a leerse como un único bloque gris con el mapa metido dentro. */
     .fg-toggle-container {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      padding: 8px;
-      background: #f2f5f8;
-      border: 1px solid #eaecf0;
-      border-radius: 100px;
-      /* Al quedar fijo flota sobre las tarjetas: sombra suave para despegarlo. */
-      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.06);
+      gap: 14px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
+    /* La píldora: es ella la que lleva fondo, radio y sombra. Sin borde — en
+       el diseño se despega por la sombra, no por una línea. Ojo: el `padding`
+       es lo que mete la barra verde hacia dentro, y positionToggleBg() la
+       coloca midiendo el botón (offsetLeft/offsetTop), así que el relleno se
+       respeta solo sin tener que repetir el número en el JS. */
     .fg-toggle {
       display: inline-flex;
       align-items: stretch;
       gap: 6px;
       position: relative;
-      background: transparent;
+      background: #ffffff;
       border: 0;
-      padding: 0;
-      box-shadow: none;
+      padding: 8px;
+      border-radius: 100px;
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.10);
     }
     .fg-toggle-bg-active {
       position: absolute;
@@ -1007,9 +1016,12 @@
       width: 90px; /* fallback antes de que el JS lo mida; sobrescrito por positionToggleBg() */
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.12);
+      /* Contenida: la píldora blanca solo la separa 8px del borde, así que una
+         sombra grande se sale por el canto redondeado y lo emborrona. Va corta
+         y en verde de marca, para que se lea apoyada y no flotando aparte. */
       box-shadow:
-        0 10px 22px -6px rgba(31,36,48,0.45),
-        0 3px 8px 0 rgba(31,36,48,0.30);
+        0 2px 6px -1px rgba(7, 69, 64, 0.30),
+        0 1px 2px 0 rgba(7, 69, 64, 0.20);
       transition:
         left 0.32s cubic-bezier(0.22,1,0.36,1),
         width 0.32s cubic-bezier(0.22,1,0.36,1),
@@ -1105,7 +1117,10 @@
       z-index: 28;
       pointer-events: none;
     }
-    .fg-toggle-bar > .fg-toggle-container { pointer-events: auto; }
+    /* Los clics los capturan las dos piezas, NO la fila que las contiene: el
+       hueco entre la píldora y el mapa deja pasar el ratón a las tarjetas. */
+    .fg-toggle-bar .fg-toggle,
+    .fg-toggle-bar .fg-location-button { pointer-events: auto; }
 
     /* Reserva el alto de la barra mientras ésta flota (lo fija el JS). */
     .fg-toggle-spacer { height: 0; }
@@ -1133,24 +1148,24 @@
       visibility: hidden;
       pointer-events: none;
     }
-    /* Flotando sobre las tarjetas necesita más contraste y elevación. */
-    .fg-toggle-container {
+    /* Flotando sobre las tarjetas necesita más contraste y elevación. Va en
+       cada pieza por separado —ya no hay caja común— para que las dos suban
+       igual y el hueco entre ellas siga siendo hueco de verdad. */
+    .fg-toggle,
+    .fg-location-button {
       transition:
         background 0.3s ease,
         border-color 0.3s ease,
         box-shadow 0.3s ease;
     }
-    .fg-toggle-bar.is-floating .fg-toggle-container {
+    .fg-toggle-bar.is-floating .fg-toggle,
+    .fg-toggle-bar.is-floating .fg-location-button {
       background: rgba(255, 255, 255, 0.92);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
-      border-color: rgba(234, 236, 240, 0.9);
       box-shadow:
         0 18px 40px -12px rgba(10, 13, 20, 0.28),
         0 4px 12px rgba(10, 13, 20, 0.10);
-    }
-    .fg-toggle-bar.is-floating .fg-location-button {
-      box-shadow: 0 8px 20px -6px rgba(10, 13, 20, 0.22);
     }
     /* Con el bottom-sheet de filtros abierto la píldora estorba (y vive fuera
        de su stacking context): se retira. */
@@ -1166,19 +1181,16 @@
       :root { --fg-float-gap: 92px; }
     }
 
-    .fg-toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    /* Floating round map-pin button — sits inside container next to toggle */
+    /* Botón redondo del mapa — pieza suelta, al costado de la píldora.
+       Mismo relleno (8px) y mismo alto de pieza interior (44px) que la
+       píldora, así los dos círculos exteriores miden igual y la fila queda
+       a ras arriba y abajo. Si tocas uno, toca el otro. */
     .fg-location-button {
       background: #ffffff;
-      border: 1px solid #eaecf0;
-      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.06);
+      border: 0;
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.10);
       border-radius: 100px;
-      padding: 4px;
+      padding: 8px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1187,8 +1199,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       padding: 6px;
       border: none;
       border-radius: 100px;
@@ -1210,9 +1222,11 @@
         linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
         #074540;
       border: none;
+      /* Misma sombra corta que la píldora verde (.fg-toggle-bg-active): las dos
+         piezas están igual de metidas en su blanco, así que se apoyan igual. */
       box-shadow:
-        0 10px 22px -6px rgba(31,36,48,0.45),
-        0 3px 8px 0 rgba(31,36,48,0.30);
+        0 2px 6px -1px rgba(7, 69, 64, 0.30),
+        0 1px 2px 0 rgba(7, 69, 64, 0.20);
     }
     .fg-location-btn.active .fg-icon-location svg { color: #ffffff; }
     

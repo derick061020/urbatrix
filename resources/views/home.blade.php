@@ -6049,7 +6049,11 @@
       const bg = toggle.querySelector('.fg-toggle-bg-active');
       const active = toggle.querySelector('button[data-view].active');
       if (!bg || !active) return;
+      // `top` también se mide: la píldora tiene relleno, así que el botón no
+      // arranca en el borde. Midiéndolo, el relleno puede cambiar en el CSS
+      // sin tener que repetir aquí el número.
       bg.style.left  = active.offsetLeft + 'px';
+      bg.style.top   = active.offsetTop + 'px';
       bg.style.width = active.offsetWidth + 'px';
     }
     window.addEventListener('resize', positionToggleBg);
