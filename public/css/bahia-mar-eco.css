@@ -527,7 +527,7 @@
   background-size:auto 100%;
   background-position:right center;
   background-repeat:no-repeat;
-  animation:ecoBandaFollaje 41s ease-in-out infinite alternate;
+  animation:ecoBandaFollaje 31s ease-in-out infinite alternate;
   will-change:transform;
 
   /* Opaca en el borde derecho, transparente al 42%: el follaje ocupa poco más
@@ -535,14 +535,19 @@
   mask-image:linear-gradient(to left, #000 0%, rgba(0,0,0,.9) 14%, transparent 42%);
 }
 
-/* 41s: primo, distinto del de la palmera de esta misma banda (37) y de los de
+/* 31s: primo, distinto del de la palmera de esta misma banda (29) y de los de
    las villas. Las dos capas de la banda tienen que ir a ritmos distintos o se
    mueven como un bloque, y entonces no es follaje meciéndose: es una foto
-   deslizándose. */
+   deslizándose.
+
+   El recorrido es el único de toda la capa que NO tiene un techo geométrico
+   —hacia la derecha siempre hay sitio—, así que el límite es de lectura: a
+   partir de ~4% la masa densa se despega visiblemente del canto derecho y se
+   ve que es una imagen moviéndose, no hojas. */
 @keyframes ecoBandaFollaje{
   0%   { transform:translate3d(0, 0, 0); }
-  44%  { transform:translate3d(1.2%, 0, 0); }
-  100% { transform:translate3d(2%, 0, 0); }
+  44%  { transform:translate3d(2%, 0, 0); }
+  100% { transform:translate3d(3.4%, 0, 0); }
 }
 
 .eco-band-eyebrow{
