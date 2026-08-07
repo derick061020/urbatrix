@@ -1504,7 +1504,7 @@
     @media (max-width: 380px) {
       .logo-img { max-width: 104px !important; }
     }
-    /* CARD — Duna v2.1 spec */
+    /* CARD — v2.1 spec */
     .fg-card {
       --status-color: var(--brand);
       --status-soft: rgba(7, 69, 64, 0.10);
@@ -2763,7 +2763,7 @@
       font-weight: 700;
       font-size: 12px;
       line-height: 20px;
-      color: #074540;                  /* makai green */
+      color: #074540;                  /* brand green */
       letter-spacing: 0.96px;
       white-space: nowrap;
     }

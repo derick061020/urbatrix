@@ -53,7 +53,7 @@ return [
     // Sign in with Apple. The `client_secret` is a short-lived JWT that we
     // generate at runtime from the .p8 private key (see AppleController), so
     // here we only need the raw credentials issued in the Apple Developer
-    // portal. `client_id` is the Services ID identifier (e.g. com.makai.web).
+    // portal. `client_id` is the Services ID identifier (e.g. com.bahiamar.web).
     'apple' => [
         'client_id'     => env('APPLE_CLIENT_ID'),
         'client_secret' => env('APPLE_CLIENT_SECRET'), // optional: pre-generated JWT

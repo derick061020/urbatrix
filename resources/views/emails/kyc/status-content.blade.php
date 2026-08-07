@@ -40,9 +40,9 @@
       @if($reason !== '')
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 22px 0;">
           <tr>
-            <td style="background-color:#fbf3f3;border:1px solid #f0d6d6;border-radius:10px;padding:14px 16px;">
-              <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:10px;font-weight:600;color:#b15454;letter-spacing:0.08em;text-transform:uppercase;">{{ __('Motivo') }}</p>
-              <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#7a4a4a;line-height:1.6;">{{ $reason }}</p>
+            <td style="background-color:#fde8e8;border:1px solid rgba(220,38,38,0.3);border-radius:10px;padding:14px 16px;">
+              <p style="margin:0 0 4px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:10px;font-weight:600;color:#d92d20;letter-spacing:0.08em;text-transform:uppercase;">{{ __('Motivo') }}</p>
+              <p style="margin:0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#b42318;line-height:1.6;">{{ $reason }}</p>
             </td>
           </tr>
         </table>

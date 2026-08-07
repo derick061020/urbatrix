@@ -280,7 +280,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/profile',  [AdminController::class, 'editProfile'])->name('admin.profile.edit');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
-    // Firma del proyecto (usada para firmar los contratos a nombre de Makai)
+    // Firma del proyecto (usada para firmar los contratos a nombre de Bahía Mar)
     Route::post('/project-signature', [AdminController::class, 'updateProjectSignature'])->name('admin.project-signature.update');
 
     // Menú del cliente (ítems configurables del navbar: enlaces y documentos)

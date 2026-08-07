@@ -59,13 +59,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Seed: project for existing Makai units
+        // Seed: proyecto principal para las unidades existentes
         $projectId = \DB::table('projects')->insertGetId([
-            'name'        => 'Makai Cap Cana',
+            'name'        => 'Bahía Mar',
             'type'        => 'Vertical',
             'stage'       => 'Construcción',
             'progress'    => 38,
-            'color'       => '#C9A84C',
+            'color'       => '#074540',
             'description' => 'Proyecto principal',
             'created_at'  => now(),
             'updated_at'  => now(),

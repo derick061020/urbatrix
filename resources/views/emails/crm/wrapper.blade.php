@@ -69,8 +69,8 @@
           </td>
         </tr>
 
-        <!-- RED ACCENT BAR -->
-        <tr><td style="background-color:#074540;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <!-- ACCENT BAR — filo claro de marca entre el header y el hero -->
+        <tr><td style="background-color:#e8f0ef;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         {{-- ── CONTENIDO DE LA PLANTILLA ── --}}
         {!! $content !!}

@@ -266,7 +266,7 @@
                                 <img src="{{ $img->path }}" alt="{{ $unitName }}" class="w-full h-36 object-cover" onerror="this.style.display='none'">
                             </div>
                         @endif
-                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">{{ __('Proyecto Landmass · Playa del Carmen') }}</div>
+                        <div class="text-[11px] font-semibold text-ink-500 uppercase tracking-wider">{{ config('company.project') }} · {{ config('company.location') }}</div>
                         <div class="font-display text-[18px] font-bold text-ink-950 mt-1">Unidad {{ $unitName }}</div>
 
                         <ul class="mt-4 space-y-2 text-[12px] text-ink-600">

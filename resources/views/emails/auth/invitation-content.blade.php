@@ -5,6 +5,13 @@
     $unitName  = $unitName ?? '';
     $days      = $days ?? 7;
     $project   = config('company.project', 'Bahía Mar Residences');
+
+    // Ojo: un @if pegado a una palabra ("nombre@if(...)") NO lo compila Blade
+    // —el \B de su regex falla— y deja el @endif suelto, rompiendo la vista.
+    // Por eso el inciso de la unidad se arma aquí y se inyecta ya montado.
+    $unitPhrase = $unitName
+        ? ' '.__('para').' <strong style="color:#171717;font-weight:600;">'.e($unitName).'</strong>'
+        : '';
 @endphp
 
 <!-- HERO -->
@@ -22,8 +29,8 @@
       <p style="margin:0 0 6px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#525866;line-height:1.6;">{{ __('Hola') }} <strong style="color:#171717;font-weight:600;">{{ $name }}</strong>,</p>
     @endif
     <p style="margin:0 0 24px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#525866;line-height:1.65;">
-      Nuestro equipo ha registrado una reserva a tu nombre@if($unitName) para <strong style="color:#171717;font-weight:600;">{{ $unitName }}</strong>@endif.
-      Para acceder a tu portal y dar seguimiento al proceso, solo necesitas activar tu cuenta y crear una contraseña.
+      {{ __('Nuestro equipo ha registrado una reserva a tu nombre') }}{!! $unitPhrase !!}.
+      {{ __('Para acceder a tu portal y dar seguimiento al proceso, solo necesitas activar tu cuenta y crear una contraseña.') }}
     </p>
 
     <!-- CTA BUTTON -->

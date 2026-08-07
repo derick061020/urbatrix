@@ -14,7 +14,7 @@ class CrmOperativoSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure additional projects exist. Only Makai is "active" in the UI —
+        // Ensure additional projects exist. Only Bahía Mar is "active" in the UI —
         // Naviva and LIV are kept as upcoming (En preparación) to match Figma
         // (Figma 644:40555). Colors + icons are sampled from the Figma render.
         $projects = [

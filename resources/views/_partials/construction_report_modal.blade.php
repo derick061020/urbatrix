@@ -33,68 +33,68 @@
     .rpt-close {
         position: absolute; top: 14px; right: 14px; z-index: 5;
         width: 30px; height: 30px; border-radius: 999px;
-        border: 1px solid rgba(241,237,227,0.25); background: rgba(241,237,227,0.10);
-        color: #F1EDE3; cursor: pointer; font-size: 12px;
+        border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.10);
+        color: #ffffff; cursor: pointer; font-size: 12px;
         display: inline-flex; align-items: center; justify-content: center;
         transition: background .15s;
     }
-    .rpt-close:hover { background: rgba(241,237,227,0.22); }
+    .rpt-close:hover { background: rgba(255,255,255,0.22); }
 
     /* Header */
-    .rpt-head { background: #0b1c0a; padding: 20px 36px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .rpt-brand { font-size: 14px; font-weight: 600; color: #F1EDE3; letter-spacing: .22em; text-transform: uppercase; line-height: 1; }
-    .rpt-group { font-size: 8px; font-weight: 400; color: rgba(241,237,227,.35); letter-spacing: .14em; text-transform: uppercase; margin-top: 4px; }
-    .rpt-doclabel { font-size: 8px; font-weight: 500; color: rgba(241,237,227,.3); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
-    .rpt-goldbar { background: #B8962E; height: 2px; font-size: 0; line-height: 0; }
+    .rpt-head { background: #074540; padding: 20px 36px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .rpt-brand { font-size: 14px; font-weight: 600; color: #ffffff; letter-spacing: .22em; text-transform: uppercase; line-height: 1; }
+    .rpt-group { font-size: 8px; font-weight: 400; color: rgba(255,255,255,.35); letter-spacing: .14em; text-transform: uppercase; margin-top: 4px; }
+    .rpt-doclabel { font-size: 8px; font-weight: 500; color: rgba(255,255,255,.3); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+    .rpt-accentbar { background: #e8f0ef; height: 2px; font-size: 0; line-height: 0; }
 
     /* Hero */
-    .rpt-hero { background: #0f2710; padding: 26px 36px 22px; }
-    .rpt-eyebrow { margin: 0 0 7px 0; font-size: 9px; font-weight: 500; color: rgba(241,237,227,.4); letter-spacing: .24em; text-transform: uppercase; }
-    .rpt-title { margin: 0; font-size: 22px; font-weight: 300; color: #F1EDE3; letter-spacing: -.02em; line-height: 1.15; }
+    .rpt-hero { background: #053330; padding: 26px 36px 22px; }
+    .rpt-eyebrow { margin: 0 0 7px 0; font-size: 9px; font-weight: 500; color: rgba(255,255,255,.4); letter-spacing: .24em; text-transform: uppercase; }
+    .rpt-title { margin: 0; font-size: 22px; font-weight: 300; color: #ffffff; letter-spacing: -.02em; line-height: 1.15; }
     .rpt-title strong { font-weight: 600; }
 
     /* Body */
     .rpt-body { background: #fff; padding: 28px 36px 8px; }
-    .rpt-period { margin: 0 0 14px 0; font-size: 9px; font-weight: 600; color: #8a8a84; letter-spacing: .22em; text-transform: uppercase; }
+    .rpt-period { margin: 0 0 14px 0; font-size: 9px; font-weight: 600; color: #99a0ae; letter-spacing: .22em; text-transform: uppercase; }
 
-    .rpt-progress-block { background: #0b1c0a; padding: 20px 18px; border-radius: 8px; }
-    .rpt-progress-cap { margin: 0 0 4px 0; font-size: 9px; font-weight: 500; color: rgba(184,150,46,.75); letter-spacing: .14em; text-transform: uppercase; }
-    .rpt-progress-num { margin: 0; font-size: 30px; font-weight: 600; color: #F1EDE3; letter-spacing: -.01em; }
+    .rpt-progress-block { background: #074540; padding: 20px 18px; border-radius: 8px; }
+    .rpt-progress-cap { margin: 0 0 4px 0; font-size: 9px; font-weight: 500; color: rgba(255,255,255,.45); letter-spacing: .14em; text-transform: uppercase; }
+    .rpt-progress-num { margin: 0; font-size: 30px; font-weight: 600; color: #ffffff; letter-spacing: -.01em; }
     .rpt-progress-num span.pct { font-size: 18px; }
-    .rpt-progress-num span.lbl { font-size: 11px; font-weight: 400; color: rgba(241,237,227,.5); }
-    .rpt-bar { margin-top: 12px; background: rgba(241,237,227,.12); border-radius: 3px; height: 6px; overflow: hidden; }
-    .rpt-bar > span { display: block; height: 6px; background: #B8962E; border-radius: 3px; }
+    .rpt-progress-num span.lbl { font-size: 11px; font-weight: 400; color: rgba(255,255,255,.5); }
+    .rpt-bar { margin-top: 12px; background: rgba(255,255,255,.12); border-radius: 3px; height: 6px; overflow: hidden; }
+    .rpt-bar > span { display: block; height: 6px; background: #e8f0ef; border-radius: 3px; }
 
-    .rpt-desc { margin: 14px 0 0 0; font-size: 12px; color: #6a6a64; line-height: 1.65; }
+    .rpt-desc { margin: 14px 0 0 0; font-size: 12px; color: #525866; line-height: 1.65; }
 
-    .rpt-meta { display: flex; margin-top: 14px; border-top: 1px solid #e8e7e3; border-bottom: 1px solid #e8e7e3; }
+    .rpt-meta { display: flex; margin-top: 14px; border-top: 1px solid #eaecf0; border-bottom: 1px solid #eaecf0; }
     .rpt-meta-cell { flex: 1 1 0; padding: 14px 16px; }
-    .rpt-meta-cell + .rpt-meta-cell { border-left: 1px solid #e8e7e3; }
-    .rpt-meta-cap { margin: 0 0 3px 0; font-size: 9px; font-weight: 500; color: #8a8a84; letter-spacing: .12em; text-transform: uppercase; }
-    .rpt-meta-val { margin: 0; font-size: 14px; font-weight: 600; color: #1a1a18; }
+    .rpt-meta-cell + .rpt-meta-cell { border-left: 1px solid #eaecf0; }
+    .rpt-meta-cap { margin: 0 0 3px 0; font-size: 9px; font-weight: 500; color: #99a0ae; letter-spacing: .12em; text-transform: uppercase; }
+    .rpt-meta-val { margin: 0; font-size: 14px; font-weight: 600; color: #171717; }
 
     /* Phases */
-    .rpt-section-cap { margin: 22px 0 12px; font-size: 9px; font-weight: 600; color: #8a8a84; letter-spacing: .18em; text-transform: uppercase; }
+    .rpt-section-cap { margin: 22px 0 12px; font-size: 9px; font-weight: 600; color: #99a0ae; letter-spacing: .18em; text-transform: uppercase; }
     .rpt-phase { margin-bottom: 12px; }
     .rpt-phase-top { display: flex; align-items: center; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-    .rpt-phase-name { display: flex; align-items: center; gap: 8px; color: #1a1a18; font-weight: 600; }
+    .rpt-phase-name { display: flex; align-items: center; gap: 8px; color: #171717; font-weight: 600; }
     .rpt-phase-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
-    .rpt-phase-meta { color: #8a8a84; font-size: 11px; }
-    .rpt-phase-meta b { color: #1a1a18; }
-    .rpt-phase-bar { background: #eceae4; border-radius: 3px; height: 5px; overflow: hidden; }
+    .rpt-phase-meta { color: #99a0ae; font-size: 11px; }
+    .rpt-phase-meta b { color: #171717; }
+    .rpt-phase-bar { background: #eaecf0; border-radius: 3px; height: 5px; overflow: hidden; }
     .rpt-phase-bar > span { display: block; height: 5px; border-radius: 3px; }
 
     /* Photos */
     .rpt-photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .rpt-photos a { display: block; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; background: #eceae4; border: 1px solid #e8e7e3; }
+    .rpt-photos a { display: block; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; background: #eaecf0; border: 1px solid #eaecf0; }
     .rpt-photos img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* Signature */
-    .rpt-sign { background: #f7f6f3; padding: 18px 36px; border-top: 1px solid #e8e7e3; }
+    .rpt-sign { background: #f5f7fa; padding: 18px 36px; border-top: 1px solid #eaecf0; }
     .rpt-sign p { margin: 0; }
-    .rpt-sign .a { font-size: 11px; color: #4a4a46; margin-bottom: 2px; }
-    .rpt-sign .b { font-size: 12px; font-weight: 600; color: #1a1a18; margin-bottom: 2px; }
-    .rpt-sign .c { font-size: 10px; color: #8a8a84; }
+    .rpt-sign .a { font-size: 11px; color: #525866; margin-bottom: 2px; }
+    .rpt-sign .b { font-size: 12px; font-weight: 600; color: #171717; margin-bottom: 2px; }
+    .rpt-sign .c { font-size: 10px; color: #99a0ae; }
 
     @media (max-width: 520px) {
         .rpt-head, .rpt-hero, .rpt-body, .rpt-sign { padding-left: 22px; padding-right: 22px; }
@@ -122,7 +122,7 @@
                 </div>
                 <div class="rpt-doclabel">{{ __('Avance · E-04') }}</div>
             </div>
-            <div class="rpt-goldbar">&nbsp;</div>
+            <div class="rpt-accentbar">&nbsp;</div>
 
             {{-- Hero --}}
             <div class="rpt-hero">

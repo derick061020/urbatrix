@@ -195,13 +195,71 @@
   }
 
 
+  /* ── 4. Entradas al entrar en pantalla ──────────────────────────────────
+     ⚠️ EL ESTADO OCULTO SE ESCRIBE DESDE AQUÍ, nunca desde el CSS.
+
+     Si `.eco-reveal` viniera puesto en la hoja de estilos y este archivo no
+     llegara a ejecutarse —un 404, un error más arriba, un navegador sin
+     IntersectionObserver— la home entera se quedaría en blanco: el contenido
+     seguiría en el DOM, invisible, sin nadie que lo encienda. Poniéndolo el
+     JS, el peor caso es que las bandas aparezcan ya montadas, que es
+     exactamente como estaban antes de esta sección.
+
+     Por eso también el guard de IntersectionObserver va ANTES de marcar
+     nada. */
+  const observador = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entradas, obs) => {
+        entradas.forEach(e => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('eco-in');
+          obs.unobserve(e.target);      // se entra una vez; no es un efecto de scroll
+        });
+      }, {
+        /* Un poco antes del borde inferior: la entrada tiene que estar
+           terminando cuando la banda llega al centro de la pantalla, no
+           empezando. Con `0px` se ve arrancar y parece que va con retraso. */
+        rootMargin: '0px 0px -12% 0px',
+        threshold: 0.08
+      })
+    : null;
+
+  function revelar() {
+    if (!observador) return;
+    document.querySelectorAll('.fg-type-band, .eco-band').forEach(el => {
+      if (el.classList.contains('eco-reveal')) return;
+
+      /* Lo que ya está en pantalla al cargar NO se anima: se marca como
+         entrado y punto. Animar lo visible obliga al usuario a esperar a que
+         aparezca algo que ya debería estar ahí, y encima compite con la
+         entrada del hero. */
+      const r = el.getBoundingClientRect();
+      const visible = r.top < innerHeight * 0.9 && r.bottom > 0;
+
+      el.classList.add('eco-reveal');
+      if (visible) el.classList.add('eco-in');
+      else observador.observe(el);
+    });
+  }
+
+
+  /* ⚠️ Aquí vivía una entrada para la píldora del header, enganchada a
+     `makai:hero-revealed`. Está retirada, y el porqué está escrito entero en
+     el CSS (sección 11, "LA PÍLDORA DEL HEADER NO ENTRA"). Resumen: no
+     conseguí demostrar que la transición terminara siempre, y su fallo dejaba
+     la cabecera invisible. No lo reintentes sin leer aquello. */
+
+
   /* La banda no altera la paridad (va al final del DOM, colocada con
      `order`), así que el orden de estas llamadas es indiferente. Se mantiene
-     por legibilidad. */
+     por legibilidad.
+
+     `revelar()` sí va la última: necesita que la banda de compromiso exista
+     ya para poder observarla. */
   function init() {
     pintarBandaCompromiso();
     pintarSombras();
     pintarContador();
+    revelar();
   }
 
   document.readyState === 'loading'
@@ -222,6 +280,7 @@
       colocarBanda();            // las villas nuevas nacen sin order
       pintarSombras();
       recalcularLados();         // por si el re-render cambió el orden
+      revelar();                 // y las nuevas nacen sin entrada
     }).observe(host, { childList: true, subtree: true });
   }
 })();

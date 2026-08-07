@@ -31,13 +31,36 @@
     </div>
   </div>
   <style>
+    /* ⚠️ EL TELÓN Y LA PÁGINA SON EL MISMO MATERIAL.
+       Esto iba en un gris verdoso (#fbfcfa → #e8ede5) que era el de la página
+       de entonces. Con la capa eco la página es arena (--eco-page, #F5F1E9), y
+       un telón frío que se levanta sobre un fondo cálido se nota como un
+       cambio de pantalla en vez de como una cortina: lo primero que ve el
+       usuario al entrar es un salto de color.
+
+       Los hex van literales, NO como var(--eco-page): la capa se enlaza más
+       abajo en el body y esto tiene que pintarse bien en el primer frame, antes
+       de que exista el token. Si cambias --eco-page, cambia también estos tres.
+
+       El centro de luz va arriba a la izquierda (25% 22%), que es el mismo sol
+       del proyecto (--eco-sol-x): el telón se ilumina por donde luego entran
+       las sombras de las villas. */
     #makaiLoader{
       position:fixed; inset:0; z-index:99999;
       display:flex; align-items:center; justify-content:center;
-      background:radial-gradient(120% 120% at 50% 30%, #fbfcfa 0%, #f1f4ee 55%, #e8ede5 100%);
+      background:radial-gradient(130% 130% at 25% 22%, #FDFBF7 0%, #F5F1E9 52%, #ECE5D8 100%);
       transition:opacity .6s ease, visibility .6s ease;
     }
+    /* La cortina se LEVANTA: el bloque central sube un pelo mientras el telón
+       se desvanece. Sin esto la salida es un interruptor —opacidad y ya— y el
+       hero aparece de golpe detrás. Los 18px son los mismos que usan las
+       entradas de la sección 11 de la capa, para que todo el sitio entre y
+       salga con el mismo gesto. */
     #makaiLoader.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+    #makaiLoader.is-hidden .ml-inner{
+      transform:translateY(-18px);
+      transition:transform .6s cubic-bezier(.16,1,.3,1);
+    }
     .ml-inner{
       display:flex; flex-direction:column; align-items:center; gap:30px;
       animation:ml-fade-in .7s ease both;
@@ -96,6 +119,8 @@
       .ml-ring{ animation:none; }
       .ml-ring:first-child{ opacity:.35; transform:scale(2.2); }
       .ml-bar span{ animation:ml-breathe 1.3s ease-in-out infinite; transform:none; width:100%; }
+      /* El telón sigue desvaneciéndose; lo que se quita es el desplazamiento. */
+      #makaiLoader.is-hidden .ml-inner{ transform:none; }
     }
   </style>
   <script>
@@ -1578,7 +1603,7 @@
       padding:0; background:transparent; border:none; box-shadow:none; min-height:0;
     }
     .fg-master{
-      --m-ink:#0b1c0a; --m-terra:#c97c40;
+      --m-ink:#074540; --m-terra:#074540;
       --m-disp:#2f7d57; --m-res:#b0752a; --m-sold:#8a8f86;
       max-width:1224px; margin:0 auto;
       display:grid; grid-template-columns:1fr 300px; gap:24px;
@@ -1620,7 +1645,7 @@
     .fg-master-detail .md-badge{ display:inline-block; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; }
     .fg-master-detail .md-specs{ margin-top:6px; color:#5a6472; }
     .fg-master-detail .md-price{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; color:var(--m-ink); margin:10px 0 4px; }
-    .fg-master-detail .md-btn{ width:100%; margin-top:8px; background:var(--m-ink); color:#f1ede3; border:none; border-radius:12px; padding:12px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+    .fg-master-detail .md-btn{ width:100%; margin-top:8px; background:var(--m-ink); color:#ffffff; border:none; border-radius:12px; padding:12px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
     .fg-master-detail .md-btn:hover{ background:#132e11; }
     @media (max-width:860px){
       body[data-view="plan"] #fgPlanWrap{ padding:8px 14px 60px; }
@@ -2314,7 +2339,7 @@
           <div class="fg-hero" id="hero" data-active="makai">
             <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span>LAS TERRENAS</span>
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span>CAP CANA</span>
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 
@@ -4633,7 +4658,7 @@
     function openVideoCall() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
       const subject = encodeURIComponent('Agendar videollamada - Unidad ' + unitNum + ' Bahía Mar Residences');
-      window.location.href = 'mailto:support+makai_residences@launchbase.co.za?subject=' + subject;
+      window.location.href = 'mailto:{{ config('company.support_email') }}?subject=' + subject;
     }
 
     function openAdvisorVideoCall(unitId) {

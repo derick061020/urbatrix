@@ -48,8 +48,9 @@ class CrmTemplateRenderer
         'mes_reporte'            => 'Mayo 2026',
         'num_fotos'              => '12',
         'hitos_actualizados'     => '3',
-        'link_portal'            => 'https://makairesidences.com/dashboard',
-        'link_comprobante'       => 'https://makairesidences.com/dashboard/payments',
+        'email_soporte'          => 'hello@landmasscapital.com',
+        'link_portal'            => 'https://landmasscapital.com/dashboard',
+        'link_comprobante'       => 'https://landmasscapital.com/dashboard/payments',
     ];
 
     /**
@@ -108,8 +109,9 @@ class CrmTemplateRenderer
     private static function company(): array
     {
         return [
-            'proyecto'    => config('company.project'),
-            'link_portal' => self::route('dashboard'),
+            'proyecto'      => config('company.project'),
+            'email_soporte' => config('company.support_email'),
+            'link_portal'   => self::route('dashboard'),
         ];
     }
 

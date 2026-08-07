@@ -53,13 +53,13 @@
           </td>
         </tr>
 
-        <!-- RED ACCENT BAR -->
-        <tr><td style="background-color:#074540;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <!-- ACCENT BAR — filo claro de marca entre el header y el hero -->
+        <tr><td style="background-color:#e8f0ef;height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- HERO -->
         <tr>
           <td style="background-color:#053330;padding:28px 36px 24px 36px;">
-            @if($eyebrow)<p style="margin:0 0 8px 0;font-size:9px;font-weight:600;color:#074540;letter-spacing:0.24em;text-transform:uppercase;">{{ $eyebrow }}</p>@endif
+            @if($eyebrow)<p style="margin:0 0 8px 0;font-size:9px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.24em;text-transform:uppercase;">{{ $eyebrow }}</p>@endif
             <p style="margin:0;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-size:23px;font-weight:600;color:#ffffff;letter-spacing:-0.02em;line-height:1.18;">{!! $title !!}</p>
           </td>
         </tr>

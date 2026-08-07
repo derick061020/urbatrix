@@ -45,7 +45,7 @@
           </tr>
           <tr>
             <td colspan="2" style="background-color:#074540;padding:18px 16px;">
-              <p style="margin:0 0 4px 0;font-size:9px;font-weight:500;color:#f97066;letter-spacing:0.14em;text-transform:uppercase;">Monto recibido · {{ $d['fecha_pago'] }}</p>
+              <p style="margin:0 0 4px 0;font-size:9px;font-weight:500;color:rgba(255,255,255,0.45);letter-spacing:0.14em;text-transform:uppercase;">Monto recibido · {{ $d['fecha_pago'] }}</p>
               <p style="margin:0;font-size:26px;font-weight:600;color:#ffffff;letter-spacing:-0.01em;">{{ $d['moneda'] }} {{ $d['monto'] }}</p>
               <p style="margin:5px 0 0 0;font-size:9px;font-style:italic;color:rgba(255,255,255,0.38);">{{ $d['monto_en_letras'] }}</p>
             </td>

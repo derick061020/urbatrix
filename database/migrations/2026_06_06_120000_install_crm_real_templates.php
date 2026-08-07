@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Instala las plantillas HTML reales de Duna Development (E-01..E-12, sin las
+ * Instala las plantillas HTML reales del CRM (E-01..E-12, sin las
  * que no tienen flujo de datos: E-06/E-07/E-08) y sus automatizaciones,
  * reemplazando las plantillas demo de texto plano. El cuerpo de cada plantilla
  * se lee de database/seeders/crm_emails/*.html (solo el contenido interno; el

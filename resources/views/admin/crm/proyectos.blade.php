@@ -97,10 +97,12 @@
     $activos = $proyectos->filter(fn($p) => ($p->units_count ?? 0) > 0)->count();
 
     // Fallback assets when no icon_path is stored in DB (matched by slug prefix)
+    // Ojo: se compara contra el slug del nombre, así que la clave del proyecto
+    // principal es 'bahia-mar' desde el rebrand (antes 'makai').
     $iconFallback = [
-        'makai'  => '/images/projects/makai.png',
-        'naviva' => '/images/projects/naviva.png',
-        'liv'    => '/images/projects/liv.png',
+        'bahia-mar' => '/images/projects/makai-icon.png',
+        'naviva'    => '/images/projects/naviva.png',
+        'liv'       => '/images/projects/liv.png',
     ];
 
     $resolveIcon = function($p) use ($iconFallback) {

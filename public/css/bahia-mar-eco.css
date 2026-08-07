@@ -482,6 +482,16 @@ nav > div{
    a un inline sin `!important`. Escrito con fallback, así que si esta capa se
    quita, el listado recupera el azul del sitio él solo. */
 
+/* El fondo del `body` es el último que hay debajo de todo: se ve en el rebote
+   del scroll (macOS / iOS), antes de que la maqueta termine de montarse y en
+   cualquier hueco. Estaba en #84d1fe, un azul cielo saturado — es el más frío
+   de todos y el único que además es SATURADO, así que asomando un centímetro
+   se lleva por delante la paleta entera.
+
+   Era el cielo de respaldo del hero, pero el hero ya tiene el suyo propio
+   (`.fg-hero{background:#cfe7f5}`), o sea que éste no cubría nada. */
+body{ background-color:var(--eco-page); }
+
 .fg-filter-bar{ background:var(--eco-page); }
 
 .fg-types-grid,
@@ -491,6 +501,14 @@ nav > div{
    frío justo donde el ojo ya venía en cálido; el borde superior sigue siendo
    quien lo separa, así que no pierde su función. */
 .fg-footer{ background:var(--eco-page); }
+
+/* El hueco de la foto, mientras la foto no está. Era #e6e9ec —gris azulado—
+   y se ve más de lo que parece: media banda a sangre, en el momento en que la
+   imagen aún no ha cargado o todavía no ha entrado (sección 11). Un rectángulo
+   frío de 720px de ancho contra el arena es exactamente el salto que esta
+   sección viene a quitar. Mismo tono, un punto más oscuro que la página, para
+   que se lea como hueco y no como superficie. */
+.fg-type-band .fg-card-img{ background:#E9E3D7; }
 
 /* ⚠️ `.fg-hero::after` ES DEL SITIO — y esto NO contradice la sección 1.
    Lo que allí se prohíbe es SECUESTRARLO: la v5 lo usó para meter una sombra,
@@ -530,8 +548,204 @@ nav > div{
 .fg-hero-spacer{ background:var(--eco-page); }
 
 
+/* ══ 11. ENTRADAS Y RESPUESTA AL PUNTERO ═══════════════════════════════════
+   Las bandas aparecían ya montadas: bajabas y estaban ahí. Con bandas a
+   sangre de 544px eso es mucha superficie llegando de golpe.
+
+   ⚠️ NO SE MUEVE LA BANDA, se mueve su CONTENIDO. Las bandas van pegadas
+   (`gap:0`), así que desplazar una deja ver el fondo de página por la rendija
+   y el borde entre bandas parpadea durante toda la entrada. Moviendo el texto
+   y la foto dentro de una caja quieta, el fondo nunca se descose.
+
+   El orden es editorial y es el mismo con el que se lee: primero la foto
+   —que es el activo—, luego el texto, luego los botones, y el número de fondo
+   el último porque es lo que menos importa. Los retardos son cortos (0 → 90 →
+   150 → 220ms): esto tiene que leerse como que la página se asienta, no como
+   una secuencia que hay que esperar.
+
+   ⚠️ EL ESTADO OCULTO LO PONE EL JS, no el CSS. Si estuviera escrito aquí y
+   el JS fallara —o IntersectionObserver no existiera— la home entera se
+   quedaría en blanco. Escrito así, sin JS todo se ve: simplemente no entra. */
+/* ⚠️ LAS TRANSICIONES VAN EN `.eco-in`, NO EN EL ESTADO OCULTO.
+
+   Escritas en `.eco-reveal` el efecto salía AL REVÉS de lo que parece: el
+   navegador pinta la banda montada, el JS le añade la clase, y como la
+   transición ya está declarada, el contenido se DESVANECE en 0,8s antes de
+   volver a entrar. Se ve aparecer, irse y volver.
+
+   No se pilló mirando —dura menos de un segundo y engaña— sino midiendo: a
+   los 800ms de cargar, con `eco-in` todavía sin poner, la foto daba
+   opacity 0.0164 y el texto 0.0043. Un estado supuestamente estático no puede
+   dar decimales; eran fotogramas de una transición corriendo hacia 0.
+
+   La regla de CSS que lo arregla: la transición que manda es la del estado al
+   que se LLEGA. Declarándola sólo en `.eco-in`, ocultar es instantáneo (no hay
+   transición declarada en ese estado) y aparecer se anima. Sin rAF ni reflows
+   forzados.                                                                  */
+.fg-type-band.eco-reveal .fg-card-img > img,
+.fg-type-band.eco-reveal .fg-card-body,
+.fg-type-band.eco-reveal .fg-card-actions,
+.fg-type-band.eco-reveal .fg-card-price,
+.fg-type-band.eco-reveal .fg-band-num{ opacity:0; }
+
+.fg-type-band.eco-reveal .fg-card-body,
+.fg-type-band.eco-reveal .fg-card-actions,
+.fg-type-band.eco-reveal .fg-card-price{ transform:translateY(18px); }
+
+/* La foto no sube: entra abriéndose. Un desplazamiento sobre una imagen a
+   sangre se lee como que la maqueta se está recolocando; una apertura mínima
+   (1.06 → 1) se lee como profundidad. */
+.fg-type-band.eco-reveal .fg-card-img > img{ transform:scale(1.06); }
+
+.fg-type-band.eco-reveal.eco-in .fg-card-body,
+.fg-type-band.eco-reveal.eco-in .fg-card-actions,
+.fg-type-band.eco-reveal.eco-in .fg-card-price,
+.fg-type-band.eco-reveal.eco-in .fg-band-num{
+  opacity:1; transform:none;
+  transition:opacity .8s var(--eco-ease), transform .8s var(--eco-ease);
+}
+/* La foto va más lenta que el texto a propósito: la masa grande tiene que
+   pesar más que la pequeña. */
+.fg-type-band.eco-reveal.eco-in .fg-card-img > img{
+  opacity:1; transform:none;
+  transition:opacity 1.15s var(--eco-ease), transform 1.15s var(--eco-ease);
+}
+
+.fg-type-band.eco-reveal.eco-in .fg-card-body   { transition-delay:.09s; }
+.fg-type-band.eco-reveal.eco-in .fg-card-actions{ transition-delay:.15s; }
+.fg-type-band.eco-reveal.eco-in .fg-card-price  { transition-delay:.22s; }
+.fg-type-band.eco-reveal.eco-in .fg-band-num    { transition-delay:.3s; transition-duration:1.1s; }
+
+/* La sombra llega con la luz, no con el layout: entra la última y despacio.
+   El destino no se escribe: al dejar de cumplirse el `:not(.eco-in)` vuelve a
+   mandar `opacity:var(--eco-sombra-fuerza)` de la sección 2, que cambia por
+   especie. No se toca el `i` de dentro: la deriva ya está corriendo. */
+.fg-type-band.eco-reveal:not(.eco-in) .eco-shade{ opacity:0; }
+.fg-type-band.eco-reveal.eco-in .eco-shade{
+  transition:opacity 1.6s var(--eco-ease) .35s;
+}
+
+/* La banda verde entra igual, en el mismo orden en que se lee. */
+.eco-band.eco-reveal .eco-band-eyebrow,
+.eco-band.eco-reveal .eco-band-title,
+.eco-band.eco-reveal .eco-band-stat{ opacity:0; transform:translateY(20px); }
+/* El follaje no entra desplazado: es fondo, y un fondo que se mueve delata
+   que hay una capa encima. Sólo aparece, y más lento que todo lo demás. */
+.eco-band.eco-reveal .eco-band-foliage{ opacity:0; }
+
+.eco-band.eco-reveal.eco-in .eco-band-eyebrow,
+.eco-band.eco-reveal.eco-in .eco-band-title,
+.eco-band.eco-reveal.eco-in .eco-band-stat{
+  opacity:1; transform:none;
+  transition:opacity .85s var(--eco-ease), transform .85s var(--eco-ease);
+}
+.eco-band.eco-reveal.eco-in .eco-band-foliage{
+  opacity:1; transition:opacity 1.5s var(--eco-ease);
+}
+.eco-band.eco-reveal.eco-in .eco-band-title{ transition-delay:.08s; }
+.eco-band.eco-reveal.eco-in .eco-band-stat:nth-child(1){ transition-delay:.22s; }
+.eco-band.eco-reveal.eco-in .eco-band-stat:nth-child(2){ transition-delay:.3s; }
+.eco-band.eco-reveal.eco-in .eco-band-stat:nth-child(3){ transition-delay:.38s; }
+
+/* ── Puntero ───────────────────────────────────────────────────────────────
+   La foto de la banda ABRE una vista (`openVillaType`), así que responder al
+   puntero no es adorno: es la única señal de que se puede pulsar. Sólo en
+   dispositivos con puntero fino — en táctil el hover se queda pegado tras el
+   tap y la foto se queda ampliada.
+
+   1.5s y 1.035 de escala. Más rápido o más grande y deja de ser respuesta
+   para ser efecto, que es justo lo que esta capa lleva evitando desde la v3. */
+@media (hover:hover) and (pointer:fine){
+  .fg-type-band .fg-card-img > img{
+    transition:transform 1.5s var(--eco-ease);
+  }
+  .fg-type-band .fg-card-img:hover > img{ transform:scale(1.035); }
+
+  /* El chip de precio flota sobre la foto: al acercarse, se despega un poco
+     más. Es el mismo sol del proyecto, así que la sombra crece hacia la
+     derecha (--eco-sol-x), no hacia abajo a plomo. */
+  .fg-type-band .fg-card-price{
+    transition:transform .5s var(--eco-ease), box-shadow .5s var(--eco-ease);
+  }
+  .fg-type-band .fg-card-inner:hover .fg-card-price{
+    transform:translateY(-2px);
+    box-shadow:
+      calc(3px * var(--eco-sol-x))  3px  6px rgba(14,18,27,.10),
+      calc(9px * var(--eco-sol-x))  9px 18px rgba(14,18,27,.10);
+  }
+
+  .fg-type-band .fg-btn-info,
+  .fg-type-band .fg-btn-cta{
+    transition:transform .35s var(--eco-ease), filter .35s var(--eco-ease),
+               background .35s var(--eco-ease), box-shadow .35s var(--eco-ease);
+  }
+  .fg-type-band .fg-btn-info:hover,
+  .fg-type-band .fg-btn-cta:hover{ transform:translateY(-1px); }
+}
+
+/* ── LA PÍLDORA DEL HEADER NO ENTRA. NO LO REINTENTES ──────────────────────
+   Se probó: esconderla y bajarla al levantarse el telón, enganchada a
+   `makai:hero-revealed`. Se cayó dos veces y la segunda no supe arreglarla.
+
+   1) Primera versión, con `requestAnimationFrame` para armar la transición.
+      rAF no corre en una pestaña que carga en segundo plano, así que la
+      callback se quedaba en cola y la píldora invisible. Medido: a los 12s
+      seguía con las dos clases y opacidad 0.
+
+   2) Segunda versión, ya sin rAF y con el mismo mecanismo que las bandas
+      —estado oculto sin transición, transición en el destino—. Las clases se
+      intercambian bien y aun así la opacidad no se movía del 0.
+      `getAnimations()` sobre la píldora: dos transiciones en
+      `playState:'running'` con `currentTime: 0`, o sea armadas y sin avanzar
+      nunca. Quitándole TODAS las clases seguía en 0, porque la transición
+      colgada mantiene el valor. Las mismas transiciones sobre las bandas, en
+      la misma página, sí corrían.
+
+   No llegué al motivo. Puede ser cosa del headless con el que se midió, o de
+   que la píldora vive dentro de un `position:fixed` que se compone aparte.
+   Da igual: la cabecera es la navegación, y no se puede publicar un efecto
+   cuyo fallo la deja invisible sin poder demostrar que no falla. Lo que se
+   ganaba era una píldora bajando; lo que se arriesgaba, la home sin header.
+
+   Si algún día se retoma: hay que probarlo en un navegador de verdad, en
+   pestaña de fondo y con la red lenta, y el estado por defecto tiene que ser
+   VISIBLE — que el efecto sea añadir, nunca quitar.                         */
+
+/* ── Coherencia ────────────────────────────────────────────────────────────
+   Las entradas se quedan en desvanecido, sin desplazamientos ni escalas, y
+   el puntero deja de mover nada. Lo que NO se hace es anularlas del todo: sin
+   transición el estado oculto se quedaría fijo y el contenido no aparecería. */
+@media (prefers-reduced-motion:reduce){
+  .fg-type-band.eco-reveal .fg-card-img > img,
+  .fg-type-band.eco-reveal .fg-card-body,
+  .fg-type-band.eco-reveal .fg-card-actions,
+  .fg-type-band.eco-reveal .fg-card-price,
+  .eco-band.eco-reveal .eco-band-eyebrow,
+  .eco-band.eco-reveal .eco-band-title,
+  .eco-band.eco-reveal .eco-band-stat{ transform:none; }
+
+  .fg-type-band .fg-card-img:hover > img,
+  .fg-type-band .fg-card-inner:hover .fg-card-price,
+  .fg-type-band .fg-btn-info:hover,
+  .fg-type-band .fg-btn-cta:hover{ transform:none; }
+}
+
+
 /* ============================================================================
    AUDITORÍA — pegar en la consola tras cualquier cambio.
+
+   ⚠️ DESDE LA SECCIÓN 11, PÁSALO CON LA PÁGINA ASENTADA. Las bandas entran al
+   aparecer en pantalla y la sombra es lo último en llegar (1,6s de transición
+   con 0,35s de retardo). Si lanzas la auditoría mientras esa entrada corre,
+   lees `opacidad: "0"` y un `contraste: 15` — que es exactamente el 15 que el
+   propio script avisa de que no significa nada, porque mide contra el arena
+   limpio en vez de contra el arena oscurecido por la sombra.
+
+   Pasó midiendo: una pasada a 1700 px cantó Villa C con la sombra a 0, y las
+   tres siguientes dieron 0.13. No era un fallo de la capa, era la auditoría
+   llegando antes que la animación. Baja hasta el final, espera un par de
+   segundos y entonces pega el script.
+
    Pásalo al menos a 1440 px y a 1700 px: el sitio cambia el padding y la
    altura de la banda en 1600. Todo tiene que cumplirse a la vez:
 
