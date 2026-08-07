@@ -19,7 +19,7 @@
         $overall = optional($latest)->overall_progress ?? (int) optional($activeProject)->progress ?? 0;
         $phases  = optional($latest)->phases ?: [];
         $unitsCount = optional($activeProject)->total_units ?? 0;
-        $location   = optional($activeProject)->location ?? 'Cap Cana · Punta Cana';
+        $location   = optional($activeProject)->location ?? 'Bahía Mar · Landmass';
         $statusMap = ['done' => '#1fc16b', 'active' => '#fa7319', 'pending' => '#cacfd8'];
     @endphp
 

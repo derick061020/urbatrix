@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <div class="text-[14px] font-semibold text-ink-950">{{ __('Avance global de obra') }}</div>
-                        <div class="text-[12px] text-ink-500">{{ __('Cap Cana · Punta Cana') }}</div>
+                        <div class="text-[12px] text-ink-500">{{ __('Bahía Mar · Landmass') }}</div>
                         <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $delivery }}</div>
                     </div>
                 </div>

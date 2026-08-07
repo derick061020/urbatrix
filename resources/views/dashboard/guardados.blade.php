@@ -545,7 +545,7 @@
 @php
     $units = $units ?? collect();
     $project = optional($units->first())->project_id ? \App\Models\Project::find(optional($units->first())->project_id) : null;
-    $projectName = $project->name ?? 'Bahía Mar Residences, Cap Cana';
+    $projectName = $project->name ?? 'Bahía Mar';
 @endphp
 
 <div class="sv-scope p-4 sm:p-6 lg:p-7 space-y-5">

@@ -439,7 +439,7 @@
    cuatro lados— pero si algún día lo tocas, no te fíes del signo.           */
 .eco-band::after{
   content:"";
-  position:absolute; inset:-6%;
+  position:absolute; inset:-9%;
   pointer-events:none;
   background-image:var(--eco-sombra); background-size:cover;
   transform:scale(-1, -1);
@@ -458,9 +458,11 @@
    distintos no hay múltiplo, así que nunca se sincronizan y el ojo no llega a
    pillarle el bucle.
 
-   El 6% de sobrante del `inset` es el techo del recorrido: con 5% se queda a
-   un punto del borde. No lo subas sin subir el `inset` primero, o la textura
-   se despega del canto y aparece la raya clara.                             */
+   El sobrante del `inset` es el techo del recorrido. No subas este 5% sin
+   subir el `inset` primero, o la textura se despega del canto y aparece la
+   raya clara. La cuenta se hace midiendo, no de cabeza: el porcentaje del
+   `translate` es sobre el ancho de la CAJA (que ya viene inflada por el
+   inset) y el del `inset` sobre el ancho de la BANDA — no son la misma base. */
 @keyframes ecoBandaPalma{
   0%   { transform:scale(-1,-1) translate3d(0, 0, 0); }
   38%  { transform:scale(-1,-1) translate3d(2.4%, .7%, 0); }

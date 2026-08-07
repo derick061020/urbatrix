@@ -24,7 +24,7 @@ class CrmOperativoSeeder extends Seeder
                 'stage'     => 'En preparación',
                 'progress'  => 0,
                 'color'     => '#b2a908',
-                'location'  => 'Cap Cana · Punta Cana',
+                'location'  => 'República Dominicana',
                 'icon_path' => '/images/projects/naviva-icon.png',
             ],
             [
@@ -33,7 +33,7 @@ class CrmOperativoSeeder extends Seeder
                 'stage'     => 'En preparación',
                 'progress'  => 0,
                 'color'     => '#077f82',
-                'location'  => 'Cap Cana · Punta Cana',
+                'location'  => 'República Dominicana',
                 'icon_path' => '/images/projects/liv-icon.png',
             ],
         ];

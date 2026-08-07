@@ -244,7 +244,7 @@
                 <span class="sep"></span>
                 <span class="success">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z" transform="rotate(180 12 12)"/></svg>
-                  {{ __('12% below Cap Cana avg.') }}
+                  {{ __('12% below the area average') }}
                 </span>
               </div>
               <div class="mt-price-meta">
@@ -2339,7 +2339,7 @@
           <div class="fg-hero" id="hero" data-active="makai">
             <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span>LAS TERRENAS</span>
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">LANDMASS</span>BAHÍA MAR</span>
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 

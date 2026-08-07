@@ -64,7 +64,7 @@
         <div class="flex flex-wrap gap-5 items-start justify-between">
             <div>
                 <h2 class="font-display text-[18px] font-semibold text-ink-950" id="ccProjName">—</h2>
-                <div class="text-[12px] text-ink-500" id="ccProjSub">{{ __('Landmass · Cap Cana') }}</div>
+                <div class="text-[12px] text-ink-500" id="ccProjSub">{{ __('Bahía Mar · Landmass') }}</div>
                 <div class="flex items-center gap-3 mt-3">
                     <button class="cc-sw fam" id="ccMasterSw" role="switch" aria-checked="false" aria-label="{{ __('Estado de comunicaciones del proyecto') }}"></button>
                     <span class="text-[13px] font-semibold text-ink-900">{{ __('Comunicaciones del proyecto') }}</span>

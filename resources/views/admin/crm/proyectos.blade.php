@@ -330,7 +330,7 @@
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Tipo') }}</label><input type="text" name="type" placeholder="{{ __('Residencial') }}" class="crm-input pl-3 mt-1"></div>
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Etapa') }}</label><input type="text" name="stage" placeholder="{{ __('En desarrollo') }}" class="crm-input pl-3 mt-1"></div>
             </div>
-            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ubicación') }}</label><input type="text" name="location" placeholder="{{ __('Cap Cana · Punta Cana') }}" class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ubicación') }}</label><input type="text" name="location" placeholder="{{ __('República Dominicana') }}" class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="text-[12px] font-semibold text-ink-700">Avance %</label><input type="number" name="progress" value="0" min="0" max="100" class="crm-input pl-3 mt-1"></div>
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Color') }}</label><input type="color" name="color" value="#074540" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>

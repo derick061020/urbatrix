@@ -558,7 +558,9 @@
       transform: translateY(-180%);
       will-change: transform, opacity;
     }
-    /* Small brand label above the big location name (e.g. "Bahía Mar") */
+    /* Crédito pequeño de la desarrolladora (LANDMASS) encima del nombre grande
+       del proyecto (BAHÍA MAR). Antes llevaba la marca arriba y la localidad
+       abajo; el hero ya no nombra localidad. */
     .fg-hero-sub {
       display: block;
       font-size: 0.26em;
@@ -1003,18 +1005,14 @@
       border: 0;
       padding: 8px;
       border-radius: 100px;
-      /* Elevación alta a propósito: el control va suelto sobre el listado y
-         tiene que cantar. La sombra hace el trabajo, no un borde. */
-      box-shadow:
-        0 12px 28px -6px rgba(10, 13, 20, 0.22),
-        0 3px 8px -1px rgba(10, 13, 20, 0.10);
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.10);
     }
     .fg-toggle-bg-active {
       position: absolute;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
         #074540;
-      height: 48px;
+      height: 44px;
       left: 0;
       top: 0;
       width: 90px; /* fallback antes de que el JS lo mida; sobrescrito por positionToggleBg() */
@@ -1051,15 +1049,15 @@
       width: auto;
       min-width: 90px;
       white-space: nowrap;
-      height: 48px;
-      padding: 10px 18px;
+      height: 44px;
+      padding: 10px 16px;
       border: none;
       border-radius: 100px;
       background: transparent;
       font-family: 'Poppins', sans-serif;
       font-weight: 500;
       font-size: 16px;
-      color: #525866;
+      color: #7b7b7b;
       letter-spacing: -0.176px;
       cursor: pointer;
       transition: color 0.22s ease;
@@ -1076,7 +1074,7 @@
     .fg-toggle.plan-active button { color: #7b7b7b; }
     .fg-toggle.plan-active button svg { color: #7b7b7b; }
     .fg-toggle button:not(.active):hover { color: var(--brand, #074540); }
-    .fg-toggle button:not(.active) svg { color: #525866; transition: color 0.22s ease; }
+    .fg-toggle button:not(.active) svg { color: #7b7b7b; transition: color 0.22s ease; }
     .fg-toggle button:not(.active):hover svg { color: var(--brand, #074540); }
 
     /* La posición/ancho de la barra activa la calcula positionToggleBg() en JS
@@ -1192,10 +1190,7 @@
     .fg-location-button {
       background: #ffffff;
       border: 0;
-      /* Misma elevación que la píldora: van a la par. */
-      box-shadow:
-        0 12px 28px -6px rgba(10, 13, 20, 0.22),
-        0 3px 8px -1px rgba(10, 13, 20, 0.10);
+      box-shadow: 0 6px 20px rgba(10, 13, 20, 0.10);
       border-radius: 100px;
       padding: 8px;
       display: inline-flex;
@@ -1206,8 +1201,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       padding: 6px;
       border: none;
       border-radius: 100px;

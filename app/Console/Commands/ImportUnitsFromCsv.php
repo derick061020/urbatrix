@@ -37,7 +37,7 @@ class ImportUnitsFromCsv extends Command
 {
     protected $signature = 'units:import
                             {files?* : Rutas a los CSV (por defecto database/data/makai_etapa_*.csv)}
-                            {--project=Bahía Mar Cap Cana : Nombre del proyecto destino}
+                            {--project=Bahía Mar : Nombre del proyecto destino}
                             {--fresh : Borra todas las unidades del proyecto antes de importar}
                             {--public : Marca las unidades como públicas (visibles en el home)}
                             {--force : No pedir confirmación al borrar}';

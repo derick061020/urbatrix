@@ -254,7 +254,7 @@ body {
     </div>
     <div class="hdr-right">
       <div class="hdr-doc">{{ __('KYC · Verificación de Identidad') }}</div>
-      <div class="hdr-ref">{{ $proyecto }} · Cap Cana, R.D. · Exp. #{{ $referencia }}</div>
+      <div class="hdr-ref">{{ $proyecto }} · Landmass · Exp. #{{ $referencia }}</div>
     </div>
   </div>
 

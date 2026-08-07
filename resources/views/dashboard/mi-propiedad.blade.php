@@ -104,7 +104,7 @@
             <div class="relative z-10">
                 <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
                 <div class="font-display text-[48px] font-medium leading-tight mt-1">{{ $unidad }}</div>
-                <div class="text-[13px] opacity-80 mt-1">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
+                <div class="text-[13px] opacity-80 mt-1">{{ __('Bahía Mar · Landmass') }}</div>
 
                 {{-- Quick stats pills --}}
                 <div class="mt-6 inline-flex items-stretch rounded-2xl bg-white/10 backdrop-blur border border-white/15 overflow-hidden">
@@ -169,7 +169,7 @@
                         [__('Terraza'),   ($reservation->unit->expense_1 ?? '207').' sqft'],
                         [__('Vista'),     ($reservation->unit->outlook ?? 'Lake Facing')],
                         [__('Proyecto'),  'Bahía Mar Residences'],
-                        [__('Ubicación'), 'Cap Cana, Punta Cana · RD'],
+                        [__('Ubicación'), 'República Dominicana'],
                     ];
                 @endphp
                 @foreach($details as $d)

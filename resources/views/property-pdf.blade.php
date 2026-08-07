@@ -425,7 +425,7 @@ body {
       <div class="cta-label">{{ __('Agenda tu visita') }}</div>
       <div class="cta-modes">{{ __('Presencial · Tour 360°') }}</div>
       <hr class="cta-rule">
-      <div class="cta-desc">Recorre {{ $projectName }} desde donde estés o visítanos en Cap Cana.</div>
+      <div class="cta-desc">Recorre {{ $projectName }} desde donde estés o visítanos en obra.</div>
       <a class="cta-link" href="#">Agendar →</a>
     </div>
   </div>
@@ -441,7 +441,7 @@ body {
       <div class="advisor-name">{{ $advisorName }}</div>
       <div class="advisor-contact">
         {{ $advisorEmail }}<br>
-        landmasscapital.com · Cap Cana, R.D.
+        landmasscapital.com
       </div>
     </div>
     <div class="advisor-cta">
@@ -457,7 +457,7 @@ body {
 </div><!-- /sheet-inner page 1 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Cap Cana, Punta Cana · República Dominicana') }}</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Bahía Mar · Landmass') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 </div><!-- /sheet page 1 -->
@@ -468,7 +468,7 @@ body {
 
 <div class="p2-hdr">
   <div>
-    <div class="p2-hdr-sub">{{ $projectName }} · Cap Cana</div>
+    <div class="p2-hdr-sub">{{ $projectName }} · Landmass</div>
     <div class="p2-hdr-title">{{ __('Detalles del Proyecto') }}</div>
   </div>
   <div class="p2-hdr-right">
@@ -526,7 +526,7 @@ body {
       </div>
 
       <div class="sec-title" style="margin-top:14px">{{ __('Ubicación y entorno') }}</div>
-      <div class="location-placeholder">{{ __('Cap Cana · Punta Cana · República Dominicana') }}</div>
+      <div class="location-placeholder">{{ __('República Dominicana') }}</div>
       <div class="distances-grid">
         <div class="dist-row"><span class="dist-label">{{ __('Playa Juanillo') }}</span><span class="dist-time">3 min</span></div>
         <div class="dist-row"><span class="dist-label">{{ __('Aeropuerto PUJ') }}</span><span class="dist-time">15 min</span></div>
@@ -602,7 +602,7 @@ body {
 </div><!-- /sheet-inner page 2 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Cap Cana, Punta Cana · República Dominicana') }}</div>
+  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Bahía Mar · Landmass') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 

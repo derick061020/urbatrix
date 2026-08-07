@@ -31,7 +31,7 @@
     <div class="px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200 flex items-center gap-3">
         <div class="min-w-0">
             <div class="text-[15px] font-bold text-ink-950">{{ $unidad }}</div>
-            <div class="text-[12px] text-ink-500">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
+            <div class="text-[12px] text-ink-500">{{ __('Bahía Mar · Landmass') }}</div>
         </div>
         <button onclick="downloadBankData()" class="ml-auto shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-[12px] font-semibold text-ink-700 hover:border-brand hover:text-brand transition-colors">
             <i class="pi pi-download text-[12px]"></i> {{ __('Descargar datos bancarios') }}

@@ -152,8 +152,8 @@ body {
 </div>
 
 @php
-  $phHeader = '<div class="ph"><div class="ph-left"><svg class="ph-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg><div class="ph-name">BAHÍA MAR</div></div><div class="ph-right"><div class="ph-doc">Promesa de Venta de Inmueble</div><div class="ph-pg">Bahía Mar Residences · Cap Cana, R.D.</div></div></div>';
-  $ftr = '<div class="footer"><div class="footer-l">BAHÍA MAR</div><div class="footer-c">Documento Confidencial · Uso Exclusivo de las Partes</div><div class="footer-r">Bahía Mar Residences · Cap Cana, R.D.</div></div>';
+  $phHeader = '<div class="ph"><div class="ph-left"><svg class="ph-iso" viewBox="0 0 87 87" fill="none"><use href="#iso"/></svg><div class="ph-name">BAHÍA MAR</div></div><div class="ph-right"><div class="ph-doc">Promesa de Venta de Inmueble</div><div class="ph-pg">Bahía Mar · Landmass</div></div></div>';
+  $ftr = '<div class="footer"><div class="footer-l">BAHÍA MAR</div><div class="footer-c">Documento Confidencial · Uso Exclusivo de las Partes</div><div class="footer-r">Bahía Mar · Landmass</div></div>';
 @endphp
 
 <!-- PÁGINA 1 — PORTADA -->
@@ -172,7 +172,7 @@ body {
   <div class="cover">
     <div class="cover-eyebrow">Documento Legal Oficial</div>
     <div class="cover-title"><strong>Promesa</strong> de Venta de Inmueble</div>
-    <div class="cover-project">Proyecto Bahía Mar Residences — Dolce by Wyndham · Cap Cana, República Dominicana</div>
+    <div class="cover-project">Proyecto Bahía Mar Residences — Dolce by Wyndham · República Dominicana</div>
     <hr class="cover-rule">
 
     <div class="cover-parties">
@@ -216,7 +216,7 @@ body {
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Dormitorios</div><div class="cover-prop-cell-val"><span class="f">{{ $dormitorios }}</span></div></div>
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Baños</div><div class="cover-prop-cell-val"><span class="f">{{ $banos }}</span></div></div>
         <div class="cover-prop-cell"><div class="cover-prop-cell-label">Estacionamientos</div><div class="cover-prop-cell-val"><span class="f">{{ $estacionamientos }}</span></div></div>
-        <div class="cover-prop-cell"><div class="cover-prop-cell-label">Ubicación</div><div class="cover-prop-cell-val">Cap Cana, La Altagracia</div></div>
+        <div class="cover-prop-cell"><div class="cover-prop-cell-label">Ubicación</div><div class="cover-prop-cell-val">República Dominicana</div></div>
       </div>
     </div>
 

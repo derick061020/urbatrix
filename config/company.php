@@ -14,12 +14,12 @@ return [
     'brand'        => env('COMPANY_BRAND', 'BAHÍA MAR'),
     'project'      => env('COMPANY_PROJECT', 'Bahía Mar'),
     'group'        => env('COMPANY_GROUP', 'BAHÍA MAR'),
-    'location'     => env('COMPANY_LOCATION', 'Cap Cana, República Dominicana'),
+    'location'     => env('COMPANY_LOCATION', 'República Dominicana'),
 
     // Emisor de los comprobantes
     'legal_name'   => env('COMPANY_LEGAL_NAME', 'IGUANAS LAKE CONDO & RESIDENCE SRL'),
     'rnc'          => env('COMPANY_RNC', ''),
-    'address'      => env('COMPANY_ADDRESS', 'Cap Cana, Punta Cana, República Dominicana'),
+    'address'      => env('COMPANY_ADDRESS', 'República Dominicana'),
 
     // Contacto
     'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@landmasscapital.com'),

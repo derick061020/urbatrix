@@ -1,6 +1,6 @@
 {{--
     Layout compartido de los correos del CRM (BAHÍA MAR).
-    El chrome (header con logo, acento rojo, banda de firma y footer) vive aquí;
+    El chrome (header con logo, filo de acento, banda de firma y footer) vive aquí;
     cada plantilla aporta solo su contenido interno (hero + cuerpo) ya sustituido.
 
     Variables esperadas:
@@ -11,7 +11,7 @@
 @php
     $brand    = config('company.brand', 'BAHÍA MAR');
     $group    = config('company.group', 'BAHÍA MAR');
-    $location = config('company.location', 'Cap Cana, Punta Cana, República Dominicana');
+    $location = config('company.location', 'República Dominicana');
     $email    = config('company.support_email', 'hello@landmasscapital.com');
     $phone    = config('company.phone', '+1 849 499 2578');
     $website   = config('company.website', 'landmasscapital.com');

@@ -90,7 +90,7 @@
                 <div class="flex-1">
                     <div class="text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold">{{ $proyecto->developer ?? 'Landmass' }}</div>
                     <div class="font-display text-[28px] sm:text-[34px] font-semibold leading-tight mt-1">{{ $proyecto->name }}</div>
-                    <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?? 'Cap Cana · Punta Cana' }}</div>
+                    <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?? 'República Dominicana' }}</div>
                 </div>
                 <div class="text-right">
                     @php $updatedAt = optional($latestReport)->published_at ?? $proyecto->updated_at; @endphp
@@ -228,7 +228,7 @@
                     </div>
                 @endforeach
             </dl>
-            <p class="text-[10px] text-ink-400 mt-3 leading-relaxed">* Proyecciones basadas en datos históricos de {{ Str::before($proyecto->location ?? 'Cap Cana', '·') }} {{ $entregaFmt }}. No constituyen garantía de rendimiento.</p>
+            <p class="text-[10px] text-ink-400 mt-3 leading-relaxed">* Proyecciones basadas en datos históricos de {{ Str::before($proyecto->location ?? 'República Dominicana', '·') }} {{ $entregaFmt }}. No constituyen garantía de rendimiento.</p>
         </div>
 
         {{-- Launch discount + signals --}}
@@ -322,10 +322,10 @@
 
         <div class="crm-card p-5">
             <div class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Ubicación y amenidades') }}</div>
-            <div class="font-display text-[20px] font-bold text-ink-900 mt-2">{{ $proyecto->location ?? 'Cap Cana, Punta Cana' }}</div>
+            <div class="font-display text-[20px] font-bold text-ink-900 mt-2">{{ $proyecto->location ?? 'República Dominicana' }}</div>
             <div class="text-[12px] text-ink-600 mt-1">{{ $proyecto->description ?? 'República Dominicana · Zona de lujo en la región del Caribe más demandada por inversores internacionales.' }}</div>
             <div class="mt-4 grid grid-cols-2 gap-2 text-[12px]">
-                @foreach (['Beach Club privado','Marina Cap Cana','Golf 18 hoyos','Spa & Wellness','Seguridad 24/7','Concierge'] as $a)
+                @foreach (['Beach Club privado','Marina','Golf 18 hoyos','Spa & Wellness','Seguridad 24/7','Concierge'] as $a)
                     <div class="flex items-center gap-2 text-ink-700"><span class="dot bg-ok"></span> {{ $a }}</div>
                 @endforeach
             </div>

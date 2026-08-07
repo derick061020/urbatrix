@@ -29,7 +29,7 @@
                 <div>
                     <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Presupuesto') }}</div>
                     <div class="font-display text-[32px] font-medium leading-tight">{{ $unidad }}</div>
-                    <div class="text-[13px] opacity-80">{{ __('Bahía Mar Residences · Cap Cana, Punta Cana') }}</div>
+                    <div class="text-[13px] opacity-80">{{ __('Bahía Mar · Landmass') }}</div>
                 </div>
             </div>
         </div>
