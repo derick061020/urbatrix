@@ -29,8 +29,19 @@
      del hero (47s): si se sincronizan, el ojo detecta el loop y el efecto
      pasa de "hay un árbol ahí fuera" a "hay un gif de fondo". Por eso primos:
      entre primos distintos el múltiplo es imposible, así que la lista crece
-     sin tener que comprobar nada — solo hay que no repetir y no usar el 47. */
-  const RITMOS = [31, 43, 37, 29, 41];
+     sin tener que comprobar nada — solo hay que no repetir y no usar el 47.
+
+     ⚠️ Estos son la MITAD del ciclo, no el ciclo. La animación va con
+     `alternate`, así que un 29 son 58 segundos de ida y vuelta. Los valores
+     viejos (29-43) daban entre 58 y 86 segundos para recorrer 5 píxeles: el
+     movimiento estaba escrito pero no ocurría a una velocidad que un ojo
+     humano pueda registrar.
+
+     Los nuevos (13-29) dejan el ciclo completo entre 26 y 58 segundos. Sigue
+     siendo lento —una fronda mecida no es un abanico— pero ahora se ve. Si
+     alguna vez hay que frenarlo, se bajan aquí sin tocar el CSS; lo único
+     innegociable es que sigan siendo primos distintos y que ninguno sea 47. */
+  const RITMOS = [19, 23, 17, 29, 13];
 
   /* ⚠️ MÉTRICAS PLACEHOLDER — Bahía Mar tiene que confirmarlas antes de
      publicar. Publicar datos ambientales inventados es exactamente el

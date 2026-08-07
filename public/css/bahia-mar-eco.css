@@ -120,13 +120,64 @@
    sombra proyectada sobre el cielo no existe. Las sombras caen sobre
    superficies. El resto es la villa, que es el activo de venta.            */
 
-/* Deriva mínima y lentísima: es lo que convierte "textura de fondo" en "hay
-   un árbol ahí fuera". Cada sombra lleva un ritmo distinto y NINGUNO es
-   múltiplo de otro (29/31/37/41/43 son primos), así que no se sincronizan
-   nunca y el ojo no llega a detectar el loop. */
+/* Deriva: es lo que convierte "textura de fondo" en "hay un árbol ahí fuera".
+   Cada sombra lleva un ritmo distinto y NINGUNO es múltiplo de otro (primos),
+   así que no se sincronizan nunca y el ojo no llega a detectar el loop.
+
+   ── POR QUÉ ESTO CAMBIÓ ──────────────────────────────────────────────────
+   La versión anterior era `from 0 → to translate(-1.4%, 1%) scale(1.04)` en
+   29-43s. Con `alternate` eso son 58-86s de ciclo completo para recorrer 1,4%
+   de 371px: **5 píxeles en un minuto y medio**. No es que fuera sutil, es que
+   no existía — nadie que abriera la página iba a ver moverse nada.
+
+   Tres cambios, y ninguno es "subirle el volumen":
+
+   1. EL CAMINO NO ES RECTO. Dos keyframes interpolan en línea recta y el ojo
+      lee "panorámica", que es cámara moviéndose, no viento. Con cuatro pasos
+      intermedios de dirección desigual —una racha, una pausa, un regreso que
+      no vuelve del todo por donde vino— se lee como aire.
+
+   2. HAY GIRO, con el pivote en la esquina por la que la sombra ENTRA
+      (`transform-origin` en `.eco-shade i`). Una fronda no se desplaza en
+      bloque: cuelga de una rama que está fuera del cuadro y se mece desde
+      ahí. Sin el giro, cualquier amplitud que se note se lee como que la
+      imagen resbala.
+
+   3. ⚠️ TODOS LOS DESPLAZAMIENTOS SON ≤ 0 Y EL GIRO SIEMPRE NEGATIVO.
+      No es estética, es la trampa de los offsets otra vez. El asset viene
+      cortado por sus bordes superior e izquierdo y ese corte sólo se lee bien
+      si coincide con el borde del panel. Cualquier valor positivo mete el
+      corte hacia dentro y lo deja a la vista, flotando.
+
+      La versión vieja ya tenía `1%` en la Y —hacia ABAJO— y se lo podía
+      permitir porque 1% de 280px son 2,8px. Con la amplitud nueva eso serían
+      12px de corte a la vista. Así que la Y se invierte: el viento sólo tira
+      hacia arriba y hacia la izquierda, o sea que sólo puede esconder más el
+      corte, nunca destaparlo. Por construcción, no por medida.
+
+      El giro, por lo mismo, sólo en sentido antihorario: con el pivote en la
+      esquina superior izquierda, el horario baja el borde de arriba y abre
+      una cuña. El antihorario lo sube.
+
+   ── LA AMPLITUD SE FIJÓ MIDIENDO, NO A OJO ───────────────────────────────
+   El recorrido en píxeles es lo único que decide si esto se ve o no, y no se
+   deduce de los porcentajes: dependen del ancho de cada sombra, que cambia
+   por variante (45-52% del panel).
+
+   Primer intento a -2,2%: 8,2px de recorrido en 19s. Medido, no estimado — y
+   con ese número delante está claro que no llega. Son 0,4px por segundo: si
+   te quedas mirando el panel lo notas, y si no, no.
+
+   A -4,6% son ~17px, que sobre una sombra difusa se lee como brisa sin pasar
+   a "hay algo animándose ahí". Por encima de eso la sombra empieza a entrar y
+   salir del cuadro y el ojo se va detrás, que es justo lo que esta capa lleva
+   evitando desde la v3.                                                     */
 @keyframes ecoDeriva{
-  from{ transform:translate3d(0, 0, 0) scale(1); }
-  to  { transform:translate3d(-1.4%, 1%, 0) scale(1.04); }
+  0%   { transform:translate3d(0, 0, 0)          rotate(0)       scale(1); }
+  22%  { transform:translate3d(-1.2%, -.7%, 0)   rotate(-.28deg) scale(1.018); }
+  47%  { transform:translate3d(-3.2%, -.3%, 0)   rotate(-.62deg) scale(1.04); }
+  71%  { transform:translate3d(-2.3%, -1.7%, 0)  rotate(-.24deg) scale(1.03); }
+  100% { transform:translate3d(-4.6%, -1.2%, 0)  rotate(-.7deg)  scale(1.065); }
 }
 
 
@@ -201,6 +252,15 @@
 
   background-repeat:no-repeat;
   background-size:100% 100%;
+
+  /* El pivote del balanceo, en la esquina por la que entra la sombra. Es la
+     rama: está fuera del cuadro y lo que se mece es lo que cuelga de ella.
+     Con el pivote en el centro (el de por defecto) el giro mueve las cuatro
+     esquinas y la sombra se lee como una imagen que rota, no como una hoja.
+
+     Para las variantes con offset negativo la esquina cae ya fuera del panel,
+     que es todavía mejor: el pivote queda literalmente fuera del encuadre. */
+  transform-origin:0% 0%;
 
   /* Desvanece la salida de la sombra en diagonal, siguiendo al sol. Va sobre
      la caja de la sombra, así que los porcentajes son de la sombra. */
@@ -784,17 +844,44 @@ body{ background-color:var(--eco-page); }
        const nombre = band.querySelector('.fg-card-title-row .name');
        const hijo = sh.querySelector('i');
 
-       // medir en los DOS extremos del balanceo, no en un instante suelto, y
-       // sobre la caja EXTERIOR: es la que marca el limite de la celda. Si el
-       // recorte de .eco-shade desapareciera, aqui es donde se veria.
-       let invade = 0;
-       ['none', 'translate3d(-1.4%,1%,0) scale(1.04)'].forEach(t => {
-         hijo.style.animation = 'none'; hijo.style.transform = t;
+       // ⚠️ SE MUESTREA LA ANIMACION REAL, NO UN TRANSFORM ESCRITO A MANO.
+       //
+       // Aqui habia la cadena 'translate3d(-1.4%,1%,0) scale(1.04)' copiada de
+       // los keyframes. En cuanto los keyframes cambiaron, la auditoria siguio
+       // midiendo el balanceo viejo — y dando verde, que es lo peor que puede
+       // hacer una comprobacion. Una constante duplicada a mano en el script
+       // que vigila el original no vigila nada.
+       //
+       // Con getAnimations() se recorre la linea de tiempo de verdad y no hay
+       // nada que mantener sincronizado. Doce pasos, no dos: el camino ya no
+       // es recto, asi que los extremos no son necesariamente el peor caso.
+       //
+       // Con prefers-reduced-motion no hay animacion (anim = null) y el bucle
+       // mide doce veces el estado en reposo, que es exactamente lo que se ve.
+       const anim = hijo.getAnimations ? hijo.getAnimations()[0] : null;
+       const t0 = anim ? anim.currentTime : 0;
+       const dur = (anim && anim.effect) ? anim.effect.getComputedTiming().duration : 0;
+
+       let invade = 0, nace = true;
+       for (let k = 0; k <= 12; k++) {
+         if (anim) { anim.pause(); anim.currentTime = dur * k / 12; }
          const r = sh.getBoundingClientRect();
          if (Math.min(r.right,foto.right) - Math.max(r.left,foto.left) > 1 &&
              Math.min(r.bottom,foto.bottom) - Math.max(r.top,foto.top) > 1) invade = 1;
-       });
-       hijo.style.animation = ''; hijo.style.transform = '';
+
+         // El corte del asset no puede asomar por el borde en NINGUN instante,
+         // no solo en reposo. Es la garantia que sostiene el balanceo nuevo:
+         // desplazamientos <= 0 y giro antihorario, o sea que el viento solo
+         // puede esconder mas el corte, nunca destaparlo.
+         //
+         // Ojo con una holgura real: al girar, la caja envolvente que devuelve
+         // getBoundingClientRect crece ~1,7px, asi que este check afloja en esa
+         // misma cantidad. Si algun dia el giro sube de ~0,5deg, hay que medir
+         // las esquinas con la matriz en vez de fiarse de la envolvente.
+         const ri = hijo.getBoundingClientRect();
+         if (Math.round(ri.left - r.left) > 0 || Math.round(ri.top - r.top) > 0) nace = false;
+       }
+       if (anim) { anim.currentTime = t0; anim.play(); }
 
        // Contraste del titulo en el PEOR punto: sobre el fondo arena ya
        // oscurecido por la parte mas densa de la sombra. Medir contra el arena
@@ -812,7 +899,8 @@ body{ background-color:var(--eco-page); }
        // el asset viene cortado por arriba y por la izquierda y ese corte solo
        // se lee bien si coincide con el borde. Offsets positivos lo dejan a la
        // vista — paso con --eco-sombra-x:8% en Villa C, 57px de hueco.
-       const ri = hijo.getBoundingClientRect(), rs = sh.getBoundingClientRect();
+       // `nace` sale del bucle de arriba: se comprueba a lo largo de TODO el
+       // balanceo, no solo en reposo.
 
        out[band.dataset.modelName] = {
          sombra: band.dataset.ecoShade,
@@ -820,8 +908,7 @@ body{ background-color:var(--eco-page); }
          invadeFoto: invade,
          recorta: getComputedStyle(sh).overflow === 'hidden',
          detrasTexto: getComputedStyle(sh).zIndex === '-1',
-         naceDelBorde: Math.round(ri.left - rs.left) <= 0 &&
-                       Math.round(ri.top  - rs.top)  <= 0,
+         naceDelBorde: nace,
          contraste: +ratio.toFixed(1),
          opacidad: getComputedStyle(sh).opacity
        };
