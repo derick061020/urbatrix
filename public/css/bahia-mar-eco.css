@@ -180,7 +180,8 @@
 
    El `alternate` del `animation` es lo que hace el vaivén: 0% es un extremo y
    100% el otro, y la sombra se pasa la vida entre los dos. Sin `alternate`
-   saltaría del final al principio en un fotograma y se vería el corte.      */
+   saltaría del final al principio en un fotograma y se vería el corte.
+
    ── TERCERA CALIBRACIÓN ──────────────────────────────────────────────────
    -2,2% → 8px: no se veía.   -6,2% → 23px: se veía, pero había que buscarlo.
    -9%   → 33px, y con los ritmos más cortos salen ~2,5px por segundo, que es
@@ -414,13 +415,18 @@
    de la capa (--eco-sol-x) y por donde entran también las sombras de las
    villas. `scale(-1,-1)` es lo mismo que `rotate(180deg)` en un rectángulo.
 
-   ⚠️ `inset:-6%` NO ES DECORATIVO: ES EL MARGEN PARA MECERSE.
+   ⚠️ `inset:-9%` NO ES DECORATIVO: ES EL MARGEN PARA MECERSE.
    Con `inset:0` la textura mide exactamente la banda, así que en cuanto se
    mueve un píxel deja una franja sin overlay contra el borde — y como debajo
    hay un degradado verde y encima un `mix-blend-mode:overlay`, esa franja se
-   ve como una raya más clara a lo largo del canto. Con 6% de sobrante por los
+   ve como una raya más clara a lo largo del canto. Con sobrante por los
    cuatro lados hay de dónde tirar, y el `overflow:hidden` de `.eco-band`
    recorta lo que sobra.
+
+   Empezó en -6% y se subió midiendo: el recorrido son 80,6px y el sobrante
+   eran 86px, o sea 5,8px de margen. Funcionaba, pero es un elemento cuya caja
+   cambia de alto en 1600px y otra vez en móvil, y un margen de 5px no
+   sobrevive a eso sin que nadie se entere. A -9% son ~130px contra 80,6.
 
    ⚠️ Y EL VOLTEO VA DENTRO DE LOS KEYFRAMES. `transform` es una sola
    propiedad: si la animación declara `transform` y la regla declara otro, la
