@@ -447,14 +447,19 @@
    giro, porque aquí el asset funciona como textura y no como una fronda
    concreta colgando de un sitio.
 
-   37s, primo y distinto de los de las villas (13/17/19/23/29) y del hero
-   (47). Lo mismo de siempre: entre primos distintos no hay múltiplo, así que
-   nunca se sincronizan y el ojo no llega a pillarle el bucle.               */
+   29s, primo y distinto de los de las villas (11/13/17/19/23), del follaje de
+   esta misma banda (31) y del hero (47). Lo mismo de siempre: entre primos
+   distintos no hay múltiplo, así que nunca se sincronizan y el ojo no llega a
+   pillarle el bucle.
+
+   El 6% de sobrante del `inset` es el techo del recorrido: con 5% se queda a
+   un punto del borde. No lo subas sin subir el `inset` primero, o la textura
+   se despega del canto y aparece la raya clara.                             */
 @keyframes ecoBandaPalma{
   0%   { transform:scale(-1,-1) translate3d(0, 0, 0); }
-  38%  { transform:scale(-1,-1) translate3d(1.5%, .4%, 0); }
-  70%  { transform:scale(-1,-1) translate3d(1.1%, -.5%, 0); }
-  100% { transform:scale(-1,-1) translate3d(3%, .2%, 0); }
+  38%  { transform:scale(-1,-1) translate3d(2.4%, .7%, 0); }
+  70%  { transform:scale(-1,-1) translate3d(1.8%, -.9%, 0); }
+  100% { transform:scale(-1,-1) translate3d(5%, .4%, 0); }
 }
 /* Follaje de fondo, denso a la derecha y disuelto hacia la izquierda.
 
