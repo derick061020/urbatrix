@@ -530,45 +530,81 @@
       z-index: 4;
       transform: scale(0.8);
     }
+    /* Wordmark del hero: marca pequeña encima del nombre grande del lugar.
+
+       ⚠️ EL TAMAÑO DEL NOMBRE NO SALE DE AQUÍ: lo escribe fitHeroWordmark()
+       (script al final de home.blade.php) para que la palabra ocupe siempre la
+       misma fracción del encuadre y quede centrada, mida lo que mida — "LAS
+       TERRENAS", "NAVIVA" o "LIV". Antes era `clamp(80px, 22vw, 260px)` con
+       `nowrap`: con once letras y 0.2em de tracking la palabra medía casi el
+       doble del ancho de la ventana y se salía por los dos lados. El recorte
+       no era una decisión de diseño, era el sobrante. El `font-size` de abajo
+       es sólo la semilla del primer frame (y lo que queda si el JS no corre).
+
+       El `mix-blend-mode` se queda EN ESTE elemento y no en .fg-hero-word:
+       aquí hay `will-change`, que crea contexto de apilamiento, así que un
+       blend en el hijo se mezclaría contra un fondo aislado (vacío) en vez de
+       contra el cielo y el esmerilado desaparecería. */
     .fg-hero-text {
       position: absolute;
       left: 0;
       right: 0;
-      top: 20%;
+      top: 19%;
       z-index: 2;
       display: none;
       text-align: center;
+      padding-inline: 4vw;
       font-family: 'Antonio', sans-serif;
       font-weight: 700;
-      font-size: clamp(80px, 22vw, 260px);
-      line-height: 1;
-      letter-spacing: 0.2em;
-      background: linear-gradient(to bottom,
-        rgba(255,255,255,0.68) 37.79%,
-        rgba(255,255,255,0.28) 86.925%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      -webkit-text-fill-color: transparent;
+      font-size: 150px;
+      line-height: 0.94;
       mix-blend-mode: luminosity;
-      white-space: nowrap;
       pointer-events: none;
       user-select: none;
       opacity: 0;
       transform: translateY(-180%);
       will-change: transform, opacity;
     }
-    /* Small brand label above the big location name (e.g. "Bahía Mar") */
+    /* La palabra grande. El degradado de relleno vive aquí y no en el
+       contenedor: recortado contra los dos trozos a la vez, la rampa se
+       repartía entre marca y nombre y la marca salía casi opaca.
+
+       `inline-block` y no `block`: tiene que ajustarse al texto para que
+       fitHeroWordmark() pueda medirlo. En block ocupa todo el ancho del
+       contenedor y la medida devuelve el encuadre, no la palabra. */
+    .fg-hero-word {
+      display: inline-block;
+      letter-spacing: 0.2em;
+      /* El tracking se añade DETRÁS de la última letra. Sin descontarlo la
+         palabra se apoya medio espacio a la derecha del centro óptico — es la
+         razón de ser del viejo `text-indent: 0.2em` del media query de móvil. */
+      margin-right: -0.2em;
+      background: linear-gradient(to bottom,
+        rgba(255,255,255,0.76) 0%,
+        rgba(255,255,255,0.62) 48%,
+        rgba(255,255,255,0.30) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    /* Marca pequeña encima del nombre grande (p. ej. "BAHÍA MAR"). Tamaño
+       propio, NO relativo al nombre: atado a un `em` del nombre crecía hasta
+       competir con él. */
     .fg-hero-sub {
       display: block;
-      font-size: 0.26em;
-      letter-spacing: 0.30em;
-      margin-bottom: 0.06em;
-      font-weight: 700;
-          font-family: 'Antonio', sans-serif;
-      color: rgba(255, 255, 255, 0.62);
-      -webkit-text-fill-color: rgba(255, 255, 255, 0.62);
+      font-family: 'Antonio', sans-serif;
+      font-weight: 600;
+      font-size: clamp(11px, 1.05vw, 17px);
+      line-height: 1;
+      letter-spacing: 0.42em;
+      margin-right: -0.42em;   /* mismo centrado óptico que la palabra */
+      margin-bottom: 1.05em;
+      color: rgba(255, 255, 255, 0.80);
+      -webkit-text-fill-color: rgba(255, 255, 255, 0.80);
       background: none;
+      white-space: nowrap;
     }
     /* Active project: visible + entrance animation */
     .fg-hero[data-active="makai"]  .fg-hero-text[data-project="makai"],
@@ -620,14 +656,24 @@
       margin-top: -10px;
     }
 
-    /* HERO — MOBILE: the 1366/670 ratio collapses the height on narrow
-       screens and squishes the building. Give it a proper portrait height. */
+    /* HERO — MÓVIL/TABLET: con 1366/670 el encuadre se queda en una franja de
+       nada en pantallas estrechas y aplasta la villa. Se le da un alto de
+       retrato propio.
+
+       El alto vive en --hero-h porque de él cuelgan DOS cosas que tienen que
+       ir a la par: el encuadre (que en el carrusel lo fija .fg-stage, no
+       .fg-hero) y el ancho de la villa. */
     @media (max-width: 768px) {
+      :root {
+        --hero-h: clamp(360px, 54vh, 560px);
+        /* En vw y no en %, aunque el hero ocupe el ancho de la ventana: así es
+           una longitud de verdad y la puede usar también .fg-hero-text, donde
+           un % se resolvería contra el ALTO y no contra el ancho. */
+        --hero-building-w: clamp(100vw, var(--hero-h) * 1.85, 138vw);
+      }
       .fg-hero {
         aspect-ratio: auto;
-        height: 52vh;
-        min-height: 380px;
-        max-height: 560px;
+        height: var(--hero-h);
       }
       /* Fill the whole hero with the sky so there's no seam above the building */
       .fg-hero-sky {
@@ -635,20 +681,45 @@
         height: 100%;
         object-fit: cover;
       }
-      /* Building enlarged and horizontally centered (margin keeps the entrance
-         translateY animation intact, since it only touches transform). */
+      /* La villa se escala contra el ALTO del encuadre, no contra el ancho de
+         la ventana. Con el viejo `width:200%` el factor era el mismo a 360px
+         que a 768px: en un iPad se comía el hero entero —sin cielo, sin
+         wordmark, y la villa recortada por el centro—. Atado al alto, cada
+         tamaño amplía lo que necesita para llenar su encuadre.
+
+         El 138% es el tope: pasado ahí la casa deja de leerse como casa y
+         queda un muro de cristal a sangre (el `width:200%` de antes recortaba
+         el 50%). En un móvil —encuadre muy vertical— manda el tope y la villa
+         se apoya entera en el horizonte; en una tablet manda el alto.
+
+         El centrado va por `margin-left` y no por `transform`: el transform es
+         de la animación de entrada (translateY) y pisarlo la rompe. */
       .fg-hero-building {
-        width: 200%;
+        width: var(--hero-building-w);
         left: 50%;
-        margin-left: -100%;
+        margin-left: calc(var(--hero-building-w) / -2);
         right: auto;
         bottom: 0;
       }
+      /* El tamaño del nombre lo pone fitHeroWordmark(); aquí sólo la posición
+         y un tracking de marca más corto, que a 11px 0.42em ya es un renglón
+         suelto en vez de una palabra.
+
+         Se ancla ABAJO y no arriba: el nombre tiene que apoyarse en la línea
+         del tejado, y esa línea se mueve con el ancho de la villa (64% del
+         alto en un móvil, 43% en una tablet). Con un `top` en % había que
+         elegir cuál de los dos quedaba bien. La villa mide 3.25 de ancho por 1
+         de alto; dividir por 3.32 en vez de por 3.25 deja el nombre justo
+         posado en el tejado, igual que en escritorio. */
       .fg-hero-text {
-        top: 30%;
-        font-size: clamp(64px, 28vw, 200px);
-        /* Compensate the trailing letter-spacing so the word reads centered */
-        text-indent: 0.2em;
+        top: auto;
+        bottom: calc(var(--hero-building-w) / 3.32);
+        padding-inline: 4vw;
+      }
+      .fg-hero-sub {
+        letter-spacing: 0.34em;
+        margin-right: -0.34em;
+        margin-bottom: 0.95em;
       }
     }
 
@@ -687,7 +758,9 @@
       aspect-ratio: 1366 / 670;
     }
     @media (max-width: 768px) {
-      .fg-stage.has-slider { aspect-ratio: auto; height: 52vh; min-height: 380px; max-height: 560px; }
+      /* Mismo alto que .fg-hero (ver --hero-h): la etapa recorta el hero, así
+         que si los dos no miden igual la villa se corta a media pared. */
+      .fg-stage.has-slider { aspect-ratio: auto; height: var(--hero-h); }
     }
 
     /* Track horizontal: fila de celdas a 100% de ancho cada una. */
@@ -1168,13 +1241,17 @@
         0 4px 12px rgba(10, 13, 20, 0.10);
     }
     /* Con el bottom-sheet de filtros abierto la píldora estorba (y vive fuera
-       de su stacking context): se retira. */
-    body.filters-sheet-open .fg-toggle-bar.is-floating {
+       de su stacking context): se retira. El botón de WhatsApp igual — se
+       queda encima del "Ver resultados" del sheet, y subirle el z-index al
+       sheet no sirve porque el FAB está en otro contexto de apilamiento. */
+    body.filters-sheet-open .fg-toggle-bar.is-floating,
+    body.filters-sheet-open .fg-wa-float {
       opacity: 0;
       visibility: hidden;
       transform: translateY(14px);
       transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
     }
+    .fg-wa-float { transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease; }
     /* En pantallas estrechas la píldora centrada chocaría con el botón
        flotante de WhatsApp (56px, abajo a la derecha): se sube por encima. */
     @media (max-width: 480px) {
@@ -1359,6 +1436,16 @@
       .fg-footer-content { flex-direction: column; gap: 12px; width: 100%; }
       .fg-footer-copyright { text-align: center; padding: 0; }
       .fg-footer-social { width: auto; justify-content: center; }
+      /* El pie es lo último que se ve y encima de él flotan la píldora
+         Grid/Lista y el botón de WhatsApp. Sin este colchón, al llegar al
+         final del scroll el copyright y los iconos sociales quedan DEBAJO de
+         los dos botones y no hay forma de bajar más.
+
+         Se mide desde --fg-float-gap (la línea donde engancha la píldora, que
+         en móvil estrecho sube a 92px para esquivar el WhatsApp) más el alto
+         de la propia píldora: así el colchón sigue a la píldora en vez de ser
+         un número suelto que se queda corto cuando aquélla se mueve. */
+      .fg-footer { padding-bottom: calc(var(--fg-float-gap, 24px) + 76px + env(safe-area-inset-bottom, 0px)); }
     }
     
     .fg-footer-social {
@@ -1419,6 +1506,16 @@
     }
     @media (max-width: 560px) {
       .fg-units-grid { grid-template-columns: 1fr; }
+    }
+
+    /* El bloque central del nav —unidades vendidas, usuarios en línea y el
+       contador eco— NO encoge: sus tres líneas van con `white-space:nowrap`,
+       así que el `flex:0 1 auto` no puede recortarlo y por debajo de ~1100px
+       se cuela por debajo del selector de moneda. Se retira en ese tramo y
+       vuelve en cuanto hay sitio; a partir de 768px ya lo escondía la regla de
+       móvil de aquí abajo, esto sólo cubre el hueco tablet/portátil pequeño. */
+    @media (max-width: 1100px) {
+      .nav-center { display: none !important; }
     }
 
     /* ============================================

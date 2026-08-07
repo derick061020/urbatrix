@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=29">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=30">
 </head>
 
 <body data-view="grid">
@@ -2339,9 +2339,13 @@
           <div class="fg-hero" id="hero" data-active="makai">
             <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span>LAS TERRENAS</span>
-            <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
-            <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
+            {{-- El nombre grande va envuelto en .fg-hero-word (y no suelto en
+                 el .fg-hero-text) porque fitHeroWordmark() necesita medir SÓLO
+                 esa palabra: el contenedor está estirado a todo el hero
+                 (left:0/right:0) y medirlo devuelve el ancho del encuadre. --}}
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span><span class="fg-hero-word">LAS TERRENAS</span></span>
+            <span class="fg-hero-text" data-project="naviva" aria-hidden="true"><span class="fg-hero-word">NAVIVA</span></span>
+            <span class="fg-hero-text" data-project="liv"    aria-hidden="true"><span class="fg-hero-word">LIV</span></span>
 
             <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Bahía Mar Residences') }}">
             <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
@@ -2951,7 +2955,7 @@
     </footer>
 
     <!-- WhatsApp Floating Button -->
-    <div style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;">
+    <div class="fg-wa-float" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;">
       <button onclick="window.open('https://wa.me/18097109044', '_blank')" style="width:3.5rem;height:3.5rem;border-radius:50%;background:#25D366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
         <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path>
@@ -6303,6 +6307,68 @@
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape' && document.getElementById('clientDocModal').style.display === 'flex') closeClientDoc();
   });
+</script>
+
+<!-- ░░░ WORDMARK DEL HERO — ajuste al encuadre ░░░
+     El nombre grande del hero no lleva font-size fijo (ver .fg-hero-text en
+     style.css): se calcula aquí para que la palabra ocupe SIEMPRE la misma
+     fracción del encuadre y quede centrada, mida lo que mida. Con un
+     clamp() por viewport el tamaño dependía del ancho de la ventana pero no
+     del largo de la palabra, y "LAS TERRENAS" salía por los dos lados
+     mientras que "LIV" se quedaba corto. -->
+<script>
+  (function(){
+    var MIN_FS = 32;
+    var MAX_FS = 300;   // techo para monitores muy anchos
+    var hero = null;
+
+    function fitHeroWordmark(){
+      hero = hero || document.getElementById('hero');
+      if(!hero) return;
+      var boxW = hero.clientWidth, boxH = hero.clientHeight;
+      if(!boxW || !boxH) return;
+
+      // Cuánto del encuadre ocupa la palabra. En móvil un poco menos: los
+      // márgenes laterales pesan más en 390px que en 1440px.
+      var target = boxW * (boxW <= 768 ? 0.92 : 0.90);
+
+      var texts = hero.querySelectorAll('.fg-hero-text');
+      for(var i = 0; i < texts.length; i++){
+        var el = texts[i], word = el.querySelector('.fg-hero-word');
+        if(!word) continue;
+
+        // Las marcas inactivas están en display:none y no se pueden medir.
+        // Se destapan sólo para medir: pasa dentro del mismo frame, así que
+        // el navegador no llega a pintarlas.
+        var wasHidden = getComputedStyle(el).display === 'none';
+        if(wasHidden) el.style.display = 'block';
+        el.style.fontSize = '100px';
+        var w = word.offsetWidth;   // offsetWidth y no getBoundingClientRect:
+                                    // no le afecta el transform de la entrada
+        if(wasHidden) el.style.display = '';
+
+        if(!w){ el.style.fontSize = ''; continue; }
+        // Dos techos: el ancho del encuadre y su alto (en pantallas muy
+        // anchas y bajas la palabra cabría de sobra pero taparía el cielo).
+        var fs = Math.min(100 * target / w, boxH * 0.34, MAX_FS);
+        el.style.fontSize = Math.max(MIN_FS, fs) + 'px';
+      }
+    }
+
+    var pending = null;
+    function refit(){
+      if(pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(function(){ pending = null; fitHeroWordmark(); });
+    }
+
+    fitHeroWordmark();
+    // La medida depende de Antonio: con la fuente de respaldo la palabra mide
+    // otra cosa y el ajuste saldría corto o largo.
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitHeroWordmark);
+    window.addEventListener('resize', refit);
+    window.addEventListener('orientationchange', refit);
+    document.addEventListener('makai:hero-revealed', refit);
+  })();
 </script>
 
 <!-- ░░░ HERO SLIDER — carrusel horizontal: hero (celda 0) → imágenes, ciclando ░░░ -->
