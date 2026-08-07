@@ -171,13 +171,22 @@
    A -4,6% son ~17px, que sobre una sombra difusa se lee como brisa sin pasar
    a "hay algo animándose ahí". Por encima de eso la sombra empieza a entrar y
    salir del cuadro y el ojo se va detrás, que es justo lo que esta capa lleva
-   evitando desde la v3.                                                     */
+   evitando desde la v3.
+
+   ── EL MOVIMIENTO ES LATERAL ─────────────────────────────────────────────
+   De lado a lado, no en diagonal. La Y y la escala se quedan en lo justo para
+   que no se lea como una diapositiva deslizándose: son el cabeceo, no el
+   gesto. Lo que se tiene que ver es la fronda yendo y viniendo.
+
+   El `alternate` del `animation` es lo que hace el vaivén: 0% es un extremo y
+   100% el otro, y la sombra se pasa la vida entre los dos. Sin `alternate`
+   saltaría del final al principio en un fotograma y se vería el corte.      */
 @keyframes ecoDeriva{
   0%   { transform:translate3d(0, 0, 0)          rotate(0)       scale(1); }
-  22%  { transform:translate3d(-1.2%, -.7%, 0)   rotate(-.28deg) scale(1.018); }
-  47%  { transform:translate3d(-3.2%, -.3%, 0)   rotate(-.62deg) scale(1.04); }
-  71%  { transform:translate3d(-2.3%, -1.7%, 0)  rotate(-.24deg) scale(1.03); }
-  100% { transform:translate3d(-4.6%, -1.2%, 0)  rotate(-.7deg)  scale(1.065); }
+  22%  { transform:translate3d(-1.8%, -.5%, 0)   rotate(-.3deg)  scale(1.016); }
+  47%  { transform:translate3d(-4.3%, -.2%, 0)   rotate(-.66deg) scale(1.036); }
+  71%  { transform:translate3d(-3.1%, -1.1%, 0)  rotate(-.26deg) scale(1.026); }
+  100% { transform:translate3d(-6.2%, -.8%, 0)   rotate(-.78deg) scale(1.06); }
 }
 
 
@@ -388,14 +397,49 @@
    derecha y las frondas abriéndose hacia arriba. Girado, nace arriba a la
    izquierda y cae hacia el centro, que es por donde entra la luz en el resto
    de la capa (--eco-sol-x) y por donde entran también las sombras de las
-   villas. `scale(-1,-1)` es lo mismo que `rotate(180deg)` en un rectángulo. */
+   villas. `scale(-1,-1)` es lo mismo que `rotate(180deg)` en un rectángulo.
+
+   ⚠️ `inset:-6%` NO ES DECORATIVO: ES EL MARGEN PARA MECERSE.
+   Con `inset:0` la textura mide exactamente la banda, así que en cuanto se
+   mueve un píxel deja una franja sin overlay contra el borde — y como debajo
+   hay un degradado verde y encima un `mix-blend-mode:overlay`, esa franja se
+   ve como una raya más clara a lo largo del canto. Con 6% de sobrante por los
+   cuatro lados hay de dónde tirar, y el `overflow:hidden` de `.eco-band`
+   recorta lo que sobra.
+
+   ⚠️ Y EL VOLTEO VA DENTRO DE LOS KEYFRAMES. `transform` es una sola
+   propiedad: si la animación declara `transform` y la regla declara otro, la
+   animación gana y el `scale(-1,-1)` desaparece — la palmera se daría la
+   vuelta al empezar a moverse. Por eso el flip viaja en cada fotograma.
+
+   Ojo con el orden: con el `scale(-1,-1)` aplicado primero, el eje queda
+   espejado, así que un `translateX` POSITIVO mueve la imagen hacia la
+   IZQUIERDA en pantalla. Da igual para el resultado —hay margen por los
+   cuatro lados— pero si algún día lo tocas, no te fíes del signo.           */
 .eco-band::after{
   content:"";
-  position:absolute; inset:0;
+  position:absolute; inset:-6%;
   pointer-events:none;
   background-image:var(--eco-sombra); background-size:cover;
   transform:scale(-1, -1);
   mix-blend-mode:overlay; opacity:.22;
+  animation:ecoBandaPalma 37s ease-in-out infinite alternate;
+  will-change:transform;
+}
+
+/* La palmera de la banda: el mismo vaivén lateral que las villas, más lento
+   —es una masa mucho mayor y las masas grandes se mueven despacio— y sin
+   giro, porque aquí el asset funciona como textura y no como una fronda
+   concreta colgando de un sitio.
+
+   37s, primo y distinto de los de las villas (13/17/19/23/29) y del hero
+   (47). Lo mismo de siempre: entre primos distintos no hay múltiplo, así que
+   nunca se sincronizan y el ojo no llega a pillarle el bucle.               */
+@keyframes ecoBandaPalma{
+  0%   { transform:scale(-1,-1) translate3d(0, 0, 0); }
+  38%  { transform:scale(-1,-1) translate3d(1.5%, .4%, 0); }
+  70%  { transform:scale(-1,-1) translate3d(1.1%, -.5%, 0); }
+  100% { transform:scale(-1,-1) translate3d(3%, .2%, 0); }
 }
 /* Follaje de fondo, denso a la derecha y disuelto hacia la izquierda.
 
@@ -432,7 +476,30 @@
    ⚠️ La máscara horizontal deja el 58% izquierdo limpio. El titular llega al
    36% y los stats al 62%, así que estos rozan la zona degradada — pero ahí la
    imagen es casi negra y el texto claro, o sea que el contraste SUBE. Medido
-   sobre píxeles reales. El mínimo exigible es 4,5.                          */
+   sobre píxeles reales. El mínimo exigible es 4,5.
+
+   ── EL VAIVÉN DEL FOLLAJE SOLO PUEDE IR HACIA LA DERECHA ─────────────────
+   Y esta vez el motivo no es el corte del asset, es cómo está anclado.
+
+   El follaje va a `background-position:right center` con `auto 100%`: llena
+   el alto justo y se pega al borde derecho, sin sobrar por ningún lado. O sea
+   que CADA dirección tiene su forma de romperse:
+
+     · hacia arriba o abajo → asoma el canto horizontal de la imagen contra el
+       verde, que es exactamente el corte recto que costó cuatro intentos
+       quitar (ver arriba);
+     · hacia la izquierda   → el borde derecho se despega y deja una franja de
+       verde limpio justo en la zona MÁS densa del follaje: el sitio donde más
+       se nota.
+
+   Hacia la derecha, en cambio, no hay nada que destapar: lo que sale por el
+   canto derecho lo recorta `.eco-band`, y lo que se descubre por la izquierda
+   es zona que la máscara ya tiene desvanecida a casi nada. Así que el
+   recorrido va de 0 a +2%, y el `alternate` hace el resto.
+
+   No hace falta margen extra, y por eso no se lo doy: agrandar la caja movería
+   los porcentajes de la máscara —que se calculan sobre ELLA— y arrastraría el
+   degradado hacia el titular. La máscara se queda donde está.               */
 .eco-band-foliage{
   position:absolute; inset:0;
   pointer-events:none;
@@ -440,6 +507,8 @@
   background-size:auto 100%;
   background-position:right center;
   background-repeat:no-repeat;
+  animation:ecoBandaFollaje 41s ease-in-out infinite alternate;
+  will-change:transform;
 
   /* Opaca en el borde derecho, transparente al 42%: el follaje ocupa poco más
      de la mitad derecha y el titular se queda en zona limpia. */
