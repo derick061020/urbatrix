@@ -514,6 +514,17 @@
      de la mitad derecha y el titular se queda en zona limpia. */
   mask-image:linear-gradient(to left, #000 0%, rgba(0,0,0,.9) 14%, transparent 42%);
 }
+
+/* 41s: primo, distinto del de la palmera de esta misma banda (37) y de los de
+   las villas. Las dos capas de la banda tienen que ir a ritmos distintos o se
+   mueven como un bloque, y entonces no es follaje meciéndose: es una foto
+   deslizándose. */
+@keyframes ecoBandaFollaje{
+  0%   { transform:translate3d(0, 0, 0); }
+  44%  { transform:translate3d(1.2%, 0, 0); }
+  100% { transform:translate3d(2%, 0, 0); }
+}
+
 .eco-band-eyebrow{
   font-size:11px; letter-spacing:.24em; text-transform:uppercase;
   opacity:.72; margin:0 0 14px; font-weight:600;
@@ -581,9 +592,21 @@ nav > div{
 
 
 /* ══ 9. COHERENCIA ═════════════════════════════════════════════════════════
-   Un sitio "eco" que quema batería es una contradicción. No es opcional.   */
+   Un sitio "eco" que quema batería es una contradicción. No es opcional.
+
+   ⚠️ Van las TRES cosas que se mueven, no solo la sombra de las villas. Cada
+   vez que añadas una animación a esta capa, súbela también aquí — es el tipo
+   de olvido que no se ve en pantalla porque quien lo sufre no eres tú.
+
+   La palmera de la banda se queda en su `scale(-1,-1)`, que es su posición de
+   reposo. Sin ese `transform` explícito, quitarle la animación la devolvería
+   a la regla de `.eco-band::after`... que también lo declara, así que en
+   realidad no hace falta; se escribe igual para que no dependa de leerse dos
+   sitios a la vez.                                                          */
 @media (prefers-reduced-motion:reduce){
-  .eco-shade i{ animation:none; }
+  .eco-shade i,
+  .eco-band-foliage{ animation:none; }
+  .eco-band::after{ animation:none; transform:scale(-1,-1); }
 }
 
 
@@ -994,8 +1017,18 @@ body{ background-color:var(--eco-page); }
      // 0 % 0 = NaN, y el check cantaba SE SINCRONIZAN pasara lo que pasara.
      // Filtra los 0 porque con prefers-reduced-motion no hay animacion y eso no
      // es un fallo.
-     const rit = [...document.querySelectorAll('.eco-shade i')]
-       .map(s => parseFloat(getComputedStyle(s).animationDuration)).filter(d => d > 0);
+     //
+     // ⚠️ Y entran TAMBIEN las dos capas de la banda verde. Cuando se les puso
+     // movimiento, este check seguia mirando solo las villas: dos animaciones
+     // nuevas quedaban fuera de la unica comprobacion que existe contra el
+     // efecto gif. Un check que no cubre lo ultimo que añadiste da una
+     // tranquilidad que no te has ganado.
+     const rit = [...document.querySelectorAll('.eco-shade i, .eco-band-foliage')]
+       .map(s => parseFloat(getComputedStyle(s).animationDuration))
+       .concat(document.querySelector('.eco-band')
+         ? [parseFloat(getComputedStyle(document.querySelector('.eco-band'), '::after').animationDuration)]
+         : [])
+       .filter(d => d > 0);
      out.ritmos = !rit.length ? 'sin animacion (reduced-motion)'
        : rit.every((a, i) => rit.every((b, j) =>
            i === j || (Math.max(a,b) % Math.min(a,b)) > .01)) ? 'ok' : 'SE SINCRONIZAN: ' + rit.join(', ');
