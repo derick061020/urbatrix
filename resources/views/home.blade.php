@@ -2339,7 +2339,7 @@
           <div class="fg-hero" id="hero" data-active="makai">
             <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">LANDMASS</span>BAHÍA MAR</span>
+            <span class="fg-hero-text" data-project="makai"  aria-hidden="true"><span class="fg-hero-sub">BAHÍA MAR</span>LAS TERRENAS</span>
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
 

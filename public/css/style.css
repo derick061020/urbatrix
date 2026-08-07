@@ -558,9 +558,7 @@
       transform: translateY(-180%);
       will-change: transform, opacity;
     }
-    /* Crédito pequeño de la desarrolladora (LANDMASS) encima del nombre grande
-       del proyecto (BAHÍA MAR). Antes llevaba la marca arriba y la localidad
-       abajo; el hero ya no nombra localidad. */
+    /* Small brand label above the big location name (e.g. "Bahía Mar") */
     .fg-hero-sub {
       display: block;
       font-size: 0.26em;
