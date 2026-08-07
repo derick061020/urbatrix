@@ -37,11 +37,15 @@
      movimiento estaba escrito pero no ocurría a una velocidad que un ojo
      humano pueda registrar.
 
-     Los nuevos (13-29) dejan el ciclo completo entre 26 y 58 segundos. Sigue
-     siendo lento —una fronda mecida no es un abanico— pero ahora se ve. Si
-     alguna vez hay que frenarlo, se bajan aquí sin tocar el CSS; lo único
-     innegociable es que sigan siendo primos distintos y que ninguno sea 47. */
-  const RITMOS = [19, 23, 17, 29, 13];
+     Los de ahora (11-23) dejan el ciclo completo entre 22 y 46 segundos. Con
+     la amplitud del CSS eso son ~2,5px por segundo, que es donde el ojo lo
+     registra sin buscarlo. Sigue siendo lento — una fronda mecida no es un
+     abanico.
+
+     ⚠️ Los de la banda verde NO están aquí, están en el CSS (29 y 31), porque
+     no son por-villa. Si tocas estos, míralos: los siete números tienen que
+     ser primos DISTINTOS entre sí, y ninguno puede ser 47, que es el hero.  */
+  const RITMOS = [13, 17, 11, 19, 23];
 
   /* ⚠️ MÉTRICAS PLACEHOLDER — Bahía Mar tiene que confirmarlas antes de
      publicar. Publicar datos ambientales inventados es exactamente el

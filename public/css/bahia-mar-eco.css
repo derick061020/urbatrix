@@ -181,12 +181,27 @@
    El `alternate` del `animation` es lo que hace el vaivén: 0% es un extremo y
    100% el otro, y la sombra se pasa la vida entre los dos. Sin `alternate`
    saltaría del final al principio en un fotograma y se vería el corte.      */
+   ── TERCERA CALIBRACIÓN ──────────────────────────────────────────────────
+   -2,2% → 8px: no se veía.   -6,2% → 23px: se veía, pero había que buscarlo.
+   -9%   → 33px, y con los ritmos más cortos salen ~2,5px por segundo, que es
+   donde el movimiento se lee sin tener que fijarse.
+
+   Aquí es donde conviene parar. El límite no es el recuadro —hay sitio— sino
+   que la sombra recorre un tercio de su propio ancho: pasado eso deja de
+   mecerse y empieza a entrar y salir del cuadro, y una sombra que aparece y
+   desaparece ya no es una planta al otro lado de la ventana.
+
+   El giro se queda en -0,95°, por debajo de lo que subió la traslación, y a
+   propósito: la traslación es segura por construcción (sólo puede esconder
+   más el corte) y el giro no —con el pivote arriba a la izquierda, el borde
+   superior se descuelga hacia la derecha. Los -1,4% de Y compensan ese
+   descuelgue. Si algún día subes el giro, sube la Y negativa con él.        */
 @keyframes ecoDeriva{
   0%   { transform:translate3d(0, 0, 0)          rotate(0)       scale(1); }
-  22%  { transform:translate3d(-1.8%, -.5%, 0)   rotate(-.3deg)  scale(1.016); }
-  47%  { transform:translate3d(-4.3%, -.2%, 0)   rotate(-.66deg) scale(1.036); }
-  71%  { transform:translate3d(-3.1%, -1.1%, 0)  rotate(-.26deg) scale(1.026); }
-  100% { transform:translate3d(-6.2%, -.8%, 0)   rotate(-.78deg) scale(1.06); }
+  22%  { transform:translate3d(-2.6%, -.8%, 0)   rotate(-.36deg) scale(1.02); }
+  47%  { transform:translate3d(-6.2%, -.35%, 0)  rotate(-.8deg)  scale(1.045); }
+  71%  { transform:translate3d(-4.5%, -1.9%, 0)  rotate(-.32deg) scale(1.032); }
+  100% { transform:translate3d(-9%,   -1.4%, 0)  rotate(-.95deg) scale(1.075); }
 }
 
 
@@ -423,7 +438,7 @@
   background-image:var(--eco-sombra); background-size:cover;
   transform:scale(-1, -1);
   mix-blend-mode:overlay; opacity:.22;
-  animation:ecoBandaPalma 37s ease-in-out infinite alternate;
+  animation:ecoBandaPalma 29s ease-in-out infinite alternate;
   will-change:transform;
 }
 
