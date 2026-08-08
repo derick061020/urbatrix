@@ -2822,5 +2822,10 @@
   "Del terreno preservado": "Of the land preserved",
   "Árboles nativos conservados": "Native trees preserved",
   "Agua de lluvia captada": "Rainwater harvested",
-  "<b>68%</b> del terreno preservado · <b>1.240</b> árboles nativos": "<b>68%</b> of the land preserved · <b>1,240</b> native trees"
+  "<b>68%</b> del terreno preservado · <b>1.240</b> árboles nativos": "<b>68%</b> of the land preserved · <b>1,240</b> native trees",
+  "Agente": "Agent",
+  "Link disponible en el email": "Link available in the email",
+  "Te enviamos la invitación a tu asesor (:advisor) y a tu email.": "We sent the invitation to your advisor (:advisor) and to your email.",
+  "Te enviamos la invitación a tu email.": "We sent the invitation to your email.",
+  "También aparece en tu Google Calendar.": "It also appears in your Google Calendar."
 }

@@ -1424,6 +1424,9 @@
     }
 
     /* --- Chip de precio "desde" sobre la foto --------------------------- */
+    /* Etiqueta localizada: el ::before no puede usar __(), así que el texto
+       viaja por una variable CSS que Blade rellena según el idioma activo. */
+    :root{ --label-desde:"{{ __('Desde') }}"; }
     .fg-type-band .fg-card-price{
       position:absolute; top:16px; z-index:6; display:block; margin:0;
       background:#fff; border-radius:4px; padding:12px 14px 10px; line-height:1;
@@ -1432,7 +1435,8 @@
     .fg-type-band:nth-child(odd)  .fg-card-price{ right:16px; }
     .fg-type-band:nth-child(even) .fg-card-price{ left:16px; }
     .fg-type-band .fg-card-price::before{
-      content:"DESDE"; display:block; margin-bottom:4px;
+      content:var(--label-desde,"DESDE"); text-transform:uppercase;
+      display:block; margin-bottom:4px;
       font-family:'Poppins',sans-serif; font-weight:600; font-size:9px;
       letter-spacing:1.62px; color:var(--band-faint);
     }
@@ -2025,7 +2029,7 @@
             <button type="button" onclick="toggleProfileMenu()" aria-label="{{ __('Profile') }}" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
               <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
                 <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Samuel' }}</span>
-                <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? 'Admin' : 'Agente' }}</span>
+                <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? __('Admin') : __('Agente') }}</span>
               </span>
               @if(auth()->check() && auth()->user()->avatar)
                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="display:inline-block;width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" aria-hidden="true">
@@ -4852,12 +4856,14 @@
           meetLinkEl.href = link;
           meetLinkEl.textContent = link;
         } else {
-          meetLinkEl.textContent = 'Link disponible en el email';
+          meetLinkEl.textContent = @json(__('Link disponible en el email'));
           meetLinkEl.removeAttribute('href');
         }
         document.getElementById('advisorSuccessSub').textContent =
-          'Te enviamos la invitación a ' + (data?.meeting?.advisor ? 'tu asesor (' + data.meeting.advisor + ') y a tu email.' : 'tu email.') +
-          ' También aparece en tu Google Calendar.';
+          (data?.meeting?.advisor
+            ? @json(__('Te enviamos la invitación a tu asesor (:advisor) y a tu email.')).replace(':advisor', data.meeting.advisor)
+            : @json(__('Te enviamos la invitación a tu email.'))) +
+          ' ' + @json(__('También aparece en tu Google Calendar.'));
 
         document.getElementById('advisorForm').style.display = 'none';
         document.getElementById('advisorFooter').style.display = 'none';
@@ -5694,6 +5700,12 @@
     }
     // Total public units rendered on the page (denominator for the pill text).
     const TOTAL_UNITS = {{ $units->count() }};
+    // Localized template for the match-count pill so JS respects the active
+    // locale instead of hardcoding Spanish. Placeholders are replaced below.
+    const MATCH_COUNT_TPL = @json(__('Mostrando :shown de :total unidades'));
+    function matchCountLabel(count) {
+      return MATCH_COUNT_TPL.replace(':shown', count).replace(':total', TOTAL_UNITS);
+    }
     // Update match count — the pill in the grid filter bar now reads
     // "Mostrando X de Y unidades" (X = visible/matched, Y = total).
     function updateMatchCount(count) {
@@ -5704,7 +5716,7 @@
           <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
         </svg>
-        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
+        ${matchCountLabel(count)}`;
       pulseMatchPill(pill, count);
     }
     // The list view also has its own pill in the toolbar.
@@ -5716,7 +5728,7 @@
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
-        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
+        ${matchCountLabel(count)}`;
       pulseMatchPill(pill, count);
     }
 
@@ -5888,7 +5900,7 @@
       }
       if (typeof total !== 'undefined') {
         const headerCnt = document.querySelector('[data-saved-count]');
-        if (headerCnt) headerCnt.textContent = `Guardados (${total})`;
+        if (headerCnt) headerCnt.textContent = `${@json(__('guardados'))} (${total})`;
       }
       if (typeof currentOpenUnit !== 'undefined' && String(currentOpenUnit) === String(unitId)) {
         setModalAddToListState(!!wishlisted, unitCount);
@@ -5995,7 +6007,7 @@
               const cnt = document.querySelector(`[data-unit-count="${unitId}"]`);
               if (cnt && typeof data.unit_count !== 'undefined') cnt.textContent = data.unit_count;
               const headerCnt = document.querySelector('[data-saved-count]');
-              if (headerCnt && typeof data.total !== 'undefined') headerCnt.textContent = `Guardados (${data.total})`;
+              if (headerCnt && typeof data.total !== 'undefined') headerCnt.textContent = `${@json(__('guardados'))} (${data.total})`;
               // Keep the modal toggle in sync if this unit happens to be open
               if (typeof currentOpenUnit !== 'undefined' && String(currentOpenUnit) === String(unitId)) {
                 setModalAddToListState(!!data.wishlisted, data.unit_count);
