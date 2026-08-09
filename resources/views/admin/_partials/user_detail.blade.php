@@ -7,10 +7,11 @@
     $agente = $reservation?->budget_configured_by ?: '—';
     $unitName = $unit ? ($unit->custom_id ?? $unit->name ?? '—') : '—';
     $project  = $unit?->project?->name ?? ($reservation ? 'Bahía Mar Residences' : '—');
+    $extraEmails = $user->extraEmails();
     $editData = \Illuminate\Support\Js::from([
         'id' => $user->id, 'first' => $user->first_name, 'last' => $user->last_name,
         'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone,
-        'country' => $user->country, 'role' => $user->role,
+        'country' => $user->country, 'role' => $user->role, 'extra' => $extraEmails,
     ]);
 @endphp
 
@@ -67,14 +68,20 @@
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 mb-3">{{ __('Contacto') }}</div>
             <div class="divide-y divide-ink-100">
-                @foreach([
-                    ['Nombre', $fullName],
-                    ['Email', $user->email],
-                    ['Teléfono', $user->phone ?: '—'],
-                    ['País', $user->country ?: '—'],
-                    ['Registro', optional($user->created_at)->format('Y-m-d') ?? '—'],
-                    ['Agente asignado', $agente],
-                ] as [$l, $v])
+                @php
+                    // Los correos adicionales son sólo contacto: se listan debajo del principal.
+                    $contactRows = array_merge(
+                        [['Nombre', $fullName], ['Email', $user->email]],
+                        array_map(fn ($e) => [__('Email adicional'), $e], $extraEmails),
+                        [
+                            ['Teléfono', $user->phone ?: '—'],
+                            ['País', $user->country ?: '—'],
+                            ['Registro', optional($user->created_at)->format('Y-m-d') ?? '—'],
+                            ['Agente asignado', $agente],
+                        ]
+                    );
+                @endphp
+                @foreach($contactRows as [$l, $v])
                     <div class="py-2.5 flex items-center justify-between gap-4">
                         <span class="text-[12px] text-ink-500">{{ $l }}</span>
                         <span class="text-[13px] font-semibold text-ink-900 text-right truncate">{{ $v }}</span>

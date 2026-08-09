@@ -2936,6 +2936,9 @@ class AdminController extends Controller
             'user_id'        => 'required_if:client_mode,existing|nullable|exists:users,id',
             'cliente_nombre' => 'required_if:client_mode,new|nullable|string|max:255',
             'cliente_email'  => 'required_if:client_mode,new|nullable|email|max:255',
+            // Correos adicionales del cliente: sólo contacto, no reciben la invitación.
+            'cliente_emails_extra'   => 'nullable|array|max:10',
+            'cliente_emails_extra.*' => 'nullable|email|max:255',
             'unit_id'        => 'required|exists:units,id',
             'fecha'          => 'required|date',
             'monto'          => 'required|numeric|min:0',
@@ -3030,9 +3033,21 @@ class AdminController extends Controller
         $first = $parts[0] ?? '';
         $last  = $parts[1] ?? '';
 
+        // Correos adicionales del cliente (sólo contacto).
+        $extraEmails = User::normalizeExtraEmails($data['cliente_emails_extra'] ?? [], $data['cliente_email'] ?? null);
+        $hasExtraCol = \Illuminate\Support\Facades\Schema::hasColumn('users', 'extra_emails');
+
         $existing = User::where('email', $data['cliente_email'])->first();
         if ($existing) {
             // El correo ya tiene cuenta: vincúlala sin reinvitar.
+            if ($hasExtraCol && $extraEmails) {
+                // Suma los nuevos a los que ya tuviera, sin duplicar.
+                $merged = User::normalizeExtraEmails(
+                    array_merge($existing->extraEmails(), $extraEmails),
+                    $existing->email
+                );
+                $existing->forceFill(['extra_emails' => $merged ?: null])->save();
+            }
             return [[
                 'user_id'    => $existing->id,
                 'email'      => $existing->email,
@@ -3052,6 +3067,7 @@ class AdminController extends Controller
         if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'first_name'))          $userAttrs['first_name']          = $first;
         if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'last_name'))           $userAttrs['last_name']           = $last;
         if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) $userAttrs['verification_status'] = 'approved';
+        if ($hasExtraCol && $extraEmails)                                                 $userAttrs['extra_emails']        = $extraEmails;
 
         $user = User::create($userAttrs);
 
@@ -4489,6 +4505,9 @@ class AdminController extends Controller
             'last_name'  => ['nullable', 'string', 'max:80'],
             'name'       => ['nullable', 'string', 'max:160'],
             'email'      => ['required', 'email', 'max:160', Rule::unique('users', 'email')->ignore($user->id)],
+            // Correos adicionales: sólo dato de contacto (no sirven para acceder).
+            'extra_emails'   => ['nullable', 'array', 'max:10'],
+            'extra_emails.*' => ['nullable', 'email', 'max:160'],
             'phone'      => ['nullable', 'string', 'max:30'],
             'country'    => ['nullable', 'string', 'max:10'],
             'role'       => ['nullable', 'in:user,admin'],
@@ -4516,6 +4535,10 @@ class AdminController extends Controller
         $user->first_name = $data['first_name'] ?? $user->first_name;
         $user->last_name  = $data['last_name']  ?? $user->last_name;
         $user->email      = $data['email'];
+        // Correos adicionales (sólo contacto): se normalizan y se quita el principal si viene repetido.
+        if ($request->has('extra_emails')) {
+            $user->extra_emails = User::normalizeExtraEmails($data['extra_emails'] ?? [], $user->email) ?: null;
+        }
         $user->phone      = $data['phone']   ?? $user->phone;
         $user->country    = $data['country'] ?? $user->country;
         if (!empty($data['role'])) {
