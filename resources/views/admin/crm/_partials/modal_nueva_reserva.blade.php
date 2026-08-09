@@ -48,7 +48,14 @@
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Email del cliente') }}</label>
                     <input type="email" name="cliente_email" data-new-input placeholder="cliente@email.com" class="crm-input pl-3 mt-1">
-                    <p class="text-[11px] text-ink-500 mt-1.5"><i class="pi pi-envelope text-[10px] mr-1"></i> {{ __('Se enviará una invitación para que active su cuenta y cree su contraseña.') }}</p>
+
+                    {{-- Correos adicionales del cliente (co-compradores): sólo dato de contacto. --}}
+                    <div data-extra-emails class="space-y-2 mt-2"></div>
+                    <button type="button" data-add-email class="inline-flex items-center gap-1 text-[12px] font-semibold text-brand hover:underline mt-2">
+                        <i class="pi pi-plus text-[10px]"></i> {{ __('Agregar otro correo') }}
+                    </button>
+
+                    <p class="text-[11px] text-ink-500 mt-1.5"><i class="pi pi-envelope text-[10px] mr-1"></i> {{ __('Se enviará una invitación al correo principal para que active su cuenta y cree su contraseña.') }}</p>
                 </div>
             </div>
 
@@ -112,7 +119,8 @@
     const hidden    = form.querySelector('[data-client-mode]');
     const btns      = form.querySelectorAll('[data-mode-btn]');
     const panes     = { new: form.querySelector('[data-pane="new"]'), existing: form.querySelector('[data-pane="existing"]') };
-    const newInputs = form.querySelectorAll('[data-new-input]');
+    // Se consulta en vivo: los correos adicionales se agregan de forma dinámica.
+    const newInputs = () => form.querySelectorAll('[data-new-input]');
     const existing  = form.querySelector('[data-existing-input]');
     const existingValue  = existing.querySelector('[data-combobox-value]');
     const existingSearch = existing.querySelector('[data-combobox-search]');
@@ -165,8 +173,12 @@
             b.classList.toggle('text-ink-500', !on);
         });
 
-        // Requeridos + enabled según el modo (evita enviar campos del modo oculto)
-        newInputs.forEach(i => { i.required = (mode === 'new'); i.disabled = (mode !== 'new'); });
+        // Requeridos + enabled según el modo (evita enviar campos del modo oculto).
+        // Los marcados como opcionales (correos adicionales) nunca son obligatorios.
+        newInputs().forEach(i => {
+            i.required = (mode === 'new') && !i.hasAttribute('data-optional');
+            i.disabled = (mode !== 'new');
+        });
         existingValue.disabled  = (mode !== 'existing');
         existingSearch.disabled = (mode !== 'existing');
     }
@@ -193,6 +205,21 @@
             e.preventDefault();
             alert('{{ __('Esperá a que termine la subida del comprobante.') }}');
         }
+    });
+
+    // ── Correos adicionales del cliente (sólo dato de contacto) ──
+    const extraWrap = form.querySelector('[data-extra-emails]');
+    form.querySelector('[data-add-email]').addEventListener('click', () => {
+        if (extraWrap.querySelectorAll('input').length >= 10) return;
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2';
+        row.innerHTML =
+            '<input type="email" name="cliente_emails_extra[]" data-new-input data-optional class="crm-input pl-3 flex-1" placeholder="otro@email.com">' +
+            '<button type="button" class="w-9 h-9 shrink-0 rounded-lg border border-ink-200 text-ink-400 hover:text-err hover:border-err transition-colors" title="Quitar" aria-label="Quitar"><i class="pi pi-trash text-[12px]"></i></button>';
+        row.querySelector('button').addEventListener('click', () => row.remove());
+        extraWrap.appendChild(row);
+        setMode(hidden.value);
+        row.querySelector('input').focus();
     });
 
     btns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));

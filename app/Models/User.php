@@ -15,6 +15,7 @@ use Illuminate\Notifications\Notifiable;
     'first_name',
     'last_name',
     'email',
+    'extra_emails',
     'password',
     'role',
     'last_seen',
@@ -74,7 +75,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'first_name', 'last_name', 'email', 'password', 'role',
+        'name', 'first_name', 'last_name', 'email', 'extra_emails', 'password', 'role',
         'last_seen', 'google_id', 'apple_id', 'avatar',
         'phone', 'country', 'verification_status', 'kyc_id_document', 'kyc_id_document_back',
     ];
@@ -90,7 +91,45 @@ class User extends Authenticatable
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
             'crm_raw' => 'array',
+            // Correos adicionales (sólo contacto; el principal sigue siendo `email`).
+            'extra_emails' => 'array',
         ];
+    }
+
+    /* ========================= Correos adicionales ========================= */
+
+    /**
+     * Correos adicionales normalizados: sin vacíos, sin duplicados y sin el
+     * correo principal. Son sólo dato de contacto — el sistema envía siempre
+     * al correo principal.
+     */
+    public function extraEmails(): array
+    {
+        return static::normalizeExtraEmails($this->extra_emails, $this->email);
+    }
+
+    /** Correo principal + adicionales, en ese orden. */
+    public function allEmails(): array
+    {
+        return array_values(array_filter(array_merge([$this->email], $this->extraEmails())));
+    }
+
+    /**
+     * Limpia una lista de correos adicionales: recorta, pasa a minúsculas,
+     * descarta vacíos/duplicados y quita el correo principal si viene repetido.
+     */
+    public static function normalizeExtraEmails($emails, ?string $primary = null): array
+    {
+        $list = collect(is_array($emails) ? $emails : [])
+            ->map(fn ($e) => strtolower(trim((string) $e)))
+            ->filter()
+            ->unique();
+
+        if ($primary) {
+            $list = $list->reject(fn ($e) => $e === strtolower(trim($primary)));
+        }
+
+        return $list->values()->all();
     }
 
     /* ============================ 2FA / TOTP ============================ */
