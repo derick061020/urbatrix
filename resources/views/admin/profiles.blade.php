@@ -211,6 +211,7 @@
                                             data-last="{{ $u->last_name }}"
                                             data-name="{{ $u->name }}"
                                             data-email="{{ $u->email }}"
+                                            data-extra="{{ json_encode($u->extraEmails()) }}"
                                             data-phone="{{ $u->phone }}"
                                             data-country="{{ $u->country }}"
                                             data-role="{{ $u->role }}"
@@ -266,9 +267,16 @@
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre para mostrar') }} <span class="text-ink-400 font-normal">(opcional)</span></label>
                     <input type="text" name="name" id="eu-name" class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre completo') }}">
                 </div>
-                <div>
+                <div class="sm:col-span-2">
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Correo electrónico') }}</label>
                     <input type="email" name="email" id="eu-email" required class="crm-input pl-3 mt-1" placeholder="usuario@correo.com">
+
+                    {{-- Correos adicionales: sólo dato de contacto (el principal es el de acceso). --}}
+                    <div id="eu-extra-emails" class="space-y-2 mt-2"></div>
+                    <button type="button" onclick="euAddEmail()" class="inline-flex items-center gap-1 text-[12px] font-semibold text-brand hover:underline mt-2">
+                        <i class="pi pi-plus text-[10px]"></i> {{ __('Agregar otro correo') }}
+                    </button>
+                    <p class="text-[11px] text-ink-500 mt-1.5">{{ __('Los correos adicionales se guardan como contacto; las notificaciones se envían al principal.') }}</p>
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
@@ -323,11 +331,33 @@
         document.getElementById('eu-phone').value   = d.phone || '';
         document.getElementById('eu-country').value = d.country || '';
         document.getElementById('eu-role').value    = d.role || 'user';
+        euSetExtraEmails(d.extra);
         f.querySelector('input[name=password]').value = '';
         f.querySelector('input[name=password_confirmation]').value = '';
         document.getElementById('modal-editar-usuario').showModal();
     }
     function openEditUser(btn) { openEditUserObj(btn.dataset); }
+
+    // ── Correos adicionales (sólo contacto) ──
+    function euAddEmail(value) {
+        const wrap = document.getElementById('eu-extra-emails');
+        const row  = document.createElement('div');
+        row.className = 'flex items-center gap-2';
+        row.innerHTML =
+            '<input type="email" name="extra_emails[]" class="crm-input pl-3 flex-1" placeholder="{{ __('otro@correo.com') }}">' +
+            '<button type="button" class="w-9 h-9 shrink-0 rounded-lg border border-ink-200 text-ink-400 hover:text-err hover:border-err transition-colors" title="{{ __('Quitar') }}" aria-label="{{ __('Quitar') }}"><i class="pi pi-trash text-[12px]"></i></button>';
+        row.querySelector('button').addEventListener('click', () => row.remove());
+        row.querySelector('input').value = typeof value === 'string' ? value : '';
+        wrap.appendChild(row);
+        if (typeof value !== 'string') row.querySelector('input').focus();
+    }
+
+    function euSetExtraEmails(raw) {
+        document.getElementById('eu-extra-emails').innerHTML = '';
+        let list = [];
+        try { list = typeof raw === 'string' ? (JSON.parse(raw) || []) : (raw || []); } catch (e) { list = []; }
+        list.forEach(e => euAddEmail(e));
+    }
 
     // ── Modal de detalle de usuario (carga vía fetch) ──
     const UD_BASE = "{{ url('admin/users') }}";
