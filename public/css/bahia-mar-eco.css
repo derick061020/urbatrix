@@ -10,6 +10,11 @@
    v7 se queda solo con sombras: la naturaleza entra como luz filtrada, no
    como elementos colocados.
 
+   v7.1 añade la sección 12: el GRID DE UNIDADES entra en la capa. Hasta ahora
+   sólo estaban las bandas de tipología, y el catálogo —que es donde el usuario
+   pasa el rato— seguía en tarjetas blancas con chrome gris azulado. Mismo
+   material, mismas sombras, sin animarlas (ver 12.2).
+
    v7 cambia respecto a v6:
      · FUERA todos los PNG recortados: las frondas del hero, las enredaderas de
        las villas y el filodendro de la banda verde. Se leían como sticker
@@ -913,6 +918,241 @@ body{ background-color:var(--eco-page); }
   .fg-type-band .fg-card-inner:hover .fg-card-price,
   .fg-type-band .fg-btn-info:hover,
   .fg-type-band .fg-btn-cta:hover{ transform:none; }
+}
+
+
+/* ══ 12. EL CATÁLOGO — LAS TARJETAS ════════════════════════════════════════
+   Las bandas de tipología ya estaban en la capa; el grid de unidades no. Y es
+   la pantalla donde el usuario pasa el rato: bajaba desde el arena de las
+   bandas y se encontraba con cinco rectángulos blancos de chrome gris azulado.
+   No es que estuviera feo — es que era OTRA página.
+
+   Aquí se le aplica exactamente el mismo material que a las bandas, en el
+   mismo orden de decisiones:
+
+     · la tarjeta deja de ser blanco puro y pasa a papel cálido, con grano
+     · una sombra vegetal cae sobre el cuerpo de texto, nunca sobre la foto
+     · el chrome frío (#f2f5f8, #ebebeb) se pasa a la familia arena
+     · el verde genérico de "hay un asesor" pasa al verde del proyecto
+
+   ⚠️ TODO VA COLGADO DE `.fg-units-grid > .fg-card`. `.fg-card-inner`,
+   `.fg-card-body` y `.fg-card-price` son selectores COMPARTIDOS con las
+   bandas de tipología: escritos sueltos, cada regla de aquí se llevaría por
+   delante las secciones 2, 3 y 4. La sección 10 ya avisaba de lo contrario
+   —"la tarjeta sigue siendo blanca"— y esto lo revisa a conciencia: lo que
+   se calienta es la SUPERFICIE de la tarjeta, así que los grises que van
+   sobre ella se calientan con ella y no quedan beige sucio sobre blanco.  */
+
+/* ── 12.1 Papel, no plástico ───────────────────────────────────────────────
+   El mismo gesto de la sección 4, un punto más claro: la banda es superficie
+   grande y puede permitirse el arena; la tarjeta es pequeña y sobre ella va
+   texto de 10px, así que se queda en papel casi blanco. El degradado sigue
+   al sol del proyecto (arriba-izquierda más luminoso).                     */
+.fg-units-grid > .fg-card,
+.fg-units-grid > .fg-card .fg-card-inner{
+  background:linear-gradient(155deg, #FFFDF9 0%, #FCF9F3 58%, #F8F4EC 100%);
+}
+
+/* Grano de papel, la mitad de fuerza que en las bandas: en una superficie de
+   este tamaño el mismo 3,5% se lee como textura sucia en vez de como papel.
+
+   ⚠️ Va en `.fg-card-body::before`, NO en `.fg-card-inner::after` como en la
+   sección 3. En la banda el `inner` es todo panel; en la tarjeta contiene
+   también la foto, y `.fg-card-img` está posicionada con z-index auto, así
+   que un pseudo-elemento posterior le pintaría el grano ENCIMA al render.
+   Colgándolo del cuerpo, el grano cubre exactamente el papel y nada más.   */
+.fg-units-grid > .fg-card .fg-card-body::before{
+  content:"";
+  position:absolute; inset:0; z-index:0;
+  pointer-events:none;
+  background-image:var(--eco-grano);
+  background-size:180px 180px;
+  mix-blend-mode:multiply;
+  opacity:.018;
+}
+
+/* ── 12.2 La sombra vegetal ────────────────────────────────────────────────
+   Mismos dos assets que las bandas y misma doctrina: entra cortada por la
+   esquina superior izquierda, cae sobre el recuadro de texto y NUNCA sobre la
+   foto. Aquí el recorte no lo da una columna de grid sino el propio cuerpo de
+   la tarjeta, que es quien la contiene.
+
+   ⚠️ NO LLEVA `z-index:-1` como la de las bandas. `.fg-card-inner` pinta un
+   fondo propio y crea contexto (`z-index:2`), así que una capa en negativo se
+   iría DETRÁS de ese fondo y no se vería nada. Se resuelve al revés: la
+   sombra en `z-index:0` y el contenido del cuerpo subido a 1.
+
+   ⚠️ Y NO SE ANIMA. En las bandas hay cinco sombras en toda la página; aquí
+   puede haber cuarenta a la vez. Cuarenta capas compuestas en bucle es
+   justo la contradicción que la sección 9 viene a evitar — y encima el
+   balanceo, a este tamaño, no se percibe.                                  */
+.fg-units-grid > .fg-card .fg-card-body{ position:relative; }
+.fg-units-grid > .fg-card .fg-card-body > :not(.eco-shade-card){
+  position:relative;
+  z-index:1;
+}
+
+.eco-shade-card{
+  position:absolute; inset:0; z-index:0;
+  overflow:hidden;
+  pointer-events:none;
+  mix-blend-mode:multiply;
+  opacity:var(--eco-sombra-fuerza, .09);
+}
+
+.eco-shade-card i{
+  display:block;
+  position:absolute;
+  top:var(--eco-sombra-y, 0);
+  left:var(--eco-sombra-x, 0);
+  width:var(--eco-sombra-ancho, 58%);
+  aspect-ratio:1.3258;                 /* ratio de los dos assets: 1400×1056 */
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+
+  /* ⚠️ DOS MÁSCARAS, y la segunda no es un adorno.
+
+     La diagonal es la de las bandas: desvanece la salida de la sombra
+     siguiendo al sol. Con ella sola, el borde SUPERIOR de la sombra queda a
+     corte limpio — y ahí está la diferencia con la banda: allí ese corte cae
+     en el borde de la banda y se lee como el encuadre; aquí cae dentro de la
+     tarjeta, justo debajo de la foto, y se lee como una costura.
+
+     La segunda máscara la hace entrar desvanecida desde arriba. Si el
+     navegador no soporta `mask-composite`, se queda la diagonal sola, que es
+     exactamente el estado anterior a esta línea: peor, pero no roto.       */
+  mask-image:
+    linear-gradient(145deg, #000 0%, rgba(0,0,0,.82) 48%, transparent 94%),
+    linear-gradient(to bottom, transparent 0%, #000 24%);
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
+}
+
+/* Las cinco variantes de la sección 2, reescaladas al cuerpo de la tarjeta.
+   Se reparten por índice desde el JS, y el ciclo de cinco contra una rejilla
+   de tres o cuatro columnas deja la repetición en diagonal: es lo que impide
+   que se lea una columna entera con la misma hoja.
+
+   Los anchos suben (58-72% frente al 45-52% de las bandas) porque el cuerpo
+   de la tarjeta mide un tercio del panel de una banda: al ancho de allí, la
+   hoja se leería como una mancha pequeña en la esquina y no como una sombra
+   que entra desde fuera del cuadro. Los offsets siguen siendo ≤ 0 por lo
+   mismo que en la sección 2: en positivo se ve el corte del asset flotando. */
+[data-eco-shade="fronda"]        .eco-shade-card{ --eco-sombra-fuerza:.13; }
+[data-eco-shade="fronda"]        .eco-shade-card i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:66%;
+}
+
+[data-eco-shade="monstera"]      .eco-shade-card{ --eco-sombra-fuerza:.085; }
+[data-eco-shade="monstera"]      .eco-shade-card i{
+  background-image:var(--eco-sombra-monstera);
+  --eco-sombra-ancho:62%;
+}
+
+[data-eco-shade="fronda-alt"]    .eco-shade-card{ --eco-sombra-fuerza:.15; }
+[data-eco-shade="fronda-alt"]    .eco-shade-card i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:60%;
+  --eco-sombra-x:-9%;
+  --eco-sombra-y:-13%;
+}
+
+[data-eco-shade="monstera-alt"]  .eco-shade-card{ --eco-sombra-fuerza:.10; }
+[data-eco-shade="monstera-alt"]  .eco-shade-card i{
+  background-image:var(--eco-sombra-monstera);
+  --eco-sombra-ancho:58%;
+  --eco-sombra-x:-11%;
+  --eco-sombra-y:-9%;
+}
+
+[data-eco-shade="fronda-corta"]  .eco-shade-card{ --eco-sombra-fuerza:.15; }
+[data-eco-shade="fronda-corta"]  .eco-shade-card i{
+  background-image:var(--eco-sombra-fronda);
+  --eco-sombra-ancho:72%;
+  --eco-sombra-x:-14%;
+  --eco-sombra-y:-5%;
+}
+
+/* La tarjeta vendida se apaga entera: la sombra encima de un cuadro ya
+   desaturado sólo lo ensucia. */
+.fg-units-grid > .fg-card.is-sold .eco-shade-card{ opacity:.03; }
+
+/* ── 12.3 El chrome, a la familia cálida ───────────────────────────────────
+   Éstos SÍ entran, al revés que los chips de la sección 10: allí el gris iba
+   sobre tarjeta blanca y calentarlo lo ensuciaba; aquí la tarjeta ya es
+   papel, así que el frío es lo que canta. Son los mismos valores de siempre
+   pasados a la familia cálida — la luminancia no se toca.                  */
+.fg-units-grid > .fg-card .fg-card-divider{ background:#EDE7DB; }
+.fg-units-grid > .fg-card .fg-stats       { border-color:#EDE7DB; }
+.fg-units-grid > .fg-card .fg-btn-info    { background:#F1ECE1; color:#5E6B5F; }
+.fg-units-grid > .fg-card .fg-btn-info:hover{ background:#E7E0D1; }
+.fg-units-grid > .fg-card .fg-card-img    { background:#F1ECE1; }
+
+/* El hueco de la foto mientras carga, igual que en las bandas (sección 10). */
+.fg-units-grid > .fg-card .fg-card-img-noimage{ background:#F1ECE1; }
+
+/* ── 12.4 El verde del proyecto ────────────────────────────────────────────
+   Los iconos de las specs iban en #848484, un gris puro: seis piezas de
+   dibujo repetidas en cada tarjeta y todas neutras. Pasados al verde del
+   proyecto, muy desaturado, la retícula de specs deja de ser chrome y se lee
+   como parte de la marca. El texto NO se toca: en 10px el verde pierde
+   contraste y esto es información, no decoración.                          */
+.fg-units-grid > .fg-card .fg-stat svg{ color:#7C8C7A; }
+
+/* "Un asesor está disponible ahora mismo" venía en #1fc16b, el verde de
+   semáforo del sitio. Es el único acento verde grande de la tarjeta, así que
+   es también el que más lejos deja el conjunto del verde pino del proyecto.
+   Se pasa a --eco-green y el punto conserva su halo y su latido: sigue
+   leyéndose como señal de disponibilidad, ahora en el color de la casa.    */
+.fg-units-grid > .fg-card .fg-card-availability{ color:var(--eco-green); }
+.fg-units-grid > .fg-card .fg-card-availability .dot{
+  background:var(--eco-green);
+  box-shadow:0 0 6px rgba(47,93,80,.55);
+}
+/* La nota de "vendida" es roja por el sitio y tiene que seguir siéndolo. */
+.fg-units-grid > .fg-card.is-sold .fg-card-availability{ color:#e2534e; }
+.fg-units-grid > .fg-card.is-sold .fg-card-availability .dot{
+  background:#e2534e;
+  box-shadow:0 0 6px rgba(226,83,78,.5);
+}
+
+/* La banda "Reserva desde $5000" es un cristal BLANCO al 50% con el texto en
+   blanco encima: se lee cuando la foto es oscura y se pierde cuando no. Al
+   pasarlo al verde profundo del proyecto el cristal se oscurece, así que el
+   texto blanco gana contraste en vez de perderlo — es de las pocas veces que
+   una decisión de color mejora la legibilidad de paso.
+
+   ⚠️ Si alguna vez se aclara este cristal, hay que cambiar también el color
+   del texto: va en `#ffffff` desde el sitio.                               */
+.fg-units-grid > .fg-card .fg-reserve-banner{
+  background:linear-gradient(180deg, rgba(30,61,51,.26) 0%, rgba(30,61,51,.54) 100%);
+}
+
+/* ── 12.5 Respuesta al puntero ─────────────────────────────────────────────
+   La tarjeta levantaba con una sombra neutra hacia abajo. Se le da la
+   inclinación del sol del proyecto —igual que la sección 7 hizo con el pill
+   del header— y un filo verde muy tenue, que es el que dice "esto es de la
+   misma familia que las bandas". Sin desplazamiento: el grid tiene muchas
+   tarjetas y moverlas al pasar por encima convierte el listado en un campo
+   de minas.                                                                */
+@media (hover:hover){
+  .fg-units-grid > .fg-card:hover{
+    box-shadow:
+      calc( 4px * var(--eco-sol-x))  4px  10px rgba(30,61,51,.05),
+      calc(14px * var(--eco-sol-x)) 14px  28px rgba(30,61,51,.07),
+      0 0 0 1px rgba(47,93,80,.10);
+  }
+}
+
+/* ── 12.6 Coherencia y responsive ──────────────────────────────────────────
+   La sombra de la tarjeta no se anima, así que no hay nada que apagar en
+   `prefers-reduced-motion`. Lo que sí cambia es el móvil: la tarjeta pasa a
+   ocupar el ancho de la pantalla y la sombra, a la misma proporción, se
+   convierte en una mancha sobre el texto. Se baja fuerza y tamaño.         */
+@media (max-width:640px){
+  .eco-shade-card{ --eco-sombra-fuerza:.06; }
+  .eco-shade-card i{ --eco-sombra-ancho:48%; }
 }
 
 

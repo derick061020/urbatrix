@@ -1,7 +1,8 @@
 /* ============================================================================
    BAHÍA MAR — Capa "eco" v7 · JS de apoyo
    Acompaña a bahia-mar-eco.css. Solo inserta markup y decide qué sombra va en
-   cada villa; toda la geometría y la animación viven en el CSS.
+   cada villa —y, desde la sección 12, en cada tarjeta del catálogo—; toda la
+   geometría y la animación viven en el CSS.
 
    Lo ideal es que esto salga del template. Existe para no tocar el motor de
    render en la primera iteración — ver docs/capa-eco.md.
@@ -127,6 +128,38 @@
       sh.setAttribute('aria-hidden', 'true');
       sh.appendChild(document.createElement('i'));
       inner.appendChild(sh);
+    });
+  }
+
+  /* ── 1b. Sombra vegetal en las tarjetas del catálogo ────────────────────
+     Sección 12 del CSS. Mismo reparto por índice que las bandas y los mismos
+     cinco variantes: un ciclo de 5 contra una rejilla de 3 o 4 columnas deja
+     la repetición en diagonal, que es lo que impide leer una columna entera
+     con la misma hoja.
+
+     ⚠️ EL ÍNDICE ES EL DEL DOM, no un contador propio. El grid se re-renderiza
+     al filtrar y las tarjetas nuevas llegan mezcladas con las que ya tenían
+     sombra; un contador que solo avanzara con las nuevas repartiría distinto
+     en cada filtrado y la diagonal se perdería. Con el índice del DOM, una
+     tarjeta cae siempre en la misma variante esté quien esté a su lado.
+
+     Va dentro de `.fg-card-body` a propósito: es la caja que recorta la
+     sombra y la que garantiza que no toque la foto — el equivalente a pedir
+     la columna del texto en las bandas. */
+  function pintarSombrasCatalogo() {
+    document.querySelectorAll('.fg-units-grid > .fg-card').forEach((card, i) => {
+      if (card.querySelector('.eco-shade-card')) return;
+
+      const body = card.querySelector('.fg-card-body');
+      if (!body) return;
+
+      card.dataset.ecoShade = SOMBRAS[i % SOMBRAS.length];
+
+      const sh = document.createElement('div');
+      sh.className = 'eco-shade-card';
+      sh.setAttribute('aria-hidden', 'true');
+      sh.appendChild(document.createElement('i'));
+      body.insertBefore(sh, body.firstChild);
     });
   }
 
@@ -273,6 +306,7 @@
   function init() {
     pintarBandaCompromiso();
     pintarSombras();
+    pintarSombrasCatalogo();
     pintarContador();
     revelar();
   }
@@ -297,5 +331,17 @@
       recalcularLados();         // por si el re-render cambió el orden
       revelar();                 // y las nuevas nacen sin entrada
     }).observe(host, { childList: true, subtree: true });
+  }
+
+  /* El catálogo tiene su propio ciclo de vida: se filtra, se ordena y carga
+     por tandas al bajar, y cada tanda son tarjetas nuevas sin sombra.
+
+     ⚠️ Sólo `childList` y SIN `subtree`. La sombra se inserta DENTRO de una
+     tarjeta, así que un observer con subtree se dispararía a sí mismo en
+     bucle. Escuchando sólo a los hijos directos del grid, lo único que lo
+     despierta es que entren o salgan tarjetas — que es justo el caso. */
+  const gridCatalogo = document.querySelector('.fg-units-grid');
+  if (gridCatalogo) {
+    new MutationObserver(pintarSombrasCatalogo).observe(gridCatalogo, { childList: true });
   }
 })();
