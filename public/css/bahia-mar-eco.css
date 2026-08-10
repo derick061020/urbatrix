@@ -16,9 +16,13 @@
    la tarjeta, hojas, chrome y tinta— en vez de gritar en una sola. Lo que NO
    se toca: los aros de estado del sitio (ver el ⚠️ del filo en 12.4).
 
-   Y la vegetación va en UNA DE CADA TRES tarjetas, no en todas: quien sostiene
-   el verde es la superficie, así que la hoja puede permitirse ser un accidente
-   de luz. En todas se convertía en papel pintado (reparto en el JS, `hojaDe`).
+   Y la vegetación va en UNA DE CADA TRES tarjetas, no en todas: en todas se
+   convertía en papel pintado (reparto en el JS, `hojaDe`). Esa misma tarjeta
+   es la que va en salvia; las otras dos van en blanco. Hoja y color son la
+   misma decisión — el porqué, en 12.1.
+
+   El contenedor del grid se queda con el arena de la página: hubo un lavado
+   verde y se retiró (12.0).
 
    v7.1 añade la sección 12: el GRID DE UNIDADES entra en la capa. Hasta ahora
    sólo estaban las bandas de tipología, y el catálogo —que es donde el usuario
@@ -953,101 +957,53 @@ body{ background-color:var(--eco-page); }
    se calienta es la SUPERFICIE de la tarjeta, así que los grises que van
    sobre ella se calientan con ella y no quedan beige sucio sobre blanco.  */
 
-/* ── 12.0 EL SUELO DE LA SECCIÓN ───────────────────────────────────────────
-   ⚠️ LA PRIMERA VERSIÓN DE ESTA SECCIÓN SE QUEDÓ CORTA, y la lección merece
-   quedar escrita: se calentó la tarjeta a papel y se dejó todo lo demás en
-   arena. En una banda de tipología eso basta —544px de superficie, dos
-   sombras enormes—, pero el catálogo son tarjetas de 300px repetidas veinte
-   veces: a esa escala un tinte de un 2% no se percibe como material, se
-   percibe como blanco. El resultado se leía corporativo, que es exactamente
-   lo contrario de lo que la capa busca.
+/* ── 12.0 EL SUELO DE LA SECCIÓN: NO SE TOCA ───────────────────────────────
+   ⚠️ AQUÍ HUBO UN LAVADO VERDE A LO ANCHO DE LA VENTANA Y SE RETIRÓ. No lo
+   vuelvas a poner sin que lo pidan.
 
-   La corrección no es subir la sombra: es que el VERDE ESTÉ EN EL MATERIAL.
-   El suelo de la sección, la superficie de la tarjeta y el chrome van todos
-   en la familia verde; las hojas dejan de ser sombras grises y pasan a ser
-   sombras VERDES. Cuando el color está en todas las capas, no hace falta
-   gritar en ninguna.
+   La idea era razonable —teñir las calles del grid para que el bloque se
+   leyera como una sección propia— y funcionaba, pero se lleva por delante lo
+   que la sección 10 dejó cosido: el listado, la barra de filtros, las bandas
+   y el pie comparten UN fondo, `--eco-page`, y esa continuidad es justo lo
+   que hace que la página no se lea como pantallas pegadas. Un rectángulo
+   verde en el medio la parte otra vez.
 
-   El suelo: un lavado verde sobre la página arena más el follaje de la banda
-   de compromiso —el mismo asset, ver sección 5— entrando por arriba y por
-   abajo con máscara. Es la pieza que hace que el bloque de tarjetas se lea
-   como una sección propia y no como una lista sobre fondo neutro.          */
-.fg-units-grid{
-  position:relative;
-  isolation:isolate;                 /* el lavado no se mezcla con la página */
-}
-
-/* ⚠️ EL SUELO ES UN LAVADO, NO UNA PLANTA. Probé las dos cosas y hay una
-   razón geométrica para que aquí no vaya vegetación:
-
-     · con `--eco-follaje` —una FOTO con bordes rectos— el borde del asset se
-       lee como un rectángulo oscuro flotando sobre la página, que es la misma
-       trampa del PNG recortado que hizo caer la v6, sólo que en grande
-     · con las dos sombras, que sí se funden en `multiply`, el problema es
-       otro: LAS TARJETAS SON OPACAS. Una hoja detrás del grid sólo se ve por
-       las calles de 16px que quedan entre tarjeta y tarjeta, o sea que no se
-       ve — salvo durante la entrada, cuando las tarjetas están a media
-       opacidad y entonces sí aparece, atravesándolas. Peor imposible: sólo se
-       ve cuando no debe.
-
-   La vegetación de esta sección va DENTRO de cada tarjeta (12.2), que es
-   donde hay superficie propia para sostenerla. El suelo se limita a teñir de
-   verde las calles del grid y los bordes de la sección.                    */
-.fg-units-grid::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  pointer-events:none;
-  /* Se sale del padding del grid a propósito: el suelo es de la SECCIÓN, no
-     de la caja de tarjetas, así que llega hasta los bordes de la ventana. */
-  inset:0 calc(50% - 50vw);
-
-  background:linear-gradient(180deg,
-    rgba(47,93,80,.14)  0%,
-    rgba(47,93,80,.075) 24%,
-    rgba(47,93,80,.075) 76%,
-    rgba(47,93,80,.15) 100%);
-}
-
-/* Las tarjetas van POR ENCIMA del suelo. `.fg-card` ya es `position:relative`
-   desde el sitio; lo único que falta es sacarla del z-index 0 del lavado. */
-.fg-units-grid > .fg-card{ z-index:1; }
+   El contenedor se queda con el arena de la página. El verde de esta sección
+   lo ponen las tarjetas, que es donde hay superficie para sostenerlo.      */
 
 
-/* ── 12.1 La superficie: papel VERDE ───────────────────────────────────────
-   Verde salvia real, no un blanco insinuado. El degradado sigue al sol del
-   proyecto (arriba-izquierda más luminoso) igual que el panel de las bandas.
+/* ── 12.1 LAS DOS SUPERFICIES ──────────────────────────────────────────────
+   La tarjeta tiene dos versiones y la que le toca a cada una la decide una
+   sola cosa: si lleva hoja o no.
 
-   ⚠️ El límite de cuánto puede bajar es el texto de 10px de las specs, que el
-   sitio pinta en gris medio. Por eso el fondo NO baja de #E4EEDD en la
-   esquina más oscura y por eso la 12.4 sube esos grises a verde oscuro: lo
-   que hace legible una tarjeta no es que el fondo sea claro, es la distancia
-   entre fondo y tinta. Bajando el fondo Y oscureciendo la tinta, la tarjeta
-   acaba con MÁS contraste del que tenía en blanco.                         */
+     · CON hoja  → salvia. La hoja necesita una superficie de color debajo:
+       una sombra sobre blanco es gris (fue la v7.1) y el gris apaga el verde
+       en vez de sumarle. Sobre salvia, la misma sombra ES verde.
+     · SIN hoja  → blanco. Sin nada que sostener, el papel blanco deja
+       respirar el listado y, de rebote, hace que las verdes se lean MÁS
+       verdes de lo que se leerían entre verdes.
+
+   O sea que las dos decisiones —dónde va la vegetación y de qué color es la
+   tarjeta— son la MISMA decisión, y por eso el CSS puede resolverlo con
+   `[data-eco-shade]` sin que el JS tenga que marcar nada aparte.
+
+   ⚠️ El chrome NO cambia entre las dos. La tinta, la retícula de specs, el
+   filo y la banda de reserva siguen siendo los verdes de 12.3 y 12.4 en
+   ambas. Neutralizando el chrome de la blanca, dejaría de pertenecer a la
+   familia y volvería a ser la tarjeta corporativa que la v7.2 vino a quitar.
+
+   El límite de cuánto puede bajar la salvia es el texto de 10px de las
+   specs: por eso no baja de #E4EEDD en la esquina más oscura, y por eso la
+   12.4 sube esos grises a verde oscuro. Lo que hace legible una tarjeta no
+   es que el fondo sea claro, es la distancia entre fondo y tinta.          */
 .fg-units-grid > .fg-card,
 .fg-units-grid > .fg-card .fg-card-inner{
-  background:linear-gradient(155deg, #F6FAF2 0%, #EDF4E7 52%, #E4EEDD 100%);
+  background:linear-gradient(155deg, #FFFFFF 0%, #FDFEFC 54%, #F6FAF3 100%);
 }
 
-/* ── 12.1b Las tarjetas en blanco ──────────────────────────────────────────
-   Una que otra sale en papel blanco en vez de en salvia. No es una excepción
-   caprichosa: veinte superficies idénticas —aunque sean bonitas— se leen como
-   una malla, y lo que hace que un listado respire es que haya respiración.
-   La blanca es el silencio entre las verdes; y de paso, al lado de una
-   blanca, la salvia se lee MÁS verde de lo que se lee entre salvias.
-
-   Es la superficie lo único que cambia: la tinta, el chrome, la retícula de
-   specs y el filo siguen siendo los verdes de 12.3 y 12.4. Si además se
-   neutralizara el chrome, la tarjeta blanca dejaría de pertenecer a la
-   familia y volveríamos exactamente a la tarjeta corporativa que la v7.2
-   viene a quitar.
-
-   No llevan hoja nunca — el reparto está en el JS (`esBlanca`), y el porqué
-   también: la hoja sobre blanco es la sombra gris de la v7.1, justo lo que
-   se descartó por apagar el verde en vez de sumarlo.                       */
-.fg-units-grid > .fg-card[data-eco-surface="blanca"],
-.fg-units-grid > .fg-card[data-eco-surface="blanca"] .fg-card-inner{
-  background:linear-gradient(155deg, #FFFFFF 0%, #FDFEFC 54%, #F6FAF3 100%);
+.fg-units-grid > .fg-card[data-eco-shade],
+.fg-units-grid > .fg-card[data-eco-shade] .fg-card-inner{
+  background:linear-gradient(155deg, #F6FAF2 0%, #EDF4E7 52%, #E4EEDD 100%);
 }
 
 /* Grano de papel, la mitad de fuerza que en las bandas: en una superficie de
