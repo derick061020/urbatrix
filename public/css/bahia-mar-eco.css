@@ -16,6 +16,10 @@
    la tarjeta, hojas, chrome y tinta— en vez de gritar en una sola. Lo que NO
    se toca: los aros de estado del sitio (ver el ⚠️ del filo en 12.4).
 
+   Y la vegetación va en UNA DE CADA TRES tarjetas, no en todas: quien sostiene
+   el verde es la superficie, así que la hoja puede permitirse ser un accidente
+   de luz. En todas se convertía en papel pintado (reparto en el JS, `hojaDe`).
+
    v7.1 añade la sección 12: el GRID DE UNIDADES entra en la capa. Hasta ahora
    sólo estaban las bandas de tipología, y el catálogo —que es donde el usuario
    pasa el rato— seguía en tarjetas blancas con chrome gris azulado. Mismo
@@ -1120,9 +1124,12 @@ body{ background-color:var(--eco-page); }
 }
 
 /* Las cinco variantes de la sección 2, reescaladas al cuerpo de la tarjeta.
-   Se reparten por índice desde el JS, y el ciclo de cinco contra una rejilla
-   de tres o cuatro columnas deja la repetición en diagonal: es lo que impide
-   que se lea una columna entera con la misma hoja.
+
+   ⚠️ Sólo una de cada tres tarjetas lleva hoja. Quién la lleva y cuál le toca
+   lo decide el JS (`hojaDe`), y el porqué del reparto —ciclo primo, huecos
+   irregulares, seis hojas contra cinco especies— está escrito allí. Aquí sólo
+   importa la consecuencia: como la hoja no está en todas, la que aparece
+   tiene que pesar. De ahí las fuerzas de abajo.
 
    Los anchos suben (58-72% frente al 45-52% de las bandas) porque el cuerpo
    de la tarjeta mide un tercio del panel de una banda: al ancho de allí, la

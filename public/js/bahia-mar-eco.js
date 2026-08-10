@@ -132,28 +132,69 @@
   }
 
   /* ── 1b. Sombra vegetal en las tarjetas del catálogo ────────────────────
-     Sección 12 del CSS. Mismo reparto por índice que las bandas y los mismos
-     cinco variantes: un ciclo de 5 contra una rejilla de 3 o 4 columnas deja
-     la repetición en diagonal, que es lo que impide leer una columna entera
-     con la misma hoja.
+     Sección 12 del CSS.
+
+     ⚠️ NO TODAS LAS TARJETAS LLEVAN HOJA — una de cada tres, y el reparto es
+     lo único delicado de esta función.
+
+     Con hoja en todas, veinte tarjetas iguales convierten la sombra en un
+     patrón de papel pintado: deja de leerse como "hay una planta ahí fuera" y
+     pasa a leerse como una textura del componente. Salteándolas, cada hoja
+     vuelve a ser un accidente de luz — y como el fondo salvia ya es el que
+     sostiene el verde (12.1), no hace falta que la vegetación esté en todas
+     para que la sección se lea verde.
+
+     El PATRÓN va dentro de un ciclo de 17. Diecisiete es primo, así que no
+     comparte factor con ninguna de las anchuras del grid (5, 4, 3, 2 y 1
+     columnas) y el reparto no puede alinearse en columnas ni en filas con
+     ninguna de ellas. Un `i % 3`, que es lo primero que uno escribe, dibuja
+     franjas verticales limpias en cuanto el grid baja a 3 columnas.
+
+     Los huecos dentro del ciclo tampoco son regulares (3, 4, 2, 3, 2, 3): con
+     un paso constante el ojo encuentra el ritmo aunque el ciclo sea primo.
+
+     Y las ESPECIES: seis hojas por ciclo contra cinco variantes hace que la
+     rotación se desplace una posición en cada vuelta, así que la combinación
+     de qué hoja cae en qué sitio no se repite nunca. De ahí que se sienta que
+     hay varias y no dos alternándose.
 
      ⚠️ EL ÍNDICE ES EL DEL DOM, no un contador propio. El grid se re-renderiza
      al filtrar y las tarjetas nuevas llegan mezcladas con las que ya tenían
-     sombra; un contador que solo avanzara con las nuevas repartiría distinto
-     en cada filtrado y la diagonal se perdería. Con el índice del DOM, una
-     tarjeta cae siempre en la misma variante esté quien esté a su lado.
+     sombra; un contador que sólo avanzara con las nuevas repartiría distinto
+     en cada filtrado. Con el índice del DOM, una tarjeta cae siempre en la
+     misma variante esté quien esté a su lado.
 
      Va dentro de `.fg-card-body` a propósito: es la caja que recorta la
      sombra y la que garantiza que no toque la foto — el equivalente a pedir
      la columna del texto en las bandas. */
+  const CICLO  = 17;
+  const PATRON = [0, 3, 7, 9, 12, 14];   // posiciones con hoja dentro del ciclo
+
+  function hojaDe(i) {
+    const pos = PATRON.indexOf(i % CICLO);
+    if (pos === -1) return null;         // esta tarjeta va limpia
+    const n = Math.floor(i / CICLO) * PATRON.length + pos;
+    return SOMBRAS[n % SOMBRAS.length];
+  }
+
   function pintarSombrasCatalogo() {
     document.querySelectorAll('.fg-units-grid > .fg-card').forEach((card, i) => {
-      if (card.querySelector('.eco-shade-card')) return;
+      const especie = hojaDe(i);
+      const actual  = card.querySelector('.eco-shade-card');
+
+      /* Al filtrar, una tarjeta puede caer en otro índice y quedarse con una
+         hoja que ya no le toca. Se retira antes de decidir nada más. */
+      if (!especie) {
+        if (actual) actual.remove();
+        delete card.dataset.ecoShade;
+        return;
+      }
+
+      card.dataset.ecoShade = especie;
+      if (actual) return;
 
       const body = card.querySelector('.fg-card-body');
       if (!body) return;
-
-      card.dataset.ecoShade = SOMBRAS[i % SOMBRAS.length];
 
       const sh = document.createElement('div');
       sh.className = 'eco-shade-card';
