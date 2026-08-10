@@ -1547,15 +1547,22 @@
     /* ---------------------------------------------------------------------
        Portada (tipos de villa) ↔ catálogo (grid/lista/planta de siempre)
        ---------------------------------------------------------------------
-       La barra de filtros y el toggle Grid/Lista/Planta se ven SIEMPRE, también
-       en la portada: lo único que cambia es qué ocupa el lugar del listado.
+       Lo único que cambia entre las dos es qué ocupa el lugar del listado:
 
          · sin `is-catalog` (vista Grid, sin modelo ni filtros) → bandas de tipos
          · con `is-catalog`                                     → grid/lista/planta
 
-       El propio toggle y los filtros encienden `is-catalog` (ver
-       syncCatalogMode en el JS), así pasar a Lista/Planta o filtrar muestra el
-       catálogo sin que el usuario tenga que entrar por un tipo.
+       El toggle Grid/Lista/Planta se ve en las dos, y pasar a Lista o Planta
+       enciende `is-catalog` (ver syncCatalogMode en el JS), así que se puede
+       entrar al catálogo sin elegir un tipo.
+
+       ⚠️ LA BARRA DE FILTROS NO SE VE EN LA PORTADA. Aquí se veía, y no tenía
+       sentido: la portada lista CINCO modelos, no 466 unidades, y filtrar por
+       nº de unidad, piso, orientación o precio no significa nada sobre una
+       banda de tipología — cualquiera de esos filtros, además, salta al
+       catálogo en cuanto se toca, o sea que la barra sólo servía para salir de
+       la pantalla en la que estaba. Los filtros aparecen con el catálogo, que
+       es donde hay algo que filtrar.
        --------------------------------------------------------------------- */
     body.is-catalog .fg-types-section,
     body:not([data-view="grid"]) .fg-types-section{ display:none; }
@@ -1566,10 +1573,16 @@
     body[data-active-project="liv"]    #main-unit-reserve-list .fg-types-section,
     body[data-active-project="liv"]    #main-unit-reserve-list .fg-catalog-head{ display:none !important; }
     /* En la portada, las bandas sustituyen al grid de unidades (y a su
-       centinela de scroll infinito). La cinta de "volver" sólo tiene sentido
-       dentro del catálogo. */
+       centinela de scroll infinito). La cinta de "volver" y la barra de
+       filtros sólo tienen sentido dentro del catálogo.
+
+       ⚠️ La barra se OCULTA, no se desmonta: el JS le escribe el contador de
+       coincidencias (`.fg-filter-bar .fg-pill-matches`) y la usa de ancla al
+       entrar a un tipo. Con `display:none` sigue en el DOM y ninguna de las
+       dos cosas se entera; quitándola del Blade, las dos revientan. */
     body:not(.is-catalog) .fg-units-grid,
     body:not(.is-catalog) .fg-lazy-more,
+    body:not(.is-catalog) .fg-filter-bar,
     body:not(.is-catalog) .fg-catalog-head{ display:none !important; }
 
     .fg-catalog-head{
