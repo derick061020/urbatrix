@@ -78,8 +78,13 @@ class DocumentDataHelper
             'cuotas'            => $cuotas,
             'total_cuotas'      => number_format($breakdown['pago_construccion'], 2, '.', ','),
 
+            // El pago inicial y los costos legales son conceptos separados: el
+            // primero es % del precio de la unidad, el segundo un cargo aparte.
             'pct_inicial'       => self::pct($breakdown['porcentaje_inicial']),
-            'monto_inicial'     => number_format($breakdown['pago_inicial'], 2, '.', ','),
+            'monto_inicial'     => number_format($breakdown['pago_inicial_sin_legales'], 2, '.', ','),
+            'costos_legales'    => number_format($breakdown['costos_legales'], 2, '.', ','),
+            'tiene_legales'     => $breakdown['costos_legales'] > 0,
+            'total_al_firmar'   => number_format($breakdown['total_al_firmar'], 2, '.', ','),
 
             'pct_construccion'  => self::pct($breakdown['porcentaje_construccion']),
             'monto_construccion' => number_format($breakdown['pago_construccion'], 2, '.', ','),

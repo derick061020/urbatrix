@@ -360,6 +360,18 @@
                             @forelse($reservation->payments->sortBy('due_date') as $p)
                                 @php
                                     $st = $p->isPartial() ? ['Parcial','warn'] : ($statusPay[$p->status] ?? ['—','ink-500']);
+                                    // Datos que alimentan el modal de corrección de la cuota.
+                                    $editPayload = [
+                                        'id'             => $p->id,
+                                        'subtitle'       => $p->display_label.' · '.(optional($p->due_date)->format('Y-m-d') ?? '—'),
+                                        'label'          => $p->label,
+                                        'amount'         => number_format((float) $p->amount, 2, '.', ''),
+                                        'paid_amount'    => number_format((float) $p->paid_amount, 2, '.', ''),
+                                        'due_date'       => optional($p->due_date)->format('Y-m-d'),
+                                        'paid_at'        => optional($p->paid_at)->format('Y-m-d'),
+                                        'payment_method' => $p->payment_method,
+                                        'notes'          => $p->notes,
+                                    ];
                                 @endphp
                                 <tr>
                                     <td class="text-[13px] font-semibold text-ink-900">{{ $p->display_label }}</td>
@@ -385,6 +397,12 @@
                                                         onclick="abrirModalPago({{ $p->id }}, '{{ number_format($p->remaining, 2, '.', '') }}', @js($p->display_label))"
                                                         class="crm-btn crm-btn-primary text-[11px] py-1 px-3"><i class="pi pi-check text-[10px]"></i> {{ __('Pagar') }}</button>
                                             @endif
+                                            {{-- Corregir la cuota: sirve también para pagos ya realizados
+                                                 (montos mal cargados, fecha o método equivocados). --}}
+                                            <button type="button" onclick="abrirModalEditarPago(@js($editPayload))"
+                                                    class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Editar / corregir el pago') }}">
+                                                <i class="pi pi-pencil text-[10px]"></i> {{ __('Editar') }}
+                                            </button>
                                             {{-- Pago ya registrado: adjuntar o reemplazar el recibo firmado/sellado --}}
                                             <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png" id="rcpt-file-{{ $p->id }}" onchange="attachReceiptToPayment({{ $p->id }}, this)">
                                             <button type="button" onclick="document.getElementById('rcpt-file-{{ $p->id }}').click()"
@@ -571,6 +589,7 @@
 @include('admin.crm._partials.modal_subir_documento', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.modal_solicitar_documento', ['reservation' => $reservation])
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
+@include('admin.crm._partials.modal_editar_pago')
 @include('admin.crm._partials.document_preview_modal')
 
 {{-- Confirmación HTML reutilizable (subir versión firmada y aprobada, etc.) --}}

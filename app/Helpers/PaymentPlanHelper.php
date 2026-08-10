@@ -79,15 +79,19 @@ class PaymentPlanHelper
         $pagoConstruccion = $totalPrice * $constructionPercentage / 100;
         $pagoEntrega = $totalPrice * $deliveryPercentage / 100;
         
-        // Add legal costs to initial payment
+        // Total a desembolsar a la firma: el inicial más los costos legales.
+        // Ojo: son dos conceptos separados del plan de pagos (dos cuotas
+        // distintas); esta suma existe sólo para mostrar el desembolso total.
         $pagoInicialConLegales = $pagoInicialSinLegales + $legalCosts;
-        
+
         // Calculate installment amount if there are installments
         $cuota = $installments > 0 ? $pagoConstruccion / $installments : 0;
-        
+
         return [
+            // Compatibilidad: 'pago_inicial' históricamente incluía los legales.
             'pago_inicial' => $pagoInicialConLegales,
             'pago_inicial_sin_legales' => $pagoInicialSinLegales,
+            'total_al_firmar' => $pagoInicialConLegales,
             'pago_construccion' => $pagoConstruccion,
             'pago_entrega' => $pagoEntrega,
             'costos_legales' => $legalCosts,

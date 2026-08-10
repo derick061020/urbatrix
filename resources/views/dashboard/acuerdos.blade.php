@@ -161,7 +161,8 @@
         font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
     }
 
-    .acm-bk-grid { display:grid; gap:8px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .acm-bk-grid { display:grid; gap:8px; grid-template-columns: repeat(4, minmax(0,1fr)); }
+    @media (max-width: 980px) { .acm-bk-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width: 760px) { .acm-bk-grid { grid-template-columns: 1fr; } }
     .acm-bk-cell { border:1px solid #eaecf0; border-radius:10px; padding:10px 12px; background:#fff; }
     .acm-bk-cell .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#99a0ae; font-weight:600; }
@@ -418,6 +419,11 @@
                                 <div class="lbl">{{ __('Pago inicial') }}</div>
                                 <div class="val" id="acm-bk-initial">$—</div>
                                 <div class="meta" id="acm-bk-initial-meta">—</div>
+                            </div>
+                            <div class="acm-bk-cell">
+                                <div class="lbl">{{ __('Costos legales') }}</div>
+                                <div class="val" id="acm-bk-legal">$—</div>
+                                <div class="meta" id="acm-bk-legal-meta">—</div>
                             </div>
                             <div class="acm-bk-cell">
                                 <div class="lbl">{{ __('Durante construcción') }}</div>
@@ -678,8 +684,11 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     $bk = null;
     if (($isBudget || $isPayment) && $reservation && $breakdown) {
         $bk = [
-            'initial'           => (float) ($breakdown['pago_inicial'] ?? 0),
-            'initial_meta'      => ($reservation->payment_initial_percentage ?? 0).'% + $'.number_format((float)($reservation->legal_costs ?? 0)).' '.__('legales'),
+            // Inicial y costos legales van separados: son dos cuotas del plan.
+            'initial'           => (float) ($breakdown['pago_inicial_sin_legales'] ?? 0),
+            'initial_meta'      => ($reservation->payment_initial_percentage ?? 0).'% '.__('del precio de la unidad'),
+            'legal'             => (float) ($breakdown['costos_legales'] ?? 0),
+            'legal_meta'        => __('Se abonan junto al pago inicial'),
             'construction'      => (float) ($breakdown['pago_construccion'] ?? 0),
             'construction_meta' => ($reservation->payment_construction_percentage ?? 0).'%'
                 . (($reservation->payment_installments ?? 0) > 0
@@ -888,6 +897,8 @@ function openAcuerdoModal(id) {
         bkCard.style.display = '';
         document.getElementById('acm-bk-initial').textContent      = fmt$(bk.initial);
         document.getElementById('acm-bk-initial-meta').textContent = bk.initial_meta || '';
+        document.getElementById('acm-bk-legal').textContent        = fmt$(bk.legal);
+        document.getElementById('acm-bk-legal-meta').textContent   = bk.legal_meta || '';
         document.getElementById('acm-bk-construction').textContent = fmt$(bk.construction);
         document.getElementById('acm-bk-construction-meta').textContent = bk.construction_meta || '';
         document.getElementById('acm-bk-delivery').textContent     = fmt$(bk.delivery);

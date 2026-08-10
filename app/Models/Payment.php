@@ -141,6 +141,8 @@ class Payment extends Model
         return match ($this->payment_type) {
             'reservation'  => __('Reserva').$detail,
             'initial'      => __('Pago inicial').$detail,
+            'legal'        => __('Costos legales').$detail,
+            'credit'       => __('Saldo a favor').$detail,
             'construction' => __('Pago en construcción').$detail,
             'delivery'     => __('Pago en entrega').$detail,
             'installment'  => match (true) {

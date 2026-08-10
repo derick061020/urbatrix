@@ -65,7 +65,9 @@
         // Definición de etapas en orden, con los payment_type que agrupa cada una.
         $phaseDefs = [
             ['key' => 'reservation', 'types' => ['reservation'],               'label' => __('Reserva'),      'icon' => 'pi-bookmark-fill'],
-            ['key' => 'initial',     'types' => ['initial'],                   'label' => __('Pago inicial'), 'icon' => 'pi-flag-fill'],
+            // Los costos legales son una cuota aparte, pero vencen con el pago
+            // inicial: comparten etapa en el stepper y se listan por separado.
+            ['key' => 'initial',     'types' => ['initial', 'legal'],          'label' => __('Pago inicial'), 'icon' => 'pi-flag-fill'],
             ['key' => 'construction','types' => ['construction', 'installment'],'label' => __('Construcción'), 'icon' => 'pi-building'],
             ['key' => 'delivery',    'types' => ['delivery'],                  'label' => __('Entrega'),      'icon' => 'pi-key'],
         ];

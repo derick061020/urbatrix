@@ -91,8 +91,24 @@
                         <tr>
                             <td class="px-4 py-3.5 text-[13px] text-ink-700">{{ __('Pago Inicial') }}</td>
                             <td class="px-4 py-3.5 text-center text-[13px] text-ink-700">{{ $breakdown['porcentaje_inicial'] }}%</td>
-                            <td class="px-4 py-3.5 text-right text-[13px] font-semibold text-ink-950">${{ number_format($breakdown['pago_inicial'], 0) }}</td>
+                            <td class="px-4 py-3.5 text-right text-[13px] font-semibold text-ink-950">${{ number_format($breakdown['pago_inicial_sin_legales'], 0) }}</td>
                         </tr>
+                        {{-- Concepto aparte: no forma parte del precio de la unidad. --}}
+                        @if($breakdown['costos_legales'] > 0)
+                        <tr>
+                            <td class="px-4 py-3.5 text-[13px] text-ink-700">
+                                {{ __('Costos legales') }}
+                                <span class="text-[11px] text-ink-500"> ({{ __('se abonan junto al pago inicial') }})</span>
+                            </td>
+                            <td class="px-4 py-3.5 text-center text-[13px] text-ink-500">—</td>
+                            <td class="px-4 py-3.5 text-right text-[13px] font-semibold text-ink-950">${{ number_format($breakdown['costos_legales'], 0) }}</td>
+                        </tr>
+                        <tr class="bg-ink-50">
+                            <td class="px-4 py-3.5 text-[13px] font-semibold text-ink-900">{{ __('Total a pagar al firmar') }}</td>
+                            <td class="px-4 py-3.5 text-center text-[13px] text-ink-500">—</td>
+                            <td class="px-4 py-3.5 text-right text-[13px] font-bold text-ink-950">${{ number_format($breakdown['total_al_firmar'], 0) }}</td>
+                        </tr>
+                        @endif
                         @if($breakdown['pago_construccion'] > 0)
                         <tr>
                             <td class="px-4 py-3.5 text-[13px] text-ink-700">

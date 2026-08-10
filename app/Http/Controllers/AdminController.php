@@ -3405,6 +3405,86 @@ class AdminController extends Controller
         return back()->with('success', $msg);
     }
 
+    /**
+     * Corrige una cuota del plan de pagos, incluidos los pagos ya realizados.
+     *
+     * Existe para arreglar cargas equivocadas (monto de más, fecha errónea,
+     * método mal elegido). El estado no se pide: se recalcula a partir de los
+     * montos, así que bajar el "monto pagado" devuelve la cuota a parcial o
+     * pendiente sin dejar rastros inconsistentes.
+     */
+    public function updatePaymentEntry(Request $request, Payment $payment)
+    {
+        $data = $request->validate([
+            'label'          => 'required|string|max:255',
+            'amount'         => 'required|numeric|min:0',
+            'paid_amount'    => 'required|numeric|min:0',
+            'due_date'       => 'required|date',
+            'paid_at'        => 'nullable|date',
+            'payment_method' => 'nullable|string|max:50',
+            'notes'          => 'nullable|string|max:1000',
+        ]);
+
+        $amount = round((float) $data['amount'], 2);
+        $paid   = round((float) $data['paid_amount'], 2);
+
+        // El excedente se registra como "saldo a favor" desde el modal de pago,
+        // no inflando una cuota: acá el abono nunca supera lo programado.
+        if ($paid > $amount + 0.001) {
+            return back()->with('error', __('El monto pagado no puede superar el monto programado de la cuota.'));
+        }
+
+        $before = [
+            'amount'      => (float) $payment->amount,
+            'paid_amount' => (float) $payment->paid_amount,
+            'status'      => $payment->status,
+        ];
+
+        $fullyPaid = $amount > 0 && $paid + 0.001 >= $amount;
+
+        $payment->fill([
+            'label'          => $data['label'],
+            'amount'         => $amount,
+            'paid_amount'    => $paid,
+            'due_date'       => $data['due_date'],
+            'payment_method' => ($data['payment_method'] ?? null) ?: null,
+            'notes'          => ($data['notes'] ?? null) ?: null,
+        ]);
+
+        if ($fullyPaid) {
+            $payment->status          = 'paid';
+            $payment->paid_at         = ($data['paid_at'] ?? null) ?: ($payment->paid_at ?? now());
+            $payment->approval_status = 'approved';
+            $payment->approved_by     = Auth::id();
+            $payment->approved_at     = now();
+            $payment->rejection_reason = null;
+        } else {
+            $payment->status  = \Carbon\Carbon::parse($data['due_date'])->endOfDay()->isPast() ? 'overdue' : 'pending';
+            $payment->paid_at = $paid > 0 ? (($data['paid_at'] ?? null) ?: ($payment->paid_at ?? now())) : null;
+            // Una cuota que vuelve a tener saldo ya no está aprobada; se deja
+            // sin estado de aprobación para no mostrarla como "en revisión".
+            if ($payment->approval_status === 'approved') {
+                $payment->approval_status = null;
+                $payment->approved_by     = null;
+                $payment->approved_at     = null;
+            }
+        }
+
+        $payment->save();
+
+        \App\Support\ActivityLogger::log(
+            Auth::id(),
+            'payment_edit',
+            'Corrigió el pago "'.$payment->label.'": $'.number_format($before['paid_amount'], 2)
+                .' → $'.number_format((float) $payment->paid_amount, 2)
+                .' (programado $'.number_format($before['amount'], 2).' → $'.number_format((float) $payment->amount, 2).')',
+            $payment,
+            ['before' => $before, 'reservation_id' => $payment->reservation_id],
+        );
+
+        return back()->with('success', __('Pago actualizado correctamente.'));
+    }
+
     /** Lista de recursos válidos para exportación con su etiqueta. */
     private const EXPORT_RESOURCES = [
         'expedientes' => 'Expedientes',
@@ -3624,7 +3704,7 @@ class AdminController extends Controller
     public function createPayment(Request $request, $reservationId)
     {
         $validator = Validator::make($request->all(), [
-            'payment_type' => 'required|in:initial,installment,construction,delivery,extra',
+            'payment_type' => 'required|in:initial,legal,installment,construction,delivery,reservation,credit,extra',
             'installment_number' => 'nullable|integer|min:1',
             'label' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -3659,7 +3739,7 @@ class AdminController extends Controller
     public function updatePayment(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'payment_type' => 'required|in:initial,installment,construction,delivery,extra',
+            'payment_type' => 'required|in:initial,legal,installment,construction,delivery,reservation,credit,extra',
             'installment_number' => 'nullable|integer|min:1',
             'label' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',

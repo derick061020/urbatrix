@@ -9,17 +9,31 @@
     // Create payment plan structure
     $paymentPlan = [];
     
-    // Initial payment
-    if ($paymentBreakdown['pago_inicial'] > 0) {
+    // Initial payment — sólo el % del precio; los legales van aparte.
+    if ($paymentBreakdown['pago_inicial_sin_legales'] > 0) {
         $paymentPlan[] = [
             'type' => 'initial',
             'label' => 'Pago Inicial',
-            'amount' => $paymentBreakdown['pago_inicial'],
+            'amount' => $paymentBreakdown['pago_inicial_sin_legales'],
             'percentage' => $paymentBreakdown['porcentaje_inicial'],
-            'description' => 'Pago inicial con costos legales incluidos',
+            'description' => 'Porcentaje inicial del precio de la unidad',
             'installment_number' => null,
             'due_date' => $reservation->created_at->addDays(7)->format('Y-m-d'),
             'order' => 1
+        ];
+    }
+
+    // Costos legales — concepto independiente que vence con el pago inicial.
+    if ($paymentBreakdown['costos_legales'] > 0) {
+        $paymentPlan[] = [
+            'type' => 'legal',
+            'label' => 'Costos legales',
+            'amount' => $paymentBreakdown['costos_legales'],
+            'percentage' => null,
+            'description' => 'Cargo independiente del precio de la unidad',
+            'installment_number' => null,
+            'due_date' => $reservation->created_at->addDays(7)->format('Y-m-d'),
+            'order' => 2
         ];
     }
     
@@ -292,7 +306,7 @@
                                             </span>
                                         </div>
                                         <div class="text-sm text-gray-600 mt-1">
-                                            {{ $paymentItem['description'] }} · {{ $paymentItem['percentage'] }}% del total
+                                            {{ $paymentItem['description'] }}@if($paymentItem['percentage'] !== null) · {{ $paymentItem['percentage'] }}% del total @endif
                                         </div>
                                     </div>
                                 </div>
@@ -352,7 +366,7 @@
                                             </div>
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Porcentaje:</span>
-                                                <span class="font-medium">{{ $paymentItem['percentage'] }}%</span>
+                                                <span class="font-medium">{{ $paymentItem['percentage'] !== null ? $paymentItem['percentage'].'%' : '—' }}</span>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600">Vencimiento:</span>
