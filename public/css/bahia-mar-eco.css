@@ -10,6 +10,12 @@
    v7 se queda solo con sombras: la naturaleza entra como luz filtrada, no
    como elementos colocados.
 
+   v7.2 sube el volumen de la sección 12. La v7.1 caliente-pero-blanca se leía
+   corporativa: a 300px de tarjeta, un tinte del 2% no es material, es blanco.
+   Ahora el verde está en TODAS las capas —suelo de la sección, superficie de
+   la tarjeta, hojas, chrome y tinta— en vez de gritar en una sola. Lo que NO
+   se toca: los aros de estado del sitio (ver el ⚠️ del filo en 12.4).
+
    v7.1 añade la sección 12: el GRID DE UNIDADES entra en la capa. Hasta ahora
    sólo estaban las bandas de tipología, y el catálogo —que es donde el usuario
    pasa el rato— seguía en tarjetas blancas con chrome gris azulado. Mismo
@@ -943,14 +949,80 @@ body{ background-color:var(--eco-page); }
    se calienta es la SUPERFICIE de la tarjeta, así que los grises que van
    sobre ella se calientan con ella y no quedan beige sucio sobre blanco.  */
 
-/* ── 12.1 Papel, no plástico ───────────────────────────────────────────────
-   El mismo gesto de la sección 4, un punto más claro: la banda es superficie
-   grande y puede permitirse el arena; la tarjeta es pequeña y sobre ella va
-   texto de 10px, así que se queda en papel casi blanco. El degradado sigue
-   al sol del proyecto (arriba-izquierda más luminoso).                     */
+/* ── 12.0 EL SUELO DE LA SECCIÓN ───────────────────────────────────────────
+   ⚠️ LA PRIMERA VERSIÓN DE ESTA SECCIÓN SE QUEDÓ CORTA, y la lección merece
+   quedar escrita: se calentó la tarjeta a papel y se dejó todo lo demás en
+   arena. En una banda de tipología eso basta —544px de superficie, dos
+   sombras enormes—, pero el catálogo son tarjetas de 300px repetidas veinte
+   veces: a esa escala un tinte de un 2% no se percibe como material, se
+   percibe como blanco. El resultado se leía corporativo, que es exactamente
+   lo contrario de lo que la capa busca.
+
+   La corrección no es subir la sombra: es que el VERDE ESTÉ EN EL MATERIAL.
+   El suelo de la sección, la superficie de la tarjeta y el chrome van todos
+   en la familia verde; las hojas dejan de ser sombras grises y pasan a ser
+   sombras VERDES. Cuando el color está en todas las capas, no hace falta
+   gritar en ninguna.
+
+   El suelo: un lavado verde sobre la página arena más el follaje de la banda
+   de compromiso —el mismo asset, ver sección 5— entrando por arriba y por
+   abajo con máscara. Es la pieza que hace que el bloque de tarjetas se lea
+   como una sección propia y no como una lista sobre fondo neutro.          */
+.fg-units-grid{
+  position:relative;
+  isolation:isolate;                 /* el lavado no se mezcla con la página */
+}
+
+/* ⚠️ EL SUELO ES UN LAVADO, NO UNA PLANTA. Probé las dos cosas y hay una
+   razón geométrica para que aquí no vaya vegetación:
+
+     · con `--eco-follaje` —una FOTO con bordes rectos— el borde del asset se
+       lee como un rectángulo oscuro flotando sobre la página, que es la misma
+       trampa del PNG recortado que hizo caer la v6, sólo que en grande
+     · con las dos sombras, que sí se funden en `multiply`, el problema es
+       otro: LAS TARJETAS SON OPACAS. Una hoja detrás del grid sólo se ve por
+       las calles de 16px que quedan entre tarjeta y tarjeta, o sea que no se
+       ve — salvo durante la entrada, cuando las tarjetas están a media
+       opacidad y entonces sí aparece, atravesándolas. Peor imposible: sólo se
+       ve cuando no debe.
+
+   La vegetación de esta sección va DENTRO de cada tarjeta (12.2), que es
+   donde hay superficie propia para sostenerla. El suelo se limita a teñir de
+   verde las calles del grid y los bordes de la sección.                    */
+.fg-units-grid::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  /* Se sale del padding del grid a propósito: el suelo es de la SECCIÓN, no
+     de la caja de tarjetas, así que llega hasta los bordes de la ventana. */
+  inset:0 calc(50% - 50vw);
+
+  background:linear-gradient(180deg,
+    rgba(47,93,80,.14)  0%,
+    rgba(47,93,80,.075) 24%,
+    rgba(47,93,80,.075) 76%,
+    rgba(47,93,80,.15) 100%);
+}
+
+/* Las tarjetas van POR ENCIMA del suelo. `.fg-card` ya es `position:relative`
+   desde el sitio; lo único que falta es sacarla del z-index 0 del lavado. */
+.fg-units-grid > .fg-card{ z-index:1; }
+
+
+/* ── 12.1 La superficie: papel VERDE ───────────────────────────────────────
+   Verde salvia real, no un blanco insinuado. El degradado sigue al sol del
+   proyecto (arriba-izquierda más luminoso) igual que el panel de las bandas.
+
+   ⚠️ El límite de cuánto puede bajar es el texto de 10px de las specs, que el
+   sitio pinta en gris medio. Por eso el fondo NO baja de #E4EEDD en la
+   esquina más oscura y por eso la 12.4 sube esos grises a verde oscuro: lo
+   que hace legible una tarjeta no es que el fondo sea claro, es la distancia
+   entre fondo y tinta. Bajando el fondo Y oscureciendo la tinta, la tarjeta
+   acaba con MÁS contraste del que tenía en blanco.                         */
 .fg-units-grid > .fg-card,
 .fg-units-grid > .fg-card .fg-card-inner{
-  background:linear-gradient(155deg, #FFFDF9 0%, #FCF9F3 58%, #F8F4EC 100%);
+  background:linear-gradient(155deg, #F6FAF2 0%, #EDF4E7 52%, #E4EEDD 100%);
 }
 
 /* Grano de papel, la mitad de fuerza que en las bandas: en una superficie de
@@ -1000,6 +1072,25 @@ body{ background-color:var(--eco-page); }
   opacity:var(--eco-sombra-fuerza, .09);
 }
 
+/* ⚠️ NO LE PONGAS UN `filter` VERDE A LA HOJA. Lo probé y deja una costura.
+
+   La idea era obvia: los dos webp son grises (ver ASSETS), así que
+   `sepia() hue-rotate()` los pasaría a verde y la hoja aportaría color en vez
+   de sólo oscurecer. Funciona con la hoja… y también con el FONDO BLANCO del
+   asset, que deja de ser blanco puro. Y un blanco que ya no es blanco deja de
+   ser neutro en `multiply`: la caja entera de la sombra se tiñe y aparece un
+   rectángulo de otro tono en la esquina de cada tarjeta.
+
+   Lo que sí tiñe la hoja SIN tocar el blanco es `screen` contra un verde de
+   follaje: en `screen` el blanco es el elemento neutro —blanco con lo que sea
+   da blanco—, así que el fondo del asset sale intacto y sólo se colorea lo
+   que tiene tinta. Como `screen` además aclara, las fuerzas de más abajo
+   suben para compensar.                                                     */
+.eco-shade-card i{
+  background-color:#1B5E36;
+  background-blend-mode:screen;
+}
+
 .eco-shade-card i{
   display:block;
   position:absolute;
@@ -1038,67 +1129,103 @@ body{ background-color:var(--eco-page); }
    hoja se leería como una mancha pequeña en la esquina y no como una sombra
    que entra desde fuera del cuadro. Los offsets siguen siendo ≤ 0 por lo
    mismo que en la sección 2: en positivo se ve el corte del asset flotando. */
-[data-eco-shade="fronda"]        .eco-shade-card{ --eco-sombra-fuerza:.13; }
+/* ⚠️ LAS FUERZAS SUBEN RESPECTO A LAS BANDAS, no bajan.
+
+   En la sección 2 la sombra va sobre arena y al 7-13% ya pesa. Aquí compite
+   con seis iconos, una retícula de specs y dos botones en 300px de ancho: a
+   la fuerza de las bandas la hoja desaparecía bajo el contenido. Con el
+   filtro verde de arriba, además, la mancha ya no ensucia — tiñe.          */
+[data-eco-shade="fronda"]        .eco-shade-card{ --eco-sombra-fuerza:.46; }
 [data-eco-shade="fronda"]        .eco-shade-card i{
   background-image:var(--eco-sombra-fronda);
-  --eco-sombra-ancho:66%;
+  --eco-sombra-ancho:78%;
 }
 
-[data-eco-shade="monstera"]      .eco-shade-card{ --eco-sombra-fuerza:.085; }
+[data-eco-shade="monstera"]      .eco-shade-card{ --eco-sombra-fuerza:.34; }
 [data-eco-shade="monstera"]      .eco-shade-card i{
   background-image:var(--eco-sombra-monstera);
-  --eco-sombra-ancho:62%;
+  --eco-sombra-ancho:72%;
 }
 
-[data-eco-shade="fronda-alt"]    .eco-shade-card{ --eco-sombra-fuerza:.15; }
+[data-eco-shade="fronda-alt"]    .eco-shade-card{ --eco-sombra-fuerza:.52; }
 [data-eco-shade="fronda-alt"]    .eco-shade-card i{
   background-image:var(--eco-sombra-fronda);
-  --eco-sombra-ancho:60%;
+  --eco-sombra-ancho:70%;
   --eco-sombra-x:-9%;
   --eco-sombra-y:-13%;
 }
 
-[data-eco-shade="monstera-alt"]  .eco-shade-card{ --eco-sombra-fuerza:.10; }
+[data-eco-shade="monstera-alt"]  .eco-shade-card{ --eco-sombra-fuerza:.40; }
 [data-eco-shade="monstera-alt"]  .eco-shade-card i{
   background-image:var(--eco-sombra-monstera);
-  --eco-sombra-ancho:58%;
+  --eco-sombra-ancho:66%;
   --eco-sombra-x:-11%;
   --eco-sombra-y:-9%;
 }
 
-[data-eco-shade="fronda-corta"]  .eco-shade-card{ --eco-sombra-fuerza:.15; }
+[data-eco-shade="fronda-corta"]  .eco-shade-card{ --eco-sombra-fuerza:.52; }
 [data-eco-shade="fronda-corta"]  .eco-shade-card i{
   background-image:var(--eco-sombra-fronda);
-  --eco-sombra-ancho:72%;
+  --eco-sombra-ancho:84%;
   --eco-sombra-x:-14%;
   --eco-sombra-y:-5%;
 }
 
-/* La tarjeta vendida se apaga entera: la sombra encima de un cuadro ya
+/* La tarjeta vendida se apaga entera: la hoja encima de un cuadro ya
    desaturado sólo lo ensucia. */
-.fg-units-grid > .fg-card.is-sold .eco-shade-card{ opacity:.03; }
+.fg-units-grid > .fg-card.is-sold .eco-shade-card{ opacity:.06; }
 
-/* ── 12.3 El chrome, a la familia cálida ───────────────────────────────────
+/* ── 12.3 El chrome, al verde ──────────────────────────────────────────────
    Éstos SÍ entran, al revés que los chips de la sección 10: allí el gris iba
    sobre tarjeta blanca y calentarlo lo ensuciaba; aquí la tarjeta ya es
-   papel, así que el frío es lo que canta. Son los mismos valores de siempre
-   pasados a la familia cálida — la luminancia no se toca.                  */
-.fg-units-grid > .fg-card .fg-card-divider{ background:#EDE7DB; }
-.fg-units-grid > .fg-card .fg-stats       { border-color:#EDE7DB; }
-.fg-units-grid > .fg-card .fg-btn-info    { background:#F1ECE1; color:#5E6B5F; }
-.fg-units-grid > .fg-card .fg-btn-info:hover{ background:#E7E0D1; }
-.fg-units-grid > .fg-card .fg-card-img    { background:#F1ECE1; }
+   salvia, así que el gris frío es lo que canta.
 
-/* El hueco de la foto mientras carga, igual que en las bandas (sección 10). */
-.fg-units-grid > .fg-card .fg-card-img-noimage{ background:#F1ECE1; }
+   La retícula de specs, además, deja de ser un recuadro con borde y pasa a
+   ser una superficie verde: son seis piezas repetidas en cada tarjeta, o sea
+   la mancha de color más grande del cuerpo después de la foto.             */
+.fg-units-grid > .fg-card .fg-card-divider{ background:rgba(47,93,80,.20); }
+.fg-units-grid > .fg-card .fg-stats{
+  background:rgba(47,93,80,.06);
+  border-color:rgba(47,93,80,.18);
+}
+.fg-units-grid > .fg-card .fg-stat-divider{ background:rgba(47,93,80,.16); }
+.fg-units-grid > .fg-card .fg-btn-info{
+  background:rgba(47,93,80,.10);
+  color:var(--eco-deep);
+  font-weight:600;
+}
+.fg-units-grid > .fg-card .fg-btn-info:hover{ background:rgba(47,93,80,.17); }
 
-/* ── 12.4 El verde del proyecto ────────────────────────────────────────────
-   Los iconos de las specs iban en #848484, un gris puro: seis piezas de
-   dibujo repetidas en cada tarjeta y todas neutras. Pasados al verde del
-   proyecto, muy desaturado, la retícula de specs deja de ser chrome y se lee
-   como parte de la marca. El texto NO se toca: en 10px el verde pierde
-   contraste y esto es información, no decoración.                          */
-.fg-units-grid > .fg-card .fg-stat svg{ color:#7C8C7A; }
+/* El hueco de la foto mientras carga: verde, para que el primer frame de la
+   tarjeta ya sea de la familia y no un rectángulo neutro. */
+.fg-units-grid > .fg-card .fg-card-img,
+.fg-units-grid > .fg-card .fg-card-img-noimage{ background:#DCE8D4; }
+
+/* La píldora "AÑADIR A LA LISTA" es cristal blanco sobre la foto. Con todo lo
+   demás en verde, es el único objeto que queda pidiendo neutralidad. */
+.fg-units-grid > .fg-card .fg-add-to-list{
+  background:rgba(238,244,234,.72);
+  border-color:rgba(47,93,80,.22);
+}
+.fg-units-grid > .fg-card .fg-add-to-list:hover{ background:rgba(238,244,234,.92); }
+.fg-units-grid > .fg-card .fg-add-to-list .heart svg,
+.fg-units-grid > .fg-card .fg-add-to-list .text .label{ color:var(--eco-deep); }
+
+/* ── 12.4 La tinta ─────────────────────────────────────────────────────────
+   ⚠️ ESTO NO ES DECORACIÓN, ES LO QUE PAGA EL FONDO VERDE.
+
+   Al bajar el fondo de blanco a salvia, los grises del sitio (#5c5c5c en el
+   nombre, #a3a3a3 en el subtítulo, #848484 en las specs) pierden separación
+   contra él. Pasándolos a la familia verde POR ABAJO —más oscuros, no más
+   claros— la tarjeta acaba con más contraste del que tenía en blanco, y de
+   paso el color deja de vivir sólo en el fondo: está también en la tinta,
+   que es lo que hace que se lea verde de verdad y no "blanco tintado".     */
+.fg-units-grid > .fg-card .fg-card-title-row .name{ color:var(--eco-deep); }
+.fg-units-grid > .fg-card .fg-card-subtitle       { color:#63775F; }
+.fg-units-grid > .fg-card .fg-stat svg            { color:#4A6B4E; }
+.fg-units-grid > .fg-card .fg-stat .v,
+.fg-units-grid > .fg-card .fg-stat .u             { color:#41613F; }
+.fg-units-grid > .fg-card .fg-card-price .sqft    { color:#6B7F67; }
 
 /* "Un asesor está disponible ahora mismo" venía en #1fc16b, el verde de
    semáforo del sitio. Es el único acento verde grande de la tarjeta, así que
@@ -1126,7 +1253,23 @@ body{ background-color:var(--eco-page); }
    ⚠️ Si alguna vez se aclara este cristal, hay que cambiar también el color
    del texto: va en `#ffffff` desde el sitio.                               */
 .fg-units-grid > .fg-card .fg-reserve-banner{
-  background:linear-gradient(180deg, rgba(30,61,51,.26) 0%, rgba(30,61,51,.54) 100%);
+  background:linear-gradient(180deg, rgba(30,61,51,.42) 0%, rgba(30,61,51,.78) 100%);
+}
+
+/* El filo de la tarjeta. Con el suelo de la sección también en verde, una
+   tarjeta sin borde se difumina contra él; el filo verde la recorta y de paso
+   es la línea que repite el color en las veinte tarjetas a la vez.
+
+   ⚠️ SÓLO EN LAS TARJETAS SIN ESTADO, y esto no es un detalle estético.
+
+   El sitio marca alta demanda / pendiente / 2ª oportunidad / reservada / venda
+   con un aro de 3px en `box-shadow` sobre `.fg-card.is-*`. Esa regla tiene la
+   MISMA especificidad que ésta (dos clases), así que gana la última en llegar
+   — y esta hoja se carga después de style.css. Sin el `:not()`, el filo verde
+   apaga los cinco aros de estado del catálogo entero: el usuario deja de ver
+   qué unidades están reservadas.                                            */
+.fg-units-grid > .fg-card:not(.is-high-demand):not(.is-pending):not(.is-second-chance):not(.is-reserved):not(.is-sold){
+  box-shadow:0 0 0 1px rgba(47,93,80,.16);
 }
 
 /* ── 12.5 Respuesta al puntero ─────────────────────────────────────────────
@@ -1135,13 +1278,16 @@ body{ background-color:var(--eco-page); }
    del header— y un filo verde muy tenue, que es el que dice "esto es de la
    misma familia que las bandas". Sin desplazamiento: el grid tiene muchas
    tarjetas y moverlas al pasar por encima convierte el listado en un campo
-   de minas.                                                                */
+   de minas.
+
+   Mismo `:not()` que el filo, y por lo mismo: una tarjeta reservada no puede
+   perder su aro rojo por pasarle el ratón por encima.                       */
 @media (hover:hover){
-  .fg-units-grid > .fg-card:hover{
+  .fg-units-grid > .fg-card:not(.is-high-demand):not(.is-pending):not(.is-second-chance):not(.is-reserved):not(.is-sold):hover{
     box-shadow:
-      calc( 4px * var(--eco-sol-x))  4px  10px rgba(30,61,51,.05),
-      calc(14px * var(--eco-sol-x)) 14px  28px rgba(30,61,51,.07),
-      0 0 0 1px rgba(47,93,80,.10);
+      calc( 4px * var(--eco-sol-x))  4px  10px rgba(30,61,51,.10),
+      calc(14px * var(--eco-sol-x)) 14px  28px rgba(30,61,51,.12),
+      0 0 0 1px rgba(47,93,80,.28);
   }
 }
 
@@ -1151,8 +1297,8 @@ body{ background-color:var(--eco-page); }
    ocupar el ancho de la pantalla y la sombra, a la misma proporción, se
    convierte en una mancha sobre el texto. Se baja fuerza y tamaño.         */
 @media (max-width:640px){
-  .eco-shade-card{ --eco-sombra-fuerza:.06; }
-  .eco-shade-card i{ --eco-sombra-ancho:48%; }
+  .eco-shade-card{ --eco-sombra-fuerza:.26; }
+  .eco-shade-card i{ --eco-sombra-ancho:52%; }
 }
 
 
