@@ -1314,7 +1314,7 @@ body{ background-color:var(--eco-page); }
    cascada, dejando el pseudo-elemento fuera de la caja.                    */
 .fg-hero::after,
 .hs-cell-img::after{
-  height:22%;
+  height:15%;
   background:linear-gradient(to top,
     var(--eco-page)         0%,
     rgba(245,241,233,.985)  9%,
@@ -1322,6 +1322,47 @@ body{ background-color:var(--eco-page); }
     rgba(245,241,233,.66)  45%,
     rgba(245,241,233,.34)  68%,
     rgba(245,241,233,.12)  85%,
+    rgba(245,241,233,0)   100%);
+}
+
+
+/* ── 13.1b LA JUNTA TIENE DOS LADOS ────────────────────────────────────────
+   ⚠️ ALARGAR EL DIFUMINADO DEL HERO NO ARREGLA LA COSTURA, Y ESE ERROR YA SE
+   COMETIÓ AQUÍ. Se subió al 22% y la junta seguía viéndose exactamente igual:
+   sólo se consiguió que el hero se leyera con niebla.
+
+   El motivo es que el difuminado sólo trabaja el lado de ARRIBA. Por abajo,
+   la mitad derecha de la primera banda es una foto a sangre que empieza en un
+   corte de un píxel, así que la secuencia era: disolución lenta… y tajo. Un
+   borde limpio junto a un degradado se ve MÁS, no menos: el degradado es la
+   referencia que delata que el otro lado no lo tiene.
+
+   Así que el difuminado del hero baja (15%: lo justo para que el agua llegue
+   al arena sin empañar el hero) y la banda recibe el suyo, en espejo. En el
+   punto de encuentro los dos están en arena puro y no hay junta que ver.
+
+   Va en `.fg-types-grid::before` —una sola pieza para toda la portada— y
+   afecta sólo a la primera banda porque es la única que toca el borde. Sólo
+   en la portada: en el catálogo la junta la resuelve la bandeja de filtros,
+   que ya es un objeto suelto sobre el arena.                               */
+body:not(.is-catalog) .fg-types-grid{ position:relative; }
+
+body:not(.is-catalog) .fg-types-grid::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:110px;
+  pointer-events:none;
+  /* ⚠️ z-index 3: por encima de la foto de la banda y del número de fondo
+     (que va en -1), y por debajo del chip de precio (6) y del panel de texto.
+     Si sube de 5, se come el "DESDE $1 100 000" de la primera banda.       */
+  z-index:3;
+  background:linear-gradient(to bottom,
+    var(--eco-page)         0%,
+    rgba(245,241,233,.94)  18%,
+    rgba(245,241,233,.72)  40%,
+    rgba(245,241,233,.42)  63%,
+    rgba(245,241,233,.16)  83%,
     rgba(245,241,233,0)   100%);
 }
 

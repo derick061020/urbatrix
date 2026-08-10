@@ -1840,7 +1840,7 @@
     que la regla del sitio: cargada en el head perdería el desempate por orden
     de documento y el panel se quedaría en el azul de página.
   --}}
-  <link rel="stylesheet" href="{{ asset('css/bahia-mar-eco.css') }}?v=15">
+  <link rel="stylesheet" href="{{ asset('css/bahia-mar-eco.css') }}?v=16">
 
   <div id="advisorModal" class="vc-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Agendar Videollamada') }}" onclick="if(event.target===this) closeAdvisorVideoCall()">
     <div class="vc-modal">
@@ -6515,7 +6515,7 @@
     contador: @json(__('<b>68%</b> del terreno preservado · <b>1.240</b> árboles nativos'))
   };
 </script>
-<script src="{{ asset('js/bahia-mar-eco.js') }}?v=15"></script>
+<script src="{{ asset('js/bahia-mar-eco.js') }}?v=16"></script>
 </body>
 
 </html>
