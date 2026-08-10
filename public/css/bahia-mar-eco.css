@@ -1286,6 +1286,166 @@ body{ background-color:var(--eco-page); }
 }
 
 
+/* ══ 13. LA COSTURA ENTRE EL HERO Y EL LISTADO ═════════════════════════════
+   La sección 10 puso los dos lados de la junta en el mismo color y dio el
+   problema por resuelto. No lo estaba: el color coincidía, pero la junta se
+   seguía viendo, y por tres motivos distintos que hay que arreglar por
+   separado.                                                                */
+
+/* ── 13.1 El difuminado del hero era demasiado corto ───────────────────────
+   El sitio lo resuelve en un 6% del alto del hero (8% en las celdas de
+   imagen del carrusel): unos 45px sobre 735. Con vegetación en los bordes
+   basta y por eso nadie lo miró; con la piscina en el centro no, porque un
+   turquesa saturado necesita mucho más recorrido para llegar al arena. El
+   resultado es lo que se ve: las plantas se disuelven y el agua se CORTA.
+
+   Y hay un segundo error, más fino, en la forma de la rampa: el sitio va de
+   opaco a .92 en el primer 35% del difuminado. O sea que el 8% de la altura
+   que tenía se gastaba casi entero en el tramo donde ya no se ve nada, y la
+   parte útil —de .92 a 0— quedaba comprimida en el resto. Eso deja un
+   escalón horizontal justo donde debería empezar a desaparecer.
+
+   Aquí se corrige lo uno y lo otro: el triple de recorrido y una rampa que
+   sale despacio de la opacidad total.
+
+   ⚠️ Se tocan `height` y `background` y NADA MÁS. `bottom`, `left`, `right`
+   y `z-index` siguen siendo del sitio — ver la trampa 2 en la sección 10:
+   la capa declaró una vez `inset` y el `height` del sitio le ganó en la
+   cascada, dejando el pseudo-elemento fuera de la caja.                    */
+.fg-hero::after,
+.hs-cell-img::after{
+  height:22%;
+  background:linear-gradient(to top,
+    var(--eco-page)         0%,
+    rgba(245,241,233,.985)  9%,
+    rgba(245,241,233,.90)  24%,
+    rgba(245,241,233,.66)  45%,
+    rgba(245,241,233,.34)  68%,
+    rgba(245,241,233,.12)  85%,
+    rgba(245,241,233,0)   100%);
+}
+
+
+/* ── 13.2 EN LA PORTADA, LAS VILLAS VAN PEGADAS AL HERO ────────────────────
+   Entre el hero y la primera banda había 139px de arena vacía. No era
+   margen de nadie: era el HUECO EN FLUJO de la píldora Grid/Lista, que en la
+   portada está siempre flotando abajo y deja su sitio reservado arriba.
+
+   Con la barra de filtros fuera de la portada, ese hueco se quedó suelto
+   entre dos secciones que deberían tocarse, y es lo que hacía que la portada
+   se leyera como "hero, un vacío, y luego unas bandas".
+
+   La píldora se fija SIEMPRE en la portada y el hueco se anula. No es un
+   cambio de comportamiento: en la portada ya flotaba en cuanto la ventana
+   tenía altura normal. Lo que se quita es la reserva de sitio.
+
+   ⚠️ El `!important` del hueco no es pereza: el JS le escribe la altura
+   inline (`spacer.style.height`) cuando decide enganchar la píldora, y un
+   estilo en línea gana a cualquier regla de esta hoja. Sin él, el hueco
+   vuelve en cuanto el JS se despierta.                                     */
+body:not(.is-catalog) .fg-toggle-spacer{ height:0 !important; }
+
+body:not(.is-catalog) .fg-toggle-bar{
+  position:fixed;
+  left:0; right:0;
+  bottom:calc(var(--fg-float-gap, 24px) + env(safe-area-inset-bottom, 0px));
+  padding:0;
+  z-index:90;
+}
+
+/* Lo que quedaba del hueco: el espaciador del hero y el margen negativo con
+   el que el listado se montaba encima. Los dos existían para coser el hero
+   con el gris azulado del sitio; con los dos lados ya en arena y el
+   difuminado de 13.1 haciendo el trabajo, sobran.
+
+   Sólo en la portada: en el catálogo, la barra de filtros necesita su aire
+   por encima. */
+body:not(.is-catalog) .fg-hero-spacer{ display:none; }
+body:not(.is-catalog) .fg-types-grid{ padding-top:0; }
+
+
+/* ── 13.3 LOS FILTROS, EN BANDEJA ──────────────────────────────────────────
+   La barra era una franja del color de la página con ocho cajitas blancas
+   encima. Con el listado también en tarjetas, eso son diez rectángulos
+   blancos apilados en el mismo cuadro y ninguno manda: el ojo no sabe si los
+   filtros son parte del listado o de la cabecera.
+
+   La página ya tiene resuelto ese problema una vez —la píldora Grid/Lista es
+   UNA pieza blanca con las opciones dentro— así que los filtros se pasan al
+   mismo objeto: una bandeja blanca, mismo radio de píldora, misma sombra, y
+   los controles convertidos en segmentos suyos en vez de piezas sueltas.
+
+   Quedan tres objetos en la pantalla en lugar de diez: la bandeja, el
+   contador y la píldora del toggle. Los tres del mismo material.
+
+   ⚠️ Los controles de dentro pierden fondo y borde, pero NO el estado
+   activo: un filtro puesto tiene que seguir viéndose de un golpe de vista
+   (`.is-active` conserva su contorno verde de marca).                     */
+.fg-filter-bar{ background:transparent; }
+
+.fg-filter-bar > .fg-filters-left{
+  flex:0 1 auto;                     /* la bandeja abraza su contenido */
+  gap:2px;
+  padding:8px;
+  background:#ffffff;
+  border-radius:100px;
+  box-shadow:0 6px 20px rgba(10,13,20,.10);
+}
+
+/* El contador se va al otro extremo por su cuenta, como el botón del mapa
+   respecto a la píldora del toggle. */
+.fg-filter-bar > .fg-pill-matches{
+  margin-left:auto;
+  border-color:transparent;
+  border-radius:100px;
+  box-shadow:0 6px 20px rgba(10,13,20,.10);
+}
+
+/* Los controles, ya dentro de la bandeja, dejan de ser cajas. */
+.fg-filter-bar .fg-search,
+.fg-filter-bar .fg-filter-btn,
+.fg-filter-bar .fg-filter-icon,
+.fg-filter-bar .fg-filters-mobile-trigger{
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  border-radius:100px;
+}
+
+/* Dos excepciones, y las dos por lo mismo: sin fondo no se leerían como algo
+   sobre lo que se puede actuar. El buscador es un campo —lleva el hueco
+   hundido en vez del borde— y en móvil "Filtros" es el único botón de la
+   bandeja, así que blanco sobre blanco desaparecería. */
+.fg-filter-bar .fg-search{
+  background:rgba(47,93,80,.06);
+  width:150px;
+}
+.fg-filter-bar .fg-filters-mobile-trigger{ background:rgba(47,93,80,.09); }
+
+.fg-filter-bar .fg-filter-btn:hover,
+.fg-filter-bar .fg-filter-icon:hover{
+  background:rgba(47,93,80,.09);
+  border-color:transparent;
+}
+
+/* El filtro activo conserva su marca: es información, no decoración. */
+.fg-filter-bar .fg-filter-btn.is-active,
+.fg-filter-bar .fg-filter-btn.is-active:hover{
+  background:rgba(7,69,64,.07);
+  border-color:transparent;
+  box-shadow:none;
+  color:var(--eco-deep);
+}
+
+/* En móvil la bandeja se queda con dos piezas —buscador y "Filtros"— y el
+   contador cae debajo. Que la bandeja no se estire a todo el ancho es lo que
+   la mantiene reconocible como el mismo objeto que en escritorio. */
+@media (max-width:768px){
+  .fg-filter-bar > .fg-filters-left{ flex:1 1 auto; }
+  .fg-filter-bar > .fg-pill-matches{ margin-left:0; }
+}
+
+
 /* ============================================================================
    AUDITORÍA — pegar en la consola tras cualquier cambio.
 
