@@ -209,6 +209,38 @@ body {
       </div>
     </div>
 
+    <div class="sec-title">{{ __('Desembolso a la firma — Desglose') }}</div>
+    <table class="inst-table">
+      <thead>
+        <tr>
+          <th style="width:40px">N°</th>
+          <th>{{ __('Concepto') }}</th>
+          <th>{{ __('Detalle') }}</th>
+          <th>{{ __('Monto') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>01</td>
+          <td><span class="f">{{ __('Pago inicial') }}</span></td>
+          <td>{{ $pct_inicial }}% {{ __('del precio de la unidad') }}</td>
+          <td>US$ <span class="f">{{ $monto_inicial }}</span></td>
+        </tr>
+        @if($tiene_legales)
+          <tr>
+            <td>02</td>
+            <td><span class="f">{{ __('Costos legales') }}</span></td>
+            <td>{{ __('Cargo independiente · no forma parte del precio de la unidad') }}</td>
+            <td>US$ <span class="f">{{ $costos_legales }}</span></td>
+          </tr>
+        @endif
+        <tr class="total-row">
+          <td colspan="3">{{ __('Total a pagar a la firma') }}</td>
+          <td>US$ <span class="f">{{ $total_al_firmar }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+
     <div class="sec-title">{{ __('Calendario de cuotas — Etapa de construcción') }}</div>
     <table class="inst-table">
       <thead>
@@ -250,6 +282,9 @@ body {
         <div class="stage-amount">US$ <span class="f">{{ $monto_inicial }}</span></div>
         <div class="stage-title">{{ __('Pago Inicial') }}</div>
         <div class="stage-desc">{{ __('A la firma de la Promesa de Compraventa, en un plazo máximo de 60 días naturales desde la reserva.') }}</div>
+        @if($tiene_legales)
+          <div class="stage-tag">+ US$ <span class="f">{{ $costos_legales }}</span> {{ __('de costos legales (concepto aparte)') }}</div>
+        @endif
       </div>
 
       <div>

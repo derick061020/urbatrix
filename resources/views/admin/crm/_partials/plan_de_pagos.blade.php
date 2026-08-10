@@ -78,6 +78,57 @@
         </div>
     @endif
 
+    {{-- Desglose del plan. Los costos legales NO se suman al pago inicial:
+         son un concepto propio, tanto acá como en el calendario de cuotas. --}}
+    @php
+        $price       = (float) $r->unit_price;
+        $sumInitial  = $price * $initial / 100;
+        $sumConstr   = $price * $construction / 100;
+        $sumDelivery = $price * $delivery / 100;
+        $sumCuota    = $installments > 0 ? $sumConstr / $installments : 0;
+        $money       = fn ($n) => '$'.number_format((float) $n, 2);
+        $pctTxt      = fn ($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.').'%';
+    @endphp
+    <div class="px-5 pt-5" id="pp-summary-{{ $r->id }}">
+        <div class="rounded-xl border border-ink-200 overflow-hidden">
+            <div class="px-4 py-2.5 bg-ink-50 border-b border-ink-100 flex items-center justify-between gap-3">
+                <span class="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{{ __('Desglose del plan') }}</span>
+                <span class="text-[11px] text-ink-400">{{ __('Los costos legales se cobran como cuota aparte') }}</span>
+            </div>
+            <div class="divide-y divide-ink-100">
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+                    <span class="text-[12px] text-ink-600">{{ __('Pago inicial') }} <span class="text-ink-400" data-pp="initial-pct">{{ $pctTxt($initial) }}</span></span>
+                    <span class="text-[13px] font-semibold text-ink-900" data-pp="initial">{{ $money($sumInitial) }}</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+                    <span class="text-[12px] text-ink-600">{{ __('Costos legales') }} <span class="text-ink-400">{{ __('(fuera del precio de la unidad)') }}</span></span>
+                    <span class="text-[13px] font-semibold text-ink-900" data-pp="legal">{{ $money($legal) }}</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3 bg-brand/5">
+                    <span class="text-[12px] font-semibold text-ink-700">{{ __('Total a pagar al firmar') }}</span>
+                    <span class="text-[13px] font-bold text-brand" data-pp="signing">{{ $money($sumInitial + (float) $legal) }}</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+                    <span class="text-[12px] text-ink-600">
+                        {{ __('Durante construcción') }} <span class="text-ink-400" data-pp="construction-pct">{{ $pctTxt($construction) }}</span>
+                        <span class="text-ink-400" data-pp="installments">{{ $installments > 0 ? '· '.$installments.' × '.$money($sumCuota) : '· '.__('pago único') }}</span>
+                    </span>
+                    <span class="text-[13px] font-semibold text-ink-900" data-pp="construction">{{ $money($sumConstr) }}</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+                    <span class="text-[12px] text-ink-600">{{ __('A la entrega') }} <span class="text-ink-400" data-pp="delivery-pct">{{ $pctTxt($delivery) }}</span></span>
+                    <span class="text-[13px] font-semibold text-ink-900" data-pp="delivery">{{ $money($sumDelivery) }}</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center justify-between gap-3 bg-ink-50">
+                    <span class="text-[12px] font-semibold text-ink-700">{{ __('Total contrato') }} <span class="font-normal text-ink-400">{{ __('+ legales') }}</span></span>
+                    <span class="text-[13px] font-bold text-ink-900">
+                        {{ $money($price) }} <span class="text-ink-400 font-normal">+</span> <span data-pp="legal-total">{{ $money($legal) }}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if($isLocked)
         <div class="p-5">
             <div class="rounded-lg border border-ok/30 bg-ok-soft/40 px-4 py-3 flex items-center gap-3">
@@ -89,7 +140,8 @@
             </div>
         </div>
     @else
-    <form method="POST" action="{{ route('admin.crm.budget.save', $r->id) }}" class="p-5 space-y-4 m-0">
+    <form method="POST" action="{{ route('admin.crm.budget.save', $r->id) }}" class="p-5 space-y-4 m-0"
+          oninput="planSummary(this, {{ (float) $r->unit_price }}, '{{ $r->id }}')">
         @csrf
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -203,6 +255,45 @@ window.planAutofill = function (sel) {
     set('payment_construction_percentage', p.construction);
     set('payment_delivery_percentage', p.delivery);
     set('payment_installments', p.installments);
+    form.dispatchEvent(new Event('input', { bubbles: true }));
+};
+
+// Mantiene el desglose de arriba en sincronía con el formulario. Los costos
+// legales se muestran como línea propia (no sumados al pago inicial) para que
+// el asesor vea exactamente lo mismo que verá el cliente.
+window.planSummary = function (form, price, rid) {
+    const box = document.getElementById('pp-summary-' + rid);
+    if (!box) return;
+
+    const num = (name) => {
+        const el = form.querySelector('[name=' + name + ']');
+        const v = el ? parseFloat(el.value) : 0;
+        return isNaN(v) ? 0 : v;
+    };
+    const money = (n) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pct   = (n) => (Math.round(n * 100) / 100) + '%';
+    const put   = (key, text) => { const el = box.querySelector('[data-pp="' + key + '"]'); if (el) el.textContent = text; };
+
+    const pInitial = num('payment_initial_percentage');
+    const pConstr  = num('payment_construction_percentage');
+    const pDeliv   = num('payment_delivery_percentage');
+    const legal    = num('legal_costs');
+    const nCuotas  = Math.max(0, Math.round(num('payment_installments')));
+
+    const initial = price * pInitial / 100;
+    const constr  = price * pConstr / 100;
+    const deliv   = price * pDeliv / 100;
+
+    put('initial-pct', pct(pInitial));
+    put('initial', money(initial));
+    put('legal', money(legal));
+    put('legal-total', money(legal));
+    put('signing', money(initial + legal));
+    put('construction-pct', pct(pConstr));
+    put('construction', money(constr));
+    put('installments', nCuotas > 0 ? '· ' + nCuotas + ' × ' + money(constr / nCuotas) : '· ' + @json(__('pago único')));
+    put('delivery-pct', pct(pDeliv));
+    put('delivery', money(deliv));
 };
 
 // Sube el plan de pagos firmado por chunks (evita el 413) ENVIANDO TAMBIÉN la

@@ -55,8 +55,13 @@ class DocumentBuilder
 
         $rows = [
             ['Concepto', 'Porcentaje', 'Monto', 'Detalle'],
-            ['Pago inicial',         $reservation->payment_initial_percentage.'%',      '$'.number_format($breakdown['pago_inicial'], 2, '.', ','),
-                'Incluye $'.number_format((float) $reservation->legal_costs, 2, '.', ',').' de costos legales'],
+            ['Pago inicial',         $reservation->payment_initial_percentage.'%',      '$'.number_format($breakdown['pago_inicial_sin_legales'], 2, '.', ','),
+                'A la firma de la promesa de compraventa'],
+            // Los costos legales son un concepto propio del plan, no parte del inicial.
+            ['Costos legales',       '—',                                               '$'.number_format($breakdown['costos_legales'], 2, '.', ','),
+                'Cargo independiente · se abona junto al pago inicial'],
+            ['Total a la firma',     '—',                                               '$'.number_format($breakdown['total_al_firmar'], 2, '.', ','),
+                'Pago inicial + costos legales'],
             ['Durante construcción', $reservation->payment_construction_percentage.'%', '$'.number_format($breakdown['pago_construccion'], 2, '.', ','),
                 ($reservation->payment_installments ?? 0) > 0
                     ? ($reservation->payment_installments.' cuotas de $'.number_format($breakdown['cuota'] ?? 0, 2, '.', ','))
@@ -135,8 +140,12 @@ class DocumentBuilder
 
         $section->addText('Plan de pagos acordado', ['bold' => true, 'size' => 13]);
         $section->addText('• Inicial ('.$reservation->payment_initial_percentage.'%): $'
-            .number_format($breakdown['pago_inicial'], 2, '.', ',')
-            .' — incluye $'.number_format((float) $reservation->legal_costs, 2, '.', ',').' legales');
+            .number_format($breakdown['pago_inicial_sin_legales'], 2, '.', ','));
+        if ($breakdown['costos_legales'] > 0) {
+            $section->addText('• Costos legales (concepto aparte): $'
+                .number_format($breakdown['costos_legales'], 2, '.', ',')
+                .' — total a la firma: $'.number_format($breakdown['total_al_firmar'], 2, '.', ','));
+        }
         $section->addText('• Construcción ('.$reservation->payment_construction_percentage.'%): $'
             .number_format($breakdown['pago_construccion'], 2, '.', ',')
             .(($reservation->payment_installments ?? 0) > 0

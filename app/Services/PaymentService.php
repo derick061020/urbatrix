@@ -33,16 +33,30 @@ class PaymentService
             $startDate = \Carbon\Carbon::parse($startDate);
         }
         
-        // 1. Pago Inicial
+        // 1. Pago Inicial — sólo el porcentaje del precio de la unidad.
+        //    Los costos legales van como cuota aparte (ver 1b) para que el
+        //    cliente vea con claridad qué corresponde al inmueble y qué no.
         $payments[] = [
             'payment_type' => 'initial',
             'installment_number' => null,
-            'label' => __('Pago inicial').' ('.$breakdown['porcentaje_inicial'].'% + $'.number_format($breakdown['costos_legales'], 0).' '.__('legales').')',
-            'amount' => $breakdown['pago_inicial'],
+            'label' => __('Pago inicial').' ('.$breakdown['porcentaje_inicial'].'%)',
+            'amount' => $breakdown['pago_inicial_sin_legales'],
             'due_date' => $startDate->format('Y-m-d'),
             'status' => 'pending',
         ];
-        
+
+        // 1b. Costos legales — concepto separado que vence junto al inicial.
+        if ($breakdown['costos_legales'] > 0) {
+            $payments[] = [
+                'payment_type' => 'legal',
+                'installment_number' => null,
+                'label' => __('Costos legales'),
+                'amount' => $breakdown['costos_legales'],
+                'due_date' => $startDate->format('Y-m-d'),
+                'status' => 'pending',
+            ];
+        }
+
         // 2. Pagos de Construcción (cuotas o pago único)
         if ($breakdown['cantidad_cuotas'] > 0) {
             // Generar cuotas individuales

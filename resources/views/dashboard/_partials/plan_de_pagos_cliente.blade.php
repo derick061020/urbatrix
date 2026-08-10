@@ -44,11 +44,17 @@
         @endif
     </div>
 
-    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="border border-ink-100 rounded-lg px-3 py-2.5">
             <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Pago inicial') }}</div>
-            <div class="text-[16px] font-bold text-ink-950 mt-0.5">${{ number_format($breakdown['pago_inicial'] ?? 0) }}</div>
-            <div class="text-[11px] text-ink-500 mt-0.5">{{ $r->payment_initial_percentage }}% + ${{ number_format((float) $r->legal_costs) }} legales</div>
+            <div class="text-[16px] font-bold text-ink-950 mt-0.5">${{ number_format($breakdown['pago_inicial_sin_legales'] ?? 0) }}</div>
+            <div class="text-[11px] text-ink-500 mt-0.5">{{ $r->payment_initial_percentage }}% {{ __('del precio de la unidad') }}</div>
+        </div>
+        {{-- Los costos legales van aparte: no forman parte del precio de la unidad. --}}
+        <div class="border border-ink-100 rounded-lg px-3 py-2.5">
+            <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Costos legales') }}</div>
+            <div class="text-[16px] font-bold text-ink-950 mt-0.5">${{ number_format($breakdown['costos_legales'] ?? 0) }}</div>
+            <div class="text-[11px] text-ink-500 mt-0.5">{{ __('Se abonan junto al pago inicial') }}</div>
         </div>
         <div class="border border-ink-100 rounded-lg px-3 py-2.5">
             <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Durante construcción') }}</div>
@@ -63,10 +69,17 @@
             <div class="text-[16px] font-bold text-ink-950 mt-0.5">${{ number_format($breakdown['pago_entrega'] ?? 0) }}</div>
             <div class="text-[11px] text-ink-500 mt-0.5">{{ $r->payment_delivery_percentage }}%</div>
         </div>
-        <div class="sm:col-span-2 lg:col-span-3 border border-ink-100 rounded-lg px-3 py-2.5 flex items-center justify-between">
-            <div>
-                <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Total contrato') }}</div>
-                <div class="text-[18px] font-bold text-ink-950">${{ number_format($totalPrice) }}</div>
+        <div class="sm:col-span-2 lg:col-span-4 border border-ink-100 rounded-lg px-3 py-2.5 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-6">
+                <div>
+                    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('Total contrato') }}</div>
+                    <div class="text-[18px] font-bold text-ink-950">${{ number_format($totalPrice) }}</div>
+                </div>
+                <div class="pl-6 border-l border-ink-100">
+                    <div class="text-[10px] uppercase font-semibold text-ink-400 tracking-wide">{{ __('A pagar al firmar') }}</div>
+                    <div class="text-[18px] font-bold text-ink-950">${{ number_format($breakdown['total_al_firmar'] ?? 0) }}</div>
+                    <div class="text-[10px] text-ink-500">{{ __('Inicial + costos legales') }}</div>
+                </div>
             </div>
             @if(! empty($r->budget_notes))
                 <div class="max-w-[60%] text-[12px] text-ink-700">
