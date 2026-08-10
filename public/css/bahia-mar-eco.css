@@ -1029,6 +1029,27 @@ body{ background-color:var(--eco-page); }
   background:linear-gradient(155deg, #F6FAF2 0%, #EDF4E7 52%, #E4EEDD 100%);
 }
 
+/* ── 12.1b Las tarjetas en blanco ──────────────────────────────────────────
+   Una que otra sale en papel blanco en vez de en salvia. No es una excepción
+   caprichosa: veinte superficies idénticas —aunque sean bonitas— se leen como
+   una malla, y lo que hace que un listado respire es que haya respiración.
+   La blanca es el silencio entre las verdes; y de paso, al lado de una
+   blanca, la salvia se lee MÁS verde de lo que se lee entre salvias.
+
+   Es la superficie lo único que cambia: la tinta, el chrome, la retícula de
+   specs y el filo siguen siendo los verdes de 12.3 y 12.4. Si además se
+   neutralizara el chrome, la tarjeta blanca dejaría de pertenecer a la
+   familia y volveríamos exactamente a la tarjeta corporativa que la v7.2
+   viene a quitar.
+
+   No llevan hoja nunca — el reparto está en el JS (`esBlanca`), y el porqué
+   también: la hoja sobre blanco es la sombra gris de la v7.1, justo lo que
+   se descartó por apagar el verde en vez de sumarlo.                       */
+.fg-units-grid > .fg-card[data-eco-surface="blanca"],
+.fg-units-grid > .fg-card[data-eco-surface="blanca"] .fg-card-inner{
+  background:linear-gradient(155deg, #FFFFFF 0%, #FDFEFC 54%, #F6FAF3 100%);
+}
+
 /* Grano de papel, la mitad de fuerza que en las bandas: en una superficie de
    este tamaño el mismo 3,5% se lee como textura sucia en vez de como papel.
 

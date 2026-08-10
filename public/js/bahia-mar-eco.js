@@ -177,13 +177,38 @@
     return SOMBRAS[n % SOMBRAS.length];
   }
 
+  /* Una que otra tarjeta sale en papel blanco en vez de en salvia (12.1b).
+
+     Ciclo de 11 —primo, y distinto del 17 de las hojas— por lo mismo de
+     siempre: ningún factor común con las anchuras del grid, así que las
+     blancas no pueden caer en columna. Que 11 y 17 sean coprimos, además,
+     hace que las dos rejillas se desfasen entre sí y no aparezca la pareja
+     "hoja + blanca" siempre en la misma posición relativa.
+
+     ⚠️ La hoja MANDA sobre la blanca, no al revés. Si una tarjeta que toca
+     hoja cayera además en blanca, o perdemos una hoja de las pocas que hay, o
+     la ponemos sobre blanco — que es la sombra gris de la v7.1, descartada
+     por apagar el verde. Resolviéndolo a favor de la hoja, el reparto de
+     vegetación queda intacto y las blancas salen siempre limpias.          */
+  const CICLO_BLANCA  = 11;
+  const PATRON_BLANCA = [2, 8];
+
+  function esBlanca(i) {
+    return !hojaDe(i) && PATRON_BLANCA.includes(i % CICLO_BLANCA);
+  }
+
   function pintarSombrasCatalogo() {
     document.querySelectorAll('.fg-units-grid > .fg-card').forEach((card, i) => {
       const especie = hojaDe(i);
       const actual  = card.querySelector('.eco-shade-card');
 
-      /* Al filtrar, una tarjeta puede caer en otro índice y quedarse con una
-         hoja que ya no le toca. Se retira antes de decidir nada más. */
+      /* La superficie se decide en cada pasada: al filtrar, una tarjeta puede
+         caer en otro índice y le toca otra cosa. */
+      if (esBlanca(i)) card.dataset.ecoSurface = 'blanca';
+      else             delete card.dataset.ecoSurface;
+
+      /* Lo mismo con la hoja: la que ya no le toca se retira en vez de
+         quedarse pegada. */
       if (!especie) {
         if (actual) actual.remove();
         delete card.dataset.ecoShade;
