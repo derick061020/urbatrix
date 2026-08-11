@@ -113,6 +113,33 @@ class Unit extends Model
         static::deleting(function (Unit $unit) {
             \App\Models\Wishlist::where('unit_id', $unit->id)->delete();
         });
+
+        // Última red de seguridad: venga de donde venga (formulario, importación,
+        // descuentos masivos, reservas…), ningún valor vacío llega a una columna
+        // NOT NULL. Sin esto, un descuento en blanco tira "Column 'discount'
+        // cannot be null" y la petición muere con un 500.
+        static::saving(function (Unit $unit) {
+            // getAttributes() devuelve los valores crudos: leerlos con getAttribute()
+            // aplicaría los casts y un '' en una columna decimal ya reventaría acá.
+            foreach ($unit->getAttributes() as $key => $value) {
+                if ($value !== null && $value !== '') {
+                    continue;
+                }
+
+                if (in_array($key, static::ZERO_IF_EMPTY, true)) {
+                    $unit->setAttribute($key, 0);
+                    continue;
+                }
+
+                // Texto obligatorio en blanco: se conserva lo que ya había.
+                if (in_array($key, static::SKIP_IF_EMPTY, true)) {
+                    $fallback = $unit->getOriginal($key) ?? ($key === 'status' ? 'AVAILABLE' : null);
+                    if ($fallback !== null) {
+                        $unit->setAttribute($key, $fallback);
+                    }
+                }
+            }
+        });
     }
 
     public function wishlists()
