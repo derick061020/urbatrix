@@ -10,8 +10,8 @@
             --ink-600: #5b6b66;
             --ink-400: #93a29d;
             --line: #e4e9e7;
-            --brand: #074540;
-            --sand: #faf8f4;
+            --brand: #5c7c68;
+            --sand: #f6f8f6;
         }
         * { box-sizing: border-box; }
         body {
