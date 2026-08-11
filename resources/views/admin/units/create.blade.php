@@ -7,6 +7,12 @@
 @section('content')
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
+    @if(session('error'))
+        <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px] flex items-start gap-2">
+            <i class="pi pi-exclamation-triangle mt-0.5"></i><span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     @if($errors->any())
         <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px] space-y-0.5">
             @foreach($errors->all() as $err)<div>{{ $err }}</div>@endforeach

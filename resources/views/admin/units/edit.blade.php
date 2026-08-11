@@ -19,6 +19,11 @@
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
 
     @if(session('success'))<div class="px-4 py-2 rounded-lg bg-ok-soft text-ok-dark text-[12px]">{{ session('success') }}</div>@endif
+    @if(session('error'))
+        <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px] flex items-start gap-2">
+            <i class="pi pi-exclamation-triangle mt-0.5"></i><span>{{ session('error') }}</span>
+        </div>
+    @endif
     @if($errors->any())
         <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px] space-y-0.5">
             @foreach($errors->all() as $err)<div>{{ $err }}</div>@endforeach
@@ -554,7 +559,8 @@ document.querySelectorAll('.image-upload-container').forEach(function (uploadCon
         .catch(err => {
             if (err && err.validation) {
                 const first = Object.values(err.validation.errors || {})[0];
-                setStatus('pi-exclamation-triangle', first ? first[0] : 'Error de validación', 'text-err');
+                const msg = first ? first[0] : (err.validation.message || 'Error de validación');
+                setStatus('pi-exclamation-triangle', msg, 'text-err');
             } else {
                 console.error('Autosave failed', err);
                 setStatus('pi-exclamation-triangle', 'Error al guardar', 'text-err');
