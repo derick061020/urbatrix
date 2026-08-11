@@ -174,6 +174,51 @@ class Unit extends Model
         return $this->reserved_until && $this->reserved_until->isFuture();
     }
 
+    /**
+     * Columnas numéricas/booleanas que en la base son NOT NULL con default 0.
+     * Un input vacío del formulario llega como null (ConvertEmptyStringsToNull)
+     * y MySQL lo rechaza con "Column 'x' cannot be null", así que los pasamos
+     * a 0 antes de guardar. La lista incluye columnas de ambos proyectos
+     * (Bahía Mar y Makai); solo se tocan las claves presentes en el payload.
+     */
+    public const ZERO_IF_EMPTY = [
+        'price', 'discount', 'additional_parking', 'price_adjustment',
+        'levies', 'rates', 'est_rental',
+        'expense_1', 'expense_2', 'expense_3',
+        'bedrooms', 'bathrooms', 'parking_bays', 'pools',
+        'internal_area', 'external_area', 'total_area',
+        'shortlisted_count', 'images_count', 'views_today', 'views_total',
+        'public', 'pre_arranged', 'plot', 'aircon', 'fully_furnished',
+        'guaranteed_rental', 'override_action', 'bypass_launch_date',
+        'display_on_home_page', 'show_enquire_button', 'set_discount_globally',
+        'hide_original_price', 'show_price_alternative',
+        'is_high_demand', 'is_second_chance',
+    ];
+
+    /** Columnas de texto NOT NULL: si llegan vacías se ignoran (se conserva el valor actual). */
+    public const SKIP_IF_EMPTY = ['name', 'status', 'type'];
+
+    /**
+     * Normaliza un payload de formulario antes de create()/update():
+     * vacíos -> 0 en las columnas NOT NULL, '' -> null en las que aceptan null,
+     * y fuera del payload las columnas de texto obligatorias que vengan vacías.
+     */
+    public static function sanitizePayload(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($value !== null && $value !== '') {
+                continue;
+            }
+            if (in_array($key, static::SKIP_IF_EMPTY, true)) {
+                unset($data[$key]);
+                continue;
+            }
+            $data[$key] = in_array($key, static::ZERO_IF_EMPTY, true) ? 0 : null;
+        }
+
+        return $data;
+    }
+
     protected $casts = [
         'price' => 'decimal:2',
         'public' => 'boolean',

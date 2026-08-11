@@ -395,13 +395,29 @@ class AdminController extends Controller
             'type'   => 'required|string|max:50',
             'price'  => 'required|numeric|min:0',
             'status' => 'required|in:AVAILABLE,SOLD,PENDING,RESERVED,HELD',
+        ], [], [
+            'name'   => __('nombre'),
+            'type'   => __('tipo'),
+            'price'  => __('precio'),
+            'status' => __('estado'),
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $unit = Unit::create($request->except(['_token', '_method']));
+        // Los campos del formulario que quedan vacíos llegan como null y varias
+        // columnas de `units` son NOT NULL: normalizamos antes de insertar.
+        $payload = Unit::sanitizePayload($request->except(['_token', '_method']));
+
+        try {
+            $unit = Unit::create($payload);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->back()->withInput()
+                ->with('error', __('No pudimos crear la unidad. Revisá los datos e intentá de nuevo; si el problema sigue, avisale al equipo técnico.'));
+        }
 
         return redirect()->route('admin.units.edit', $unit->id)
             ->with('success', __('Unidad creada. Ahora podés subir imágenes y completar el resto de la información.'));
@@ -480,7 +496,22 @@ class AdminController extends Controller
             $validated['agent_id'] = null;
         }
 
-        $unit->update($validated);
+        // Mismo criterio que en storeUnit: vacío -> 0 en columnas NOT NULL.
+        $validated = Unit::sanitizePayload($validated);
+
+        try {
+            $unit->update($validated);
+        } catch (\Throwable $e) {
+            report($e);
+
+            $message = __('No pudimos guardar los cambios. Revisá los datos e intentá de nuevo; si el problema sigue, avisale al equipo técnico.');
+
+            if ($request->expectsJson()) {
+                return response()->json(['ok' => false, 'message' => $message], 422);
+            }
+
+            return redirect()->back()->withInput()->with('error', $message);
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
