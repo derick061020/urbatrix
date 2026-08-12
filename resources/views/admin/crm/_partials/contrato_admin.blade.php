@@ -13,7 +13,7 @@
     $lastObs  = ! empty($obs) ? end($obs) : null;
     $awaitingClient = $lastObs && ($lastObs['from'] ?? '') === 'admin' && ($lastObs['kind'] ?? null) !== 'upload' && ! $accepted;
 
-    $title = $d->document_type === 'purchase_promise' ? 'Promesa de compraventa' : 'Contrato';
+    $title = $d->document_type === 'purchase_promise' ? __('Promesa de Compraventa') : __('Contrato');
     if ($signed)            { $stateLabel = ['Firmado por el cliente', 'ok']; }
     elseif ($accepted)      { $stateLabel = ['Aceptado · pendiente de firma', 'info']; }
     elseif ($awaitingClient){ $stateLabel = ['Esperando respuesta del cliente', 'info']; }

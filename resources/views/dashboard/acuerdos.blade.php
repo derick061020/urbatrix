@@ -231,7 +231,7 @@
                         $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
                         [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
                         $createdAt = (is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : '';
-                        $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
+                        $docTitle = \App\Support\DocumentTitle::make(is_object($doc) ? ($doc->title ?? '') : ($doc['title'] ?? ''), $docType) ?: $typeLabel;
                         $docId = is_object($doc) ? $doc->id : $doc['id'];
 
                         /* Estado "en espera de cambios": el cliente pidió una revisión y aún
@@ -295,7 +295,7 @@
                         $docType = is_object($doc) ? ($doc->document_type ?? '') : ($doc['document_type'] ?? '');
                         [$typeLabel, $typeColor, $typeIcon] = $typeMeta[$docType] ?? ['Documento', 'ink-500', 'pi-file'];
                         $signedAt = (is_object($doc) ? ($doc->signed_at ?? '') : ($doc['signed_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->signed_at : $doc['signed_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : ((is_object($doc) ? ($doc->created_at ?? '') : ($doc['created_at'] ?? '')) ? \Carbon\Carbon::parse(is_object($doc) ? $doc->created_at : $doc['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY') : '');
-                        $docTitle = is_object($doc) ? ($doc->title ?? $typeLabel) : ($doc['title'] ?? $typeLabel);
+                        $docTitle = \App\Support\DocumentTitle::make(is_object($doc) ? ($doc->title ?? '') : ($doc['title'] ?? ''), $docType) ?: $typeLabel;
                         $docId = is_object($doc) ? $doc->id : $doc['id'];
                     @endphp
                     <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 transition-colors">
@@ -358,7 +358,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-10 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
                                     <div>
-                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->title ?? ($signedTypeLabel[$d->document_type] ?? __('Documento')) }}</div>
+                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->display_title }}</div>
                                         <div class="text-[11px] text-ink-500">{{ $signedTypeLabel[$d->document_type] ?? $d->document_type }}</div>
                                     </div>
                                 </div>

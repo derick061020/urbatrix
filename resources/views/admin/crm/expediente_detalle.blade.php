@@ -290,7 +290,7 @@
                         </div>
                         <div class="flex-1">
                             <p class="text-sm text-gray-600 mb-2">
-                                {{ $paymentPlanDocument->title ?? 'Plan de Pagos' }}
+                                {{ $paymentPlanDocument?->display_title ?? __('Plan de Pagos') }}
                             </p>
                             
                             <div class="flex gap-2">

@@ -193,7 +193,7 @@ class NotificationController extends Controller
                     'icon'       => 'pi-file',
                     'color'      => 'blue',
                     'title'      => __('Documento por revisar'),
-                    'body'       => $d->title ?: $d->filename,
+                    'body'       => $d->title ? $d->display_title : $d->filename,
                     'created_at' => $d->updated_at ?: $d->created_at,
                     'url'        => route('dashboard.acuerdos'),
                 ]);

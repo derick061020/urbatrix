@@ -2750,5 +2750,7 @@
   "Monto pagado mayor al programado": "Paid amount greater than scheduled",
   "Editar / corregir el pago": "Edit / correct the payment",
   "El monto pagado no puede superar el monto programado de la cuota.": "The paid amount cannot exceed the instalment's scheduled amount.",
-  "Pago actualizado correctamente.": "Payment updated successfully."
+  "Pago actualizado correctamente.": "Payment updated successfully.",
+  "Registro fiscal / RNC": "Tax ID / Business registration",
+  "firmado": "signed"
 }

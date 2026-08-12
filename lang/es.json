@@ -2750,5 +2750,7 @@
   "Monto pagado mayor al programado": "Monto pagado mayor al programado",
   "Editar / corregir el pago": "Editar / corregir el pago",
   "El monto pagado no puede superar el monto programado de la cuota.": "El monto pagado no puede superar el monto programado de la cuota.",
-  "Pago actualizado correctamente.": "Pago actualizado correctamente."
+  "Pago actualizado correctamente.": "Pago actualizado correctamente.",
+  "Registro fiscal / RNC": "Registro fiscal / RNC",
+  "firmado": "firmado"
 }

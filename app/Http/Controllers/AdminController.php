@@ -1467,7 +1467,7 @@ class AdminController extends Controller
             $bandeja->push((object) [
                 'cat'    => $isKyc ? 'kyc' : ($isContract ? 'contrato' : 'documento'),
                 'ty'     => $isKyc ? 'KYC' : ($isContract ? 'Contrato' : 'Documento'),
-                'title'  => ($d->title ?: ucfirst((string) ($d->document_type ?? __('Documento')))).' — '.($isKyc ? __('verificación de identidad') : __('por revisar')),
+                'title'  => $d->display_title.' — '.($isKyc ? __('verificación de identidad') : __('por revisar')),
                 'sub'    => trim($cliente.' · '.$unidad.($r?->reservation_code ? ' · '.$r->reservation_code : ''), ' ·'),
                 'date'   => $d->updated_at ?? $d->created_at,
                 'url'    => $r ? route('admin.crm.expediente.detalle', $r->id) : route('admin.crm.documentos'),
@@ -3673,7 +3673,7 @@ class AdminController extends Controller
     {
         $q = Document::with('reservation');
         if ($cutoff) $q->where('updated_at', '>=', $cutoff);
-        $rows = $q->get()->map(fn($d) => [$d->title, $d->document_type, $d->status, optional($d->reservation)->first_name.' '.optional($d->reservation)->last_name, $d->updated_at])->all();
+        $rows = $q->get()->map(fn($d) => [$d->display_title, $d->document_type, $d->status, optional($d->reservation)->first_name.' '.optional($d->reservation)->last_name, $d->updated_at])->all();
         return ['documentos', ['Título','Tipo','Estado','Cliente','Actualizado'], $rows];
     }
     private function exportContratos($cutoff)

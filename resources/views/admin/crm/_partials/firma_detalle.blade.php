@@ -14,17 +14,18 @@
     try { $sigWhen = $sigTs ? \Carbon\Carbon::parse($sigTs) : $document->signed_at; }
     catch (\Throwable $e) { $sigWhen = $document->signed_at; }
 
-    $sigTypeLabel = [
-        'payment_plan'     => 'Plan de pagos',
-        'purchase_promise' => 'Promesa de compraventa',
-        'contract'         => 'Contrato',
-    ][$document->document_type] ?? ($document->title ?: 'Documento');
+    $sigTypeLabel = match ($document->document_type) {
+        'payment_plan'     => __('Plan de Pagos'),
+        'purchase_promise' => __('Promesa de Compraventa'),
+        'contract'         => __('Contrato'),
+        default            => $document->display_title,
+    };
 @endphp
 
 <div class="crm-card overflow-hidden">
     <div class="px-4 py-3 bg-ok-soft/40 border-b border-ok/20 flex items-center gap-2">
         <i class="pi pi-verified text-ok-dark"></i>
-        <div class="text-[13px] font-bold text-ink-700">{{ $sigTypeLabel }} · firmado</div>
+        <div class="text-[13px] font-bold text-ink-700">{{ $sigTypeLabel }} · {{ __('firmado') }}</div>
         <span class="crm-pill bg-ok-soft text-ok ml-auto">{{ __('Firmado') }}</span>
     </div>
     <div class="p-4 grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4">

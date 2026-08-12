@@ -131,6 +131,16 @@ class Document extends Model
     }
 
     /**
+     * Nombre del documento traducido al idioma activo. El título se guarda con
+     * el idioma que hubiera al crearlo, así que se retraduce al mostrarlo.
+     * Úsalo en lugar de $document->title en cualquier vista.
+     */
+    public function getDisplayTitleAttribute(): string
+    {
+        return \App\Support\DocumentTitle::make($this->title, $this->document_type);
+    }
+
+    /**
      * Get status label with color
      */
     public function getStatusLabelAttribute()

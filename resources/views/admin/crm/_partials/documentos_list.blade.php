@@ -37,7 +37,7 @@
                     $st = $statusLabel[$d->status] ?? ['Pendiente','warn'];
                     $previewPayload = [
                         'url' => route('documents.preview', $d->id),
-                        'title' => $d->title ?: 'Documento',
+                        'title' => $d->display_title,
                         'filename' => $d->filename ?: basename((string) $d->file_path),
                     ];
                 @endphp
@@ -47,7 +47,7 @@
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-9 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
                             <div>
-                                <div class="text-[13px] font-semibold text-ink-900">{{ $d->title }}</div>
+                                <div class="text-[13px] font-semibold text-ink-900">{{ $d->display_title }}</div>
                                 <div class="text-[11px] text-ink-500">Subido {{ optional($d->generated_at ?? $d->created_at)->format('Y-m-d') }}</div>
                             </div>
                         </div>

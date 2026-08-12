@@ -183,7 +183,7 @@ class SearchController extends Controller
             ->get(['id', 'title', 'filename', 'document_type']);
 
         $docItems = $docs->map(fn ($d) => [
-            'label' => $d->title ?: $d->filename,
+            'label' => $d->title ? $d->display_title : $d->filename,
             'sub'   => $d->document_type,
             'icon'  => 'pi-file',
             'url'   => route('dashboard.documents'),

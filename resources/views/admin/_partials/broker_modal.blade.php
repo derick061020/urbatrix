@@ -99,14 +99,14 @@
                             <div class="px-4 py-3 flex items-center gap-3">
                                 <span class="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi {{ $doc->icon }}"></i></span>
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-[13px] font-semibold text-ink-900 truncate">{{ $doc->title }}</div>
+                                    <div class="text-[13px] font-semibold text-ink-900 truncate">{{ \App\Support\DocumentTitle::make($doc->title) }}</div>
                                     <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }} · {{ $doc->downloads }} descargas</div>
                                 </div>
                                 <button type="button" class="text-ink-500 hover:text-brand p-1" title="{{ __('Ver') }}"
-                                    onclick="openBrokerDoc({{ \Illuminate\Support\Js::from(['title'=>$doc->title,'format'=>strtoupper($doc->format),'kind'=>$doc->previewKind(),'url'=>$doc->fileUrl(),'download'=>$doc->downloadUrl()]) }})"><i class="pi pi-eye"></i></button>
+                                    onclick="openBrokerDoc({{ \Illuminate\Support\Js::from(['title'=>\App\Support\DocumentTitle::make($doc->title),'format'=>strtoupper($doc->format),'kind'=>$doc->previewKind(),'url'=>$doc->fileUrl(),'download'=>$doc->downloadUrl()]) }})"><i class="pi pi-eye"></i></button>
                                 <a href="{{ $doc->downloadUrl() }}" target="_blank" class="text-ink-500 hover:text-brand p-1" title="{{ __('Descargar') }}"><i class="pi pi-download"></i></a>
                                 <button type="button" class="text-ink-400 hover:text-err p-1" title="{{ __('Eliminar') }}"
-                                    onclick="openBrokerDocDelete({{ \Illuminate\Support\Js::from(['url'=>route('admin.agents.documents.destroy', [$b->id, $doc->id]),'title'=>$doc->title]) }})"><i class="pi pi-trash"></i></button>
+                                    onclick="openBrokerDocDelete({{ \Illuminate\Support\Js::from(['url'=>route('admin.agents.documents.destroy', [$b->id, $doc->id]),'title'=>\App\Support\DocumentTitle::make($doc->title)]) }})"><i class="pi pi-trash"></i></button>
                             </div>
                         @empty
                             <div class="px-4 py-8 text-center text-[12px] text-ink-400">{{ __('Este broker todavía no tiene contratos. Subí el primero arriba.') }}</div>

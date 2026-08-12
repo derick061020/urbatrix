@@ -232,13 +232,15 @@ class DocumentDataHelper
                 'view'   => 'documents.plan-de-pagos',
                 'data'   => fn () => self::paymentPlan($reservation),
                 'prefix' => 'plan_de_pagos',
-                'title'  => __('Plan de Pagos'),
+                // El título se guarda en español (idioma canónico) y se traduce
+                // al mostrarlo con App\Support\DocumentTitle.
+                'title'  => 'Plan de Pagos',
             ],
             'purchase_promise' => [
                 'view'   => 'documents.promesa-compraventa',
                 'data'   => fn () => self::purchasePromise($reservation),
                 'prefix' => 'promesa_compraventa',
-                'title'  => __('Promesa de Compraventa'),
+                'title'  => 'Promesa de Compraventa',
             ],
         ][$type];
 

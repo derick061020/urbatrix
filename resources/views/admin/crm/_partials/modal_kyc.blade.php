@@ -11,7 +11,7 @@
         : null;
     $kycPreviewPayload = $kycDoc?->file_path ? [
         'url' => route('documents.preview', $kycDoc->id),
-        'title' => 'Documento de identidad',
+        'title' => __('Documento de identidad'),
         'filename' => $kycDoc->filename ?: basename((string) $kycDoc->file_path),
     ] : null;
 

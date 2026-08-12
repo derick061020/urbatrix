@@ -198,7 +198,7 @@
                                     }
                                     $previewPayload = [
                                         'url' => route('documents.preview', $d->id),
-                                        'title' => $d->title ?: 'Documento',
+                                        'title' => $d->display_title,
                                         'filename' => $d->filename ?: basename((string) $d->file_path),
                                     ];
                                 @endphp
@@ -207,7 +207,7 @@
                                         <div class="flex items-center gap-3">
                                             <div class="w-8 h-9 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
                                             <div>
-                                                <div class="text-[13px] font-semibold text-ink-900">{{ $d->title }}</div>
+                                                <div class="text-[13px] font-semibold text-ink-900">{{ $d->display_title }}</div>
                                                 @if($isRequested && ! $hasFile)
                                                     <div class="text-[11px] text-ink-500">{{ data_get($d->metadata, 'description') ?: 'Solicitado al cliente' }}</div>
                                                 @else
@@ -293,7 +293,7 @@
                                         @php
                                             $receiptPreviewPayload = [
                                                 'url' => asset('storage/'.$p->receipt_path),
-                                                'title' => 'Comprobante de pago',
+                                                'title' => __('Comprobante de pago'),
                                                 'filename' => basename((string) $p->receipt_path),
                                             ];
                                         @endphp
@@ -389,7 +389,7 @@
                                         <div class="inline-flex items-center gap-1 justify-end">
                                             @if($p->receipt_path)
                                                 <button type="button"
-                                                        onclick="openDocumentPreview(@js(['url' => asset('storage/'.$p->receipt_path), 'title' => 'Comprobante de pago', 'filename' => basename((string) $p->receipt_path)]))"
+                                                        onclick="openDocumentPreview(@js(['url' => asset('storage/'.$p->receipt_path), 'title' => __('Comprobante de pago'), 'filename' => basename((string) $p->receipt_path)]))"
                                                         class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver comprobante') }}"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                             @endif
                                             @if($p->status !== 'paid')
@@ -482,7 +482,7 @@
                         @php
                             $events = collect();
                             foreach ($reservation->documents as $d) {
-                                $events->push(['ok', $fullName.' subió documento "'.$d->title.'"', $d->updated_at, $d->status === 'approved' ? 'ok' : ($d->status === 'rejected' ? 'err' : 'warn')]);
+                                $events->push(['ok', $fullName.' subió documento "'.$d->display_title.'"', $d->updated_at, $d->status === 'approved' ? 'ok' : ($d->status === 'rejected' ? 'err' : 'warn')]);
                             }
                             foreach ($reservation->payments as $p) {
                                 $events->push(['info', 'Pago registrado: '.$p->label.' por $'.number_format($p->amount), $p->paid_at ?? $p->created_at, $p->status === 'paid' ? 'ok' : 'warn']);

@@ -113,7 +113,7 @@
                         <div class="w-9 h-9 rounded-full bg-ink-100 flex items-center justify-center text-ink-500 shrink-0"><i class="pi pi-file"></i></div>
                         <div class="flex-1 min-w-0">
                             <div class="text-[13px] font-semibold text-ink-950 flex items-center gap-2">
-                                {{ $d->title }}
+                                {{ $d->display_title }}
                                 @if($d->status === 'rejected')
                                     <span class="cli-pill bg-err-soft text-err">{{ __('RECHAZADO') }}</span>
                                 @endif
@@ -173,7 +173,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-10 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-id-card"></i></div>
                                     <div>
-                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->title ?? ($typeLabel[$d->document_type] ?? __('Documento')) }}</div>
+                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->display_title }}</div>
                                         <div class="text-[11px] text-ink-500">{{ $typeLabel[$d->document_type] ?? $d->document_type }}</div>
                                     </div>
                                 </div>
@@ -183,7 +183,7 @@
                             <td class="px-3 py-4 text-right">
                                 <div class="flex items-center gap-2 justify-end">
                                     @if($d->file_path)
-                                        <button type="button" onclick="openDocumentPreview({{ json_encode(['url' => route('documents.preview', $d->id), 'title' => $d->title ?? ($typeLabel[$d->document_type] ?? __('Documento')), 'filename' => $d->filename ?? basename((string) $d->file_path)]) }})" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                        <button type="button" onclick="openDocumentPreview({{ json_encode(['url' => route('documents.preview', $d->id), 'title' => $d->display_title, 'filename' => $d->filename ?? basename((string) $d->file_path)]) }})" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                         <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                     @else
                                         <span class="text-[11px] text-ink-400">{{ __('Sin archivo') }}</span>
@@ -224,7 +224,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-10 rounded bg-ink-100 flex items-center justify-center text-ink-500"><i class="pi pi-file"></i></div>
                                     <div>
-                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->title }}</div>
+                                        <div class="text-[13px] font-semibold text-ink-950">{{ $d->display_title }}</div>
                                         @if(data_get($d->metadata, 'description'))
                                             <div class="text-[11px] text-ink-500">{{ data_get($d->metadata, 'description') }}</div>
                                         @endif
@@ -235,7 +235,7 @@
                             <td class="px-3 py-4 text-[12px] text-ink-700">{{ optional($d->generated_at ?? $d->created_at)->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMM YYYY' : 'MMM D, YYYY') }}</td>
                             <td class="px-3 py-4 text-right">
                                 <div class="flex items-center gap-2 justify-end">
-                                    <button type="button" onclick="openDocumentPreview({{ json_encode(['url' => route('documents.preview', $d->id), 'title' => $d->title, 'filename' => $d->filename ?? basename((string) $d->file_path)]) }})" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
+                                    <button type="button" onclick="openDocumentPreview({{ json_encode(['url' => route('documents.preview', $d->id), 'title' => $d->display_title, 'filename' => $d->filename ?? basename((string) $d->file_path)]) }})" class="cli-btn cli-btn-ghost text-[11px] py-1 px-3"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                     <a href="{{ route('documents.download', $d->id) }}" class="cli-btn cli-btn-primary text-[11px] py-1 px-3"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                 </div>
                             </td>
