@@ -94,13 +94,8 @@
             <input type="hidden" id="nr-uploading" value="">
             <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Comprobante de pago') }} <span class="text-ink-400 font-normal">({{ __('opcional') }})</span></label>
-                <div class="border-2 border-dashed border-ink-200 rounded-xl py-4 px-4 text-center cursor-pointer hover:border-brand transition-colors mt-1"
-                     onclick="this.querySelector('input[type=file]').click()">
-                    <i class="pi pi-cloud-upload text-ink-400 text-[18px]"></i>
-                    <div class="text-[12px] font-semibold text-ink-700 mt-1"><span id="nr-receipt-name">{{ __('Adjuntar recibo firmado y sellado') }}</span></div>
-                    <div class="text-[11px] text-ink-500 mt-0.5">{{ __('PDF, JPG o PNG · máx. 50 MB') }}</div>
-                    <input type="file" id="nr-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="nrReceiptSelected(this)">
-                </div>
+                <div class="mt-1.5" id="nr-morph"></div>
+                <input type="file" id="nr-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">
@@ -227,54 +222,42 @@
 })();
 
 // Sube el comprobante de la seña por chunks (~512 KB) para evitar el 413.
-async function nrReceiptSelected(input) {
-    var file = input.files && input.files[0];
-    if (!file) return;
-
-    var nameEl = document.getElementById('nr-receipt-name');
+// UploadMorph.chunked sube y dibuja el progreso; acá sólo guardamos la ruta.
+(function () {
+    var input  = document.getElementById('nr-receipt-file');
     var pathEl = document.getElementById('nr-receipt-path');
     var upEl   = document.getElementById('nr-uploading');
-    var csrf   = document.querySelector('form[data-nueva-reserva] input[name=_token]')?.value
-                 || document.querySelector('meta[name=csrf-token]')?.content || '';
-    var chunkSize = 512 * 1024;
-    var total    = Math.ceil(file.size / chunkSize) || 1;
-    var uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    if (!input || !window.UploadMorph) return;
 
-    if (pathEl) pathEl.value = '';
-    if (upEl)   upEl.value = '1';
+    var morph = UploadMorph.mount(input, {
+        into: document.getElementById('nr-morph'),
+        emptyName: @json(__('Adjuntar recibo firmado y sellado')),
+        emptySub: @json(__('o arrástralo aquí · PDF, JPG o PNG · máx. 50 MB')),
+        onSelect: function (file) { send(file); }
+    });
 
-    try {
-        for (var i = 0; i < total; i++) {
-            var fd = new FormData();
-            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
-            fd.append('upload_id', uploadId);
-            fd.append('index', i);
-            fd.append('total', total);
-            fd.append('name', file.name);
-            fd.append('_token', csrf);
+    function send(file) {
+        var csrf = document.querySelector('form[data-nueva-reserva] input[name=_token]')
+                   || document.querySelector('meta[name=csrf-token]');
+        var token = csrf ? (csrf.value || csrf.content || '') : '';
+        pathEl.value = '';
+        upEl.value = '1';
 
-            var res = await fetch('{{ route('admin.crm.payment.receipt') }}', {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: fd,
-                credentials: 'same-origin',
+        UploadMorph.chunked(morph, file, '{{ route('admin.crm.payment.receipt') }}', {}, token)
+            .then(function (d) {
+                pathEl.value = d.path || '';
+                upEl.value = '';
+                morph.done(@json(__('Comprobante subido')), {
+                    label: @json(__('Cambiar')),
+                    onClick: function () { pathEl.value = ''; morph.clear(); }
+                });
+            })
+            .catch(function (e) {
+                pathEl.value = '';
+                upEl.value = '';
+                morph.fail(e.message || @json(__('No se pudo subir el comprobante.')),
+                           function () { send(file); });
             });
-            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413).');
-            var d = await res.json().catch(function () { return {}; });
-            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante.');
-
-            if (nameEl) nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
-            if (d.done) {
-                if (pathEl) pathEl.value = d.path || '';
-                if (nameEl) nameEl.textContent = file.name;
-            }
-        }
-    } catch (e) {
-        if (pathEl) pathEl.value = '';
-        if (nameEl) nameEl.textContent = 'Adjuntar recibo firmado y sellado';
-        alert(e.message || 'No se pudo subir el comprobante.');
-    } finally {
-        if (upEl) upEl.value = '';
     }
-}
+})();
 </script>

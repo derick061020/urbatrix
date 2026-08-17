@@ -64,11 +64,17 @@
 
     @if(! $signed)
         <div class="p-5 space-y-3">
-            <form method="POST" action="{{ route('admin.crm.contract.upload', $d->id) }}" enctype="multipart/form-data" class="space-y-3 m-0">
+            <form method="POST" action="{{ route('admin.crm.contract.upload', $d->id) }}" enctype="multipart/form-data" class="space-y-3 m-0"
+                  data-morph-form
+                  data-morph-empty="{{ __('Seleccionar contrato modificado') }}"
+                  data-morph-hint="{{ __('o arrástralo aquí · PDF, DOC o DOCX') }}"
+                  data-morph-label="{{ __('Cambiar') }}"
+                  data-morph-done="{{ __('Versión enviada al cliente') }}">
                 @csrf
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Subir versión modificada del contrato') }}</label>
-                    <input type="file" name="file" required accept=".pdf,.doc,.docx" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
+                    <div class="mt-1.5" data-morph-slot></div>
+                    <input type="file" name="file" required accept=".pdf,.doc,.docx" class="hidden">
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Mensaje al cliente (opcional)') }}</label>
@@ -105,10 +111,12 @@
                     @csrf
                     <div>
                         <label class="text-[12px] font-semibold text-ink-700">{{ __('Versión firmada') }}</label>
-                        <input type="file" name="file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
+                        {{-- El pill elige y muestra el archivo; la subida por
+                             chunks la dispara el submit de este form. --}}
+                        <div class="mt-1.5" data-signed-slot></div>
+                        <input type="file" name="file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="hidden">
                     </div>
                     <div class="flex items-center justify-end gap-3">
-                        <span class="signed-upload-progress text-[11px] text-ink-500"></span>
                         <button type="submit" class="crm-btn crm-btn-primary"><i class="pi pi-upload"></i> {{ __('Subir y aprobar') }}</button>
                     </div>
                 </form>
