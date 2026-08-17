@@ -1663,6 +1663,15 @@
 
     // Sube una imagen en trozos de 512 KB y agrega su ruta a hsData.
     async function hsUpload(file){
+        // Estas imágenes se pintan a lo sumo al ancho del viewport, pero el
+        // navegador del visitante decodifica el original entero y lo mantiene
+        // como textura: una foto de 4096x2748 son 43 MB de VRAM, y el slider
+        // vive en una capa GPU permanente junto al hero. Se reduce a 2560px
+        // (suficiente para pantallas 2x) antes de subir.
+        if (window.UploadMorph) {
+            try { file = await UploadMorph.downscaleImage(file, 2560, 0.86); } catch (e) {}
+        }
+
         const chunkSize = 512 * 1024;
         const total = Math.ceil(file.size / chunkSize) || 1;
         const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);

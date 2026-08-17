@@ -519,12 +519,6 @@
       -webkit-user-drag: none;
       opacity: 0;
       transform: translateY(105%);
-      will-change: transform, opacity;
-    }
-    .fg-hero-clouds {
-      bottom: 0;
-      z-index: 4;
-      transform: scale(0.8);
     }
     /* Wordmark del hero: marca pequeña encima del nombre grande del lugar.
 
@@ -537,10 +531,9 @@
        no era una decisión de diseño, era el sobrante. El `font-size` de abajo
        es sólo la semilla del primer frame (y lo que queda si el JS no corre).
 
-       El `mix-blend-mode` se queda EN ESTE elemento y no en .fg-hero-word:
-       aquí hay `will-change`, que crea contexto de apilamiento, así que un
-       blend en el hijo se mezclaría contra un fondo aislado (vacío) en vez de
-       contra el cielo y el esmerilado desaparecería. */
+       Ya no hay `mix-blend-mode` ni `will-change` acá: el blend costaba una
+       relectura del fondo por frame y el matiz que aportaba ahora viene puesto
+       directo en el color del degradado de .fg-hero-word. */
     .fg-hero-text {
       position: absolute;
       left: 0;
@@ -554,12 +547,15 @@
       font-weight: 700;
       font-size: 150px;
       line-height: 0.94;
-      mix-blend-mode: luminosity;
+      /* Acá vivía mix-blend-mode: luminosity. Sobre un texto de 150px obliga a
+         releer el fondo y mezclar píxel por píxel en CADA frame, y con la
+         entrada de 1.6s más el translateX de 0.8s del slider encima era la
+         causa principal del tirón. El matiz que aportaba el blend ahora viene
+         puesto en el color del degradado de .fg-hero-word. */
       pointer-events: none;
       user-select: none;
       opacity: 0;
       transform: translateY(-180%);
-      will-change: transform, opacity;
     }
     /* La palabra grande. El degradado de relleno vive aquí y no en el
        contenedor: recortado contra los dos trozos a la vez, la rampa se
@@ -576,9 +572,9 @@
          razón de ser del viejo `text-indent: 0.2em` del media query de móvil. */
       margin-right: -0.2em;
       background: linear-gradient(to bottom,
-        rgba(255,255,255,0.76) 0%,
-        rgba(255,255,255,0.62) 48%,
-        rgba(255,255,255,0.30) 100%);
+        rgba(230,245,255,0.78) 0%,
+        rgba(230,245,255,0.64) 48%,
+        rgba(230,245,255,0.32) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
