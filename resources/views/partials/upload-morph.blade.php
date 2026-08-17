@@ -478,6 +478,53 @@ window.UploadMorph = (function () {
 
         of: function (input) { return registry.get(input) || null; },
 
+        /* Reduce una imagen ANTES de subirla. Una foto de cámara moderna llega
+           a 4096px: se muestra a lo sumo al ancho del viewport, pero el
+           navegador igual la decodifica entera y la mantiene como textura
+           (4096x2748 = 43 MB en VRAM). Escalarla acá baja la subida, el riesgo
+           de 413 y sobre todo la memoria de video del visitante.
+
+           No toca lo que no hace falta: si ya está por debajo del máximo, o no
+           es una imagen, o el navegador no puede procesarla, devuelve el
+           archivo original sin tocar. */
+        downscaleImage: function (file, maxW, quality) {
+            maxW = maxW || 2560;
+            quality = quality || 0.86;
+
+            var passthrough = Promise.resolve(file);
+            if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return passthrough;
+            if (typeof createImageBitmap !== 'function' || !window.OffscreenCanvas) {
+                if (typeof document.createElement('canvas').toBlob !== 'function') return passthrough;
+            }
+
+            return createImageBitmap(file).then(function (bmp) {
+                if (bmp.width <= maxW) { bmp.close && bmp.close(); return file; }
+
+                var w = maxW;
+                var h = Math.round(bmp.height * (maxW / bmp.width));
+                var canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(bmp, 0, 0, w, h);
+                bmp.close && bmp.close();
+
+                // PNG se mantiene PNG por si trae transparencia; el resto va a JPEG.
+                var type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+
+                return new Promise(function (resolve) {
+                    canvas.toBlob(function (blob) {
+                        if (!blob || blob.size >= file.size) { resolve(file); return; }
+                        resolve(new File([blob], file.name, {
+                            type: type,
+                            lastModified: file.lastModified
+                        }));
+                    }, type, quality);
+                });
+            }).catch(function () { return file; });
+        },
+
         /* Sube por chunks de 512 KB (evita el 413 de nginx) dibujando el
            progreso real. Devuelve la respuesta JSON del último chunk. */
         chunked: function (m, file, url, extra, token) {
