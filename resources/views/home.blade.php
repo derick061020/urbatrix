@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=30">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=31">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -1359,7 +1359,6 @@
     }
     .fg-units-grid > .fg-card {
       animation: fgCardIn .32s cubic-bezier(.16,1,.3,1) both;
-      will-change: opacity, transform;
     }
     .fg-units-grid > .fg-card.is-fading-out {
       animation: fgCardOut .22s ease forwards;
@@ -1768,7 +1767,6 @@
     .fg-units-grid > .fg-card.is-lazy-in {
       animation: fgLazyIn .55s cubic-bezier(.16,1,.3,1) both;
       animation-delay: calc(var(--lazy-i, 0) * 55ms);
-      will-change: opacity, transform;
     }
     @keyframes fgLazyRowIn {
       0%   { opacity: 0; transform: translateY(10px); }
@@ -2357,7 +2355,15 @@
         <!-- Celda 0: Hero -->
         <div class="hs-cell hs-cell-hero">
           <div class="fg-hero" id="hero" data-active="makai">
-            <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png" alt="" aria-hidden="true">
+            {{-- Los heroes van en WebP (q92, alpha_q 100: la máscara de recorte
+                 queda idéntica) con el PNG como respaldo. El <picture> no altera
+                 el layout: los <img> conservan clase y data-project, y todo el
+                 CSS/JS que los toca usa selectores de descendencia. --}}
+            <picture>
+              <source type="image/webp" srcset="/images/hero/SKY.webp">
+              <img class="fg-hero-layer fg-hero-sky" src="/images/hero/SKY.png"
+                   width="1366" height="534" alt="" aria-hidden="true">
+            </picture>
 
             {{-- El nombre grande va envuelto en .fg-hero-word (y no suelto en
                  el .fg-hero-text) porque fitHeroWordmark() necesita medir SÓLO
@@ -2367,9 +2373,23 @@
             <span class="fg-hero-text" data-project="naviva" aria-hidden="true"><span class="fg-hero-word">NAVIVA</span></span>
             <span class="fg-hero-text" data-project="liv"    aria-hidden="true"><span class="fg-hero-word">LIV</span></span>
 
-            <img class="fg-hero-building" data-project="makai"  src="/images/hero/MAKAI.png"  alt="{{ __('Bahía Mar Residences') }}">
-            <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png" alt="{{ __('Naviva Residences') }}">
-            <img class="fg-hero-building" data-project="liv"    src="/images/hero/LIV.png"    alt="{{ __('Liv Residences') }}">
+            {{-- El MAKAI de esta rama es 1536x472, así que no lleva variante
+                 reducida: un 1600w sería un upscale del original. --}}
+            <picture>
+              <source type="image/webp" srcset="/images/hero/MAKAI.webp">
+              <img class="fg-hero-building" data-project="makai" src="/images/hero/MAKAI.png"
+                   width="1536" height="472" fetchpriority="high" alt="{{ __('Bahía Mar Residences') }}">
+            </picture>
+            <picture>
+              <source type="image/webp" srcset="/images/hero/NAVIVA.webp">
+              <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png"
+                   width="1366" height="460" alt="{{ __('Naviva Residences') }}">
+            </picture>
+            <picture>
+              <source type="image/webp" srcset="/images/hero/LIV.webp">
+              <img class="fg-hero-building" data-project="liv" src="/images/hero/LIV.png"
+                   width="1366" height="460" alt="{{ __('Liv Residences') }}">
+            </picture>
           </div>
         </div>
 
