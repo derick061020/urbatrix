@@ -6329,7 +6329,12 @@
     var modal = document.getElementById('clientDocModal');
     document.getElementById('clientDocTitle').textContent = title || 'Documento';
     document.getElementById('clientDocFrame').src = url;
-    document.getElementById('clientDocDownload').href = url;
+    // El atributo download fuerza la descarga en vez de que el navegador abra
+    // el PDF en la pestaña. Sólo aplica same-origin, que es el caso: los
+    // archivos del menú del cliente viven en el storage propio.
+    var dl = document.getElementById('clientDocDownload');
+    dl.href = url;
+    dl.setAttribute('download', (title || 'documento').replace(/[\\/:*?"<>|]/g, '-'));
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     // forzar reflow para que la transición de entrada se dispare

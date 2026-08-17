@@ -33,7 +33,7 @@
                         <div class="text-[13px] font-bold text-ink-950 leading-tight">{{ $m->title }}</div>
                         <div class="text-[10.5px] text-ink-400">{{ $m->file_size ?: '—' }}@if($m->category) · {{ $m->category }}@endif</div>
                         @if($m->downloadUrl())
-                            <a href="{{ $m->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost mt-auto">{{ __('Descargar') }}</a>
+                            <a href="{{ $m->downloadUrl() }}" @if($m->external_url) target="_blank" rel="noopener" @endif class="brk-btn brk-btn-ghost mt-auto">{{ __('Descargar') }}</a>
                         @else
                             <span class="text-[11px] text-ink-300 mt-auto">{{ __('No disponible') }}</span>
                         @endif
