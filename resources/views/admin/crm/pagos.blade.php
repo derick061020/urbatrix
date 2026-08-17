@@ -486,8 +486,10 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Boleta/Comprobante de Pago') }}</label>
-                        <input type="file" name="payment_receipt" id="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="text-xs text-gray-500 mt-1">{{ __('Formatos aceptados: PDF, JPG, PNG. Máximo 5MB.') }}</p>
+                        {{-- El archivo no viaja en el POST del pago (es JSON):
+                             se sube aparte al confirmar. --}}
+                        <div id="paymentReceiptMorph"></div>
+                        <input type="file" name="payment_receipt" id="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
                     </div>
                     
                     @if(isset($existingPayment) && $existingPayment->receipt_path)
@@ -653,6 +655,9 @@ function editPayment(paymentId) {
 function closePaymentModal() {
     document.getElementById('paymentModal').classList.add('hidden');
     document.getElementById('paymentForm').reset();
+    // form.reset() no toca el componente de subida: hay que limpiarlo aparte
+    var m = window.UploadMorph ? UploadMorph.of(document.getElementById('paymentReceipt')) : null;
+    if (m) m.clear();
 }
 
 function removeReceipt() {
@@ -683,6 +688,66 @@ function removeReceipt() {
     }
 }
 
+(function () {
+    var input = document.getElementById('paymentReceipt');
+    if (!input || !window.UploadMorph) return;
+    UploadMorph.mount(input, {
+        into: document.getElementById('paymentReceiptMorph'),
+        cancelable: false,
+        label: @json(__('Cambiar')),
+        emptyName: @json(__('Seleccionar comprobante')),
+        emptySub: @json(__('o arrástralo aquí · PDF, JPG o PNG · máx. 5 MB')),
+        // la subida arranca al confirmar el pago, no al elegir el archivo
+        onSubmit: function () { input.click(); }
+    });
+})();
+
+// El endpoint de pagos habla JSON, así que el archivo no puede viajar en el
+// mismo request: primero se sube por chunks (que es lo que evita el 413 de
+// nginx) y después se le asocia la ruta al pago ya creado.
+async function uploadPaymentReceipt(paymentId, file) {
+    if (!paymentId) throw new Error('No se pudo identificar el pago');
+
+    const morph = window.UploadMorph ? UploadMorph.of(document.getElementById('paymentReceipt')) : null;
+    const csrf  = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    const uploaded = morph
+        ? await UploadMorph.chunked(morph, file, '{{ route('admin.crm.payment.receipt') }}', {}, csrf)
+        : await (async () => {
+            const fd = new FormData();
+            fd.append('chunk', file);
+            fd.append('upload_id', Date.now().toString(36));
+            fd.append('index', 0);
+            fd.append('total', 1);
+            fd.append('name', file.name);
+            fd.append('_token', csrf);
+            const r = await fetch('{{ route('admin.crm.payment.receipt') }}', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: fd,
+                credentials: 'same-origin',
+            });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante');
+            return d;
+        })();
+
+    const attach = await fetch(`/admin/api/payments/${paymentId}/receipt`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrf,
+        },
+        body: JSON.stringify({ receipt_path: uploaded.path }),
+        credentials: 'same-origin',
+    });
+    if (!attach.ok) throw new Error('No se pudo asociar el comprobante al pago');
+
+    if (morph) morph.done(@json(__('Comprobante subido')));
+    return attach.json();
+}
+
 // Form submission
 document.getElementById('paymentForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -691,7 +756,12 @@ document.getElementById('paymentForm').addEventListener('submit', async function
     const data = Object.fromEntries(formData.entries());
     const paymentId = data.payment_id;
     delete data.payment_id;
-    
+    // Object.fromEntries deja el File tal cual y JSON.stringify lo serializa
+    // como {}: el comprobante se perdía en silencio. Se saca del JSON y se sube
+    // aparte, igual que en el modal de registrar pago.
+    delete data.payment_receipt;
+    const receiptFile = document.getElementById('paymentReceipt')?.files?.[0] || null;
+
     try {
         const url = paymentId ? `/admin/api/payments/${paymentId}` : `/admin/api/reservations/${currentReservationId}/payments`;
         const method = paymentId ? 'PUT' : 'POST';
@@ -706,6 +776,15 @@ document.getElementById('paymentForm').addEventListener('submit', async function
         });
         
         if (response.ok) {
+            // El pago ya existe: recién ahora se le puede colgar el comprobante.
+            if (receiptFile) {
+                try {
+                    const saved = await response.json();
+                    await uploadPaymentReceipt(paymentId || saved.id, receiptFile);
+                } catch (err) {
+                    showNotification('El pago se guardó, pero el comprobante no: ' + err.message, 'error');
+                }
+            }
             closePaymentModal();
             location.reload();
             showNotification('Pago guardado exitosamente', 'success');
