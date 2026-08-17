@@ -46,6 +46,8 @@
       .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#5c7c68; }
       @media (max-width:1023px){ #brk-sidebar{ display:none !important; } }
     </style>
+    {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+    @include('partials.upload-morph')
     @stack('styles')
 </head>
 <body id="brk-root">

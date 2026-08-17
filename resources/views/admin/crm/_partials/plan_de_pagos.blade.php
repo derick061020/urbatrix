@@ -165,8 +165,10 @@
             </label>
             <div id="manual-plan-fields-{{ $r->id }}" class="hidden mt-3">
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Plan de pagos firmado') }}</label>
-                <input type="file" name="signed_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full mt-1 text-[12px] text-ink-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/15">
-                <span class="signed-upload-progress block text-[11px] text-ink-500 mt-1"></span>
+                {{-- El pill sólo elige/muestra el archivo; la subida la dispara
+                     el botón "Subir firmado y aprobar" de la fila de acciones. --}}
+                <div class="mt-1.5" data-signed-plan-morph></div>
+                <input type="file" name="signed_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="hidden">
             </div>
         </div>
 
@@ -208,10 +210,34 @@ window.planAutofill = function (sel) {
 // Sube el plan de pagos firmado por chunks (evita el 413) ENVIANDO TAMBIÉN la
 // configuración actual del formulario (plan, porcentajes, cuotas, fecha, legales,
 // notas) para que se persista junto con el documento aprobado.
+// Monta el pill sobre cada input de plan firmado. El botón propio del pill
+// sólo reabre el selector; la subida real la dispara submitSignedPlan.
+(function () {
+    if (!window.UploadMorph) return;
+    function mountAll() {
+        document.querySelectorAll('[data-signed-plan-morph]').forEach(function (slot) {
+            if (slot.dataset.mounted) return;
+            var input = slot.parentNode.querySelector('[name=signed_file]');
+            if (!input) return;
+            slot.dataset.mounted = '1';
+            UploadMorph.mount(input, {
+                into: slot,
+                cancelable: false,
+                label: @json(__('Cambiar')),
+                emptyName: @json(__('Seleccionar plan firmado')),
+                emptySub: @json(__('o arrástralo aquí · PDF, DOC o imagen')),
+                onSubmit: function () { input.click(); }
+            });
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAll);
+    else mountAll();
+})();
+
 window.submitSignedPlan = async function (btn) {
     const form      = btn.closest('form');
     const fileInput = form.querySelector('[name=signed_file]');
-    const progress  = form.querySelector('.signed-upload-progress');
+    const morph     = window.UploadMorph ? UploadMorph.of(fileInput) : null;
     const file      = fileInput && fileInput.files ? fileInput.files[0] : null;
     const url       = btn.dataset.url;
     const token     = form.querySelector('input[name=_token]')?.value
@@ -220,7 +246,6 @@ window.submitSignedPlan = async function (btn) {
     if (!file) {
         document.getElementById('manual-plan-fields-' + '{{ $r->id }}')?.classList.remove('hidden');
         if (window.crmToast) crmToast(@json(__('Seleccioná el archivo firmado.')), 'err');
-        else if (progress) progress.textContent = @json(__('Seleccioná el archivo firmado.'));
         return;
     }
     const okConfirm = window.crmConfirm
@@ -240,40 +265,18 @@ window.submitSignedPlan = async function (btn) {
     const cfg = {};
     cfgNames.forEach(n => { const el = form.querySelector('[name=' + n + ']'); cfg[n] = el ? el.value : ''; });
 
-    const chunkSize = 512 * 1024;
-    const total     = Math.ceil(file.size / chunkSize) || 1;
-    const uploadId  = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    const original  = btn.innerHTML;
+    const original = btn.innerHTML;
     btn.disabled = true;
 
     try {
-        for (let i = 0; i < total; i++) {
-            const fd = new FormData();
-            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
-            fd.append('upload_id', uploadId);
-            fd.append('index', i);
-            fd.append('total', total);
-            fd.append('name', file.name);
-            fd.append('_token', token);
-            Object.keys(cfg).forEach(k => fd.append(k, cfg[k]));
-
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: fd,
-                credentials: 'same-origin',
-            });
-            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413). Subí client_max_body_size en nginx.');
-            const d = await res.json().catch(() => ({}));
-            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el archivo.');
-
-            if (progress) progress.textContent = 'Subiendo… ' + Math.round(((i + 1) / total) * 100) + '%';
-            if (d.done) { if (progress) progress.textContent = 'Listo, recargando…'; window.location.reload(); return; }
-        }
+        await UploadMorph.chunked(morph, file, url, cfg, token);
+        morph.done(@json(__('Plan firmado y aprobado')));
+        // deja correr la elevación antes de recargar
+        setTimeout(function () { window.location.reload(); }, 1200);
     } catch (e) {
         const msg = e.message || 'No se pudo subir el archivo.';
         if (window.crmToast) crmToast(msg, 'err');
-        if (progress) progress.textContent = msg;
+        if (morph) morph.fail(msg, function () { submitSignedPlan(btn); });
         btn.disabled = false;
         btn.innerHTML = original;
     }

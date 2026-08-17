@@ -63,6 +63,9 @@
             })
             .then(html => {
                 content.innerHTML = html;
+                // El swap borra los componentes de subida montados: los re-monta.
+                if (window.UploadMorph) UploadMorph.autowire(content);
+                if (window.mountSignedMorphs) mountSignedMorphs(content);
                 if (push) history.pushState({}, '', url);
             })
             .catch(err => console.error(err))

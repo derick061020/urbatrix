@@ -409,6 +409,9 @@
             }
         }
     </style>
+{{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+@include('partials.upload-morph')
+@stack('styles')
 </head>
 <body data-mode="{{ ($mode ?? 'login') === 'register' ? 'register' : 'login' }}" class="bg-white">
 
@@ -1264,5 +1267,6 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 </script>
 
+@stack('scripts')
 </body>
 </html>

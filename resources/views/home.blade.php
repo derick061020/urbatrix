@@ -12,6 +12,9 @@
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=23">
+{{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+@include('partials.upload-morph')
+@stack('styles')
 </head>
 
 <body data-view="grid">
@@ -5836,6 +5839,7 @@
     setTimeout(function(){ kick(0); }, 8000);
   })();
 </script>
+@stack('scripts')
 </body>
 
 </html>
