@@ -70,14 +70,11 @@
                 </div>
             </div>
 
-            <div class="border-2 border-dashed border-ink-200 rounded-xl py-7 px-4 text-center cursor-pointer hover:border-brand transition-colors"
-                 onclick="this.querySelector('input[type=file]').click()">
-                <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
-                <div class="text-[13px] font-semibold text-ink-700 mt-2">{{ __('Arrastra aquí o haz clic para seleccionar') }}</div>
-                <div class="text-[11px] text-ink-500 mt-1">{{ __('PDF, JPG o PNG · máx. 50 MB') }}</div>
-                <button type="button" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); this.parentNode.querySelector('input[type=file]').click()"><span id="rp-receipt-name">{{ __('Buscar archivo') }}</span></button>
+            <div>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Comprobante') }}</label>
+                <div class="mt-1.5" id="rp-morph"></div>
                 {{-- Sin name: el archivo NO se postea entero; se sube por chunks. --}}
-                <input type="file" id="rp-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="rpReceiptSelected(this)">
+                <input type="file" id="rp-receipt-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
             </div>
 
             <div>
@@ -106,64 +103,49 @@
         if (lbl && label) lbl.value = label;
         // Limpia el comprobante de una apertura anterior.
         var rp = document.getElementById('rp-receipt-path');
-        var rn = document.getElementById('rp-receipt-name');
         if (rp) rp.value = '';
-        if (rn) rn.textContent = 'Buscar archivo';
+        if (window.rpMorph) rpMorph.clear();
         document.getElementById('modal-registrar-pago').showModal();
     }
 
     // Sube el comprobante en trozos de ~512 KB para evitar el 413 ("Too Large").
-    async function rpReceiptSelected(input) {
-        var file = input.files && input.files[0];
-        if (!file) return;
+    // UploadMorph.chunked sube y dibuja el progreso; acá sólo guardamos la ruta.
+    (function () {
+        var input  = document.getElementById('rp-receipt-file');
+        var pathEl = document.getElementById('rp-receipt-path');
+        var upEl   = document.getElementById('rp-uploading');
+        if (!input || !window.UploadMorph) return;
 
-        var nameEl   = document.getElementById('rp-receipt-name');
-        var pathEl   = document.getElementById('rp-receipt-path');
-        var upEl     = document.getElementById('rp-uploading');
-        var csrf     = document.querySelector('#modal-registrar-pago input[name=_token]')?.value || '';
-        var chunkSize = 512 * 1024;
-        var total    = Math.ceil(file.size / chunkSize) || 1;
-        var uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        window.rpMorph = UploadMorph.mount(input, {
+            into: document.getElementById('rp-morph'),
+            emptyName: @json(__('Seleccionar comprobante')),
+            emptySub: @json(__('o arrástralo aquí · PDF, JPG o PNG · máx. 50 MB')),
+            onSelect: function (file) { send(file); }
+        });
 
-        if (pathEl) pathEl.value = '';
-        if (upEl)   upEl.value = '1';
+        function send(file) {
+            var csrf = document.querySelector('#modal-registrar-pago input[name=_token]');
+            pathEl.value = '';
+            upEl.value = '1';
 
-        try {
-            for (var i = 0; i < total; i++) {
-                var chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
-                var fd = new FormData();
-                fd.append('chunk', chunk);
-                fd.append('upload_id', uploadId);
-                fd.append('index', i);
-                fd.append('total', total);
-                fd.append('name', file.name);
-                fd.append('_token', csrf);
-
-                var res = await fetch('{{ route('admin.crm.payment.receipt') }}', {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: fd,
-                    credentials: 'same-origin',
+            UploadMorph.chunked(rpMorph, file, '{{ route('admin.crm.payment.receipt') }}',
+                                {}, csrf ? csrf.value : '')
+                .then(function (d) {
+                    pathEl.value = d.path || '';
+                    upEl.value = '';
+                    rpMorph.done(@json(__('Comprobante subido')), {
+                        label: @json(__('Cambiar')),
+                        onClick: function () { pathEl.value = ''; rpMorph.clear(); }
+                    });
+                })
+                .catch(function (e) {
+                    pathEl.value = '';
+                    upEl.value = '';
+                    rpMorph.fail(e.message || @json(__('No se pudo subir el comprobante.')),
+                                 function () { send(file); });
                 });
-                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño. Subí client_max_body_size en nginx.');
-                var d = await res.json().catch(function () { return {}; });
-                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el comprobante.');
-
-                if (nameEl) nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
-
-                if (d.done) {
-                    if (pathEl) pathEl.value = d.path || '';
-                    if (nameEl) nameEl.textContent = file.name;
-                }
-            }
-        } catch (e) {
-            if (pathEl) pathEl.value = '';
-            if (nameEl) nameEl.textContent = 'Buscar archivo';
-            alert(e.message || 'No se pudo subir el comprobante.');
-        } finally {
-            if (upEl) upEl.value = '';
         }
-    }
+    })();
 
     // Evita enviar el pago mientras el comprobante aún se está subiendo.
     function rpBeforeSubmit(form) {

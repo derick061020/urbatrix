@@ -292,6 +292,8 @@
       .crm-select__opt.is-active .crm-select__check { opacity: 1; }
       .crm-select__opt.is-active { font-weight: 600; }
     </style>
+    {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+    @include('partials.upload-morph')
     @stack('styles')
 </head>
 <body id="crm-root">

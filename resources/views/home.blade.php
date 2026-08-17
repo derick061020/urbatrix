@@ -13,6 +13,9 @@
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=30">
+{{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+@include('partials.upload-morph')
+@stack('styles')
 </head>
 
 <body data-view="grid">
@@ -6516,6 +6519,7 @@
   };
 </script>
 <script src="{{ asset('js/bahia-mar-eco.js') }}?v=16"></script>
+@stack('scripts')
 </body>
 
 </html>

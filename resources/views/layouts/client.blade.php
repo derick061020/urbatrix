@@ -197,6 +197,8 @@
           #cli-topbar { padding-left: 16px !important; padding-right: 16px !important; gap: 12px !important; }
       }
     </style>
+    {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+    @include('partials.upload-morph')
     @stack('styles')
 </head>
 <body id="cli-root">

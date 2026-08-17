@@ -144,6 +144,9 @@
           .form-section-title { font-size:13px !important; }
       }
     </style>
+{{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
+@include('partials.upload-morph')
+@stack('styles')
 </head>
 <body>
 
@@ -1075,5 +1078,6 @@
 })();
 </script>
 
+@stack('scripts')
 </body>
 </html>

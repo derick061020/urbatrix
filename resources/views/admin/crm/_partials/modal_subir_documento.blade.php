@@ -44,14 +44,9 @@
                 <input type="text" name="title" required placeholder="{{ __('KYC — Carlos Méndez') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
-                <div class="border-2 border-dashed border-ink-200 rounded-xl py-8 px-4 text-center cursor-pointer hover:border-brand transition-colors"
-                     onclick="this.querySelector('input').click()">
-                    <i class="pi pi-cloud-upload text-ink-400 text-[22px]"></i>
-                    <div class="text-[13px] font-semibold text-ink-700 mt-2">{{ __('Arrastra aquí o haz clic para seleccionar') }}</div>
-                    <div class="text-[11px] text-ink-500 mt-1">{{ __('PDF, JPG o PNG · máx. 50 MB') }}</div>
-                    <button type="button" id="sd-file-name" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mt-3" onclick="event.stopPropagation(); this.previousElementSibling.click()">{{ __('Buscar archivo') }}</button>
-                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="sdFileSelected(this)">
-                </div>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Archivo') }}</label>
+                <div class="mt-1.5" id="sd-morph"></div>
+                <input type="file" id="sd-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -78,61 +73,48 @@
 
 <script>
     // Sube el documento en trozos de ~512 KB para evitar el 413 ("Too Large").
-    async function sdFileSelected(input) {
-        var file = input.files && input.files[0];
-        if (!file) return;
-
-        var nameEl = document.getElementById('sd-file-name');
+    // UploadMorph.chunked hace la subida y dibuja el progreso; acá sólo
+    // guardamos la ruta que devuelve el último chunk.
+    (function () {
+        var input  = document.getElementById('sd-file');
         var pathEl = document.getElementById('sd-file-path');
         var fnEl   = document.getElementById('sd-file-name-input');
         var upEl   = document.getElementById('sd-uploading');
-        var csrf   = document.querySelector('#modal-subir-documento input[name=_token]')?.value || '';
-        var chunkSize = 512 * 1024;
-        var total     = Math.ceil(file.size / chunkSize) || 1;
-        var uploadId  = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        if (!input || !window.UploadMorph) return;
 
-        if (pathEl) pathEl.value = '';
-        if (fnEl)   fnEl.value = '';
-        if (upEl)   upEl.value = '1';
+        var morph = UploadMorph.mount(input, {
+            into: document.getElementById('sd-morph'),
+            emptyName: @json(__('Seleccionar archivo')),
+            emptySub: @json(__('o arrástralo aquí · PDF, JPG o PNG · máx. 50 MB')),
+            onSelect: function (file) { send(file); }
+        });
 
-        try {
-            for (var i = 0; i < total; i++) {
-                var chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
-                var fd = new FormData();
-                fd.append('chunk', chunk);
-                fd.append('upload_id', uploadId);
-                fd.append('index', i);
-                fd.append('total', total);
-                fd.append('name', file.name);
-                fd.append('_token', csrf);
+        function send(file) {
+            var csrf = document.querySelector('#modal-subir-documento input[name=_token]');
+            pathEl.value = '';
+            fnEl.value = '';
+            upEl.value = '1';
 
-                var res = await fetch('{{ route('admin.crm.document.upload-chunk') }}', {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: fd,
-                    credentials: 'same-origin',
+            UploadMorph.chunked(morph, file, '{{ route('admin.crm.document.upload-chunk') }}',
+                                {}, csrf ? csrf.value : '')
+                .then(function (d) {
+                    pathEl.value = d.path || '';
+                    fnEl.value = d.name || file.name;
+                    upEl.value = '';
+                    morph.done(@json(__('Documento subido')), {
+                        label: @json(__('Cambiar')),
+                        onClick: function () { morph.clear(); }
+                    });
+                })
+                .catch(function (e) {
+                    pathEl.value = '';
+                    fnEl.value = '';
+                    upEl.value = '';
+                    morph.fail(e.message || @json(__('No se pudo subir el documento.')),
+                               function () { send(file); });
                 });
-                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño. Subí client_max_body_size en nginx.');
-                var d = await res.json().catch(function () { return {}; });
-                if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el documento.');
-
-                if (nameEl) nameEl.textContent = file.name + ' — ' + Math.round(((i + 1) / total) * 100) + '%';
-
-                if (d.done) {
-                    if (pathEl) pathEl.value = d.path || '';
-                    if (fnEl)   fnEl.value = d.name || file.name;
-                    if (nameEl) nameEl.textContent = file.name;
-                }
-            }
-        } catch (e) {
-            if (pathEl) pathEl.value = '';
-            if (fnEl)   fnEl.value = '';
-            if (nameEl) nameEl.textContent = 'Buscar archivo';
-            alert(e.message || 'No se pudo subir el documento.');
-        } finally {
-            if (upEl) upEl.value = '';
         }
-    }
+    })();
 
     // Evita enviar el formulario si falta el archivo o aún se está subiendo.
     function sdBeforeSubmit(form) {

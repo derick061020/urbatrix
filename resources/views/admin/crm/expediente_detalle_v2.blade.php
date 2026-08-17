@@ -759,6 +759,29 @@ window.crmToast = function (msg, type) {
 // ── Subida por chunks de documentos firmados (plan de pagos / contrato) ──
 // Evita el 413 ("Too Large") partiendo el archivo en trozos de 512 KB, igual
 // que la subida del menú del cliente. El backend reensambla y finaliza.
+// Monta el pill en cada form de firmado. Se re-ejecuta tras los swaps de
+// innerHTML del tab de documentos, por eso es idempotente.
+window.mountSignedMorphs = function (root) {
+    if (!window.UploadMorph) return;
+    (root || document).querySelectorAll('form[data-signed-upload]').forEach(function (form) {
+        const slot  = form.querySelector('[data-signed-slot]');
+        const input = form.querySelector('input[type=file]');
+        if (!slot || !input || slot.dataset.mounted) return;
+        slot.dataset.mounted = '1';
+        UploadMorph.mount(input, {
+            into: slot,
+            cancelable: false,
+            label: @json(__('Cambiar')),
+            emptyName: @json(__('Seleccionar versión firmada')),
+            emptySub: @json(__('o arrástralo aquí · PDF, DOC o imagen')),
+            onSubmit: function () { input.click(); }
+        });
+    });
+};
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { mountSignedMorphs(); });
+} else { mountSignedMorphs(); }
+
 document.addEventListener('submit', async function(ev) {
     const form = ev.target.closest('form[data-signed-upload]');
     if (!form) return;
@@ -766,11 +789,11 @@ document.addEventListener('submit', async function(ev) {
 
     const input    = form.querySelector('input[type=file]');
     const btn      = form.querySelector('button[type=submit]');
-    const progress = form.querySelector('.signed-upload-progress');
     const token    = form.querySelector('input[name=_token]')?.value
                      || document.querySelector('meta[name=csrf-token]')?.content;
     const url      = form.dataset.url;
     const file     = input?.files?.[0];
+    const morph    = window.UploadMorph ? UploadMorph.of(input) : null;
 
     if (!file) { crmToast('Seleccioná un archivo.', 'err'); return; }
     const okConfirm = await crmConfirm({
@@ -781,44 +804,18 @@ document.addEventListener('submit', async function(ev) {
     });
     if (!okConfirm) return;
 
-    const chunkSize = 512 * 1024;
-    const total     = Math.ceil(file.size / chunkSize) || 1;
-    const uploadId  = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    const original  = btn.innerHTML;
+    const original = btn.innerHTML;
     btn.disabled = true;
 
     try {
-        for (let i = 0; i < total; i++) {
-            const fd = new FormData();
-            fd.append('chunk', file.slice(i * chunkSize, (i + 1) * chunkSize));
-            fd.append('upload_id', uploadId);
-            fd.append('index', i);
-            fd.append('total', total);
-            fd.append('name', file.name);
-            fd.append('_token', token);
-
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: fd,
-                credentials: 'same-origin',
-            });
-            if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (413). Subí client_max_body_size en nginx.');
-            const d = await res.json().catch(() => ({}));
-            if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el archivo.');
-
-            progress.textContent = 'Subiendo… ' + Math.round(((i + 1) / total) * 100) + '%';
-
-            if (d.done) {
-                progress.textContent = 'Listo, recargando…';
-                window.location.reload();
-                return;
-            }
-        }
+        await UploadMorph.chunked(morph, file, url, {}, token);
+        morph.done(@json(__('Versión firmada y aprobada')));
+        // deja correr la elevación antes de recargar
+        setTimeout(function () { window.location.reload(); }, 1200);
     } catch (e) {
         const msg = e.message || 'No se pudo subir el archivo.';
         crmToast(msg, 'err');
-        progress.textContent = msg;
+        if (morph) morph.fail(msg);
         btn.disabled = false;
         btn.innerHTML = original;
     }
