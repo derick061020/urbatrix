@@ -30,10 +30,29 @@ class DocumentController extends Controller
             \App\Support\ActivityLogger::log(auth()->id(), 'document_download', 'Descargó '.($document->filename ?: 'un documento'), $document);
         }
 
-        // Los documentos HTML imprimibles (plan de pagos / promesa) se sirven inline:
-        // el navegador los renderiza y el botón "Descargar PDF" usa window.print().
+        // Los documentos imprimibles (plan de pagos / promesa / KYC) se guardan
+        // como HTML. "Descargar" tiene que entregar un archivo, no abrir una
+        // pestaña con el diálogo de impresión, así que se convierten a PDF acá.
+        // La vista en pantalla sigue usando preview(), que los sirve inline.
         if (strtolower(pathinfo($absolute, PATHINFO_EXTENSION)) === 'html') {
-            return Response::file($absolute, ['Content-Type' => 'text/html; charset=UTF-8']);
+            try {
+                $pdf = \App\Support\PrintableToPdf::render(file_get_contents($absolute));
+
+                return Response::make($pdf, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="'
+                        .str_replace('"', '', \App\Support\PrintableToPdf::filename($document->filename, basename($absolute)))
+                        .'"',
+                ]);
+            } catch (\Throwable $e) {
+                // Si la conversión falla, es preferible entregar el HTML a no
+                // entregar nada; queda registro para poder revisarlo.
+                \Illuminate\Support\Facades\Log::warning(
+                    'No se pudo convertir a PDF el documento '.$document->id.': '.$e->getMessage()
+                );
+
+                return Response::file($absolute, ['Content-Type' => 'text/html; charset=UTF-8']);
+            }
         }
 
         return Response::download($absolute, $document->filename ?: basename($absolute));

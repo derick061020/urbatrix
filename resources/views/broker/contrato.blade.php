@@ -68,7 +68,7 @@
                                     <div class="text-[13px] font-semibold text-ink-950 truncate">{{ \App\Support\DocumentTitle::make($doc->title) }}</div>
                                     <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
                                 </div>
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
+                                <a href="{{ $doc->downloadUrl() }}" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
                             </div>
                         @endforeach
                     </div>
@@ -88,7 +88,7 @@
                                 <div class="text-[11px] text-ink-400">{{ $doc->category }} · {{ $doc->file_size ?: $doc->format }}</div>
                             </div>
                             @if($doc->downloadUrl())
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
+                                <a href="{{ $doc->downloadUrl() }}" class="brk-btn brk-btn-ghost"><i class="pi pi-download"></i> {{ __('Descargar') }}</a>
                             @endif
                         </div>
                     @empty

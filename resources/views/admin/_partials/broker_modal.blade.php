@@ -104,7 +104,7 @@
                                 </div>
                                 <button type="button" class="text-ink-500 hover:text-brand p-1" title="{{ __('Ver') }}"
                                     onclick="openBrokerDoc({{ \Illuminate\Support\Js::from(['title'=>\App\Support\DocumentTitle::make($doc->title),'format'=>strtoupper($doc->format),'kind'=>$doc->previewKind(),'url'=>$doc->fileUrl(),'download'=>$doc->downloadUrl()]) }})"><i class="pi pi-eye"></i></button>
-                                <a href="{{ $doc->downloadUrl() }}" target="_blank" class="text-ink-500 hover:text-brand p-1" title="{{ __('Descargar') }}"><i class="pi pi-download"></i></a>
+                                <a href="{{ $doc->downloadUrl() }}" class="text-ink-500 hover:text-brand p-1" title="{{ __('Descargar') }}"><i class="pi pi-download"></i></a>
                                 <button type="button" class="text-ink-400 hover:text-err p-1" title="{{ __('Eliminar') }}"
                                     onclick="openBrokerDocDelete({{ \Illuminate\Support\Js::from(['url'=>route('admin.agents.documents.destroy', [$b->id, $doc->id]),'title'=>\App\Support\DocumentTitle::make($doc->title)]) }})"><i class="pi pi-trash"></i></button>
                             </div>
