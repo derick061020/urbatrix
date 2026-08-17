@@ -44,10 +44,15 @@
 
                 <form action="{{ route('admin.data-import.upload', $resource->key()) }}"
                       method="POST" enctype="multipart/form-data"
-                      class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      class="flex flex-col gap-3 sm:flex-row sm:items-center"
+                      data-morph-form
+                      data-morph-empty="{{ __('Seleccionar CSV') }}"
+                      data-morph-hint="{{ __('o arrástralo aquí') }}"
+                      data-morph-label="{{ __('Cambiar') }}"
+                      data-morph-done="{{ __('CSV subido') }}">
                     @csrf
-                    <input type="file" name="file" accept=".csv,text/csv" required
-                           class="block w-full text-sm text-gray-600 file:mr-4 file:rounded file:border-0 file:bg-[#eef0ea] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#5c6b4a] hover:file:bg-[#e2e6dc]">
+                    <div data-morph-slot class="w-full"></div>
+                    <input type="file" name="file" accept=".csv,text/csv" required class="hidden">
                     <button type="submit"
                             class="whitespace-nowrap rounded bg-[#5c6b4a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#4a5a3a]">
                         {{ __('Subir y mapear') }}

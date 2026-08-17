@@ -113,7 +113,12 @@
 
 {{-- ===== Modal: alta / edición ===== --}}
 <dialog id="matModal" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto w-[540px] max-w-[94vw]">
-    <form id="matForm" method="POST" action="{{ route('admin.materials.store') }}" enctype="multipart/form-data" class="bg-white rounded-2xl overflow-hidden">
+    <form id="matForm" method="POST" action="{{ route('admin.materials.store') }}" enctype="multipart/form-data" class="bg-white rounded-2xl overflow-hidden"
+          data-morph-form
+          data-morph-empty="{{ __('Subir un archivo') }}"
+          data-morph-hint="{{ __('o arrástralo aquí · el formato y el tamaño se detectan solos') }}"
+          data-morph-label="{{ __('Cambiar') }}"
+          data-morph-done="{{ __('Material subido') }}">
         @csrf
         <input type="hidden" name="_method" id="matMethod" value="POST">
         <div class="px-6 py-4 border-b border-ink-100 flex items-center gap-3">
@@ -177,14 +182,8 @@
 
             <div class="pt-1">
                 <label class="mat-label">{{ __('Archivo') }}</label>
-                <label class="mat-drop" id="matDrop">
-                    <span class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-500 shrink-0"><i class="pi pi-cloud-upload"></i></span>
-                    <span class="min-w-0">
-                        <span class="block text-[13px] font-semibold text-ink-800" id="matDropName">{{ __('Subir un archivo') }}</span>
-                        <span class="block text-[11px] text-ink-400">{{ __('El formato y el tamaño se detectan automáticamente.') }}</span>
-                    </span>
-                    <input type="file" name="file" id="matInputFile">
-                </label>
+                <div data-morph-slot></div>
+                <input type="file" name="file" id="matInputFile" class="hidden">
             </div>
 
             <div class="relative flex items-center gap-3 py-1">
@@ -249,11 +248,13 @@
     const matForm = document.getElementById('matForm');
     const storeAction = "{{ route('admin.materials.store') }}";
     const matFileInput = document.getElementById('matInputFile');
-    const matDropName = document.getElementById('matDropName');
 
-    matFileInput.addEventListener('change', () => {
-        matDropName.textContent = matFileInput.files.length ? matFileInput.files[0].name : @json(__('Subir un archivo'));
-    });
+    // El nombre del archivo lo muestra el propio componente de subida.
+    function matResetFile() {
+        matFileInput.value = '';
+        const m = window.UploadMorph ? UploadMorph.of(matFileInput) : null;
+        if (m) m.clear();
+    }
 
     // Selector de icono
     const matIconInput = document.getElementById('matInputIcon');
@@ -283,8 +284,7 @@
         document.getElementById('matInputUrl').value = m.external_url || '';
         document.getElementById('matInputOrder').value = m.sort_order ?? 0;
         document.getElementById('matInputVisible').checked = !!m.visible;
-        matFileInput.value = '';
-        matDropName.textContent = @json(__('Subir un archivo'));
+        matResetFile();
         document.getElementById('matModal').showModal();
     }
 
@@ -293,7 +293,7 @@
         document.getElementById('matMethod').value = 'POST';
         matForm.action = storeAction;
         matForm.reset();
-        matDropName.textContent = @json(__('Subir un archivo'));
+        matResetFile();
         setMaterialIcon('');
         document.getElementById('matInputVisible').checked = true;
         document.getElementById('matModal').showModal();

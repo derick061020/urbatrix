@@ -76,7 +76,12 @@
                 <div class="p-6 space-y-4">
                     {{-- Subir contrato --}}
                     <form method="POST" action="{{ route('admin.agents.documents.store', $b->id) }}" enctype="multipart/form-data"
-                          class="border border-ink-100 rounded-xl p-4 bg-ink-50/40 space-y-3">
+                          class="border border-ink-100 rounded-xl p-4 bg-ink-50/40 space-y-3"
+                          data-morph-form
+                          data-morph-empty="{{ __('Seleccionar contrato') }}"
+                          data-morph-hint="{{ __('o arrástralo aquí') }}"
+                          data-morph-label="{{ __('Cambiar') }}"
+                          data-morph-done="{{ __('Contrato subido') }}">
                         @csrf
                         <div class="text-[12px] font-semibold text-ink-700">{{ __('Subir contrato para este broker') }}</div>
                         <div class="grid grid-cols-2 gap-3">
@@ -87,8 +92,9 @@
                                 <option value="Legal">{{ __('Legal') }}</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input type="file" name="file" required class="crm-input pl-3 flex-1 py-1.5">
+                        <div data-morph-slot></div>
+                        <input type="file" name="file" required class="hidden">
+                        <div class="flex justify-end">
                             <button type="submit" class="crm-btn crm-btn-primary shrink-0"><i class="pi pi-upload"></i> {{ __('Subir') }}</button>
                         </div>
                     </form>

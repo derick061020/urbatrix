@@ -129,12 +129,20 @@
                                 <div class="text-[11px] text-err mt-0.5">{{ $d->notes }}</div>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('dashboard.documents.upload', $d->id) }}" enctype="multipart/form-data" class="shrink-0">
+                        {{-- El pill reemplaza al botón cuando hay archivo elegido;
+                             requestSubmit() y no submit(), que no dispara el
+                             listener del componente. --}}
+                        <form method="POST" action="{{ route('dashboard.documents.upload', $d->id) }}"
+                              enctype="multipart/form-data" class="shrink-0 w-full sm:w-[320px]"
+                              data-morph-form
+                              data-morph-empty="{{ $d->status === 'rejected' ? __('Volver a subir') : __('Seleccionar archivo') }}"
+                              data-morph-hint="{{ __('o arrástralo aquí · PDF, JPG, PNG o DOC') }}"
+                              data-morph-label="{{ __('Cambiar') }}"
+                              data-morph-done="{{ __('Documento enviado') }}">
                             @csrf
-                            <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="hidden" onchange="this.form.submit()">
-                            <button type="button" onclick="this.previousElementSibling.click()" class="cli-btn cli-btn-primary text-[12px] py-2 px-4">
-                                {{ $d->status === 'rejected' ? __('Volver a subir') : __('Subir') }} <i class="pi pi-upload text-[10px]"></i>
-                            </button>
+                            <div data-morph-slot></div>
+                            <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="hidden"
+                                   onchange="this.form.requestSubmit()">
                         </form>
                     </div>
                 @endforeach
