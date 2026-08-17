@@ -294,6 +294,7 @@
     </style>
     {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
     @include('partials.upload-morph')
+    @include('partials.download-morph')
     @stack('styles')
 </head>
 <body id="crm-root">
