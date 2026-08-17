@@ -34,7 +34,7 @@
                     <div class="flex items-center justify-between pt-2.5 border-t border-ink-100 mt-auto">
                         <span class="text-[10.5px] text-ink-400">{{ $m->file_size ?: '—' }}@if($m->category) · {{ $m->category }}@endif</span>
                         @if($m->downloadUrl())
-                            <a href="{{ $m->downloadUrl() }}" target="_blank" class="text-brand hover:text-brand-dark text-[12px] font-semibold inline-flex items-center gap-1">
+                            <a href="{{ $m->downloadUrl() }}" @if($m->external_url) target="_blank" rel="noopener" @endif class="text-brand hover:text-brand-dark text-[12px] font-semibold inline-flex items-center gap-1">
                                 <i class="pi pi-download text-[12px]"></i> Descargar
                             </a>
                         @else

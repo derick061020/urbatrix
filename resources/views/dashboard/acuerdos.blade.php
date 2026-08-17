@@ -390,7 +390,7 @@
             {{-- Header --}}
             <div class="px-5 py-3 border-b border-ink-100 flex items-center gap-3">
                 <div id="acm-title" class="font-display text-[16px] font-semibold text-ink-950 truncate flex-1">{{ __('Documento') }}</div>
-                <a id="acm-download" href="#" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-1.5 px-3"><i class="pi pi-download text-[11px]"></i> {{ __('Descargar') }}</a>
+                <a id="acm-download" href="#" class="cli-btn cli-btn-ghost text-[12px] py-1.5 px-3"><i class="pi pi-download text-[11px]"></i> {{ __('Descargar') }}</a>
                 <button type="button" onclick="closeAcuerdoModal()" class="w-9 h-9 rounded-full border border-ink-200 text-ink-500 hover:bg-ink-50 flex items-center justify-center"><i class="pi pi-times text-[12px]"></i></button>
             </div>
 
