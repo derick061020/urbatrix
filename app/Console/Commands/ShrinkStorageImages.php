@@ -130,7 +130,12 @@ class ShrinkStorageImages extends Command
         if (extension_loaded('imagick')) {
             return 'imagick';
         }
-        if (extension_loaded('gd') && function_exists('imagecreatetruecolor')) {
+        // GD puede estar compilado sin libjpeg/libwebp (pasa en imágenes Docker
+        // mínimas): entonces existe pero no sirve para esto.
+        if (extension_loaded('gd')
+            && function_exists('imagecreatetruecolor')
+            && function_exists('imagecreatefromjpeg')
+            && function_exists('imagejpeg')) {
             return 'gd';
         }
         foreach (['magick', 'convert'] as $bin) {
