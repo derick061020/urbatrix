@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=32">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=33">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -3499,6 +3499,9 @@
       const img = document.getElementById('modalMainImg');
       if (img) {
         img.src = modalImages[currentModalImg];
+        // Los planos son láminas sobre blanco: se muestran enteros (contain),
+        // los renders llenan el marco (cover).
+        img.classList.toggle('is-plan', /\/planos\//.test(modalImages[currentModalImg] || ''));
         const counter = document.getElementById('modalImgCounter');
         if (counter) counter.textContent = (currentModalImg + 1) + ' / ' + modalImages.length;
       }
@@ -3510,7 +3513,7 @@
         if (thumbsWrap.dataset.key !== key) {
           thumbsWrap.dataset.key = key;
           thumbsWrap.innerHTML = modalImages.map((src, i) =>
-            '<button type="button" class="mt-thumb" data-idx="' + i + '" aria-label="' + (i + 1) + '">' +
+            '<button type="button" class="mt-thumb' + (/\/planos\//.test(src) ? ' is-plan' : '') + '" data-idx="' + i + '" aria-label="' + (i + 1) + '">' +
               '<img src="' + src + '" alt="" loading="lazy" decoding="async">' +
             '</button>').join('');
         }

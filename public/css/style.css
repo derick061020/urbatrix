@@ -4185,6 +4185,9 @@
       object-fit: cover;
       display: block;
     }
+    /* Planos: lámina completa sobre blanco, sin recortar el cajetín ni el dibujo. */
+    .mt-gallery-img.is-plan { object-fit: contain; background: #fff; }
+    .mt-thumb.is-plan img   { object-fit: contain; background: #fff; }
     .mt-dim-toggle {
       position: absolute;
       top: 16px;
