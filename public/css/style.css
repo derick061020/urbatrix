@@ -4255,7 +4255,16 @@
       background: #eaecf0;
       border-top: 1px solid rgba(23, 23, 23, 0.04);
       flex-shrink: 0;
+      /* Una unidad puede traer 19 imágenes: la tira se desplaza en horizontal
+         y el JS centra la activa. Barra oculta, el scroll sigue funcionando. */
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
+    .mt-thumbs::-webkit-scrollbar { display: none; }
+    .mt-thumbs .mt-thumb { flex: 0 0 auto; scroll-snap-align: center; }
     .mt-thumb {
       width: 86px;
       height: 60px;
@@ -4358,7 +4367,7 @@
       .mt-tab { padding: 9px 6px; font-size: 9px; }
       .mt-tab span,
       .mt-tab { letter-spacing: 0.03em; }
-      .mt-thumbs { flex-wrap: wrap; }
+      .mt-thumbs { flex-wrap: nowrap; }
       .mt-thumb { width: 56px; height: 40px; }
     }
 

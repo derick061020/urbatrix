@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=31">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=32">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -530,20 +530,9 @@
           </div>
 
           <!-- Thumbs -->
-          <div class="mt-thumbs" id="mtThumbs">
-            <button type="button" class="mt-thumb active" data-idx="0">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="">
-            </button>
-            <button type="button" class="mt-thumb" data-idx="1">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Bahía Mar_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp" alt="">
-            </button>
-            <button type="button" class="mt-thumb" data-idx="2">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Bahía Mar_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp" alt="">
-            </button>
-            <button type="button" class="mt-thumb" data-idx="3">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Bahía Mar_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp" alt="">
-            </button>
-          </div>
+          {{-- Las miniaturas se generan en JS con todas las imágenes de la
+               unidad (antes eran 4 botones fijos y el resto no se veía). --}}
+          <div class="mt-thumbs" id="mtThumbs" aria-label="{{ __('Imágenes de la unidad') }}"></div>
         </section>
       </div><!-- /.mt-body -->
     </div><!-- /.mt-shell -->
@@ -3513,15 +3502,22 @@
         const counter = document.getElementById('modalImgCounter');
         if (counter) counter.textContent = (currentModalImg + 1) + ' / ' + modalImages.length;
       }
-      // Sync thumbs (Figma modal-tipologia)
+      // Miniaturas: una por imagen. Se regeneran sólo cuando cambia el juego
+      // de imágenes (otra unidad); al navegar sólo se mueve la activa.
       const thumbsWrap = document.getElementById('mtThumbs');
       if (thumbsWrap) {
-        const thumbs = thumbsWrap.querySelectorAll('.mt-thumb');
-        thumbs.forEach((t, i) => {
-          t.classList.toggle('active', i === currentModalImg);
-          const tImg = t.querySelector('img');
-          if (tImg && modalImages[i]) tImg.src = modalImages[i];
-          t.style.display = modalImages[i] ? '' : 'none';
+        const key = modalImages.join('\n');
+        if (thumbsWrap.dataset.key !== key) {
+          thumbsWrap.dataset.key = key;
+          thumbsWrap.innerHTML = modalImages.map((src, i) =>
+            '<button type="button" class="mt-thumb" data-idx="' + i + '" aria-label="' + (i + 1) + '">' +
+              '<img src="' + src + '" alt="" loading="lazy" decoding="async">' +
+            '</button>').join('');
+        }
+        thumbsWrap.querySelectorAll('.mt-thumb').forEach((t, i) => {
+          const on = i === currentModalImg;
+          t.classList.toggle('active', on);
+          if (on) t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
         });
       }
     }
