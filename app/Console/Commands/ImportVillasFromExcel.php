@@ -48,6 +48,7 @@ class ImportVillasFromExcel extends Command
                             {--keep-existing : No borrar las villas actuales antes de importar}
                             {--price-per-m2= : Precio = $/m² × m² privativos, en vez de los estimados por tipología}
                             {--no-images : No asignar el render de la tipología a cada villa}
+                            {--refresh-images : Rehacer las galerías del repo de las villas existentes (respeta las subidas a mano)}
                             {--private : Importa las villas como NO públicas (no se ven en el home)}
                             {--force : No pedir confirmación al borrar}
                             {--dry-run : Muestra lo que haría sin escribir en la base}';
@@ -224,8 +225,9 @@ class ImportVillasFromExcel extends Command
         $images  = 0;
 
         $withImages = ! $this->option('no-images');
+        $refresh    = $withImages && $this->option('refresh-images');
 
-        DB::transaction(function () use ($payloads, $withImages, &$created, &$updated, &$images) {
+        DB::transaction(function () use ($payloads, $withImages, $refresh, &$created, &$updated, &$images) {
             foreach ($payloads as $payload) {
                 $existing = Unit::where('custom_id', $payload['custom_id'])->first();
 
@@ -240,6 +242,9 @@ class ImportVillasFromExcel extends Command
                     $created++;
                 }
 
+                if ($refresh) {
+                    $this->dropRepoImages($unit);
+                }
                 if ($withImages && $this->attachRender($unit)) {
                     $images++;
                 }
@@ -348,6 +353,12 @@ class ImportVillasFromExcel extends Command
             return false;
         }
 
+        // Todas las villas de una tipología comparten galería, así que en el
+        // grid las 32 de Horizonte abrían con el mismo render. La portada rota
+        // entre los exteriores según el número de lote: 001 → R1, 002 → R2 …
+        // Es determinista, así que reimportar no baraja las portadas.
+        $rows = $this->rotateCover($rows, $unit->custom_id);
+
         foreach ($rows as $i => [$category, $path]) {
             UnitImage::create([
                 'unit_id'    => $unit->id,
@@ -404,6 +415,37 @@ class ImportVillasFromExcel extends Command
         }
 
         return $this->galleryCache[$layout] = $rows;
+    }
+
+    /** Rota el bloque de exteriores para que la portada dependa del lote. */
+    private function rotateCover(array $rows, ?string $customId): array
+    {
+        $ext = array_values(array_filter($rows, fn ($r) => $r[0] === 'property' && str_contains($r[1], '-exterior-')));
+        if (count($ext) < 2 || ! preg_match('/(\d+)\s*$/', (string) $customId, $m)) {
+            return $rows;
+        }
+        $shift = ((int) $m[1] - 1) % count($ext);
+        if ($shift === 0) {
+            return $rows;
+        }
+        $rotated = array_merge(array_slice($ext, $shift), array_slice($ext, 0, $shift));
+        $rest    = array_filter($rows, fn ($r) => ! ($r[0] === 'property' && str_contains($r[1], '-exterior-')));
+
+        return array_values(array_merge($rotated, $rest));
+    }
+
+    /**
+     * Borra las imágenes que puso este importador (galerías del repo y
+     * placeholders), dejando intactas las subidas a mano desde el panel.
+     */
+    private function dropRepoImages(Unit $unit): void
+    {
+        UnitImage::where('unit_id', $unit->id)
+            ->where(function ($q) {
+                $q->where('path', 'like', self::GALLERY_DIR . '%')
+                  ->orWhere('path', 'like', self::RENDER_DIR . '%');
+            })
+            ->delete();
     }
 
     /** Imágenes web de una carpeta, ordenadas por nombre (sin recursión). */
