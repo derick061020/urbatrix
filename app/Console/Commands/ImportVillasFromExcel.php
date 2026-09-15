@@ -35,7 +35,7 @@ use Illuminate\Support\Str;
  * —editables luego desde el admin— o un $/m² uniforme con --price-per-m2.
  *
  * Uso:
- *   php artisan villas:import                    # borra las villas actuales e importa las 248
+ *   php artisan villas:import                    # reemplaza las villas actuales por las del Excel
  *   php artisan villas:import --dry-run          # muestra el resumen sin tocar la base
  *   php artisan villas:import --keep-existing    # importa sin borrar (actualiza por custom_id)
  *   php artisan villas:import --price-per-m2=3500
@@ -69,24 +69,44 @@ class ImportVillasFromExcel extends Command
         'T1' => 1_100_000,
         'T2' => 750_000,
         'T3' => 620_000,
+        // T4/T5 (Villa D/E) entraron en el levantamiento de septiembre. Mismo
+        // criterio que los tres de arriba: ~US$2.500 por m² privativo.
+        'T4' => 490_000,   // 195,6 m²
+        'T5' => 600_000,   // 238,6 m²
     ];
 
     /**
-     * Render de referencia por tipología (public/images/seed-villas). Son los
-     * mismos que ya usaba el home; se asignan como imagen de la unidad para que
-     * las tarjetas no queden vacías, y se reemplazan subiendo los renders
-     * definitivos desde el panel. Se respeta cualquier imagen ya cargada.
+     * Galería por tipología. Los renders definitivos del estudio (agosto 2026)
+     * viven en public/images/villas/{carpeta}/: los archivos sueltos van como
+     * imágenes de la villa (categoría «property», en orden alfabético, así que
+     * el nombre manda el orden) y los de la subcarpeta planos/ como «plans».
+     *
+     * Es data-driven a propósito: para cambiar la galería de una tipología basta
+     * con reemplazar archivos en su carpeta y volver a importar. Se respeta
+     * cualquier imagen ya cargada a mano desde el panel.
+     *
+     * Si la carpeta no existe se cae a los placeholders de seed-villas, que son
+     * los que usaba el home antes de tener renders.
      */
+    private const GALLERY_DIRS = [
+        'T1' => 'villa-a',
+        'T2' => 'villa-b',
+        'T3' => 'villa-c',
+        'T4' => 'villa-d',
+        'T5' => 'villa-e',
+    ];
+
+    /** Placeholders anteriores, sólo como respaldo si no hay galería real. */
     private const RENDERS = [
-        'T1' => 'palma.jpg',   // 4 hab · el programa más grande
-        'T2' => 'marea.jpg',   // 3 hab
-        'T3' => 'coral.jpg',   // 2 hab
+        'T1' => 'palma.jpg',
+        'T2' => 'marea.jpg',
+        'T3' => 'coral.jpg',
         'T4' => 'brisa.jpg',
         'T5' => 'arena.jpg',
     ];
 
-    /** Carpeta pública de los renders. */
-    private const RENDER_DIR = '/images/seed-villas/';
+    private const GALLERY_DIR = '/images/villas/';
+    private const RENDER_DIR  = '/images/seed-villas/';
 
     public function handle(): int
     {
@@ -164,7 +184,8 @@ class ImportVillasFromExcel extends Command
         if ($this->option('dry-run')) {
             $existing = $this->existingVillasQuery()->count();
             $this->newLine();
-            $this->info("[dry-run] Se borrarían {$existing} villas y se crearían " . count($payloads) . '. Nada fue escrito.');
+            $prot = $this->protectedVillasQuery()->count();
+            $this->info("[dry-run] Se borrarían " . ($existing - $prot) . " villas (se conservarían {$prot} con reserva o no disponibles) y se crearían/actualizarían " . count($payloads) . '. Nada fue escrito.');
 
             return self::SUCCESS;
         }
@@ -196,7 +217,9 @@ class ImportVillasFromExcel extends Command
                 $existing = Unit::where('custom_id', $payload['custom_id'])->first();
 
                 if ($existing) {
-                    $existing->update($payload);
+                    // Datos físicos sí; estado, precio y visibilidad no, que son
+                    // los que se gestionan desde el panel y pueden tener reserva.
+                    $existing->update(array_diff_key($payload, array_flip(['status', 'price', 'public'])));
                     $unit = $existing;
                     $updated++;
                 } else {
@@ -214,7 +237,7 @@ class ImportVillasFromExcel extends Command
         if ($deleted) {
             $this->warn("Villas anteriores eliminadas: {$deleted}");
         }
-        $this->info("Listo. Creadas: {$created} · Actualizadas: {$updated}" . ($withImages ? " · Renders asignados: {$images}" : ''));
+        $this->info("Listo. Creadas: {$created} · Actualizadas: {$updated}" . ($withImages ? " · Villas con galería: {$images}" : ''));
         $this->info('Total de villas en la base: ' . $this->existingVillasQuery()->count());
 
         if (! $this->option('price-per-m2')) {
@@ -294,26 +317,95 @@ class ImportVillasFromExcel extends Command
      */
     private function attachRender(Unit $unit): bool
     {
-        if (UnitImage::where('unit_id', $unit->id)->exists()) {
+        $existing = UnitImage::where('unit_id', $unit->id)->count();
+        if ($existing > 0) {
+            // Ya tiene imágenes (del panel o de una importación previa): se
+            // respetan, pero el contador se deja consistente.
+            if ((int) $unit->images_count !== $existing) {
+                $unit->forceFill(['images_count' => $existing])->save();
+            }
+
             return false;
         }
 
-        $render = self::RENDERS[$unit->layout] ?? null;
-        if (! $render || ! is_file(public_path(self::RENDER_DIR . $render))) {
+        $rows = $this->galleryFor($unit->layout);
+        if ($rows === []) {
             return false;
         }
 
-        UnitImage::create([
-            'unit_id'    => $unit->id,
-            'category'   => 'property',
-            'name'       => $unit->custom_1 ?: $unit->name,
-            'path'       => self::RENDER_DIR . $render,
-            'sort_order' => 0,
-        ]);
+        foreach ($rows as $i => [$category, $path]) {
+            UnitImage::create([
+                'unit_id'    => $unit->id,
+                'category'   => $category,
+                'name'       => ($unit->custom_1 ?: $unit->name) . ($i ? " ({$i})" : ''),
+                'path'       => $path,
+                'sort_order' => $i,
+            ]);
+        }
 
-        $unit->forceFill(['images_count' => 1])->save();
+        $unit->forceFill(['images_count' => count($rows)])->save();
 
         return true;
+    }
+
+    /**
+     * [[categoría, ruta pública], …] para una tipología, en el orden en que se
+     * van a mostrar. Se memoriza por layout porque se llama una vez por villa.
+     *
+     * @return array<int, array{0:string,1:string}>
+     */
+    private array $galleryCache = [];
+
+    private function galleryFor(?string $layout): array
+    {
+        if ($layout === null) {
+            return [];
+        }
+        if (isset($this->galleryCache[$layout])) {
+            return $this->galleryCache[$layout];
+        }
+
+        $rows = [];
+        $dir  = self::GALLERY_DIRS[$layout] ?? null;
+        $abs  = $dir ? public_path(self::GALLERY_DIR . $dir) : null;
+
+        if ($abs && is_dir($abs)) {
+            foreach ($this->imageFiles($abs) as $f) {
+                $rows[] = ['property', self::GALLERY_DIR . $dir . '/' . $f];
+            }
+            if (is_dir($abs . '/planos')) {
+                foreach ($this->imageFiles($abs . '/planos') as $f) {
+                    $rows[] = ['plans', self::GALLERY_DIR . $dir . '/planos/' . $f];
+                }
+            }
+        }
+
+        // Sin galería real: el placeholder de siempre, para que la tarjeta no quede vacía.
+        if ($rows === []) {
+            $render = self::RENDERS[$layout] ?? null;
+            if ($render && is_file(public_path(self::RENDER_DIR . $render))) {
+                $rows[] = ['property', self::RENDER_DIR . $render];
+            }
+        }
+
+        return $this->galleryCache[$layout] = $rows;
+    }
+
+    /** Imágenes web de una carpeta, ordenadas por nombre (sin recursión). */
+    private function imageFiles(string $dir): array
+    {
+        $out = [];
+        foreach (scandir($dir) ?: [] as $f) {
+            if ($f[0] === '.' || ! is_file("$dir/$f")) {
+                continue;
+            }
+            if (preg_match('/\.(webp|jpe?g|png)$/i', $f)) {
+                $out[] = $f;
+            }
+        }
+        natcasesort($out);
+
+        return array_values($out);
     }
 
     /** Precio de la villa: $/m² uniforme si se pasó la opción, si no el estimado. */
@@ -384,9 +476,18 @@ class ImportVillasFromExcel extends Command
     private function deleteExistingVillas(): int
     {
         return DB::transaction(function () {
-            $ids   = $this->existingVillasQuery()->pluck('id');
+            // Nunca se borra una villa con compromiso comercial: `reservations`
+            // cae en cascada al borrar la unidad, así que borrarla sería borrar
+            // la reserva del cliente. Esas quedan y se actualizan por custom_id.
+            $protected = $this->protectedVillasQuery()->pluck('custom_id', 'id');
+            $ids       = $this->existingVillasQuery()
+                ->whereNotIn('id', $protected->keys())
+                ->pluck('id');
             $count = $ids->count();
 
+            if ($protected->isNotEmpty()) {
+                $this->warn('Con reserva o no disponibles, se conservan: ' . $protected->values()->sort()->implode(', '));
+            }
             if ($count === 0) {
                 return 0;
             }
@@ -396,6 +497,19 @@ class ImportVillasFromExcel extends Command
             Unit::whereIn('id', $ids)->delete();
 
             return $count;
+        });
+    }
+
+    /** Villas que tienen reserva, deal, o no están disponibles. */
+    private function protectedVillasQuery()
+    {
+        return $this->existingVillasQuery()->where(function ($q) {
+            // La app guarda el estado tanto en mayúsculas como en minúsculas.
+            $q->whereRaw('UPPER(status) <> ?', ['AVAILABLE'])
+              ->orWhereHas('reservations')
+              ->orWhereExists(function ($d) {
+                  $d->selectRaw('1')->from('deals')->whereColumn('deals.unit_id', 'units.id');
+              });
         });
     }
 
