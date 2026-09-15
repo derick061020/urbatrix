@@ -96,6 +96,19 @@ class ImportVillasFromExcel extends Command
         'T5' => 'villa-e',
     ];
 
+    /**
+     * Nombre comercial de cada tipología. El Excel las llama «Villa A» … «Villa
+     * E»; el nombre con el que se venden es este. La letra sigue viva en
+     * custom_id (A-001) y en custom_1 («Villa A · Horizonte») para el panel.
+     */
+    private const NOMBRES = [
+        'T1' => 'Horizonte',
+        'T2' => 'Esencia',
+        'T3' => 'Armonía',
+        'T4' => 'Ámbar',
+        'T5' => 'Remanso',
+    ];
+
     /** Placeholders anteriores, sólo como respaldo si no hay galería real. */
     private const RENDERS = [
         'T1' => 'palma.jpg',
@@ -299,7 +312,9 @@ class ImportVillasFromExcel extends Command
 
             // Información complementaria
             'description' => $typ['description'] ?: null,
-            'custom_1'    => $typ['model'],
+            'custom_1'    => $typ['code_label'] !== $typ['model']
+                ? $typ['code_label'] . ' · ' . $typ['model']
+                : $typ['model'],
             'custom_2'    => $phase,
             'custom_3'    => $this->extras($typ),
 
@@ -546,9 +561,12 @@ class ImportVillasFromExcel extends Command
                 continue;
             }
 
+            $excelModel = Str::title(trim($row['model'] ?? '')) ?: $code;
+
             $out[$code] = [
                 'code'            => $code,
-                'model'           => Str::title(trim($row['model'] ?? '')) ?: $code,
+                'model'           => self::NOMBRES[$code] ?? $excelModel,
+                'code_label'      => $excelModel,   // «Villa A», para custom_1
                 'description'     => trim($row['description'] ?? ''),
                 'stories'         => $this->num($row['stories'] ?? ''),
                 'bedrooms'        => $this->num($row['bedrooms'] ?? ''),
