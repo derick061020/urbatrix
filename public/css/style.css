@@ -3521,11 +3521,16 @@
 
     .mt-body {
       display: grid;
-      grid-template-columns: 468px 1fr;
+      /* minmax(0, 1fr) y no 1fr: un ítem de grid tiene min-width:auto, y la
+         tira de miniaturas (todas en fila) le daba a la columna un ancho
+         intrínseco enorme que ensanchaba el modal entero. */
+      grid-template-columns: 468px minmax(0, 1fr);
       min-height: 0;
       flex: 1;
       overflow: hidden;
     }
+    .mt-right  { min-width: 0; max-width: 100%; }
+    .mt-thumbs { min-width: 0; max-width: 100%; width: 100%; }
 
     /* === LEFT === */
     .mt-left {
@@ -4294,7 +4299,7 @@
       .mt-overlay { padding: 12px; }
       /* Stacked layout — let the whole modal scroll instead of forcing a fixed height */
       .mt-shell { height: auto; max-height: calc(100vh - 24px); }
-      .mt-body { grid-template-columns: 1fr; overflow-y: auto; }
+      .mt-body { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
       .mt-left { border-right: none; border-bottom: 1px solid #eaecf0; }
       .mt-right { min-height: 380px; }
       .mt-header { flex-wrap: wrap; }

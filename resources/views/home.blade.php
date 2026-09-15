@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-landmass.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=33">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=34">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
