@@ -336,6 +336,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Admin requests a document from the client + removes a request/document
     Route::post('/crm/expedientes/{reservation}/document/request', [AdminController::class, 'requestDocument'])->name('admin.crm.document.request');
     Route::post('/crm/document/{document}/delete', [AdminController::class, 'deleteDocumentQuick'])->name('admin.crm.document.delete');
+    Route::post('/crm/document/{document}/update', [AdminController::class, 'updateDocumentQuick'])->name('admin.crm.document.update');
     Route::post('/crm/payment/create',     [AdminController::class, 'createPaymentQuick'])->name('admin.crm.payment.create');
     Route::post('/crm/payment/receipt',    [AdminController::class, 'uploadReceiptChunk'])->name('admin.crm.payment.receipt');
     // Corrección de una cuota ya cargada (montos, fechas, método, concepto)

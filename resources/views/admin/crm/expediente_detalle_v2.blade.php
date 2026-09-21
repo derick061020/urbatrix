@@ -247,8 +247,30 @@
                                             <button type="button" onclick="openDocumentPreview(@js($previewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                                             <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                         @endif
-                                        @if($isRequested)
-                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm(@json(__('¿Eliminar esta solicitud de documento?')));">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
+                                        @if($d->document_type !== 'kyc')
+                                            @php
+                                                // Un plan/promesa firmado bloquea la tarjeta del plan y el
+                                                // estado del expediente: avisar que al borrarlo se destraban.
+                                                $locksFlow = in_array($d->document_type, ['payment_plan', 'purchase_promise', 'contract'])
+                                                    && in_array($d->status, ['signed', 'approved']);
+                                                $editPayload = [
+                                                    'url'      => route('admin.crm.document.update', $d->id),
+                                                    'title'    => $d->title,
+                                                    'type'     => $d->document_type,
+                                                    'status'   => $d->status,
+                                                    'date'     => optional($d->generated_at ?? $d->created_at)->format('Y-m-d'),
+                                                    'filename' => $hasFile ? $d->filename : null,
+                                                ];
+                                                $deleteMsg = $isRequested
+                                                    ? __('¿Eliminar esta solicitud de documento?')
+                                                    : ($locksFlow
+                                                        ? __('Se eliminará el archivo. El plan de pagos / contrato volverá a quedar editable y el expediente dejará de estar "contrato firmado". ¿Continuar?')
+                                                        : __('¿Eliminar este documento? Se borrará también el archivo.'));
+                                            @endphp
+                                            @unless($isRequested)
+                                                <button type="button" onclick="openEditDocument(@js($editPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 mr-1" title="{{ __('Editar') }}"><i class="pi pi-pencil text-[10px]"></i> {{ __('Editar') }}</button>
+                                            @endunless
+                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" data-confirm="{{ $deleteMsg }}" onsubmit="return confirmDeleteDocument(event, this)">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ $isRequested ? __('Eliminar solicitud') : __('Borrar documento') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
                                         @endif
                                     </td>
                                 </tr>
@@ -587,6 +609,7 @@
 </div>
 
 @include('admin.crm._partials.modal_subir_documento', ['reservationId' => $reservation->id])
+@include('admin.crm._partials.modal_editar_documento')
 @include('admin.crm._partials.modal_solicitar_documento', ['reservation' => $reservation])
 @include('admin.crm._partials.modal_registrar_pago', ['reservationId' => $reservation->id])
 @include('admin.crm._partials.modal_editar_pago')
@@ -716,6 +739,16 @@ function syncSignNow(docId, btn) {
         btn.disabled = false;
     });
 }
+
+// Borrar documento: confirma con el diálogo del CRM y recién ahí envía el form.
+window.confirmDeleteDocument = function (ev, form) {
+    ev.preventDefault();
+    const go = () => { form.onsubmit = null; form.submit(); };
+    if (!window.crmConfirm) { if (confirm(form.dataset.confirm)) go(); return false; }
+    crmConfirm({ title: @json(__('Borrar documento')), body: form.dataset.confirm, ok: @json(__('Borrar')), icon: 'pi-trash' })
+        .then(ok => { if (ok) go(); });
+    return false;
+};
 
 // ── Confirmación HTML reutilizable (devuelve Promise<boolean>) ──
 window.crmConfirm = function (opts) {

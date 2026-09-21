@@ -3288,22 +3288,111 @@ class AdminController extends Controller
     }
 
     /**
+     * Edita un documento del expediente: título, tipo, estado, fecha y, si se
+     * subió uno nuevo por chunks (file_path + file_name), reemplaza el archivo.
+     * Nació porque un plan de pagos subido con el PDF equivocado no tenía
+     * forma de corregirse sin borrar el expediente entero.
+     */
+    public function updateDocumentQuick(Request $request, Document $document)
+    {
+        $this->abortUnlessBrokerOwns($document->reservation);
+
+        $data = $request->validate([
+            'document_type' => 'required|string|max:50',
+            'title'         => 'required|string|max:255',
+            'status'        => 'required|string|in:pending,generated,signed,approved,rejected',
+            'generated_at'  => 'nullable|date',
+            'file_path'     => 'nullable|string|max:255',
+            'file_name'     => 'nullable|string|max:255',
+        ]);
+
+        $attrs = [
+            'document_type' => $data['document_type'],
+            'title'         => $data['title'],
+            'status'        => $data['status'],
+            'generated_at'  => $data['generated_at'] ?? $document->generated_at,
+        ];
+
+        // Archivo nuevo: se borra el anterior del disco y se apunta al recién subido.
+        if (! empty($data['file_path']) && $data['file_path'] !== $document->file_path) {
+            if ($document->file_path && $document->file_path !== 'pending'
+                && \Illuminate\Support\Facades\Storage::disk('public')->exists($document->file_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($document->file_path);
+            }
+            $attrs['file_path'] = $data['file_path'];
+            $attrs['filename']  = $data['file_name'] ?: basename($data['file_path']);
+        }
+
+        // Bajar de firmado/aprobado a otro estado deja sin efecto la firma; si no,
+        // fixDocumentStates() lo volvería a subir solo porque signed_at está lleno.
+        if (! in_array($data['status'], ['signed', 'approved'], true)) {
+            $attrs['signed_at']   = null;
+            $attrs['approved_at'] = null;
+        }
+
+        $document->update($attrs);
+        $this->releaseContractFlowIfNeeded($document);
+
+        return back()->with('success', __('Documento actualizado.'));
+    }
+
+    /**
      * Remove a document (or a pending request) from an expediente. Form-based
      * counterpart to the JSON documents.delete endpoint, so it can redirect back.
      */
     public function deleteDocumentQuick(Document $document)
     {
+        $this->abortUnlessBrokerOwns($document->reservation);
+
         $reservation = $document->reservation;
+
+        \App\Services\DocumentService::deleteDocument($document);
+
+        if ($reservation) {
+            $this->releaseContractFlowIfNeeded($document, $reservation);
+        }
+
+        return back()->with('success', __('Documento eliminado.'));
+    }
+
+    /** Un broker sólo toca documentos de expedientes de sus unidades. */
+    private function abortUnlessBrokerOwns(?Reservation $reservation): void
+    {
         if ($reservation && Auth::user()->role === 'broker') {
             $allowed = Auth::user()->assignedUnits()->pluck('units.id')->map(fn($i) => (string) $i)->all();
             if (! in_array((string) $reservation->unit_id, $allowed, true)) {
                 abort(403, __('No tienes acceso a este expediente.'));
             }
         }
+    }
 
-        \App\Services\DocumentService::deleteDocument($document);
+    /**
+     * Si se borró o dejó de estar firmado el plan de pagos / la promesa, el
+     * expediente no puede seguir "contrato firmado" ni el presupuesto
+     * "aceptado": la tarjeta del plan se destraba para poder rehacerlo.
+     */
+    private function releaseContractFlowIfNeeded(Document $document, ?Reservation $reservation = null): void
+    {
+        $reservation ??= $document->reservation;
+        if (! $reservation || ! in_array($document->document_type, ['payment_plan', 'purchase_promise', 'contract'], true)) {
+            return;
+        }
 
-        return back()->with('success', __('Documento eliminado.'));
+        $signed = fn (string $type) => $reservation->documents()
+            ->where('document_type', $type)->whereIn('status', ['signed', 'approved'])->exists();
+
+        $updates = [];
+        if ($document->document_type === 'payment_plan' && ! $signed('payment_plan')
+            && $reservation->budget_status === 'approved') {
+            $updates['budget_status'] = 'draft';
+        }
+        if (in_array($reservation->status, ['contract_signed', 'signed'], true)
+            && ! ($signed('payment_plan') && $signed('purchase_promise'))) {
+            $updates['status'] = 'confirmed';
+        }
+        if ($updates !== []) {
+            $reservation->update($updates);
+        }
     }
 
     public function createPaymentQuick(Request $request)

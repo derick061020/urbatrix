@@ -2752,5 +2752,18 @@
   "El monto pagado no puede superar el monto programado de la cuota.": "The paid amount cannot exceed the instalment's scheduled amount.",
   "Pago actualizado correctamente.": "Payment updated successfully.",
   "Registro fiscal / RNC": "Tax ID / Business registration",
-  "firmado": "signed"
+  "firmado": "signed",
+  "Editar documento": "Edit document",
+  "(opcional: dejá el actual o elegí otro)": "(optional: keep the current one or pick another)",
+  "Reemplazar archivo": "Replace file",
+  "Archivo nuevo listo": "New file ready",
+  "No se pudo subir el archivo.": "The file could not be uploaded.",
+  "Esperá a que termine la subida del archivo.": "Wait for the file upload to finish.",
+  "Un plan de pagos en estado firmado o aprobado bloquea la tarjeta del plan en la pestaña Pagos. Si lo pasás a otro estado, el plan vuelve a quedar editable.": "A payment plan in signed or approved status locks the plan card in the Payments tab. Switching it to another status makes the plan editable again.",
+  "Promesa de compraventa (generada)": "Purchase promise (generated)",
+  "Borrar documento": "Delete document",
+  "Borrar": "Delete",
+  "¿Eliminar este documento? Se borrará también el archivo.": "Delete this document? The file will be removed as well.",
+  "Se eliminará el archivo. El plan de pagos / contrato volverá a quedar editable y el expediente dejará de estar \"contrato firmado\". ¿Continuar?": "The file will be removed. The payment plan / contract becomes editable again and the case file is no longer \"contract signed\". Continue?",
+  "Documento actualizado.": "Document updated."
 }
