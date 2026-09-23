@@ -2765,5 +2765,9 @@
   "Borrar": "Delete",
   "¿Eliminar este documento? Se borrará también el archivo.": "Delete this document? The file will be removed as well.",
   "Se eliminará el archivo. El plan de pagos / contrato volverá a quedar editable y el expediente dejará de estar \"contrato firmado\". ¿Continuar?": "The file will be removed. The payment plan / contract becomes editable again and the case file is no longer \"contract signed\". Continue?",
-  "Documento actualizado.": "Document updated."
+  "Documento actualizado.": "Document updated.",
+  "Eliminar cuota": "Delete installment",
+  "¿Eliminar esta cuota del calendario?": "Delete this installment from the schedule?",
+  "Esta cuota tiene $:monto ya registrados como pagados y se borrará junto con su comprobante. ¿Eliminarla igual?": "This installment has $:monto already recorded as paid and will be deleted along with its receipt. Delete it anyway?",
+  "Cuota eliminada: ": "Installment deleted: "
 }

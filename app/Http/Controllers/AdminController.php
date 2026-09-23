@@ -3355,6 +3355,33 @@ class AdminController extends Controller
         return back()->with('success', __('Documento eliminado.'));
     }
 
+    /**
+     * Borra una cuota del calendario de pagos (y su comprobante del disco).
+     * Contraparte por formulario del endpoint JSON deletePayment, para poder
+     * volver al expediente con el mensaje.
+     *
+     * Hace falta porque el calendario se genera desde el plan y, si una cuota
+     * entró con la fecha o el monto equivocados, editarla no alcanza cuando lo
+     * que sobra es la fila entera.
+     */
+    public function deletePaymentQuick(Payment $payment)
+    {
+        $reservation = $payment->reservation;
+        $this->abortUnlessBrokerOwns($reservation);
+
+        $label = $payment->display_label;
+
+        DB::transaction(function () use ($payment) {
+            // El comprobante es de esta cuota y de ninguna otra: se va con ella.
+            if ($payment->receipt_path && Storage::disk('public')->exists($payment->receipt_path)) {
+                Storage::disk('public')->delete($payment->receipt_path);
+            }
+            $payment->delete();
+        });
+
+        return back()->with('success', __('Cuota eliminada: ') . $label);
+    }
+
     /** Un broker sólo toca documentos de expedientes de sus unidades. */
     private function abortUnlessBrokerOwns(?Reservation $reservation): void
     {

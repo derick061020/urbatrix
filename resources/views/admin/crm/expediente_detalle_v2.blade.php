@@ -431,6 +431,20 @@
                                                     class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Subir comprobante') }}">
                                                 <i class="pi pi-paperclip text-[10px]"></i> {{ $p->receipt_path ? __('Reemplazar') : __('Adjuntar') }}
                                             </button>
+                                            {{-- Borrar la fila entera: para cuotas que no deberían existir
+                                                 (fechas o conceptos cargados mal). Editar no alcanza ahí. --}}
+                                            @php
+                                                $delMsg = $p->paid_amount > 0
+                                                    ? __('Esta cuota tiene $:monto ya registrados como pagados y se borrará junto con su comprobante. ¿Eliminarla igual?', ['monto' => number_format((float) $p->paid_amount, 2)])
+                                                    : __('¿Eliminar esta cuota del calendario?');
+                                            @endphp
+                                            <form method="POST" action="{{ route('admin.crm.payment.delete', $p->id) }}" class="inline m-0"
+                                                  data-confirm="{{ $delMsg }}" data-label="{{ $p->display_label }}"
+                                                  onsubmit="return confirmDeletePayment(event, this)">@csrf
+                                                <button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar cuota') }}">
+                                                    <i class="pi pi-trash text-[10px]"></i> {{ __('Eliminar') }}
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -739,6 +753,17 @@ function syncSignNow(docId, btn) {
         btn.disabled = false;
     });
 }
+
+// Borrar una cuota del calendario: confirma con el diálogo del CRM. Avisa
+// aparte cuando la cuota ya tiene monto pagado, porque se pierde el comprobante.
+window.confirmDeletePayment = function (ev, form) {
+    ev.preventDefault();
+    const go = () => { form.onsubmit = null; form.submit(); };
+    if (!window.crmConfirm) { if (confirm(form.dataset.confirm)) go(); return false; }
+    crmConfirm({ title: @json(__('Eliminar cuota')) + ' · ' + form.dataset.label, body: form.dataset.confirm, ok: @json(__('Eliminar')), icon: 'pi-trash' })
+        .then(ok => { if (ok) go(); });
+    return false;
+};
 
 // Borrar documento: confirma con el diálogo del CRM y recién ahí envía el form.
 window.confirmDeleteDocument = function (ev, form) {

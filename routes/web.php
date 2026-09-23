@@ -341,6 +341,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/payment/receipt',    [AdminController::class, 'uploadReceiptChunk'])->name('admin.crm.payment.receipt');
     // Corrección de una cuota ya cargada (montos, fechas, método, concepto)
     Route::post('/crm/payment/{payment}/update', [AdminController::class, 'updatePaymentEntry'])->name('admin.crm.payment.update');
+    Route::post('/crm/payment/{payment}/delete', [AdminController::class, 'deletePaymentQuick'])->name('admin.crm.payment.delete');
     Route::get('/crm/export',              [AdminController::class, 'exportResource'])->name('admin.crm.export');
     Route::post('/crm/export/request-code', [AdminController::class, 'requestExportCode'])->name('admin.crm.export.request');
     Route::post('/crm/export/resend-code',  [AdminController::class, 'resendExportCode'])->name('admin.crm.export.resend');
