@@ -60,21 +60,36 @@ else
 fi
 
 echo
-echo "3· Aplicación"
+echo "3· Dependencias PHP"
+# El compose monta el repo sobre /var/www, lo que tapa el vendor/ que quedó en
+# la imagen. Como vendor/ no está versionado, hay que instalarlo dentro del
+# contenedor contra el directorio montado o artisan no arranca.
+if [[ $DRY -eq 0 ]] && [[ ! -f vendor/autoload.php ]]; then
+  run docker exec siebe_app composer install --no-dev --optimize-autoloader --no-interaction
+else
+  [[ $DRY -eq 1 ]] && echo "   [dry-run] composer install si falta vendor/"
+fi
+
+# php-fpm corre como www-data; el checkout es de root, así que sin esto
+# Laravel no puede escribir logs ni caché y todo responde 500.
+run docker exec siebe_app chown -R www-data:www-data storage bootstrap/cache
+
+echo
+echo "4· Aplicación"
 run docker exec siebe_app php artisan migrate --force
 run docker exec siebe_app php artisan db:seed --class=AdminUserSeeder --force
 run docker exec siebe_app php artisan db:seed --class=CrmOperativoSeeder --force
 
 echo
-echo "4· Catálogo: 18 unidades desde la lista de precios del estudio"
+echo "5· Catálogo: 18 unidades desde la lista de precios del estudio"
 run docker exec siebe_app php artisan units:import --public --force
 
 echo
-echo "5· Galería compartida (renders del estudio)"
+echo "6· Galería compartida (renders del estudio)"
 run docker exec siebe_app php artisan units:shared-images
 
 echo
-echo "6· Cachés"
+echo "7· Cachés"
 run docker exec siebe_app php artisan storage:link
 run docker exec siebe_app php artisan config:clear
 run docker exec siebe_app php artisan view:clear
