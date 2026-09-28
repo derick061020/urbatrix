@@ -48,11 +48,8 @@
         content:""; position:absolute; top:32px; right:32px;
         width: 300px; height: 300px;
         background: url('/images/isotipo-siebe.png') no-repeat center/contain;
-        opacity: 1;
-        /* El isotipo es blanco pleno, pero sobre las zonas claras del render
-           (ventanal, cortinas) se diluía y parecía translúcido. La sombra lo
-           despega del fondo sin bajarle el blanco. */
-        filter: drop-shadow(0 6px 22px rgba(30,28,26,0.55));
+        /* Marca de agua discreta: el render manda y el isotipo sólo lo firma. */
+        opacity: 0.35;
         pointer-events:none;
       }
       @media (max-width: 900px) {
