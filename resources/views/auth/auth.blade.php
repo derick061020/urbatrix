@@ -45,11 +45,18 @@
       }
       /* Decorative isotipo in the hero top-right area */
       .auth-bg::after {
-        content:""; position:absolute; top:-10px; right:-10px;
-        width: 450px; height: 450px;
+        content:""; position:absolute; top:32px; right:32px;
+        width: 300px; height: 300px;
         background: url('/images/isotipo-siebe.png') no-repeat center/contain;
         opacity: 1;
+        /* El isotipo es blanco pleno, pero sobre las zonas claras del render
+           (ventanal, cortinas) se diluía y parecía translúcido. La sombra lo
+           despega del fondo sin bajarle el blanco. */
+        filter: drop-shadow(0 6px 22px rgba(30,28,26,0.55));
         pointer-events:none;
+      }
+      @media (max-width: 900px) {
+        .auth-bg::after { width: 190px; height: 190px; top: 20px; right: 20px; }
       }
 
       /* ---- Floating panel ---- */
