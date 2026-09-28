@@ -27,7 +27,7 @@ class CrmTemplateRenderer
         'nombre_profesional'     => 'María Broker',
         'nombre_asesor'          => 'Ana Gómez',
         'tel_asesor'             => '+1 809 555 0100',
-        'proyecto'               => 'Makai Residences',
+        'proyecto'               => 'Siebe Residences',
         'unidad'                 => 'A-204',
         'precio_venta'           => 'USD 285,000.00',
         'monto_reserva'          => 'USD 15,000.00',
@@ -48,8 +48,8 @@ class CrmTemplateRenderer
         'mes_reporte'            => 'Mayo 2026',
         'num_fotos'              => '12',
         'hitos_actualizados'     => '3',
-        'link_portal'            => 'https://makairesidences.com/dashboard',
-        'link_comprobante'       => 'https://makairesidences.com/dashboard/payments',
+        'link_portal'            => 'https://sieberesidences.com/dashboard',
+        'link_comprobante'       => 'https://sieberesidences.com/dashboard/payments',
     ];
 
     /**

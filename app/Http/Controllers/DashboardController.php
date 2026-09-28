@@ -372,7 +372,7 @@ class DashboardController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Presupuesto aceptado. Bienvenido a Makai Residences.'),
+                'message' => __('Presupuesto aceptado. Bienvenido a Siebe Residences.'),
                 'redirect' => route('dashboard')
             ]);
 

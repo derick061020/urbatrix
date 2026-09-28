@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Dashboard — CRM Duna Makai'))
+@section('title', __('Dashboard — CRM Siebe'))
 @section('page_title', __('Escritorio'))
 @section('page_breadcrumb', __('Vista global · todos los proyectos'))
 @php $activeRoute = 'crm.dashboard'; @endphp

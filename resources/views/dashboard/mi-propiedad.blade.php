@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', __('Mi Propiedad').' — MAKAI')
+@section('title', __('Mi Propiedad').' — SIEBE')
 @section('page_title', __('Mi Propiedad'))
-@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Makai Residences')
+@section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Siebe Residences')
 @php $activeRoute = 'mi-propiedad'; @endphp
 
 @section('content')
@@ -96,15 +96,15 @@
 
     {{-- Hero card with property summary --}}
     <div class="cli-card overflow-hidden relative">
-        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#5c7c68 0%, #3f5848 100%)">
-            {{-- Decorative Makai isotipo top-right (matches login) --}}
-            <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt=""
+        <div class="p-7 text-white relative overflow-hidden" style="background:linear-gradient(135deg,#2b2b1a 0%, #3f5848 100%)">
+            {{-- Decorative Siebe isotipo top-right (matches login) --}}
+            <img src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt=""
                  class="absolute -top-16 -right-24 w-[360px] h-[360px] pointer-events-none opacity-20 select-none" />
 
             <div class="relative z-10">
                 <div class="text-[11px] uppercase tracking-[0.18em] font-semibold opacity-80">{{ __('Tu propiedad') }}</div>
                 <div class="font-display text-[48px] font-medium leading-tight mt-1">{{ $unidad }}</div>
-                <div class="text-[13px] opacity-80 mt-1">{{ __('Makai Residences · Cap Cana, Punta Cana') }}</div>
+                <div class="text-[13px] opacity-80 mt-1">{{ __('Siebe Residences · Aruba') }}</div>
 
                 {{-- Quick stats pills --}}
                 <div class="mt-6 inline-flex items-stretch rounded-2xl bg-white/10 backdrop-blur border border-white/15 overflow-hidden">
@@ -168,8 +168,8 @@
                         [__('Interior'),  ($reservation->unit->internal_area ?? '959').' sqft'],
                         [__('Terraza'),   ($reservation->unit->expense_1 ?? '207').' sqft'],
                         [__('Vista'),     ($reservation->unit->outlook ?? 'Lake Facing')],
-                        [__('Proyecto'),  'Makai Residences'],
-                        [__('Ubicación'), 'Cap Cana, Punta Cana · RD'],
+                        [__('Proyecto'),  'Siebe Residences'],
+                        [__('Ubicación'), 'Aruba · RD'],
                     ];
                 @endphp
                 @foreach($details as $d)
@@ -217,7 +217,7 @@
             {{-- Asesor card --}}
             <div class="cli-card p-4">
                 <div class="flex items-center gap-3">
-                    <div class="cli-avatar" style="background:#5c7c68">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
+                    <div class="cli-avatar" style="background:#2b2b1a">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? 'Carlos Méndez' }}</div>
                         <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> {{ __('Disponible ahora') }}</div>

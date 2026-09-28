@@ -17,7 +17,7 @@ $attendants = [
         'username'    => '-',
         'user_app_id' => '-',
         'disabled'    => false,
-        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fattendants%2Fab6e3c82-0a5a-4aa3-9e5c-f52b02b82e10.png?alt=media&token=72a08a87-3a6a-4bb8-9ae4-1655b900b400',
+        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/siebe-savyo.firebasestorage.app/o/images%2Fattendants%2Fab6e3c82-0a5a-4aa3-9e5c-f52b02b82e10.png?alt=media&token=72a08a87-3a6a-4bb8-9ae4-1655b900b400',
     ],
     [
         'name'        => 'Ernesto Rivas',
@@ -28,7 +28,7 @@ $attendants = [
         'username'    => '-',
         'user_app_id' => '-',
         'disabled'    => false,
-        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fattendants%2F6b301dff-0901-4959-9e55-6d0bb4ae415d.png?alt=media&token=4ce38092-a502-444b-a6c9-0463c21a9ba6',
+        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/siebe-savyo.firebasestorage.app/o/images%2Fattendants%2F6b301dff-0901-4959-9e55-6d0bb4ae415d.png?alt=media&token=4ce38092-a502-444b-a6c9-0463c21a9ba6',
     ],
     [
         'name'        => 'Maria Virginia',
@@ -39,7 +39,7 @@ $attendants = [
         'username'    => '-',
         'user_app_id' => '-',
         'disabled'    => false,
-        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fattendants%2F5b4575b4-633a-41cb-b038-08da46aaef3f.png?alt=media&token=f5bcb7fd-9df6-4411-b032-625af05417e0',
+        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/siebe-savyo.firebasestorage.app/o/images%2Fattendants%2F5b4575b4-633a-41cb-b038-08da46aaef3f.png?alt=media&token=f5bcb7fd-9df6-4411-b032-625af05417e0',
     ],
     [
         'name'        => 'Vanessa Garcia',
@@ -50,7 +50,7 @@ $attendants = [
         'username'    => '-',
         'user_app_id' => '-',
         'disabled'    => false,
-        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/makai-savyo.firebasestorage.app/o/images%2Fattendants%2F8d96b8e7-c00c-475e-b2b0-592993835e99.png?alt=media&token=fef82b2a-2b66-4e9c-8608-3aa6d343520e',
+        'avatar'      => 'https://firebasestorage.googleapis.com/v0/b/siebe-savyo.firebasestorage.app/o/images%2Fattendants%2F8d96b8e7-c00c-475e-b2b0-592993835e99.png?alt=media&token=fef82b2a-2b66-4e9c-8608-3aa6d343520e',
     ],
 ];
 $attendants = json_encode($attendants);

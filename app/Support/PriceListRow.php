@@ -4,7 +4,7 @@ namespace App\Support;
 
 /**
  * Lectura de una fila de las listas de precios en CSV
- * (database/data/makai_etapa_*.csv).
+ * (database/data/siebe_etapa_*.csv).
  *
  * Vive aparte porque la usan dos comandos: units:import, que recrea las
  * unidades desde cero, y units:prices, que sólo mueve los precios cuando el
@@ -115,7 +115,9 @@ class PriceListRow
     {
         $beds   = (int) filter_var($bedroomsRaw, FILTER_SANITIZE_NUMBER_INT);
         $feat   = strtolower($feature);
-        $isPent = $floor === '6th';
+        // Penthouse por planta (Makai: la 6ª) o porque la lista lo marca con
+        // rooftop propio (Siebe: los dos PH están en la 4ª, la última).
+        $isPent = $floor === '6th' || str_contains($feat, 'roof top') || str_contains($feat, 'rooftop');
 
         if ($isPent) {
             return $beds >= 2 ? 'penthouse_2_bed' : 'penthouse_1_bed';
@@ -123,7 +125,10 @@ class PriceListRow
         if (str_contains($feat, 'family')) {
             return '1_bed_family';
         }
-        if (str_contains($feat, 'lock')) {
+        // «1 Bed & Studio Lock-off» describe una unidad de un dormitorio con el
+        // estudio separable. En Siebe los Lock-off son de dos dormitorios, así
+        // que ahí manda el número de habitaciones, no la característica.
+        if (str_contains($feat, 'lock') && $beds <= 1) {
             return '1_bed_studio';
         }
 

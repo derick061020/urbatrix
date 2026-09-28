@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Proyectos — CRM Duna Makai'))
+@section('title', __('Proyectos — CRM Siebe'))
 @section('page_title', __('Proyectos'))
 @section('page_breadcrumb', __('Proyectos · Gestión de proyectos'))
 @php $activeRoute = 'crm.proyectos'; @endphp
@@ -73,7 +73,7 @@
     }
     .pr-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
     .pr-btn-ghost:hover { background:#f5f7fa; }
-    .pr-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; }
+    .pr-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; }
     .pr-btn-primary:hover { background:#4a6354; }
     .pr-avatar-sm {
         width:30px; height:30px; border-radius:999px;
@@ -98,7 +98,7 @@
 
     // Fallback assets when no icon_path is stored in DB (matched by slug prefix)
     $iconFallback = [
-        'makai'  => '/images/projects/makai.png',
+        'siebe'  => '/images/projects/siebe.png',
         'naviva' => '/images/projects/naviva.png',
         'liv'    => '/images/projects/liv.png',
     ];
@@ -112,7 +112,7 @@
             }
         }
         return [
-            'bg'  => $p->color ?: '#5c7c68',
+            'bg'  => $p->color ?: '#2b2b1a',
             'img' => $img,
         ];
     };
@@ -328,10 +328,10 @@
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Tipo') }}</label><input type="text" name="type" placeholder="{{ __('Residencial') }}" class="crm-input pl-3 mt-1"></div>
                 <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Etapa') }}</label><input type="text" name="stage" placeholder="{{ __('En desarrollo') }}" class="crm-input pl-3 mt-1"></div>
             </div>
-            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ubicación') }}</label><input type="text" name="location" placeholder="{{ __('Cap Cana · Punta Cana') }}" class="crm-input pl-3 mt-1"></div>
+            <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ubicación') }}</label><input type="text" name="location" placeholder="{{ __('Aruba · Punta Cana') }}" class="crm-input pl-3 mt-1"></div>
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="text-[12px] font-semibold text-ink-700">Avance %</label><input type="number" name="progress" value="0" min="0" max="100" class="crm-input pl-3 mt-1"></div>
-                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Color') }}</label><input type="color" name="color" value="#5c7c68" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>
+                <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Color') }}</label><input type="color" name="color" value="#2b2b1a" class="h-9 w-full rounded-md border border-ink-200 mt-1"></div>
             </div>
             <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Ícono (URL o ruta)') }}</label><input type="text" name="icon_path" placeholder="/images/projects/proyecto.png" class="crm-input pl-3 mt-1"></div>
             <div><label class="text-[12px] font-semibold text-ink-700">{{ __('Descripción') }}</label><textarea name="description" rows="3" class="crm-input pl-3 pt-2 mt-1 h-auto resize-none"></textarea></div>

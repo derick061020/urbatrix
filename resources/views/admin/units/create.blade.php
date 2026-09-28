@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Nueva unidad — CRM Duna Makai'))
+@section('title', __('Nueva unidad — CRM Siebe'))
 @section('page_title', __('Nueva unidad'))
 @section('page_breadcrumb', __('Proyectos · Unidades · Crear'))
 @php $activeRoute = 'units'; @endphp

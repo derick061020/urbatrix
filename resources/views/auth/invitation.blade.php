@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('MAKAI · Activar cuenta') }}</title>
+    <title>{{ __('SIEBE · Activar cuenta') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -32,13 +32,13 @@
       html, body { font-family: 'Inter', system-ui, sans-serif; overflow:hidden; }
       #auth-panel { position: relative; z-index: 10; background:#fff; width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
       .auth-input { width:100%; height:40px; padding:0 14px; border:1px solid #ebebeb; border-radius:10px; background:#fff; color:#171717; font-size:14px; transition: border-color .15s, box-shadow .15s; }
-      .auth-input:focus { outline:none; border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.15); }
+      .auth-input:focus { outline:none; border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.15); }
       .auth-input::placeholder { color:#a3a3a3; }
       .has-icon  { padding-left:38px; }
       .has-trail { padding-right:40px; }
       .auth-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:10px; font-weight:500; font-size:14px; line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s, color .15s, transform .12s; }
       .auth-btn:active { transform: translateY(1px); }
-      .auth-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
+      .auth-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
       .auth-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#f5f5f5; color:#171717; border:1px solid transparent; }
@@ -129,7 +129,7 @@
         </main>
 
         <footer class="relative z-10 flex items-center justify-between px-7 lg:px-11 py-5 text-[12px] text-ink-500 mt-auto">
-            <span>{{ __('© 2026 MAKAI RESIDENCES') }}</span>
+            <span>{{ __('© 2026 SIEBE RESIDENCES') }}</span>
             @include('auth._lang_select')
         </footer>
     </div>

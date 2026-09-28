@@ -9,8 +9,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Importa unidades de Makai desde las listas de precios en CSV
- * (database/data/makai_etapa_*.csv).
+ * Importa unidades de Siebe desde las listas de precios en CSV
+ * (database/data/siebe_etapa_*.csv).
  *
  * Estructura esperada del CSV (17 columnas, generadas desde el Excel original):
  *   0  Apartamento / Unit          → name
@@ -37,8 +37,8 @@ use Illuminate\Support\Facades\DB;
 class ImportUnitsFromCsv extends Command
 {
     protected $signature = 'units:import
-                            {files?* : Rutas a los CSV (por defecto database/data/makai_etapa_*.csv)}
-                            {--project=Makai Cap Cana : Nombre del proyecto destino}
+                            {files?* : Rutas a los CSV (por defecto database/data/siebe_etapa_*.csv)}
+                            {--project=Siebe Residences : Nombre del proyecto destino}
                             {--fresh : Borra todas las unidades del proyecto antes de importar}
                             {--public : Marca las unidades como públicas (visibles en el home)}
                             {--force : No pedir confirmación al borrar}';
@@ -49,7 +49,7 @@ class ImportUnitsFromCsv extends Command
     {
         $files = $this->argument('files');
         if (empty($files)) {
-            $files = glob(database_path('data/makai_etapa_*.csv'));
+            $files = glob(database_path('data/siebe_etapa_*.csv'));
             sort($files);
         }
 

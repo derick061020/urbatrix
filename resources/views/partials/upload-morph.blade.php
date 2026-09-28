@@ -20,7 +20,7 @@
         m.reset();
 
     El color se toma del token `brand` de Tailwind leyendo un probe, así el
-    mismo archivo funciona en main/makai (#5c7c68) y landmass (#074540) sin
+    mismo archivo funciona en main/siebe (#2b2b1a) y landmass (#074540) sin
     tocar una línea.
 --}}
 
@@ -28,7 +28,7 @@
 @push('styles')
 <style>
 :root{
-  --upl-brand:#5c7c68;                                        /* lo pisa el probe */
+  --upl-brand:#2b2b1a;                                        /* lo pisa el probe */
   --upl-deep:color-mix(in srgb, var(--upl-brand) 58%, #0d120f);
   --upl-groove:rgba(255,255,255,.17);
   --upl-err:#fb3748;

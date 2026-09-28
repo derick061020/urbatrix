@@ -19,7 +19,7 @@
     <!-- PAGE HEADER -->
     <div>
         <header class="mb-4">
-            <h1 class="text-3xl font-semibold text-surface-700">{{ __('Makai Residences Sales') }}</h1>
+            <h1 class="text-3xl font-semibold text-surface-700">{{ __('Siebe Residences Sales') }}</h1>
             <p class="text-surface-700 text-base">{{ __('Manage your interactive price list and development sales') }}</p>
         </header>
 
@@ -282,12 +282,12 @@
             scales: {
                 x: {
                     grid: { display: true, color: 'rgba(0,0,0,0.06)' },
-                    ticks: { font: { family: 'Montserrat', size: 10 }, color: '#888', maxRotation: 45, minRotation: 30 }
+                    ticks: { font: { family: 'Open Sans', size: 10 }, color: '#888', maxRotation: 45, minRotation: 30 }
                 },
                 y: {
                     beginAtZero: true,
                     grid: { color: 'rgba(0,0,0,0.06)' },
-                    ticks: { font: { family: 'Montserrat', size: 11 }, color: '#888' }
+                    ticks: { font: { family: 'Open Sans', size: 11 }, color: '#888' }
                 }
             }
         }

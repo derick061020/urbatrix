@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Cuelga en todas las unidades del proyecto las imágenes compartidas que viven
- * en el repo (public/images/makai/): las áreas comunes van a la pestaña
+ * en el repo (public/images/siebe/): las áreas comunes van a la pestaña
  * «Amenidades» y los renders genéricos de interiores a «Propiedad».
  *
  * Es idempotente: una imagen ya colgada (misma ruta) no se repite, así que se
@@ -29,9 +29,9 @@ class AttachSharedUnitImages extends Command
                             {--dry-run : Sólo mostrar qué haría}
                             {--remove : Quitar de las unidades las imágenes del repo en vez de agregarlas}';
 
-    protected $description = 'Agrega a todas las unidades las imágenes compartidas de public/images/makai (áreas comunes y renders genéricos)';
+    protected $description = 'Agrega a todas las unidades las imágenes compartidas de public/images/siebe (áreas comunes y renders genéricos)';
 
-    private const BASE = '/images/makai/';
+    private const BASE = '/images/siebe/';
 
     /**
      * [ruta relativa a BASE, categoría, nombre visible, regla].
@@ -44,25 +44,18 @@ class AttachSharedUnitImages extends Command
      * dejar reservado el hueco de una foto que todavía no llegó.
      */
     private const MANIFEST = [
-        // ── Renders genéricos de la unidad (pestaña Propiedad) ─────────────
-        ['propiedades/01-beach-pool.jpg',   'property',  'Beach pool',           null],
-        ['propiedades/02-sala.jpg',         'property',  'Sala',                 '1_bed'],
-        ['propiedades/03-cocina.jpg',       'property',  'Cocina',               'not:T2,T3,T8,T9'],
-        ['propiedades/04-habitacion.jpg',   'property',  'Habitación principal', null], // pendiente de recibir
-        ['propiedades/05-bano.jpg',         'property',  'Baño',                 null],
-        ['propiedades/06-terraza-ph.jpg',   'property',  'Terraza privada',      'penthouse'],
+        // ── Renders de la unidad (pestaña Propiedad) ───────────────────────
+        ['propiedades/01-salon.jpg',            'property',  'Salón',              null],
+        ['propiedades/02-salon-cocina.jpg',     'property',  'Salón y cocina',     null],
+        ['propiedades/03-cocina.jpg',           'property',  'Cocina',             null],
+        ['propiedades/04-dormitorio.jpg',       'property',  'Dormitorio',         null],
+        ['propiedades/05-bano.jpg',             'property',  'Baño',               null],
 
-        // ── Áreas comunes (pestaña Amenidades) ────────────────────────────
-        ['comunes/01-cine.jpg',             'amenities', 'Cine',                 null],
-        ['comunes/02-lobby.jpg',            'amenities', 'Lobby',                null],
-        ['comunes/03-entrada.jpg',          'amenities', 'Entrada',              null],
-        ['comunes/04-gimnasio.jpg',         'amenities', 'Gimnasio',             null],
-        ['comunes/05-lago.jpg',             'amenities', 'Lago',                 null],
-        ['comunes/06-muelle.jpg',           'amenities', 'Muelle',               null],
-        ['comunes/07-restaurante.jpg',      'amenities', 'Restaurante',          null],
-        ['comunes/08-piscina-rooftop.jpg',  'amenities', 'Piscina rooftop',      null],
-        ['comunes/09-piscina-jardin.jpg',   'amenities', 'Piscina jardín',       null],
-        ['comunes/10-fachada.jpg',          'amenities', 'Fachada',              null],
+        // ── Edificio y entorno (pestaña Amenidades) ────────────────────────
+        ['comunes/01-fachada-atardecer.jpg',    'amenities', 'Fachada al atardecer', null],
+        ['comunes/02-fachada-hora-azul.jpg',    'amenities', 'Fachada · hora azul',  null],
+        ['comunes/03-fachada-diurna.jpg',       'amenities', 'Fachada de día',       null],
+        ['comunes/04-entorno.jpg',              'amenities', 'Entorno',              null],
     ];
 
     public function handle(): int

@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Bienvenido — MAKAI'))
+@section('title', __('Bienvenido — SIEBE'))
 @section('page_title', __('Bienvenido'))
 @section('page_breadcrumb', __('Aún sin propiedad'))
 @php $activeRoute = 'mi-propiedad'; @endphp

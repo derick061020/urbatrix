@@ -206,7 +206,7 @@ class Unit extends Model
      * Un input vacío del formulario llega como null (ConvertEmptyStringsToNull)
      * y MySQL lo rechaza con "Column 'x' cannot be null", así que los pasamos
      * a 0 antes de guardar. La lista incluye columnas de ambos proyectos
-     * (Bahía Mar y Makai); solo se tocan las claves presentes en el payload.
+     * (Bahía Mar y Siebe); solo se tocan las claves presentes en el payload.
      */
     public const ZERO_IF_EMPTY = [
         'price', 'discount', 'additional_parking', 'price_adjustment',

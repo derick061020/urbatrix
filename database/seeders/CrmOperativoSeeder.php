@@ -14,32 +14,18 @@ class CrmOperativoSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure additional projects exist. Only Makai is "active" in the UI —
-        // Naviva and LIV are kept as upcoming (En preparación) to match Figma
-        // (Figma 644:40555). Colors + icons are sampled from the Figma render.
-        $projects = [
+        // Siebe Residences es el único desarrollo de este sitio: los proyectos
+        // hermanos de Makai (Naviva, LIV) no van acá.
+        Project::firstOrCreate(
+            ['name' => 'Siebe Residences'],
             [
-                'name'      => 'Naviva Residences',
-                'type'      => 'Horizontal',
-                'stage'     => 'En preparación',
-                'progress'  => 0,
-                'color'     => '#b2a908',
-                'location'  => 'Cap Cana · Punta Cana',
-                'icon_path' => '/images/projects/naviva-icon.png',
-            ],
-            [
-                'name'      => 'LIV at Cap Cana',
-                'type'      => 'Vertical',
-                'stage'     => 'En preparación',
-                'progress'  => 0,
-                'color'     => '#077f82',
-                'location'  => 'Cap Cana · Punta Cana',
-                'icon_path' => '/images/projects/liv-icon.png',
-            ],
-        ];
-        foreach ($projects as $p) {
-            Project::firstOrCreate(['name' => $p['name']], $p);
-        }
+                'type'     => 'Vertical',
+                'stage'    => 'En construcción',
+                'progress' => 0,
+                'color'    => '#2b2b1a',
+                'location' => 'Aruba',
+            ]
+        );
 
         $reservations = Reservation::take(5)->get();
 

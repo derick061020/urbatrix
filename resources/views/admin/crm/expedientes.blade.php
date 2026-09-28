@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Expedientes — CRM Duna Makai'))
+@section('title', __('Expedientes — CRM Siebe'))
 @section('page_title', __('Expedientes'))
 @section('page_breadcrumb', __('Gestión · Expedientes de clientes'))
 @php $activeRoute = 'crm.expedientes'; @endphp
@@ -91,7 +91,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68']; @endphp
+                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#2b2b1a']; @endphp
                     @forelse($reservations as $r)
                         @php
                             $init = strtoupper(substr($r->first_name ?? 'C', 0, 1) . substr($r->last_name ?? '', 0, 1));
@@ -115,14 +115,14 @@
                             </td>
                             <td>
                                 <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                <div class="text-[11px] text-ink-500">{{ __('Makai Residences') }}</div>
+                                <div class="text-[11px] text-ink-500">{{ __('Siebe Residences') }}</div>
                             </td>
                             <td>
                                 @php $phaseNames = [1 => 'Reserva', 2 => 'KYC', 3 => 'Presupuesto', 4 => 'Plan de pagos / Documentos', 5 => 'Contrato firmado']; @endphp
                                 <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                                     @for ($s = 1; $s <= 5; $s++)
                                         <span class="dot-tip" tabindex="0" data-tip-label="{{ __($phaseNames[$s]) }}" data-tip-state="{{ $s <= $step ? 'done' : 'pending' }}">
-                                            <span class="dot" style="background: {{ $s <= $step ? '#5c7c68' : '#eaecf0' }}"></span>
+                                            <span class="dot" style="background: {{ $s <= $step ? '#2b2b1a' : '#eaecf0' }}"></span>
                                         </span>
                                     @endfor
                                     <span class="text-[11px] text-ink-500 ml-2">{{ __($stepName) }}</span>

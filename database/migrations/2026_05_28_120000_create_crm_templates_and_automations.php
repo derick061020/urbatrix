@@ -51,38 +51,38 @@ return new class extends Migration
 
         $templates = [
             ['name' => 'Bienvenida — Reserva confirmada', 'category' => 'bienvenida', 'icon' => 'file', 'channels' => ['email','whatsapp'],
-             'subject' => '¡Bienvenido a Makai, {{cliente_nombre}}!',
-             'body' => "Hola {{cliente_nombre}},\n\nTu reserva para la unidad {{unidad}} ha sido confirmada. Estamos felices de tenerte en la familia Makai.\n\nNuestro equipo se pondrá en contacto contigo en las próximas 24 horas para los siguientes pasos.\n\nSaludos,\nEquipo Makai",
+             'subject' => '¡Bienvenido a Siebe, {{cliente_nombre}}!',
+             'body' => "Hola {{cliente_nombre}},\n\nTu reserva para la unidad {{unidad}} ha sido confirmada. Estamos felices de tenerte en la familia Siebe.\n\nNuestro equipo se pondrá en contacto contigo en las próximas 24 horas para los siguientes pasos.\n\nSaludos,\nEquipo Siebe",
              'variables' => ['cliente_nombre','unidad','proyecto','fecha_reserva']],
 
             ['name' => 'KYC — Documentos pendientes', 'category' => 'seguimiento', 'icon' => 'user', 'channels' => ['email','whatsapp'],
              'subject' => 'Documentos pendientes para tu expediente',
-             'body' => "Hola {{cliente_nombre}},\n\nPara avanzar con tu reserva necesitamos completar tu KYC. Por favor sube los siguientes documentos:\n\n- Identificación oficial\n- Comprobante de domicilio\n- Comprobante de ingresos\n\nPuedes subirlos directamente en tu portal: {{portal_url}}\n\nGracias,\nEquipo Makai",
+             'body' => "Hola {{cliente_nombre}},\n\nPara avanzar con tu reserva necesitamos completar tu KYC. Por favor sube los siguientes documentos:\n\n- Identificación oficial\n- Comprobante de domicilio\n- Comprobante de ingresos\n\nPuedes subirlos directamente en tu portal: {{portal_url}}\n\nGracias,\nEquipo Siebe",
              'variables' => ['cliente_nombre','portal_url']],
 
             ['name' => 'Recordatorio de cuota', 'category' => 'pagos', 'icon' => 'eye', 'channels' => ['email','whatsapp'],
              'subject' => 'Recordatorio: cuota próxima a vencer',
-             'body' => "Hola {{cliente_nombre}},\n\nTe recordamos que tu próxima cuota de {{monto}} vence el {{fecha_vencimiento}}.\n\nPuedes realizar el pago desde tu portal: {{portal_url}}\n\nSaludos,\nEquipo Makai",
+             'body' => "Hola {{cliente_nombre}},\n\nTe recordamos que tu próxima cuota de {{monto}} vence el {{fecha_vencimiento}}.\n\nPuedes realizar el pago desde tu portal: {{portal_url}}\n\nSaludos,\nEquipo Siebe",
              'variables' => ['cliente_nombre','monto','fecha_vencimiento','portal_url']],
 
             ['name' => 'Aviso pago vencido', 'category' => 'pagos', 'icon' => 'clock', 'channels' => ['email','whatsapp'],
              'subject' => 'Pago vencido - acción requerida',
-             'body' => "Hola {{cliente_nombre}},\n\nDetectamos que tu cuota de {{monto}} con vencimiento el {{fecha_vencimiento}} aún no ha sido registrada.\n\nPor favor regulariza el pago a la brevedad para evitar cargos por mora.\n\nSi ya pagaste, ignora este mensaje.\n\nEquipo Makai",
+             'body' => "Hola {{cliente_nombre}},\n\nDetectamos que tu cuota de {{monto}} con vencimiento el {{fecha_vencimiento}} aún no ha sido registrada.\n\nPor favor regulariza el pago a la brevedad para evitar cargos por mora.\n\nSi ya pagaste, ignora este mensaje.\n\nEquipo Siebe",
              'variables' => ['cliente_nombre','monto','fecha_vencimiento']],
 
             ['name' => 'Promesa de compraventa lista', 'category' => 'legal', 'icon' => 'file-pdf', 'channels' => ['email','whatsapp'],
              'subject' => 'Tu promesa de compraventa está lista para firma',
-             'body' => "Hola {{cliente_nombre}},\n\nTu promesa de compraventa para la unidad {{unidad}} ya está lista. Puedes revisarla y firmarla digitalmente desde tu portal: {{portal_url}}\n\nCualquier duda, contáctanos.\n\nEquipo Legal Makai",
+             'body' => "Hola {{cliente_nombre}},\n\nTu promesa de compraventa para la unidad {{unidad}} ya está lista. Puedes revisarla y firmarla digitalmente desde tu portal: {{portal_url}}\n\nCualquier duda, contáctanos.\n\nEquipo Legal Siebe",
              'variables' => ['cliente_nombre','unidad','portal_url']],
 
             ['name' => 'Actualización avance de obra', 'category' => 'proyectos', 'icon' => 'chart-line', 'channels' => ['email','whatsapp'],
              'subject' => 'Avance de obra — {{proyecto}}',
-             'body' => "Hola {{cliente_nombre}},\n\nTe compartimos el último avance de obra de {{proyecto}}. Avance actual: {{avance}}%.\n\nMira las fotos y detalles en tu portal: {{portal_url}}\n\nEquipo Makai",
+             'body' => "Hola {{cliente_nombre}},\n\nTe compartimos el último avance de obra de {{proyecto}}. Avance actual: {{avance}}%.\n\nMira las fotos y detalles en tu portal: {{portal_url}}\n\nEquipo Siebe",
              'variables' => ['cliente_nombre','proyecto','avance','portal_url']],
 
             ['name' => 'Felicitación cierre de contrato', 'category' => 'seguimiento', 'icon' => 'check', 'channels' => ['email','whatsapp'],
              'subject' => '¡Felicidades por tu nueva propiedad!',
-             'body' => "Hola {{cliente_nombre}},\n\n¡Felicidades! Tu contrato para la unidad {{unidad}} se ha cerrado exitosamente.\n\nTe acompañaremos en cada paso hasta la entrega.\n\nGracias por confiar en Makai.\n\nEquipo Makai",
+             'body' => "Hola {{cliente_nombre}},\n\n¡Felicidades! Tu contrato para la unidad {{unidad}} se ha cerrado exitosamente.\n\nTe acompañaremos en cada paso hasta la entrega.\n\nGracias por confiar en Siebe.\n\nEquipo Siebe",
              'variables' => ['cliente_nombre','unidad']],
         ];
 
@@ -133,7 +133,7 @@ return new class extends Migration
         }
 
         DB::table('crm_channel_settings')->insert([
-            ['channel' => 'email', 'enabled' => true, 'config' => json_encode(['from_name' => 'Makai CRM', 'from_email' => 'no-reply@makai.do', 'reply_to' => 'hola@makai.do']), 'created_at' => $now, 'updated_at' => $now],
+            ['channel' => 'email', 'enabled' => true, 'config' => json_encode(['from_name' => 'Siebe CRM', 'from_email' => 'no-reply@siebe.do', 'reply_to' => 'hola@siebe.do']), 'created_at' => $now, 'updated_at' => $now],
             ['channel' => 'whatsapp', 'enabled' => true, 'config' => json_encode(['business_number' => '+1 809 555 0100', 'api_provider' => 'twilio']), 'created_at' => $now, 'updated_at' => $now],
             ['channel' => 'sms', 'enabled' => false, 'config' => json_encode(['provider' => '', 'sender_id' => '']), 'created_at' => $now, 'updated_at' => $now],
             ['channel' => 'push', 'enabled' => false, 'config' => json_encode(['app_key' => '']), 'created_at' => $now, 'updated_at' => $now],

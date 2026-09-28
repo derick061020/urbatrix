@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Unidades — CRM Duna Makai'))
+@section('title', __('Unidades — CRM Siebe'))
 @section('page_title', __('Unidades'))
 @section('page_breadcrumb', __('Proyectos · Gestión de unidades'))
 @php $activeRoute = 'units'; @endphp
@@ -80,7 +80,7 @@
             <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades reservadas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countReserved }}</div>
         </div>
-        <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#5c7c68">
+        <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#2b2b1a">
             <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades vendidas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countSold }}</div>
         </div>

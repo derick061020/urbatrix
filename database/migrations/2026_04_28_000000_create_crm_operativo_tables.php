@@ -59,9 +59,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Seed: project for existing Makai units
+        // Seed: project for existing Siebe units
         $projectId = \DB::table('projects')->insertGetId([
-            'name'        => 'Makai Cap Cana',
+            'name'        => 'Siebe Aruba',
             'type'        => 'Vertical',
             'stage'       => 'Construcción',
             'progress'    => 38,

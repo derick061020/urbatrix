@@ -116,7 +116,7 @@ body {
 
 <div class="print-bar"><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
 
-@include('print._makai_iso')
+@include('print._siebe_iso')
 
 <div class="page">
 

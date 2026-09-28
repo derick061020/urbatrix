@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', __('CRM Duna - Makai'))</title>
+    <title>@yield('title', __('CRM Siebe'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -60,9 +60,9 @@
       .crm-nav-link.active { background:#ffffff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
       .crm-nav-link.active::after {
           content:""; position:absolute; right:0px; top:6px; bottom:6px;
-          width:3px; border-radius:3px 0 0 3px; background:#5c7c68;
+          width:3px; border-radius:3px 0 0 3px; background:#2b2b1a;
       }
-      .crm-nav-link.active .pi { color:#5c7c68; }
+      .crm-nav-link.active .pi { color:#2b2b1a; }
       .crm-nav-section {
           font-size: 10px; font-weight: 600; color:#99a0ae;
           letter-spacing: .08em; text-transform: uppercase;
@@ -85,19 +85,19 @@
           color:#525866; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab.active { background:#5c7c68; color:#fff; }
+      .crm-tab.active { background:#2b2b1a; color:#fff; }
       .crm-tab-line {
           padding: 14px 4px; font-size:14px; font-weight:500; color:#717784;
           border-bottom:2px solid transparent; cursor:pointer;
           white-space:nowrap; flex-shrink:0;
       }
-      .crm-tab-line.active { color:#222530; border-color:#5c7c68; font-weight:600; }
+      .crm-tab-line.active { color:#222530; border-color:#2b2b1a; font-weight:600; }
       .crm-btn {
           display:inline-flex; align-items:center; gap:6px;
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
           line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s;
       }
-      .crm-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; }
+      .crm-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; }
       .crm-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
       .crm-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .crm-btn-ghost:hover { background:#f5f7fa; }
@@ -124,7 +124,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .crm-input:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .crm-input:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
       .crm-avatar {
           width:36px; height:36px; border-radius:999px;
           display:inline-flex; align-items:center; justify-content:center;
@@ -171,7 +171,7 @@
           font-size: 13px; color:#222530; background:#fff;
           width: 100%; outline:none; transition: border-color .15s, box-shadow .15s;
       }
-      .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .topbar-search:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
 
       /* Search dropdown */
       .search-dropdown {
@@ -270,7 +270,7 @@
           cursor: pointer; transition: border-color .15s, box-shadow .15s;
       }
       .crm-select__btn:hover { border-color: #cacfd8; }
-      .crm-select.is-open .crm-select__btn { border-color: #5c7c68; box-shadow: 0 0 0 3px rgba(92,124,104,.18); }
+      .crm-select.is-open .crm-select__btn { border-color: #2b2b1a; box-shadow: 0 0 0 3px rgba(43,43,26,.18); }
       .crm-select__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .crm-select__label.is-placeholder { color: #9aa1ad; }
       .crm-select__caret { font-size: 11px; color: #717784; flex-shrink: 0; transition: transform .15s; }
@@ -288,7 +288,7 @@
           background: transparent; text-align: left; cursor: pointer; transition: background-color .12s;
       }
       .crm-select__opt:hover, .crm-select__opt.is-highlight { background: #f5f7f6; }
-      .crm-select__check { font-size: 11px; color: #5c7c68; opacity: 0; flex-shrink: 0; }
+      .crm-select__check { font-size: 11px; color: #2b2b1a; opacity: 0; flex-shrink: 0; }
       .crm-select__opt.is-active .crm-select__check { opacity: 1; }
       .crm-select__opt.is-active { font-weight: 600; }
     </style>
@@ -308,14 +308,14 @@
     <aside id="crm-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         {{-- Logo card --}}
         <a href="/" class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer no-underline">
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#5c7c68">
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#2b2b1a">
                 <span class="block w-6 h-6">
-                    <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full">
+                    <img src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt="" class="block w-full h-full">
                 </span>
             </span>
             <div class="flex-1 min-w-0 leading-none">
-                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
-                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
+                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">SIEBE</div>
+                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Siebe Property Group') }}</div>
             </div>
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
         </a>
@@ -426,7 +426,7 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                <button type="button" class="crm-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#2b2b1a; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
                 <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">

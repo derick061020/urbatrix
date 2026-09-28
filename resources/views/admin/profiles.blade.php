@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Usuarios — CRM Duna Makai'))
+@section('title', __('Usuarios — CRM Siebe'))
 @section('page_title', __('Usuarios'))
 @section('page_breadcrumb', __('Equipo · Usuarios del sistema'))
 @php $activeRoute = 'profiles'; @endphp
@@ -46,7 +46,7 @@
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $kpis = [
-            ['Total registrados', $totalUsers, '#5c7c68'],
+            ['Total registrados', $totalUsers, '#2b2b1a'],
             ['Con unidad',        $conUnidad,  '#1fc16b'],
             ['Sin unidad',        $sinUnidad,  '#fa7319'],
             ['Administradores',   $admins,     '#335cff'],
@@ -132,7 +132,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68']; @endphp
+                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#2b2b1a']; @endphp
                     @forelse($users as $u)
                         @php
                             $fullName = trim(($u->first_name ?? '').' '.($u->last_name ?? '')) ?: ($u->name ?? '—');
@@ -180,7 +180,7 @@
                             <td>
                                 @if($r)
                                     <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : 'Makai Residences' }}</div>
+                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : 'Siebe Residences' }}</div>
                                 @else
                                     <span class="text-[12px] text-ink-400">—</span>
                                 @endif

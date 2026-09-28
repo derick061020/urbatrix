@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ __('home.title') }}</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=25">
@@ -19,8 +19,8 @@
 
 <body data-view="grid">
 
-  <!-- ░░░ MAKAI LOADING SCREEN ░░░ -->
-  <div id="makaiLoader" aria-hidden="true">
+  <!-- ░░░ SIEBE LOADING SCREEN ░░░ -->
+  <div id="siebeLoader" aria-hidden="true">
     <div class="ml-inner">
       <div class="ml-rings">
         <span class="ml-ring"></span>
@@ -28,28 +28,28 @@
         <span class="ml-ring"></span>
         <span class="ml-core"></span>
       </div>
-      <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="ml-logo">
+      <img src="/images/siebe-logo.png" alt="{{ __('Siebe') }}" class="ml-logo">
       <div class="ml-bar"><span></span></div>
     </div>
   </div>
   <style>
-    #makaiLoader{
+    #siebeLoader{
       position:fixed; inset:0; z-index:99999;
       display:flex; align-items:center; justify-content:center;
       background:radial-gradient(120% 120% at 50% 30%, #fbfcfa 0%, #f1f4ee 55%, #e8ede5 100%);
       transition:opacity .6s ease, visibility .6s ease;
     }
-    #makaiLoader.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+    #siebeLoader.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
     .ml-inner{
       display:flex; flex-direction:column; align-items:center; gap:30px;
       animation:ml-fade-in .7s ease both;
     }
-    /* Anillos topográficos / ondas que se expanden ("Makai" = hacia el mar) */
+    /* Anillos topográficos / ondas que se expanden ("Siebe" = hacia el mar) */
     .ml-rings{ position:relative; width:120px; height:120px; }
     .ml-ring{
       position:absolute; inset:0; margin:auto;
       width:36px; height:36px; border-radius:50%;
-      border:1.5px solid #5c7c68;
+      border:1.5px solid #2b2b1a;
       transform:scale(.3); opacity:0;
       animation:ml-ripple 2.4s cubic-bezier(.22,.61,.36,1) infinite;
     }
@@ -58,7 +58,7 @@
     .ml-core{
       position:absolute; inset:0; margin:auto;
       width:14px; height:14px; border-radius:50%;
-      background:#5c7c68;
+      background:#2b2b1a;
       animation:ml-pulse 2.4s ease-in-out infinite;
     }
     @keyframes ml-ripple{
@@ -81,11 +81,11 @@
     }
     .ml-bar{
       width:160px; height:3px; border-radius:99px;
-      background:rgba(92,124,104,.15); overflow:hidden;
+      background:rgba(43,43,26,.15); overflow:hidden;
     }
     .ml-bar span{
       display:block; height:100%; width:40%; border-radius:99px;
-      background:linear-gradient(90deg, transparent, #5c7c68, transparent);
+      background:linear-gradient(90deg, transparent, #2b2b1a, transparent);
       animation:ml-slide 1.3s ease-in-out infinite;
     }
     @keyframes ml-slide{
@@ -102,7 +102,7 @@
   </style>
   <script>
     (function(){
-      var loader = document.getElementById('makaiLoader');
+      var loader = document.getElementById('siebeLoader');
       if(!loader) return;
       var start = Date.now();
       var MIN_SHOW = 1500; // ms mínimos visibles para que la animación se aprecie aunque cargue rápido
@@ -123,7 +123,7 @@
         loader.classList.add('is-hidden');
         // Señal para el slider de portada: el hero acaba de empezar su animación
         // de entrada; el carrusel se revela cuando ésta termina.
-        document.dispatchEvent(new CustomEvent('makai:hero-revealed'));
+        document.dispatchEvent(new CustomEvent('siebe:hero-revealed'));
         setTimeout(function(){ if(loader && loader.parentNode){ loader.parentNode.removeChild(loader); } }, 700);
       }
       function requestHide(){
@@ -138,7 +138,7 @@
       setTimeout(hide, 8000);
     })();
   </script>
-  <!-- ░░░ /MAKAI LOADING SCREEN ░░░ -->
+  <!-- ░░░ /SIEBE LOADING SCREEN ░░░ -->
 
   @php
     // Listas globales editables desde el admin (Unidades → Configuraciones).
@@ -169,7 +169,7 @@
       <!-- HEADER -->
       <div class="mt-header">
         <div class="mt-header-left">
-          <img src="/images/makai-logo.png" alt="{{ __('Makai') }}" class="mt-header-logo">
+          <img src="/images/siebe-logo.png" alt="{{ __('Siebe') }}" class="mt-header-logo">
           <span class="mt-header-dot"></span>
           <span class="mt-header-unit">{{ __('Unit') }} <span id="modalUnitNum">A-101</span></span>
           <span id="modalStatusBadge" class="mt-badge-available">
@@ -221,7 +221,7 @@
                 <span class="sep"></span>
                 <span class="success">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z" transform="rotate(180 12 12)"/></svg>
-                  {{ __('12% below Cap Cana avg.') }}
+                  {{ __('12% below Aruba avg.') }}
                 </span>
               </div>
               <div class="mt-price-meta">
@@ -481,7 +481,7 @@
 
           <!-- Image -->
           <div class="mt-gallery">
-            <img id="modalMainImg" src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="{{ __('Unit') }}" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
+            <img id="modalMainImg" src="https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="{{ __('Unit') }}" class="mt-gallery-img" onclick="openImgZoom()" title="{{ __('Click to zoom') }}">
 
             <!-- Zoom hint -->
             <button class="mt-zoom-hint" type="button" onclick="openImgZoom()" aria-label="{{ __('Zoom') }}">
@@ -502,16 +502,16 @@
           <!-- Thumbs -->
           <div class="mt-thumbs" id="mtThumbs">
             <button type="button" class="mt-thumb active" data-idx="0">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="1">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Makai_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Siebe_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="2">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Makai_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Siebe_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp" alt="">
             </button>
             <button type="button" class="mt-thumb" data-idx="3">
-              <img src="https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Makai_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp" alt="">
+              <img src="https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Siebe_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp" alt="">
             </button>
           </div>
         </section>
@@ -836,7 +836,7 @@
     .sh-social-btn.tg  .sh-social-icon { background:#229ED9; color:#fff; }
     .sh-social-btn.fb  .sh-social-icon { background:#1877F2; color:#fff; }
     .sh-social-btn.tw  .sh-social-icon { background:#000;     color:#fff; }
-    .sh-social-btn.em  .sh-social-icon { background:#5c7c68;  color:#fff; }
+    .sh-social-btn.em  .sh-social-icon { background:#2b2b1a;  color:#fff; }
     .sh-social-btn.sm  .sh-social-icon { background:#222530;  color:#fff; }
 
     .sh-url-row {
@@ -854,7 +854,7 @@
     .sh-copy-btn {
         flex-shrink:0;
         padding: 9px 16px; border-radius: 9px;
-        background:#5c7c68; color:#fff; border:none; cursor:pointer;
+        background:#2b2b1a; color:#fff; border:none; cursor:pointer;
         font-size:13px; font-weight:600;
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
@@ -871,14 +871,14 @@
         margin: 14px 22px 22px;
         display:flex; align-items:center; gap:12px;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #5c7c68 0%, #4a6354 100%);
+        background: linear-gradient(135deg, #2b2b1a 0%, #4a6354 100%);
         border-radius: 14px;
         cursor:pointer; border:none; width: calc(100% - 44px); text-align:left;
         color:#fff;
         transition: transform .12s, box-shadow .15s;
-        box-shadow: 0 6px 16px -8px rgba(92,124,104,.55);
+        box-shadow: 0 6px 16px -8px rgba(43,43,26,.55);
     }
-    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(92,124,104,.65); }
+    .sh-download:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -8px rgba(43,43,26,.65); }
     .sh-download:active { transform: translateY(0); }
     .sh-download-icon {
         width:42px; height:42px; border-radius:10px;
@@ -892,7 +892,7 @@
     .sh-download-arrow { opacity:.8; }
 
     /* Smaller share tab in modal */
-    .mt-tab.mt-tab-download { color:#5c7c68;border-left: 1px solid #eaecf0;}
+    .mt-tab.mt-tab-download { color:#2b2b1a;border-left: 1px solid #eaecf0;}
     .mt-tab.mt-tab-download:hover { background:#eef2ef; }
   </style>
 
@@ -1095,14 +1095,14 @@
         const net  = btn.dataset.net;
         const url  = buildShareUrl();
         const unit = (document.getElementById('modalUnitNum')?.textContent || '').trim();
-        const text = 'Mira esta unidad de Makai Residences (' + unit + ')';
+        const text = 'Mira esta unidad de Siebe Residences (' + unit + ')';
         let target = '';
         switch (net) {
           case 'wa':  target = 'https://wa.me/?text=' + encodeURIComponent(text + ' — ' + url); break;
           case 'tg':  target = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text); break;
           case 'fb':  target = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url); break;
           case 'tw':  target = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url); break;
-          case 'em':  target = 'mailto:?subject=' + encodeURIComponent('Makai Residences — Unidad ' + unit) + '&body=' + encodeURIComponent(text + '\n\n' + url); break;
+          case 'em':  target = 'mailto:?subject=' + encodeURIComponent('Siebe Residences — Unidad ' + unit) + '&body=' + encodeURIComponent(text + '\n\n' + url); break;
           case 'sms': target = 'sms:?body=' + encodeURIComponent(text + ' ' + url); break;
         }
         if (target.startsWith('mailto:') || target.startsWith('sms:')) {
@@ -1218,8 +1218,8 @@
         font-family:inherit;
     }
     .vc-input:focus, .vc-select:focus, .vc-textarea:focus {
-        border-color:#5c7c68; background:#fff;
-        box-shadow:0 0 0 3px rgba(92,124,104,.18);
+        border-color:#2b2b1a; background:#fff;
+        box-shadow:0 0 0 3px rgba(43,43,26,.18);
     }
     .vc-select { appearance:none; padding-right:36px;
         background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23717784' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
@@ -1255,8 +1255,8 @@
     }
     .vc-slot:hover { background:#fff; border-color:#cacfd8; color:#222530; }
     .vc-slot.active {
-        background:#5c7c68; border-color:#5c7c68; color:#fff;
-        box-shadow:0 4px 12px -4px rgba(92,124,104,.45);
+        background:#2b2b1a; border-color:#2b2b1a; color:#fff;
+        box-shadow:0 4px 12px -4px rgba(43,43,26,.45);
     }
     .vc-slot[disabled], .vc-slot.disabled {
         opacity:.45; cursor:not-allowed; text-decoration:line-through;
@@ -1304,7 +1304,7 @@
     }
     .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .vc-btn-ghost:hover { background:#f5f7fa; }
-    .vc-btn-primary { background:#5c7c68; color:#fff; border-color:#5c7c68; }
+    .vc-btn-primary { background:#2b2b1a; color:#fff; border-color:#2b2b1a; }
     .vc-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
 
     .vc-alert {
@@ -1442,7 +1442,7 @@
       align-items: center; justify-content: center; gap: 12px;
       width: 100%;
       padding: 26px 0 34px;
-      color: #5c7c68;
+      color: #2b2b1a;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px; font-weight: 600; letter-spacing: .2px;
       opacity: 0;
@@ -1458,7 +1458,7 @@
     .fg-lazy-dots { display: inline-flex; gap: 6px; }
     .fg-lazy-dots span {
       width: 8px; height: 8px; border-radius: 50%;
-      background: #5c7c68;
+      background: #2b2b1a;
       animation: fgLazyDot 1s ease-in-out infinite;
     }
     .fg-lazy-dots span:nth-child(2) { animation-delay: .15s; }
@@ -1499,7 +1499,7 @@
         </div>
         <div class="vc-header-text">
           <div class="vc-header-title">{{ __('Agendar Videollamada') }}</div>
-          <div class="vc-header-sub" id="advisorModalSub">{{ __('Con tu asesor de Makai Residences') }}</div>
+          <div class="vc-header-sub" id="advisorModalSub">{{ __('Con tu asesor de Siebe Residences') }}</div>
         </div>
         <button type="button" class="vc-close" onclick="closeAdvisorVideoCall()" aria-label="{{ __('Cerrar') }}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1591,7 +1591,7 @@
         <div class="logo-section" style="position:relative;display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:200px;max-width:300px;">
           <div class="logo-container" style="display:flex;align-items:center;">
             <a href="{{trim((string) \App\Models\Setting::get('site_url', ''))}}" onclick="return false;" style="display:flex;align-items:center;text-decoration:none;height:44px;padding:0 4px;border-radius:9999px;">
-              <img src="/images/makai-logo.png" alt="{{ __('logo') }}" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
+              <img src="/images/siebe-logo.png" alt="{{ __('logo') }}" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
             </a>
           </div>
           <button type="button" id="projectsToggle" class="logo-trigger" onclick="toggleProjects()" aria-label="{{ __('Switch project') }}" aria-expanded="false">
@@ -1602,14 +1602,8 @@
 
           <!-- PROJECT SELECTOR DROPDOWN -->
           <div class="project-selector" id="projectsDropdown" role="menu" aria-label="{{ __('Projects') }}">
-            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Makai')" aria-label="{{ __('Makai Residences') }}" role="menuitem">
-              <img src="/images/projects/makai.png" alt="{{ __('Makai Residences') }}">
-            </button>
-            <button type="button" class="project-card" data-project="naviva" onclick="selectProject('Naviva')" aria-label="{{ __('Naviva') }}" role="menuitem">
-              <img src="/images/projects/naviva.png" alt="{{ __('Naviva') }}">
-            </button>
-            <button type="button" class="project-card" data-project="liv" onclick="selectProject('Liv')" aria-label="{{ __('Liv') }}" role="menuitem">
-              <img src="/images/projects/liv.png" alt="{{ __('Liv') }}">
+            <button type="button" class="project-card active" data-project="siebe" onclick="selectProject('Siebe')" aria-label="{{ __('Siebe Residences') }}" role="menuitem">
+              <img src="/images/projects/siebe.png" alt="{{ __('Siebe Residences') }}">
             </button>
           </div>
         </div>
@@ -1998,7 +1992,7 @@
 
         <!-- Celda 0: Hero -->
         <div class="hs-cell hs-cell-hero">
-          <div class="fg-hero" id="hero" data-active="makai">
+          <div class="fg-hero" id="hero" data-active="siebe">
             {{-- Los heroes van en WebP (q92, alpha_q 100: la máscara de recorte
                  queda idéntica) con el PNG como respaldo. El <picture> no altera
                  el layout: los <img> conservan clase y data-project, y todo el
@@ -2009,27 +2003,15 @@
                    width="1366" height="534" alt="" aria-hidden="true">
             </picture>
 
-            <span class="fg-hero-text" data-project="makai"  aria-hidden="true">MAKAI</span>
-            <span class="fg-hero-text" data-project="naviva" aria-hidden="true">NAVIVA</span>
-            <span class="fg-hero-text" data-project="liv"    aria-hidden="true">LIV</span>
+            <span class="fg-hero-text" data-project="siebe"  aria-hidden="true">SIEBE</span>
 
-            {{-- MAKAI sólo necesita 2560px en pantallas 2x; el resto baja 1600px --}}
+            {{-- SIEBE sólo necesita 2560px en pantallas 2x; el resto baja 1600px --}}
             <picture>
               <source type="image/webp"
-                      srcset="/images/hero/MAKAI-1600.webp 1600w, /images/hero/MAKAI.webp 2560w"
+                      srcset="/images/hero/SIEBE-1600.webp 1600w, /images/hero/SIEBE.webp 2560w"
                       sizes="100vw">
-              <img class="fg-hero-building" data-project="makai" src="/images/hero/MAKAI.png"
-                   width="2560" height="1134" fetchpriority="high" alt="{{ __('Makai Residences') }}">
-            </picture>
-            <picture>
-              <source type="image/webp" srcset="/images/hero/NAVIVA.webp">
-              <img class="fg-hero-building" data-project="naviva" src="/images/hero/NAVIVA.png"
-                   width="1366" height="460" alt="{{ __('Naviva Residences') }}">
-            </picture>
-            <picture>
-              <source type="image/webp" srcset="/images/hero/LIV.webp">
-              <img class="fg-hero-building" data-project="liv" src="/images/hero/LIV.png"
-                   width="1366" height="460" alt="{{ __('Liv Residences') }}">
+              <img class="fg-hero-building" data-project="siebe" src="/images/hero/SIEBE.png"
+                   width="2560" height="1134" fetchpriority="high" alt="{{ __('Siebe Residences') }}">
             </picture>
           </div>
         </div>
@@ -2357,7 +2339,7 @@
         </div>
       </div>
 
-      <!-- PLAN VIEW (Figma 193:9116 — Property 1=planta, makai=true) -->
+      <!-- PLAN VIEW (Figma 193:9116 — Property 1=planta, siebe=true) -->
       <div class="fg-plan-wrap" id="fgPlanWrap">
         <div class="fg-plan-board">
 
@@ -2402,7 +2384,7 @@
             // con la clave = valor del piso ('ground','1st',...). El bucket
             // "Ground" usa la clave 'ground'.
             $floorPlanImagesRaw = \App\Models\Setting::get('floor_plan_images', []) ?: [];
-            $floorPlanFallback  = '/images/plan-view/makai-planview.png';
+            $floorPlanFallback  = '/images/plan-view/siebe-planview.png';
             $floorPlanImageMap  = [];
             foreach ($floorOrder as $f) {
                 $key = ($f === 'Ground') ? 'ground' : $f;
@@ -2474,7 +2456,7 @@
                           id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
                     <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
                     <span class="fg-plan-piso-caret" aria-hidden="true">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5c7c68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b2b1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </span>
                   </button>
                   <ul class="fg-plan-piso-menu" id="fgFloorMenu" role="listbox" aria-label="{{ __('Floor filter') }}">
@@ -2590,12 +2572,12 @@
       <div class="fg-footer-content" data-node-id="124:3621">
         <!-- Logo -->
         <div class="fg-footer-logo" data-node-id="124:3656">
-          <img src="/images/makai-logo.png" alt="{{ __('logo') }}" class="logo-img" style="max-height:30px;max-width:160px;object-fit:contain;">
+          <img src="/images/siebe-logo.png" alt="{{ __('logo') }}" class="logo-img" style="max-height:30px;max-width:160px;object-fit:contain;">
         </div>
         
         <!-- Copyright -->
         <div class="fg-footer-copyright" data-node-id="124:3626">
-          <p>{{ __('©2026 Duna Development — Todos los derechos reservados') }}</p>
+          <p>{{ __('©2026 Siebe Property Group — Todos los derechos reservados') }}</p>
         </div>
         
         <!-- Social Icons -->
@@ -2647,16 +2629,16 @@
     // MORE INFO MODAL
     // ============================
     let modalImages = [
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Makai_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Makai_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
-      'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Makai_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp'
+      'https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FA_16_LA_MA_AXO_T1A_HR%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FB_Siebe_Cards_Unit_Layout_111-T1A%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FC_Siebe_Floorplans_First_Floor_111%2F1773673791087%2Ffull.webp',
+      'https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2Funits%2FSYibpx5i469nMCLpZHP5%2FD_Siebe_Floorplans_Second_Floor_111%2F1773673791087%2Ffull.webp'
     ];
     let currentModalImg = 0;
 
     // Imágenes agrupadas por apartado. El toggle "PROPIEDAD / AMENIDADES"
     // cambia entre estos grupos. modalImages siempre apunta al grupo activo.
-    const MODAL_IMG_FALLBACK = 'https://storage.googleapis.com/makai-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FUIpwnmJz8oBQ2cKHMMA6%2Ftwo_bed%2F1773908343700%2Ffull.webp';
+    const MODAL_IMG_FALLBACK = 'https://storage.googleapis.com/siebe-savyo.firebasestorage.app/assets%2Fimages%2FctaCards%2FUIpwnmJz8oBQ2cKHMMA6%2Ftwo_bed%2F1773908343700%2Ffull.webp';
     let modalImageGroups = { property: [], amenities: [] };
     let currentModalCategory = 'property';
 
@@ -3880,13 +3862,11 @@
     }
 
     const PROJECT_BRAND_RGB = {
-      makai:  [92, 124, 104],
-      naviva: [197, 191, 86],
-      liv:    [85, 127, 128],
+      siebe: [43, 43, 26],
     };
 
     function setBrandFor(project) {
-      const rgb = PROJECT_BRAND_RGB[project] || PROJECT_BRAND_RGB.makai;
+      const rgb = PROJECT_BRAND_RGB[project] || PROJECT_BRAND_RGB.siebe;
       const root = document.documentElement;
       const tuple = rgb.join(',');
       root.style.setProperty('--brand',         'rgb(' + tuple + ')');
@@ -4293,7 +4273,7 @@
         bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--brand, #5c7c68);
+        background: var(--brand, #2b2b1a);
         color: white;
         padding: 12px 24px;
         border-radius: 10px;
@@ -4330,8 +4310,8 @@
 
     function openVideoCall() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
-      const subject = encodeURIComponent('Agendar videollamada - Unidad ' + unitNum + ' Makai Residences');
-      window.location.href = 'mailto:support+makai_residences@launchbase.co.za?subject=' + subject;
+      const subject = encodeURIComponent('Agendar videollamada - Unidad ' + unitNum + ' Siebe Residences');
+      window.location.href = 'mailto:support+siebe_residences@launchbase.co.za?subject=' + subject;
     }
 
     function openAdvisorVideoCall(unitId) {
@@ -4553,13 +4533,13 @@
     function openWhatsAppBroker() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
       const price = document.getElementById('modalPrice')?.textContent || '';
-      const text = encodeURIComponent('Hola, tengo interés en la Unidad ' + unitNum + ' de Makai Residences (' + price + '). ¿Podemos hablar?');
+      const text = encodeURIComponent('Hola, tengo interés en la Unidad ' + unitNum + ' de Siebe Residences (' + price + '). ¿Podemos hablar?');
       window.open('https://wa.me/18097109044?text=' + text, '_blank');
     }
 
     function shareWithCoInvestor() {
       const unitNum = document.getElementById('modalUnitNum')?.textContent || '';
-      const subject = encodeURIComponent('Makai Residences - Unidad ' + unitNum);
+      const subject = encodeURIComponent('Siebe Residences - Unidad ' + unitNum);
       const body = encodeURIComponent('Te comparto esta unidad para que la veamos juntos: ' + window.location.href);
       window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
     }
@@ -5858,7 +5838,7 @@
 
     // Caso normal: esperar a que termine la carga (loader) y la animación de
     // entrada del hero (~1.6s) antes de iniciar el ciclo del carrusel.
-    document.addEventListener('makai:hero-revealed', function(){ kick(1750); }, { once: true });
+    document.addEventListener('siebe:hero-revealed', function(){ kick(1750); }, { once: true });
     // Respaldo 1: si el evento no llegó, arrancar poco después de la carga total.
     window.addEventListener('load', function(){ setTimeout(function(){ kick(1750); }, 300); });
     // Respaldo 2 (tope absoluto): arrancar igual aunque nada de lo anterior dispare.

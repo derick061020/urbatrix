@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| Datos de la empresa / proyecto (MAKAI · Duna Development Group)
+| Datos de la empresa / proyecto (SIEBE · Siebe Property Group)
 |--------------------------------------------------------------------------
 | Datos fijos que alimentan los documentos imprimibles (comprobante de pago,
 | hoja de datos para transferencia) y los correos. Editar aquí — o sobreponer
@@ -11,34 +11,40 @@
 
 return [
 
-    'brand'        => env('COMPANY_BRAND', 'MAKAI'),
-    'project'      => env('COMPANY_PROJECT', 'Makai Residences'),
-    'group'        => env('COMPANY_GROUP', 'Duna Development Group'),
-    'location'     => env('COMPANY_LOCATION', 'Cap Cana, República Dominicana'),
+    'brand'        => env('COMPANY_BRAND', 'SIEBE'),
+    'project'      => env('COMPANY_PROJECT', 'Siebe Residences'),
+    'group'        => env('COMPANY_GROUP', 'Siebe Property Group'),
+    'location'     => env('COMPANY_LOCATION', 'Aruba'),
 
-    // Emisor de los comprobantes
-    'legal_name'   => env('COMPANY_LEGAL_NAME', 'IGUANAS LAKE CONDO & RESIDENCE SRL'),
+    // Emisor de los comprobantes.
+    // PENDIENTE: razón social, RNC/KvK y dirección fiscal reales de Siebe.
+    // Se dejan vacíos a propósito: antes estaban los de Makai (IGUANAS LAKE
+    // CONDO & RESIDENCE SRL, Rep. Dominicana) y no pueden salir impresos aquí.
+    'legal_name'   => env('COMPANY_LEGAL_NAME', 'Siebe Property Group'),
     'rnc'          => env('COMPANY_RNC', ''),
-    'address'      => env('COMPANY_ADDRESS', 'Cap Cana, Punta Cana, República Dominicana'),
+    'address'      => env('COMPANY_ADDRESS', 'Aruba'),
 
     // Contacto
-    'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@makairesidences.com'),
-    'phone'         => env('COMPANY_PHONE', '+1 849 499 2578'),
-    'website'       => env('COMPANY_WEBSITE', 'makairesidences.com'),
+    'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@sieberesidences.com'),
+    'phone'         => env('COMPANY_PHONE', ''),
+    'website'       => env('COMPANY_WEBSITE', 'sieberesidences.com'),
 
     // Firmante autorizado de los comprobantes
-    'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
+    'signer_name'   => env('COMPANY_SIGNER_NAME', 'Siebe Property Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),
 
-    // Datos bancarios para transferencias en USD
+    // Datos bancarios para transferencias.
+    // PENDIENTE: son los de Siebe, no los de Makai. Vacíos hasta tenerlos: la
+    // hoja de transferencia muestra los campos en blanco en vez de una cuenta
+    // que no es la del proyecto.
     'bank' => [
-        'intermediary_name'    => env('COMPANY_BANK_INT_NAME', 'Citibank N.A, New York Branch'),
-        'intermediary_account' => env('COMPANY_BANK_INT_ACCOUNT', '36265334'),
-        'intermediary_address' => env('COMPANY_BANK_INT_ADDRESS', '111 Wall Street, New York, USA 10043'),
-        'swift'                => env('COMPANY_BANK_SWIFT', 'CITIUS33XXX'),
-        'aba'                  => env('COMPANY_BANK_ABA', '021000089'),
-        'beneficiary_bank'     => env('COMPANY_BANK_BENEF', 'Banco Múltiple López de Haro, S.A. · Ave. Sarasota No. 20, Santo Domingo, Rep. Dom. 10109'),
-        'account_holder'       => env('COMPANY_BANK_HOLDER', 'IGUANAS LAKE CONDO & RESIDENCE SRL'),
-        'account_number'       => env('COMPANY_BANK_ACCOUNT', '4010388162'),
+        'intermediary_name'    => env('COMPANY_BANK_INT_NAME', ''),
+        'intermediary_account' => env('COMPANY_BANK_INT_ACCOUNT', ''),
+        'intermediary_address' => env('COMPANY_BANK_INT_ADDRESS', ''),
+        'swift'                => env('COMPANY_BANK_SWIFT', ''),
+        'aba'                  => env('COMPANY_BANK_ABA', ''),
+        'beneficiary_bank'     => env('COMPANY_BANK_BENEF', ''),
+        'account_holder'       => env('COMPANY_BANK_HOLDER', ''),
+        'account_number'       => env('COMPANY_BANK_ACCOUNT', ''),
     ],
 ];

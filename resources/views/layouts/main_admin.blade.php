@@ -13,7 +13,7 @@
             rel="preconnect"
         />
         <link
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap"
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&amp;display=swap"
             rel="stylesheet"
         />
         <link
@@ -79,12 +79,12 @@
                         },
                         fontFamily: {
                             primary: [
-                                "Montserrat",
+                                "Open Sans",
                                 "Helvetica",
                                 "Arial",
                                 "sans-serif",
                             ],
-                            secondary: ["Montserrat", "sans-serif"],
+                            secondary: ["Open Sans", "sans-serif"],
                         },
                         fontSize: {
                             xxs: "10px",
@@ -150,8 +150,8 @@
                         <!-- Logo Section -->
                         <div id="logo-section" class="pt-3 px-4 transition-all duration-300 ease-in-out">
                             <img
-                                src="https://dunadevelopment.com/wp-content/cache/seraphinite-accelerator/s/m/d/img/c97274bc659c16e3ced9d91b315e2fd2.63be.png"
-                                alt="{{ __('Makai Residences') }}"
+                                src="https://siebedevelopment.com/wp-content/cache/seraphinite-accelerator/s/m/d/img/c97274bc659c16e3ced9d91b315e2fd2.63be.png"
+                                alt="{{ __('Siebe Residences') }}"
                                 class="w-[208px] h-auto object-contain transition-all duration-300 ease-in-out"
                             />
                             <div

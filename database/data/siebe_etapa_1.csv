@@ -1,0 +1,26 @@
+,,,1ST FLOOR,,,,,,,,,,,,,
+Apartamento / Unit,Tipologia / Typo,Etapa / Phase,Habitaciones / Bedrooms,Banos / Baths,Vistas / Views,Caracteristica / Feature,,m2    Interior    sqft,,m2     Terraza / Terrace    sqft,,Total,,Jardin / Garden,Precio / Price,Status
+101,T1,1,1,1,,Garden Terrace,,46.93,500.93,19.83,213.45,66.76,714.38,,"$284,225",
+102,T2,1,1,1,,Garden Terrace,,52.78,563.37,22.61,243.37,75.39,744.30,,"$320,425",
+103,T3,1,1,1,,Garden Terrace,,46.31,494.31,17.63,189.77,63.94,684.08,,"$275,625",
+,,,2ND FLOOR,,,,,,,,,,,,,
+Apartamento / Unit,Tipologia / Typo,Etapa / Phase,Habitaciones / Bedrooms,Banos / Baths,Vistas / Views,Caracteristica / Feature,,m2    Interior    sqft,,m2     Terraza / Terrace    sqft,,Total,,Jardin / Garden,Precio / Price,Status
+201,T4,1,2,2,,Lock-off,,81.46,869.50,17.94,193.11,99.40,"1,062.61",,"$452,150",
+202,T5,1,2,2,,Lock-off,,81.03,864.91,12.30,132.40,93.33,"1,001.90",,"$435,900",
+203,T6,1,1,1,,Garden View,,46.44,495.70,13.80,148.54,60.24,644.24,,"$266,700",
+204,T7,1,2,2,,Garden View,,72.77,776.75,10.66,114.74,83.43,891.49,,"$390,500",
+205,T8,1,1,1,,Garden View,,49.43,527.62,15.65,168.46,65.08,696.07,,"$286,275",
+,,,3RD FLOOR,,,,,,,,,,,,,
+Apartamento / Unit,Tipologia / Typo,Etapa / Phase,Habitaciones / Bedrooms,Banos / Baths,Vistas / Views,Caracteristica / Feature,,m2    Interior    sqft,,m2     Terraza / Terrace    sqft,,Total,,Jardin / Garden,Precio / Price,Status
+301,T4,1,2,2,,Lock-off,,81.46,869.50,17.94,193.11,99.40,"1,062.61",,"$452,150",
+302,T5,1,2,2,,Lock-off,,81.03,864.91,12.30,132.40,93.33,"1,001.90",,"$435,900",
+303,T6,1,1,1,,Garden View,,46.44,495.70,13.80,148.54,60.24,644.24,,"$266,700",
+304,T7,1,2,2,,Garden View,,72.77,776.75,10.66,114.74,83.43,891.49,,"$390,500",
+305,T8,1,1,1,,Garden View,,49.43,527.62,15.65,168.46,65.08,696.07,,"$286,275",
+,,,4TH FLOOR,,,,,,,,,,,,,
+Apartamento / Unit,Tipologia / Typo,Etapa / Phase,Habitaciones / Bedrooms,Banos / Baths,Vistas / Views,Caracteristica / Feature,,m2    Interior    sqft,,m2     Terraza / Terrace    sqft,,Total,,Jardin / Garden,Precio / Price,Status
+401,PH/T4,1,2,2,,Lock-off / Roof Top,,81.46,869.50,78.39,843.79,159.85,"1,713.29",,"$564,080",
+402,PH/T5,1,2,2,,Lock-off / Roof Top,,81.03,864.91,66.63,717.21,147.66,"1,586.71",,"$538,410",
+403,T6,1,1,1,,Garden View,,46.44,495.70,13.80,148.54,60.24,644.24,,"$280,500",
+404,T7,1,2,2,,Garden View,,72.77,776.75,10.66,114.74,83.43,891.49,,"$397,962",
+405,T8,1,1,1,,Garden View,,49.43,527.62,15.65,168.46,65.08,696.07,,"$297,230",

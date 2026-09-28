@@ -51,7 +51,7 @@
     .notif-head-title { font-size:14px; font-weight:700; color:#171717; }
     .notif-mark-read {
         background:transparent; border:none; cursor:pointer;
-        font-size:11px; color:#5c7c68; font-weight:600;
+        font-size:11px; color:#2b2b1a; font-weight:600;
         padding: 4px 6px; border-radius:6px;
     }
     .notif-mark-read:hover { background:#eef2ef; }
@@ -71,7 +71,7 @@
     .notif-item.is-unread { background: #f5f9f6; }
     .notif-item.is-unread::before {
         content:""; position:absolute; left:6px; top:50%; transform:translateY(-50%);
-        width:6px; height:6px; border-radius:999px; background:#5c7c68;
+        width:6px; height:6px; border-radius:999px; background:#2b2b1a;
     }
     .notif-icon {
         width:34px; height:34px; border-radius:10px;

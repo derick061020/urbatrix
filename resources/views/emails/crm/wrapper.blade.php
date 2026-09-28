@@ -1,5 +1,5 @@
 {{--
-    Layout compartido de los correos del CRM (MAKAI · Duna Development Group).
+    Layout compartido de los correos del CRM (SIEBE · Siebe Property Group).
     El chrome (header con logo, barra dorada, banda de firma y footer) vive aquí;
     cada plantilla aporta solo su contenido interno (hero + cuerpo) ya sustituido.
 
@@ -9,12 +9,12 @@
       $preheader string  (opcional) texto de preencabezado
 --}}
 @php
-    $brand    = config('company.brand', 'MAKAI');
-    $group    = config('company.group', 'Duna Development Group');
-    $location = config('company.location', 'Cap Cana, Punta Cana, República Dominicana');
-    $email    = config('company.support_email', 'hello@makairesidences.com');
+    $brand    = config('company.brand', 'SIEBE');
+    $group    = config('company.group', 'Siebe Property Group');
+    $location = config('company.location', 'Aruba');
+    $email    = config('company.support_email', 'hello@sieberesidences.com');
     $phone    = config('company.phone', '+1 849 499 2578');
-    $website   = config('company.website', 'makairesidences.com');
+    $website   = config('company.website', 'sieberesidences.com');
     $docLabel  = $docLabel ?? '';
     $preheader = $preheader ?? '';
 @endphp

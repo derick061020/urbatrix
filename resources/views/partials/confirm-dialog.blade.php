@@ -40,7 +40,7 @@
         display: inline-flex; align-items: center; justify-content: center;
         background: #fff1f2; color: #dc2626; margin-bottom: 14px;
     }
-    .confirm-dlg-card.tone-brand .confirm-dlg-icon { background: rgba(92,124,104,.12); color: #5c7c68; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-icon { background: rgba(43,43,26,.12); color: #2b2b1a; }
     .confirm-dlg-title {
         margin: 0; color: #171717; font-size: 18px; font-weight: 700;
         line-height: 1.25; letter-spacing: -0.02em;
@@ -61,7 +61,7 @@
     .confirm-dlg-cancel:hover { background: #f9fafb; }
     .confirm-dlg-submit { border-color: #dc2626; background: #dc2626; color: #fff; }
     .confirm-dlg-submit:hover { border-color: #b91c1c; background: #b91c1c; }
-    .confirm-dlg-card.tone-brand .confirm-dlg-submit { border-color: #5c7c68; background: #5c7c68; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-submit { border-color: #2b2b1a; background: #2b2b1a; }
     .confirm-dlg-card.tone-brand .confirm-dlg-submit:hover { border-color: #4a6354; background: #4a6354; }
     @media (max-width: 520px) {
         .confirm-dlg-card { padding: 20px; }

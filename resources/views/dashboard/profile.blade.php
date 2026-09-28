@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Mi Perfil — MAKAI'))
+@section('title', __('Mi Perfil — SIEBE'))
 @section('page_title', __('Mi Perfil'))
 @section('page_breadcrumb', __('Mi portal · Editar perfil'))
 @php $activeRoute = 'profile'; @endphp

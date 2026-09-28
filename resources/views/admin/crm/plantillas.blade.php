@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Plantillas y Automatizaciones — CRM Duna Makai'))
+@section('title', __('Plantillas y Automatizaciones — CRM Siebe'))
 @section('page_title', __('Plantillas y Automatizaciones'))
 @section('page_breadcrumb', __('Comunicación · Plantillas y flujo de automatización'))
 @php $activeRoute = 'crm.plantillas'; @endphp
@@ -23,9 +23,9 @@
     .pa-field label { display:block; font-size:11px; font-weight:600; color:#525866; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
     .pa-input, .pa-textarea, .pa-select { width:100%; border:1px solid #eaecf0; border-radius:8px; padding:9px 12px; font-size:13px; color:#222530; background:#fff; outline:none; transition:border-color .15s, box-shadow .15s; }
     .pa-textarea { min-height:140px; font-family:'Inter', system-ui; line-height:1.5; resize:vertical; }
-    .pa-input:focus, .pa-textarea:focus, .pa-select:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+    .pa-input:focus, .pa-textarea:focus, .pa-select:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
     .pa-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid #eaecf0; font-size:12px; font-weight:500; color:#525866; cursor:pointer; user-select:none; background:#fff; }
-    .pa-chip.active { background:#5c7c68; color:#fff; border-color:#5c7c68; }
+    .pa-chip.active { background:#2b2b1a; color:#fff; border-color:#2b2b1a; }
     .pa-chip input { display:none; }
     .pa-var { display:inline-block; padding:3px 8px; border-radius:6px; background:#eef2ef; color:#4a6354; font-size:11px; font-weight:600; cursor:pointer; margin:2px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .pa-var:hover { background:#dde6e0; }
@@ -45,10 +45,10 @@
     .pa-preview-block { background:#f9fafb; border:1px solid #eaecf0; border-radius:10px; padding:14px 16px; font-size:13px; color:#2b303b; white-space:pre-wrap; word-break:break-word; line-height:1.55; max-height:50vh; overflow-y:auto; }
     /* Cadena de fases */
     .pa-step { position:relative; border:1px solid #eaecf0; border-radius:10px; padding:14px 14px 14px 18px; background:#fcfcfd; }
-    .pa-step::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:3px; background:#5c7c68; }
+    .pa-step::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:3px; background:#2b2b1a; }
     .pa-step-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
     .pa-step-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#4a6354; text-transform:uppercase; letter-spacing:.04em; }
-    .pa-step-badge .num { width:20px; height:20px; border-radius:999px; background:#5c7c68; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
+    .pa-step-badge .num { width:20px; height:20px; border-radius:999px; background:#2b2b1a; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
     .pa-step-delay { display:flex; align-items:center; gap:8px; font-size:12px; color:#717784; margin-bottom:10px; }
     .pa-step-delay input { width:90px; }
     .pa-step-grid { display:grid; grid-template-columns:1fr; gap:10px; }
@@ -297,7 +297,7 @@
                 </div>
                 <div class="pa-field md:col-span-2">
                     <label>{{ __('Asunto (solo email)') }}</label>
-                    <input class="pa-input" name="subject" id="pa-tpl-subject" maxlength="255" placeholder="Ej.: ¡Bienvenido a Makai, @{{nombre_cliente}}!">
+                    <input class="pa-input" name="subject" id="pa-tpl-subject" maxlength="255" placeholder="Ej.: ¡Bienvenido a Siebe, @{{nombre_cliente}}!">
                 </div>
                 <div class="pa-field md:col-span-2">
                     <label>{{ __('Cuerpo del mensaje *') }}</label>
@@ -481,15 +481,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="pa-field">
                                     <label>{{ __('Remitente (nombre)') }}</label>
-                                    <input class="pa-input" name="channels[email][config][from_name]" value="{{ $cfg['from_name'] ?? '' }}" placeholder="{{ __('Makai CRM') }}">
+                                    <input class="pa-input" name="channels[email][config][from_name]" value="{{ $cfg['from_name'] ?? '' }}" placeholder="{{ __('Siebe CRM') }}">
                                 </div>
                                 <div class="pa-field">
                                     <label>{{ __('Email remitente') }}</label>
-                                    <input class="pa-input" type="email" name="channels[email][config][from_email]" value="{{ $cfg['from_email'] ?? '' }}" placeholder="no-reply@makai.do">
+                                    <input class="pa-input" type="email" name="channels[email][config][from_email]" value="{{ $cfg['from_email'] ?? '' }}" placeholder="no-reply@siebe.do">
                                 </div>
                                 <div class="pa-field md:col-span-2">
                                     <label>Reply-to</label>
-                                    <input class="pa-input" type="email" name="channels[email][config][reply_to]" value="{{ $cfg['reply_to'] ?? '' }}" placeholder="hola@makai.do">
+                                    <input class="pa-input" type="email" name="channels[email][config][reply_to]" value="{{ $cfg['reply_to'] ?? '' }}" placeholder="hola@siebe.do">
                                 </div>
                             </div>
                         @elseif($key === 'whatsapp')
@@ -515,7 +515,7 @@
                                 </div>
                                 <div class="pa-field">
                                     <label>{{ __('Sender ID') }}</label>
-                                    <input class="pa-input" name="channels[sms][config][sender_id]" value="{{ $cfg['sender_id'] ?? '' }}" placeholder="MAKAI">
+                                    <input class="pa-input" name="channels[sms][config][sender_id]" value="{{ $cfg['sender_id'] ?? '' }}" placeholder="SIEBE">
                                 </div>
                             </div>
                         @elseif($key === 'push')

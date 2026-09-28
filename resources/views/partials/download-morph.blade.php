@@ -25,7 +25,7 @@
 @push('styles')
 <style>
 :root{
-  --dl-brand:#5c7c68;                                          /* lo pisa el probe */
+  --dl-brand:#2b2b1a;                                          /* lo pisa el probe */
   --dl-deep:color-mix(in srgb, var(--dl-brand) 58%, #0d120f);
   --dl-line:color-mix(in srgb, var(--dl-brand) 62%, #ffffff);
   --dl-groove:rgba(255,255,255,.14);

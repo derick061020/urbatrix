@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Guardados — MAKAI'))
+@section('title', __('Guardados — SIEBE'))
 @section('page_title', __('Mi Propiedad'))
 @section('page_breadcrumb', __('Mi Propiedad · Guardados'))
 @php $activeRoute = 'guardados'; @endphp
@@ -8,8 +8,8 @@
 <style>
     /* === Saved-units page — same card as home (fg-card) === */
     .sv-scope {
-        --brand: #5c7c68;
-        --brand-soft: rgba(92, 124, 104, 0.10);
+        --brand: #2b2b1a;
+        --brand-soft: rgba(43, 43, 26, 0.10);
     }
 
     /* Header summary block */
@@ -44,7 +44,7 @@
     .sv-empty-cta {
         display:inline-flex; align-items:center; gap:6px;
         margin-top:16px; padding:0 18px; height:38px;
-        background:#5c7c68; color:#fff; border:1px solid #5c7c68; border-radius:10px;
+        background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; border-radius:10px;
         font-family:'Poppins', sans-serif; font-weight:600; font-size:12px;
         text-decoration:none; cursor:pointer;
     }
@@ -71,8 +71,8 @@
 
     .sv-scope .fg-card {
         --status-color: var(--brand);
-        --status-soft: rgba(92, 124, 104, 0.10);
-        --status-bg-faint: rgba(92, 124, 104, 0.04);
+        --status-soft: rgba(43, 43, 26, 0.10);
+        --status-bg-faint: rgba(43, 43, 26, 0.04);
         position: relative;
         display: flex;
         flex-direction: column;
@@ -544,7 +544,7 @@
 @php
     $units = $units ?? collect();
     $project = optional($units->first())->project_id ? \App\Models\Project::find(optional($units->first())->project_id) : null;
-    $projectName = $project->name ?? 'Makai Residences, Cap Cana';
+    $projectName = $project->name ?? 'Siebe Residences, Aruba';
 @endphp
 
 <div class="sv-scope p-4 sm:p-6 lg:p-7 space-y-5">

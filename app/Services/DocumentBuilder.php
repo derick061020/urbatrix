@@ -125,7 +125,7 @@ class DocumentBuilder
 
         $section->addText('Unidad', ['bold' => true, 'size' => 13]);
         $section->addText('Identificador: '.($reservation->unit_name ?? $reservation->unit?->name ?? '—'));
-        $section->addText('Proyecto: Makai Residences');
+        $section->addText('Proyecto: Siebe Residences');
         if ($reservation->unit) {
             $u = $reservation->unit;
             if ($u->floor)         $section->addText('Planta: '.$u->floor);

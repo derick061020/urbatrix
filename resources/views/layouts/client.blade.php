@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', __('Mi Propiedad — MAKAI · Duna Development'))</title>
+    <title>@yield('title', __('Mi Propiedad — SIEBE · Siebe Property Group'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+              brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -54,9 +54,9 @@
       .cli-nav-link.active { background:#ffffff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
       .cli-nav-link.active::after {
           content:""; position:absolute; right:0px; top:6px; bottom:6px;
-          width:3px; border-radius:3px 0 0 3px; background:#5c7c68;
+          width:3px; border-radius:3px 0 0 3px; background:#2b2b1a;
       }
-      .cli-nav-link.active .pi { color:#5c7c68; }
+      .cli-nav-link.active .pi { color:#2b2b1a; }
       .cli-nav-section { font-size:10px; font-weight:600; color:#99a0ae; letter-spacing:.08em; text-transform:uppercase; padding:16px 12px 6px; }
       .badge-count {
           display:inline-flex; align-items:center; justify-content:center;
@@ -75,7 +75,7 @@
           padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
           line-height:1; cursor:pointer; transition:background-color .15s, border-color .15s;
       }
-      .cli-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; }
+      .cli-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; }
       .cli-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
       .cli-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .cli-btn-ghost:hover { background:#f5f7fa; }
@@ -86,7 +86,7 @@
           font-size:13px; color:#222530; background:#fff;
           width:100%; outline:none; transition:border-color .15s, box-shadow .15s;
       }
-      .cli-input:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .cli-input:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
       .cli-avatar {
           width:36px; height:36px; border-radius:999px;
           display:inline-flex; align-items:center; justify-content:center;
@@ -117,7 +117,7 @@
           font-size:13px; color:#222530; background:#fff;
           width:100%; outline:none; transition:border-color .15s, box-shadow .15s;
       }
-      .topbar-search:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .topbar-search:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
 
       /* Search dropdown */
       .search-dropdown {
@@ -212,14 +212,14 @@
     <aside id="cli-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         {{-- Logo card --}}
         <a href="{{ url('/') }}" class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5 hover:bg-ink-50 transition-colors cursor-pointer no-underline">
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#5c7c68">
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-xs" style="background:#2b2b1a">
                 <span class="block w-6 h-6">
-                    <img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full">
+                    <img src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt="" class="block w-full h-full">
                 </span>
             </span>
             <div class="flex-1 min-w-0 leading-none">
-                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
-                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Duna Development') }}</div>
+                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">SIEBE</div>
+                <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Siebe Property Group') }}</div>
             </div>
             <span class="text-ink-400 text-xs"><i class="pi pi-angle-down"></i></span>
         </a>
@@ -293,7 +293,7 @@
             </a>
             <a href="{{ route('dashboard.guardados') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'guardados' ? 'active' : '' }}">
                 <i class="pi pi-heart"></i> {{ __('Guardados') }}
-                @if($savedCount > 0)<span class="badge-count" style="background:#5c7c68">{{ $savedCount }}</span>@endif
+                @if($savedCount > 0)<span class="badge-count" style="background:#2b2b1a">{{ $savedCount }}</span>@endif
             </a>
 
             <div class="cli-nav-section">{{ __('Comunicación') }}</div>
@@ -312,7 +312,7 @@
         {{-- User --}}
         <div class="mt-2 rounded-xl bg-white border border-ink-200">
             <div class="flex items-center gap-2.5 px-3 py-2.5">
-                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#5c7c68; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
+                <button type="button" class="cli-avatar shrink-0 border-0 p-0 cursor-pointer" style="background:#2b2b1a; {{ Auth::user()->avatar ? 'background-image:url('.asset('storage/'.Auth::user()->avatar).');background-size:cover;background-position:center;color:transparent;' : '' }}" title="{{ __('Editar') }}" onclick="openSettingsModal()">
                     @if(!Auth::user()->avatar){{ strtoupper(substr(Auth::user()->name ?? 'SU', 0, 2)) }}@endif
                 </button>
                 <button type="button" class="flex-1 min-w-0 leading-tight no-underline text-ink-950 text-left bg-transparent border-0 p-0 cursor-pointer" title="{{ __('Editar') }}" onclick="openSettingsModal()">

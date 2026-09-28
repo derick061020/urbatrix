@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', __('Portal Broker').' — MAKAI · Duna Development')</title>
+    <title>@yield('title', __('Portal Broker').' — SIEBE · Siebe Property Group')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         theme: { extend: {
           fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['"Inter Tight"','Inter','sans-serif'] },
           colors: {
-            brand: { DEFAULT:'#5c7c68', dark:'#4a6354', soft:'#5c7c6833', tint:'#eef2ef' },
+            brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
             ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
             ok:{DEFAULT:'#1fc16b',soft:'#e3f7ec',dark:'#1daf61'}, warn:{DEFAULT:'#fa7319',soft:'#fff3eb',dark:'#e16614'},
             err:{DEFAULT:'#fb3748',soft:'#ffebec',dark:'#e93544'}, info:{DEFAULT:'#335cff',soft:'#ebf1ff',dark:'#3559e9'},
@@ -33,17 +33,17 @@
       .brk-nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:#525866; font-size:13px; font-weight:500; text-decoration:none; transition:.15s; position:relative; }
       .brk-nav-link:hover { background:rgba(255,255,255,.6); color:#222530; }
       .brk-nav-link.active { background:#fff; color:#222530; font-weight:600; box-shadow:0 1px 2px rgba(10,13,20,.06); border:1px solid #eaecf0; }
-      .brk-nav-link.active::after { content:""; position:absolute; right:0; top:6px; bottom:6px; width:3px; border-radius:3px 0 0 3px; background:#5c7c68; }
-      .brk-nav-link.active .pi { color:#5c7c68; }
+      .brk-nav-link.active::after { content:""; position:absolute; right:0; top:6px; bottom:6px; width:3px; border-radius:3px 0 0 3px; background:#2b2b1a; }
+      .brk-nav-link.active .pi { color:#2b2b1a; }
       .brk-nav-section { font-size:10px; font-weight:600; color:#99a0ae; letter-spacing:.08em; text-transform:uppercase; padding:16px 12px 6px; }
       .brk-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }
       .brk-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; line-height:1; cursor:pointer; transition:.15s; text-decoration:none; }
-      .brk-btn-primary { background:#5c7c68; color:#fff; border:1px solid #5c7c68; } .brk-btn-primary:hover { background:#4a6354; }
+      .brk-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; } .brk-btn-primary:hover { background:#4a6354; }
       .brk-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; } .brk-btn-ghost:hover { background:#f5f7fa; }
       .brk-input { height:36px; padding:0 14px; border:1px solid #eaecf0; border-radius:8px; font-size:13px; color:#222530; background:#fff; width:100%; outline:none; }
-      .brk-input:focus { border-color:#5c7c68; box-shadow:0 0 0 3px rgba(92,124,104,.18); }
+      .brk-input:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
       .brk-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:600; line-height:1; letter-spacing:.04em; text-transform:uppercase; }
-      .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#5c7c68; }
+      .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#2b2b1a; }
       @media (max-width:1023px){ #brk-sidebar{ display:none !important; } }
     </style>
     {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
@@ -57,11 +57,11 @@
     {{-- SIDEBAR --}}
     <aside id="brk-sidebar" class="w-[220px] shrink-0 flex flex-col h-[calc(100vh-24px)] sticky top-3">
         <div class="rounded-xl bg-white border border-ink-200 px-3 py-2.5 flex items-center gap-2.5">
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#5c7c68">
-                <span class="block w-6 h-6"><img src="{{ asset('images/brand/makai-logo-mark.svg') }}" alt="" class="block w-full h-full"></span>
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#2b2b1a">
+                <span class="block w-6 h-6"><img src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt="" class="block w-full h-full"></span>
             </span>
             <div class="flex-1 min-w-0 leading-none">
-                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">MAKAI</div>
+                <div class="font-display text-[13px] font-bold text-ink-950 tracking-tight">SIEBE</div>
                 <div class="text-[9px] font-semibold text-ink-500 tracking-[0.18em] uppercase mt-1">{{ __('Portal Broker') }}</div>
             </div>
         </div>
@@ -133,7 +133,7 @@
         <header id="brk-topbar" class="rounded-xl bg-white border border-ink-200 px-4 sm:px-6 py-3 flex items-center gap-4 mb-3">
             <div class="min-w-0">
                 <div class="font-display text-[16px] font-bold text-ink-950 leading-tight">@yield('page_title', __('Portal Broker'))</div>
-                <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', __('Duna Development'))</div>
+                <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', __('Siebe Property Group'))</div>
             </div>
             @if(($previewAdmin ?? false))
                 <span class="ml-auto brk-pill bg-warn-soft text-warn-dark">{{ __('Vista admin') }}</span>

@@ -4,7 +4,7 @@
     $actionUrl = $actionUrl ?? '#';
     $unitName  = $unitName ?? '';
     $days      = $days ?? 7;
-    $project   = config('company.project', 'Makai Residences');
+    $project   = config('company.project', 'Siebe Residences');
 @endphp
 
 <!-- HERO -->

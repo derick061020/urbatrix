@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Brokers — CRM Duna Makai'))
+@section('title', __('Brokers — CRM Siebe'))
 @section('page_title', __('Brokers'))
 @section('page_breadcrumb', __('Equipo · Brokers con acceso al panel'))
 @php $activeRoute = 'agents'; @endphp

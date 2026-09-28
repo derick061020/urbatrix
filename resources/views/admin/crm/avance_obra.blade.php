@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Avance de Obra — CRM Duna Makai'))
+@section('title', __('Avance de Obra — CRM Siebe'))
 @section('page_title', __('Avance de Obra'))
 @section('page_breadcrumb', __('Proyectos · Avance de obra'))
 @php $activeRoute = 'crm.avance-obra'; @endphp
@@ -19,7 +19,7 @@
         $overall = optional($latest)->overall_progress ?? (int) optional($activeProject)->progress ?? 0;
         $phases  = optional($latest)->phases ?: [];
         $unitsCount = optional($activeProject)->total_units ?? 0;
-        $location   = optional($activeProject)->location ?? 'Cap Cana · Punta Cana';
+        $location   = optional($activeProject)->location ?? 'Aruba · Punta Cana';
         $statusMap = ['done' => '#1fc16b', 'active' => '#fa7319', 'pending' => '#cacfd8'];
     @endphp
 

@@ -2,11 +2,11 @@
     $fullName = trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: ($user->name ?? '—');
     $parts = preg_split('/\s+/', trim($fullName !== '—' ? $fullName : 'U'));
     $init  = strtoupper(substr($parts[0] ?? 'U', 0, 1).substr($parts[1] ?? '', 0, 1));
-    $avBg  = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68'];
+    $avBg  = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#2b2b1a'];
     $bg    = $avBg[$user->id % count($avBg)];
     $agente = $reservation?->budget_configured_by ?: '—';
     $unitName = $unit ? ($unit->custom_id ?? $unit->name ?? '—') : '—';
-    $project  = $unit?->project?->name ?? ($reservation ? 'Makai Residences' : '—');
+    $project  = $unit?->project?->name ?? ($reservation ? 'Siebe Residences' : '—');
     $extraEmails = $user->extraEmails();
     $editData = \Illuminate\Support\Js::from([
         'id' => $user->id, 'first' => $user->first_name, 'last' => $user->last_name,

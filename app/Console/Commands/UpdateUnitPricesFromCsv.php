@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Actualiza los precios de las unidades desde una lista de precios nueva
- * (database/data/makai_etapa_*.csv, el mismo formato que usa units:import).
+ * (database/data/siebe_etapa_*.csv, el mismo formato que usa units:import).
  *
  * Existe aparte de units:import porque aquel reescribe la unidad entera:
  * pisa `public` (deja fuera del home a las 6 unidades ocultas, o publica las
@@ -20,15 +20,15 @@ use Illuminate\Support\Facades\DB;
  *
  * Por defecto sólo simula; hay que pasar --apply para escribir.
  *
- *   php artisan units:prices database/data/makai_etapa_2.csv
- *   php artisan units:prices database/data/makai_etapa_2.csv --apply
- *   php artisan units:prices database/data/makai_etapa_2.csv --apply --with-status
+ *   php artisan units:prices database/data/siebe_etapa_2.csv
+ *   php artisan units:prices database/data/siebe_etapa_2.csv --apply
+ *   php artisan units:prices database/data/siebe_etapa_2.csv --apply --with-status
  */
 class UpdateUnitPricesFromCsv extends Command
 {
     protected $signature = 'units:prices
-                            {files* : CSV con la lista de precios nueva (p. ej. database/data/makai_etapa_2.csv)}
-                            {--project=Makai Cap Cana : Proyecto destino}
+                            {files* : CSV con la lista de precios nueva (p. ej. database/data/siebe_etapa_2.csv)}
+                            {--project=Siebe Aruba : Proyecto destino}
                             {--apply : Escribir de verdad (sin esto sólo simula)}
                             {--with-status : Aplicar también la columna Status (RESERVADA/BLOQUEADA/…)}
                             {--zero-blank : Poner precio 0 donde el CSV lo trae vacío (por defecto se respeta el de producción)}

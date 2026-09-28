@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Control de comunicaciones — CRM Duna Makai'))
+@section('title', __('Control de comunicaciones — CRM Siebe'))
 @section('page_title', __('Control de comunicaciones'))
 @section('page_breadcrumb', __('Comunicación · Por proyecto y canal'))
 @php $activeRoute = 'crm.comunicaciones'; @endphp
@@ -17,9 +17,9 @@
         content:""; position:absolute; top:2px; left:2px; width:16px; height:16px;
         border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.18); transition:left .15s;
     }
-    .cc-sw[aria-checked="true"]{ background:#5c7c68; border-color:#5c7c68; }
+    .cc-sw[aria-checked="true"]{ background:#2b2b1a; border-color:#2b2b1a; }
     .cc-sw[aria-checked="true"]::after{ left:20px; }
-    .cc-sw[aria-checked="mixed"]{ background:#5c7c68; border-color:#5c7c68; opacity:.5; }
+    .cc-sw[aria-checked="mixed"]{ background:#2b2b1a; border-color:#2b2b1a; opacity:.5; }
     .cc-sw[aria-checked="mixed"]::after{ left:11px; }
     .cc-sw:disabled{ opacity:.4; cursor:not-allowed; }
     .cc-sw.fam{ --w:46px; --h:24px; }
@@ -64,7 +64,7 @@
         <div class="flex flex-wrap gap-5 items-start justify-between">
             <div>
                 <h2 class="font-display text-[18px] font-semibold text-ink-950" id="ccProjName">—</h2>
-                <div class="text-[12px] text-ink-500" id="ccProjSub">{{ __('Duna Development Group · Cap Cana') }}</div>
+                <div class="text-[12px] text-ink-500" id="ccProjSub">{{ __('Siebe Property Group · Aruba') }}</div>
                 <div class="flex items-center gap-3 mt-3">
                     <button class="cc-sw fam" id="ccMasterSw" role="switch" aria-checked="false" aria-label="{{ __('Estado de comunicaciones del proyecto') }}"></button>
                     <span class="text-[13px] font-semibold text-ink-900">{{ __('Comunicaciones del proyecto') }}</span>

@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', __('Avance de Obra — MAKAI'))
+@section('title', __('Avance de Obra — SIEBE'))
 @section('page_title', __('Avance de Obra'))
 @section('page_breadcrumb', __('Mi Propiedad · Avance de Obra'))
 @php $activeRoute = 'progress'; @endphp
@@ -8,7 +8,7 @@
 @php
     $delivery = optional($report)->estimated_delivery ?: 'Q4 2026';
     $overall  = optional($report)->overall_progress ?? 52;
-    $projName = optional(optional($report)->project)->name ?? 'Makai Residences';
+    $projName = optional(optional($report)->project)->name ?? 'Siebe Residences';
 @endphp
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <div class="text-[14px] font-semibold text-ink-950">{{ __('Avance global de obra') }}</div>
-                        <div class="text-[12px] text-ink-500">{{ __('Cap Cana · Punta Cana') }}</div>
+                        <div class="text-[12px] text-ink-500">{{ __('Aruba · Punta Cana') }}</div>
                         <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $delivery }}</div>
                     </div>
                 </div>
