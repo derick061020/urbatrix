@@ -541,7 +541,11 @@
       object-position: center 62%;
       z-index: 2;
     }
-    .fg-hero[data-active="siebe"]::after {
+    /* Va en ::before y no en ::after: ese ya está ocupado por el difuminado
+       blanco del borde inferior, que es de altura 6%. Reusarlo hacía que este
+       velo heredara esa altura y se pintara sólo en los 52px de arriba, con
+       un corte seco a todo lo ancho, y de paso se comía el difuminado. */
+    .fg-hero[data-active="siebe"]::before {
       content: "";
       position: absolute;
       inset: 0;
