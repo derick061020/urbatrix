@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
+              brand: { DEFAULT:'#2b2b1a', dark:'#3f3f28', soft:'#2b2b1a33', tint:'#f1ede9' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#5c5c5c', 500:'#717784', 400:'#a3a3a3', 300:'#cacfd8', 200:'#ebebeb', 100:'#f2f5f8', 50:'#f8f8f8' },
               err: { DEFAULT:'#fb3748', soft:'#ffebec' },
               ok:  { DEFAULT:'#1fc16b', soft:'#e3f7ec' },
@@ -62,7 +62,7 @@
       }
       .auth-btn:active { transform: translateY(1px); }
       .auth-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; box-shadow: 0 1px 2px 0 rgba(10,13,20,.06); }
-      .auth-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+      .auth-btn-primary:hover { background:#3f3f28; border-color:#3f3f28; }
       .auth-btn-primary:disabled { background:#a3a3a3; border-color:#a3a3a3; cursor:not-allowed; }
       .auth-btn-ghost { background:#fff; color:#171717; border:1px solid #ebebeb; }
       .auth-btn-ghost:hover { background:#f8f8f8; }
@@ -361,7 +361,7 @@
 
     function celebrate() {
         if (typeof confetti !== 'function') return;
-        const brand = ['#2b2b1a', '#4a6354', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
+        const brand = ['#2b2b1a', '#3f3f28', '#1fc16b', '#fa7319', '#f5d76e', '#ffffff'];
 
         // Big opening burst
         confetti({ particleCount: 160, spread: 90, origin: { y: 0.55 }, colors: brand, scalar: 1.1, zIndex: 9999 });

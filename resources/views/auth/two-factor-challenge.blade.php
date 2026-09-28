@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
-        colors: { brand: { DEFAULT:'#2b2b1a', dark:'#4a6354' } } } } }
+        colors: { brand: { DEFAULT:'#2b2b1a', dark:'#3f3f28' } } } } }
     </script>
     <style>
       html, body { font-family:'Inter', system-ui, sans-serif; }

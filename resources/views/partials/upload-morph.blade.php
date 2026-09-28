@@ -56,7 +56,7 @@
 .upl.is-error .upl-card{transform:translateY(-12px) scale(.97);opacity:0;box-shadow:none}
 
 .upl.is-drag .upl-card{
-  background:#eef2ef;
+  background:#f1ede9;
   box-shadow:0 0 0 2px var(--upl-brand),0 1px 2px rgba(10,13,20,.05),
              0 14px 30px -16px rgba(10,13,20,.4);
 }
@@ -73,7 +73,7 @@
 
 .upl-icon{
   flex:0 0 auto;width:42px;height:42px;border-radius:12px;
-  background:#eef2ef;color:var(--upl-brand);
+  background:#f1ede9;color:var(--upl-brand);
   display:grid;place-items:center;
   font-size:9px;font-weight:700;letter-spacing:.03em;
   transition:background .25s var(--upl-ease),color .25s var(--upl-ease);

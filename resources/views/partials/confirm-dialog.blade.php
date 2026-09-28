@@ -62,7 +62,7 @@
     .confirm-dlg-submit { border-color: #dc2626; background: #dc2626; color: #fff; }
     .confirm-dlg-submit:hover { border-color: #b91c1c; background: #b91c1c; }
     .confirm-dlg-card.tone-brand .confirm-dlg-submit { border-color: #2b2b1a; background: #2b2b1a; }
-    .confirm-dlg-card.tone-brand .confirm-dlg-submit:hover { border-color: #4a6354; background: #4a6354; }
+    .confirm-dlg-card.tone-brand .confirm-dlg-submit:hover { border-color: #3f3f28; background: #3f3f28; }
     @media (max-width: 520px) {
         .confirm-dlg-card { padding: 20px; }
         .confirm-dlg-actions { flex-direction: column-reverse; }

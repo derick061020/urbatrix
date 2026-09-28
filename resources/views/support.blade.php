@@ -30,10 +30,10 @@
   :root{
     --bg:#f4f6f4; --card:#ffffff; --ink:#171717; --ink-strong:#222530;
     --muted:#a3a3a3; --muted-2:#5c5c5c; --line:#ebebeb; --line-2:#f2f5f8;
-    --brand:#2b2b1a; --brand-dark:#4a6354; --brand-bg:#eef2ef; --brand-line:#dde6e0;
+    --brand:#2b2b1a; --brand-dark:#3f3f28; --brand-bg:#f1ede9; --brand-line:#dde6e0;
     --green:#1fc16b; --green-bg:#e3f7ec;
     --wa:#25d366; --wa-bg:#eafbf0;
-    --info-bg:#eef2ef; --info-line:#dde6e0; --info-ink:#4a6354;
+    --info-bg:#f1ede9; --info-line:#dde6e0; --info-ink:#3f3f28;
     --ff:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --ff-display:'Inter Tight', 'Inter', system-ui, sans-serif;
     --r:14px;
@@ -249,7 +249,7 @@
             <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;"><div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div></div>
 
             <a href="{{ route('support') }}" style="text-decoration:none;display:block;width:100%">
-              <div class="menu-item" style="background:#eef2ef;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+              <div class="menu-item" style="background:#f1ede9;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
                 <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand-dark);"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </div>

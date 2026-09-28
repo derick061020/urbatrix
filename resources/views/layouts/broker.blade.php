@@ -17,7 +17,7 @@
         theme: { extend: {
           fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['"Inter Tight"','Inter','sans-serif'] },
           colors: {
-            brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
+            brand: { DEFAULT:'#2b2b1a', dark:'#3f3f28', soft:'#2b2b1a33', tint:'#f1ede9' },
             ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
             ok:{DEFAULT:'#1fc16b',soft:'#e3f7ec',dark:'#1daf61'}, warn:{DEFAULT:'#fa7319',soft:'#fff3eb',dark:'#e16614'},
             err:{DEFAULT:'#fb3748',soft:'#ffebec',dark:'#e93544'}, info:{DEFAULT:'#335cff',soft:'#ebf1ff',dark:'#3559e9'},
@@ -38,7 +38,7 @@
       .brk-nav-section { font-size:10px; font-weight:600; color:#99a0ae; letter-spacing:.08em; text-transform:uppercase; padding:16px 12px 6px; }
       .brk-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }
       .brk-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; line-height:1; cursor:pointer; transition:.15s; text-decoration:none; }
-      .brk-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; } .brk-btn-primary:hover { background:#4a6354; }
+      .brk-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; } .brk-btn-primary:hover { background:#3f3f28; }
       .brk-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; } .brk-btn-ghost:hover { background:#f5f7fa; }
       .brk-input { height:36px; padding:0 14px; border:1px solid #eaecf0; border-radius:8px; font-size:13px; color:#222530; background:#fff; width:100%; outline:none; }
       .brk-input:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }

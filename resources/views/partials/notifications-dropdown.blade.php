@@ -54,7 +54,7 @@
         font-size:11px; color:#2b2b1a; font-weight:600;
         padding: 4px 6px; border-radius:6px;
     }
-    .notif-mark-read:hover { background:#eef2ef; }
+    .notif-mark-read:hover { background:#f1ede9; }
     .notif-list { flex:1; overflow-y:auto; }
     .notif-list::-webkit-scrollbar { width:6px; }
     .notif-list::-webkit-scrollbar-thumb { background:#cacfd8; border-radius:6px; }

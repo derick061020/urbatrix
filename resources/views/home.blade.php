@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=26">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=27">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -36,7 +36,7 @@
     #siebeLoader{
       position:fixed; inset:0; z-index:99999;
       display:flex; align-items:center; justify-content:center;
-      background:radial-gradient(120% 120% at 50% 30%, #fbfcfa 0%, #f1f4ee 55%, #e8ede5 100%);
+      background:radial-gradient(120% 120% at 50% 30%, #fbfcfa 0%, #f1ede9 55%, #e6e0d6 100%);
       transition:opacity .6s ease, visibility .6s ease;
     }
     #siebeLoader.is-hidden{ opacity:0; visibility:hidden; pointer-events:none; }
@@ -859,7 +859,7 @@
         transition: background-color .15s;
         display:inline-flex; align-items:center; gap:6px;
     }
-    .sh-copy-btn:hover { background:#4a6354; }
+    .sh-copy-btn:hover { background:#3f3f28; }
     .sh-copy-btn.copied { background:#1fc16b; }
 
     .sh-divider {
@@ -871,7 +871,7 @@
         margin: 14px 22px 22px;
         display:flex; align-items:center; gap:12px;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #2b2b1a 0%, #4a6354 100%);
+        background: linear-gradient(135deg, #2b2b1a 0%, #3f3f28 100%);
         border-radius: 14px;
         cursor:pointer; border:none; width: calc(100% - 44px); text-align:left;
         color:#fff;
@@ -893,7 +893,7 @@
 
     /* Smaller share tab in modal */
     .mt-tab.mt-tab-download { color:#2b2b1a;border-left: 1px solid #eaecf0;}
-    .mt-tab.mt-tab-download:hover { background:#eef2ef; }
+    .mt-tab.mt-tab-download:hover { background:#f1ede9; }
   </style>
 
   <div id="shareModal" class="sh-overlay" role="dialog" aria-modal="true" aria-label="{{ __('Compartir propiedad') }}">
@@ -1305,7 +1305,7 @@
     .vc-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .vc-btn-ghost:hover { background:#f5f7fa; }
     .vc-btn-primary { background:#2b2b1a; color:#fff; border-color:#2b2b1a; }
-    .vc-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+    .vc-btn-primary:hover { background:#3f3f28; border-color:#3f3f28; }
 
     .vc-alert {
         margin: 0 20px 12px;
@@ -2439,7 +2439,7 @@
                   <span class="fg-chip-count">{{ $floorBuckets[$floorLabel]->count() }}</span>
                 </button>
               @empty
-                <div class="fg-plan-empty-chips" style="color:#9aa3a0;font-size:13px;padding:8px 12px;">
+                <div class="fg-plan-empty-chips" style="color:#9a958a;font-size:13px;padding:8px 12px;">
                   {{ __('Sin unidades publicadas.') }}
                 </div>
               @endforelse

@@ -521,6 +521,18 @@
        estudio es una foto completa, así que su capa cubre todo el escenario
        en vez de apoyarse abajo, y el rótulo pasa por encima con un velo para
        que siga leyéndose. */
+    /* Antes de que entre el render, el escenario mostraba el celeste de
+       relleno y la capa de cielo de Makai: un azul que no pega nada con el
+       atardecer de Siebe. Estos tonos salen de muestrear el propio render
+       (esquinas de cielo: #EAAC6B y #F8B96B a la izquierda, #B28B74 a la
+       derecha), así que el fondo previo y la foto son el mismo cielo. */
+    .fg-hero[data-active="siebe"] {
+      background: linear-gradient(105deg, #f3b46e 0%, #e2a274 45%, #b98d72 100%);
+    }
+    .fg-hero[data-active="siebe"] .fg-hero-sky {
+      display: none;
+    }
+
     .fg-hero-building[data-project="siebe"] {
       top: 0;
       bottom: 0;
@@ -1396,7 +1408,7 @@
         display: inline-flex !important;
         width: 40px !important;
         height: 40px !important;
-        background: var(--brand-soft-2, #eef2ef) !important;
+        background: var(--brand-soft-2, #f1ede9) !important;
         flex-shrink: 0;
       }
 
@@ -2595,7 +2607,7 @@
     .fg-chip-floor.is-active {
       background:
         linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%),
-        linear-gradient(90deg, #2b2b1a 0%, #4a6354 100%);
+        linear-gradient(90deg, #2b2b1a 0%, #3f3f28 100%);
       border-color: rgba(255,255,255,0.12);
       box-shadow:
         0 9px 9px 0 rgba(43,43,26,0.18),
@@ -2647,7 +2659,7 @@
       padding: 6px;
       list-style: none;
       background: #ffffff;
-      border: 1px solid #e7eee9;
+      border: 1px solid #e8e4dc;
       border-radius: 16px;
       box-shadow: 0 14px 30px rgba(16,24,40,0.16);
       z-index: 40;
@@ -2683,7 +2695,7 @@
       font-size: 11px;
       color: #5c5c5c;
     }
-    .fg-plan-piso-option.is-active { background: #f1f6f1; }
+    .fg-plan-piso-option.is-active { background: #f5f2ec; }
     .fg-plan-piso-option.is-active .fg-plan-piso-option-name { color: #2b2b1a; }
     .fg-plan-piso-option.is-active .fg-plan-piso-option-count {
       background: #2b2b1a;
@@ -2942,7 +2954,7 @@
         animation: fgPisoMenuIn 0.16s ease;
       }
       .fg-plan-piso-picker.is-open .fg-plan-piso-trigger {
-        border-color: #cfe0d4;
+        border-color: #e6e2d6;
         box-shadow: 0 0 0 3px rgba(43,43,26,0.14);
       }
       @keyframes fgPisoMenuIn {
@@ -2973,7 +2985,7 @@
         gap: 8px;
         padding: 4px;
         background: #f6f8f5;
-        border: 1px solid #e7eee9;
+        border: 1px solid #e8e4dc;
       }
       .fg-plan-piso-left {
         padding: 9px 14px;
@@ -3636,7 +3648,7 @@
       margin: 0 0 4px 0;
       font-weight: 600;
       font-size: 9px;
-      color: #658b77;
+      color: #868269;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -3646,10 +3658,10 @@
       gap: 6px;
       flex-wrap: wrap;
     }
-    .mt-projected-row .now { font-weight: 600; font-size: 13px; color: #4d7460; }
+    .mt-projected-row .now { font-weight: 600; font-size: 13px; color: #3f3f28; }
     .mt-projected-row .future { font-weight: 600; font-size: 16px; color: #1daf61; }
-    .mt-projected-row .hint { font-size: 10px; color: #4d7460; }
-    .mt-projected-row svg { color: #4d7460; }
+    .mt-projected-row .hint { font-size: 10px; color: #3f3f28; }
+    .mt-projected-row svg { color: #3f3f28; }
 
     .mt-compare {
       display: flex;
@@ -3883,7 +3895,7 @@
       width: 40px;
       height: 40px;
       border-radius: 999px;
-      background: linear-gradient(135deg, #2b2b1a, #4d7460);
+      background: linear-gradient(135deg, #2b2b1a, #3f3f28);
       display: inline-flex;
       align-items: center;
       justify-content: center;

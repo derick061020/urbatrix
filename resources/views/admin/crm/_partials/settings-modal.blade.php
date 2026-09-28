@@ -116,9 +116,9 @@
     .st-btn-ghost { background:#fff; color:#525866; border-color:#eaecf0; }
     .st-btn-ghost:hover { background:#f5f7fa; }
     .st-btn-primary { background:#2b2b1a; color:#fff; border-color:#2b2b1a; }
-    .st-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+    .st-btn-primary:hover { background:#3f3f28; border-color:#3f3f28; }
     .st-btn-link { background:transparent; color:#2b2b1a; border:none; padding:6px 8px; font-weight:600; font-size:12px; cursor:pointer; }
-    .st-btn-link:hover { color:#4a6354; }
+    .st-btn-link:hover { color:#3f3f28; }
 
     .st-tabs {
         margin: 14px 28px 0;
@@ -860,7 +860,7 @@
     }
     .cm-select-opt svg { color: #707a8a; flex-shrink: 0; }
     .cm-select-opt:hover { background: #f4f5f7; color: #222530; }
-    .cm-select-opt.active { background: #eef2ef; color: #222530; }
+    .cm-select-opt.active { background: #f1ede9; color: #222530; }
     .cm-select-opt.active svg { color: #3f6a52; }
 </style>
 

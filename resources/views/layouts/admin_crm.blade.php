@@ -21,7 +21,7 @@
               display: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
             },
             colors: {
-              brand: { DEFAULT:'#2b2b1a', dark:'#4a6354', soft:'#2b2b1a33', tint:'#eef2ef' },
+              brand: { DEFAULT:'#2b2b1a', dark:'#3f3f28', soft:'#2b2b1a33', tint:'#f1ede9' },
               ink: { 950:'#171717', 900:'#222530', 700:'#2b303b', 600:'#525866', 500:'#717784', 400:'#99a0ae', 300:'#cacfd8', 200:'#eaecf0', 100:'#f2f5f8', 50:'#f5f7fa' },
               ok:    { DEFAULT:'#1fc16b', soft:'#e3f7ec', dark:'#1daf61' },
               warn:  { DEFAULT:'#fa7319', soft:'#fff3eb', dark:'#e16614' },
@@ -98,7 +98,7 @@
           line-height:1; cursor:pointer; transition: background-color .15s, border-color .15s;
       }
       .crm-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; }
-      .crm-btn-primary:hover { background:#4a6354; border-color:#4a6354; }
+      .crm-btn-primary:hover { background:#3f3f28; border-color:#3f3f28; }
       .crm-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
       .crm-btn-ghost:hover { background:#f5f7fa; }
       .crm-card { background:#fff; border:1px solid #eaecf0; border-radius:12px; }

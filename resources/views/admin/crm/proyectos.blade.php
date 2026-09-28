@@ -74,7 +74,7 @@
     .pr-btn-ghost { background:#fff; color:#525866; border:1px solid #eaecf0; }
     .pr-btn-ghost:hover { background:#f5f7fa; }
     .pr-btn-primary { background:#2b2b1a; color:#fff; border:1px solid #2b2b1a; }
-    .pr-btn-primary:hover { background:#4a6354; }
+    .pr-btn-primary:hover { background:#3f3f28; }
     .pr-avatar-sm {
         width:30px; height:30px; border-radius:999px;
         display:inline-flex; align-items:center; justify-content:center;

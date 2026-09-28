@@ -27,7 +27,7 @@
     .pa-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid #eaecf0; font-size:12px; font-weight:500; color:#525866; cursor:pointer; user-select:none; background:#fff; }
     .pa-chip.active { background:#2b2b1a; color:#fff; border-color:#2b2b1a; }
     .pa-chip input { display:none; }
-    .pa-var { display:inline-block; padding:3px 8px; border-radius:6px; background:#eef2ef; color:#4a6354; font-size:11px; font-weight:600; cursor:pointer; margin:2px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .pa-var { display:inline-block; padding:3px 8px; border-radius:6px; background:#f1ede9; color:#3f3f28; font-size:11px; font-weight:600; cursor:pointer; margin:2px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .pa-var:hover { background:#dde6e0; }
     .pa-tag { display:inline-block; padding:2px 7px; border-radius:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
     .pa-flash { position:fixed; bottom:20px; right:20px; z-index:90; background:#1fc16b; color:#fff; padding:12px 18px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 12px 28px -8px rgba(31,193,107,.45); animation: paFlashIn .22s ease; }
@@ -47,7 +47,7 @@
     .pa-step { position:relative; border:1px solid #eaecf0; border-radius:10px; padding:14px 14px 14px 18px; background:#fcfcfd; }
     .pa-step::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:3px; background:#2b2b1a; }
     .pa-step-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
-    .pa-step-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#4a6354; text-transform:uppercase; letter-spacing:.04em; }
+    .pa-step-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#3f3f28; text-transform:uppercase; letter-spacing:.04em; }
     .pa-step-badge .num { width:20px; height:20px; border-radius:999px; background:#2b2b1a; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
     .pa-step-delay { display:flex; align-items:center; gap:8px; font-size:12px; color:#717784; margin-bottom:10px; }
     .pa-step-delay input { width:90px; }
@@ -71,7 +71,7 @@
 @section('content')
 @php
     $categoryColors = [
-        'bienvenida'  => ['bg' => '#eef2ef', 'text' => '#4a6354'],
+        'bienvenida'  => ['bg' => '#f1ede9', 'text' => '#3f3f28'],
         'seguimiento' => ['bg' => '#ebf1ff', 'text' => '#335cff'],
         'pagos'       => ['bg' => '#fff3eb', 'text' => '#e16614'],
         'legal'       => ['bg' => '#ffebec', 'text' => '#e93544'],
@@ -466,7 +466,7 @@
                     <div class="crm-pa-card p-4">
                         <div class="flex items-center justify-between gap-3 mb-3">
                             <div class="flex items-center gap-3">
-                                <div class="crm-pa-icon" style="background:#eef2ef; color:#4a6354"><i class="pi pi-{{ $def['icon'] }}"></i></div>
+                                <div class="crm-pa-icon" style="background:#f1ede9; color:#3f3f28"><i class="pi pi-{{ $def['icon'] }}"></i></div>
                                 <div>
                                     <div class="text-[13px] font-semibold text-ink-900">{{ $def['label'] }}</div>
                                     <div class="text-[11px] text-ink-500">Canal {{ $key }}</div>

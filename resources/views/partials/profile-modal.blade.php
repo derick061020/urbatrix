@@ -56,7 +56,7 @@
     .pm-btn-ghost { background: #fff; color: #344054; }
     .pm-btn-ghost:hover { background: #f4f4f5; }
     .pm-btn-primary { background: #2b2b1a; border-color: #2b2b1a; color: #fff; }
-    .pm-btn-primary:hover { background: #4a6354; border-color: #4a6354; }
+    .pm-btn-primary:hover { background: #3f3f28; border-color: #3f3f28; }
     .pm-avatar { width: 72px; height: 72px; border-radius: 999px; overflow: hidden; background: #2b2b1a; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; border: 1px solid #e5e7eb; }
     .pm-upload { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #2b2b1a; cursor: pointer; }
     .pm-alert { padding: 10px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 16px; }
