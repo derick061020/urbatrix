@@ -1,0 +1,78 @@
+# Stack de Siebe Residences (siebe.urbatrix.com).
+#
+# Mismo patrón que urbatrix (Makai) y landmass (Bahía Mar) en el servidor:
+# app php-fpm + nginx detrás de Traefik + mysql + phpmyadmin. Traefik resuelve
+# el certificado con letsencrypt, así que fuera sólo hace falta que el DNS de
+# siebe.urbatrix.com apunte al servidor.
+#
+# Los puertos publicados no se solapan con los stacks ya montados: phpmyadmin
+# de Makai usa el 8081, así que Siebe usa el 8083.
+#
+# Levantar:  docker compose up -d --build
+services:
+
+  app:
+    build: .
+    container_name: siebe_app
+    volumes:
+      - .:/var/www
+    networks:
+      - default
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: siebe_nginx
+    restart: unless-stopped
+
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+    depends_on:
+      - app
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.siebe.rule=Host(`siebe.urbatrix.com`) || Host(`www.siebe.urbatrix.com`)"
+      - "traefik.http.routers.siebe.entrypoints=websecure"
+      - "traefik.http.routers.siebe.tls.certresolver=letsencrypt"
+      - "traefik.http.services.siebe.loadbalancer.server.port=80"
+    networks:
+      - default
+      - traefik
+
+  mysql:
+    image: mysql:8
+    container_name: siebe_mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-siebe}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: siebe_phpmyadmin
+    restart: unless-stopped
+
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+
+    ports:
+      - "8083:80"
+
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+
+networks:
+  traefik:
+    external: true
+    name: traefik_default
