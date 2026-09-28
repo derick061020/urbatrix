@@ -34,6 +34,10 @@ services:
 
     labels:
       - "traefik.enable=true"
+      # nginx vive en dos redes (la del stack y la de Traefik). Sin esto
+      # Traefik elige cualquiera de las dos y, si le toca siebe_default —donde
+      # no está—, la petición muere en un 504.
+      - "traefik.docker.network=traefik_default"
       - "traefik.http.routers.siebe.rule=Host(`siebe.urbatrix.com`) || Host(`www.siebe.urbatrix.com`)"
       - "traefik.http.routers.siebe.entrypoints=websecure"
       - "traefik.http.routers.siebe.tls.certresolver=letsencrypt"
