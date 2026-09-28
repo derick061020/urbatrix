@@ -44,12 +44,28 @@ class AttachSharedUnitImages extends Command
      * dejar reservado el hueco de una foto que todavía no llegó.
      */
     private const MANIFEST = [
-        // ── Renders de la unidad (pestaña Propiedad) ───────────────────────
-        ['propiedades/01-salon.jpg',            'property',  'Salón',              null],
-        ['propiedades/02-salon-cocina.jpg',     'property',  'Salón y cocina',     null],
-        ['propiedades/03-cocina.jpg',           'property',  'Cocina',             null],
-        ['propiedades/04-dormitorio.jpg',       'property',  'Dormitorio',         null],
-        ['propiedades/05-bano.jpg',             'property',  'Baño',               null],
+        // ── Interiores (pestaña Propiedad) ────────────────────────────────
+        // Van todos a todas las unidades, pero el orden ROTA por unidad, así
+        // que cada tarjeta del grid abre con una imagen distinta en vez de
+        // repetir el mismo salón 18 veces. Ver rotate().
+        ['propiedades/01-salon.jpg',                 'property',  'Salón',                   null],
+        ['propiedades/02-salon-editorial.jpg',       'property',  'Salón · vista al jardín', null],
+        ['propiedades/03-salon-luz.jpg',             'property',  'Salón · luz natural',     null],
+        ['propiedades/04-salon-cocina.jpg',          'property',  'Salón y cocina',          null],
+        ['propiedades/05-salon-cocina-editorial.jpg','property',  'Cocina abierta',          null],
+        ['propiedades/06-cocina.jpg',                'property',  'Cocina',                  null],
+        ['propiedades/07-cocina-editorial.jpg',      'property',  'Cocina · detalle',        null],
+        ['propiedades/08-dormitorio.jpg',            'property',  'Dormitorio',              null],
+        ['propiedades/09-dormitorio-editorial.jpg',  'property',  'Dormitorio principal',    null],
+        ['propiedades/10-dormitorio-luz.jpg',        'property',  'Dormitorio · luz natural',null],
+        ['propiedades/11-bano.jpg',                  'property',  'Baño',                    null],
+        ['propiedades/12-bano-editorial.jpg',        'property',  'Baño · detalle',          null],
+
+        // ── Planos del estudio (pestaña Planos), uno por planta ───────────
+        ['planos/planta-1.jpg',   'plans', 'Planta 1 · plano general',        'floor:1st'],
+        ['planos/planta-2-3.jpg', 'plans', 'Plantas 2 y 3 · plano general',   'floor:2nd,3rd'],
+        ['planos/planta-4.jpg',   'plans', 'Planta 4 · plano general',        'floor:4th'],
+        ['planos/azotea.jpg',     'plans', 'Azotea y emplazamiento',          'floor:4th'],
 
         // ── Edificio y entorno (pestaña Amenidades) ────────────────────────
         ['comunes/01-fachada-atardecer.jpg',    'amenities', 'Fachada al atardecer', null],
@@ -97,7 +113,7 @@ class AttachSharedUnitImages extends Command
                 $next = [];   // siguiente sort_order por categoría
                 $new  = 0;
 
-                foreach ($rows as $i => $row) {
+                foreach ($this->rotate($rows, $unit) as $i => $row) {
                     if (! $this->applies($row['only'], $unit) || isset($have[$row['path']])) {
                         continue;
                     }
@@ -172,6 +188,43 @@ class AttachSharedUnitImages extends Command
         return (int) $q->max('sort_order') + 1;
     }
 
+    /**
+     * Rota el bloque de interiores para que la portada dependa de la unidad.
+     * Todas comparten el mismo juego de renders (el acabado es igual en las
+     * 18), así que sin esto el grid entero abría con el mismo salón. El
+     * desplazamiento sale del número de unidad, de forma determinista: volver
+     * a correr el comando no baraja nada.
+     *
+     * Sólo se mueven las de categoría 'property'; planos y exteriores
+     * conservan su orden.
+     */
+    private function rotate(array $rows, Unit $unit): array
+    {
+        $idx = [];
+        foreach ($rows as $i => $r) {
+            if ($r['category'] === 'property') {
+                $idx[] = $i;
+            }
+        }
+        $n = count($idx);
+        if ($n < 2 || ! preg_match('/(\d+)\s*$/', (string) $unit->name, $m)) {
+            return $rows;
+        }
+        // 101, 205, 403… el último dígito da suficiente dispersión por planta.
+        $shift = ((int) $m[1]) % $n;
+        if ($shift === 0) {
+            return $rows;
+        }
+
+        $pool = array_map(fn ($i) => $rows[$i], $idx);
+        $pool = array_merge(array_slice($pool, $shift), array_slice($pool, 0, $shift));
+        foreach ($idx as $k => $i) {
+            $rows[$i] = $pool[$k];
+        }
+
+        return $rows;
+    }
+
     private function applies(?string $only, Unit $unit): bool
     {
         if ($only === null) {
@@ -182,6 +235,10 @@ class AttachSharedUnitImages extends Command
         }
         if ($only === 'penthouse') {
             return str_starts_with((string) $unit->type, 'penthouse') || $unit->floor === '6th';
+        }
+        // 'floor:2nd,3rd' → sólo las unidades de esas plantas.
+        if (str_starts_with($only, 'floor:')) {
+            return in_array((string) $unit->floor, explode(',', substr($only, 6)), true);
         }
         if (str_starts_with($only, 'not:')) {
             $layout = strtoupper(trim((string) $unit->layout));
@@ -203,6 +260,7 @@ class AttachSharedUnitImages extends Command
             $only === null                 => 'todas',
             $only === '1_bed'              => '1 habitación',
             $only === 'penthouse'          => 'penthouses',
+            str_starts_with($only, 'floor:') => 'planta ' . str_replace(',', ', ', substr($only, 6)),
             str_starts_with($only, 'not:') => 'todas menos ' . str_replace(',', ', ', substr($only, 4)),
             default                        => $only,
         };
