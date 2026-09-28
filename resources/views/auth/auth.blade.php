@@ -49,7 +49,7 @@
         width: 300px; height: 300px;
         background: url('/images/isotipo-siebe.png') no-repeat center/contain;
         /* Marca de agua discreta: el render manda y el isotipo sólo lo firma. */
-        opacity: 0.35;
+        opacity: 0.1;
         pointer-events:none;
       }
       @media (max-width: 900px) {
