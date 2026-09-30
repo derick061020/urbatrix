@@ -18,7 +18,7 @@
 @stack('styles')
 </head>
 
-<body data-view="grid">
+<body data-view="grid"@guest data-guest="1"@endguest>
 
   <!-- ░░░ BAHÍA MAR LOADING SCREEN ░░░ -->
   <div id="makaiLoader" aria-hidden="true">
@@ -6544,6 +6544,11 @@
 </script>
 <script src="{{ asset('js/bahia-mar-eco.js') }}?v=16"></script>
 @stack('scripts')
+@guest
+  {{-- Escaparate: catálogo visible pero desenfocado y sin operar (ver partial). --}}
+  @include('partials.guest-gate')
+@endguest
+
 </body>
 
 </html>

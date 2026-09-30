@@ -2856,5 +2856,10 @@
   "Monto pagado mayor al programado": "Paid amount greater than scheduled",
   "Editar / corregir el pago": "Edit / correct the payment",
   "El monto pagado no puede superar el monto programado de la cuota.": "The paid amount cannot exceed the instalment's scheduled amount.",
-  "Pago actualizado correctamente.": "Payment updated successfully."
+  "Pago actualizado correctamente.": "Payment updated successfully.",
+  "Estás viendo una vista previa": "You're viewing a preview",
+  "Crea tu cuenta para explorar las unidades, ver planos y reservar.": "Create your account to explore the units, view floor plans and book.",
+  "Creá tu cuenta para continuar": "Create your account to continue",
+  "El catálogo completo, los planos de cada unidad y la reserva en línea están disponibles al registrarte. Toma menos de un minuto.": "The full catalogue, each unit's floor plans and online booking are available once you register. It takes less than a minute.",
+  "Ya tengo cuenta": "I already have an account"
 }
