@@ -12,6 +12,35 @@
 
     El hero queda nítido: es la carta de presentación del proyecto.
 --}}
+@php
+    // Foto de cabecera del popup: la primera imagen de amenidades del catálogo
+    // (en los tres proyectos es una vista del edificio o del entorno). Así el
+    // partial sirve igual en Siebe, Makai y Bahía Mar sin tocar rutas.
+    // Orden de preferencia: una vista del conjunto (fachada, piscina, entorno)
+    // entre las del repo —los renders curados del estudio—, luego cualquier
+    // otra del repo, y sólo al final las subidas a mano desde el panel
+    // (/storage/…), que pueden ser fotos de obra o de móvil.
+    $guestShot = \App\Models\UnitImage::where('path', 'like', '/images/%')
+            ->where(function ($q) {
+                foreach (['fachada', 'exterior', 'entorno', 'pool', 'beach', 'piscina'] as $w) {
+                    $q->orWhere('path', 'like', '%' . $w . '%');
+                }
+            })->orderBy('id')->value('path')
+        ?: \App\Models\UnitImage::where('category', 'amenities')
+            ->where('path', 'like', '/images/%')->orderBy('id')->value('path')
+        ?: \App\Models\UnitImage::where('path', 'like', '/images/%')->orderBy('id')->value('path')
+        ?: \App\Models\UnitImage::where('category', 'amenities')->orderBy('id')->value('path')
+        ?: \App\Models\UnitImage::orderBy('id')->value('path');
+
+    // Isotipo del proyecto. Cada marca lo guarda distinto en images/brand/, y
+    // en algún checkout quedó suelto el de otro proyecto, así que se busca por
+    // orden de preferencia y se comprueba que exista: primero el nombre
+    // genérico (Bahía Mar) y luego el que lleva el nombre de la marca.
+    $guestMark = collect(['images/brand/logo-mark.png', 'images/brand/logo-mark-white.png'])
+        ->merge(collect(glob(public_path('images/brand/*-logo-mark.svg')))
+            ->map(fn ($f) => 'images/brand/' . basename($f)))
+        ->first(fn ($rel) => is_file(public_path($rel)));
+@endphp
 <style>
   body[data-guest] {
     --guest-blur: 2px;
@@ -49,11 +78,11 @@
     max-width: calc(100vw - 32px);
     padding: 10px 10px 10px 20px;
     border-radius: 9999px;
-    background: rgba(30, 28, 26, 0.94);
+    background: rgba(15, 18, 27, 0.94);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 18px 44px rgba(30, 28, 26, 0.32);
-    color: #f1ede9;
+    box-shadow: 0 18px 44px rgba(10, 13, 20, 0.34);
+    color: #ffffff;
   }
   .guest-ribbon p { margin: 0; font-size: 13px; line-height: 1.35; }
   .guest-ribbon strong { font-weight: 600; }
@@ -62,15 +91,15 @@
     flex-shrink: 0;
     padding: 10px 20px;
     border-radius: 9999px;
-    background: #f1ede9;
-    color: #2b2b1a;
+    background: #ffffff;
+    color: #111111;
     font-size: 12px;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
     transition: background 0.2s ease;
   }
-  .guest-ribbon a:hover { background: #ffffff; }
+  .guest-ribbon a:hover { background: #eaecf0; }
 
   /* ── Popup ─────────────────────────────────────────────────────────────
      Mismo lenguaje que el modal de unidad de la home (.mt-shell): velo
@@ -108,7 +137,8 @@
   .guest-modal-img {
     position: relative;
     height: 168px;
-    background: url('/images/siebe/comunes/01-fachada-atardecer.jpg') center 62%/cover;
+    background-position: center 62%;
+    background-size: cover;
   }
   .guest-modal-img::after {
     content: "";
@@ -151,13 +181,14 @@
     text-decoration: none;
     transition: background 0.2s ease, border-color 0.2s ease;
   }
+  /* Color de marca de cada proyecto: --brand ya está definido en su CSS. */
   .guest-btn-primary {
-    background: #2b2b1a;
+    background: var(--brand);
     color: #ffffff;
-    border: 1px solid #2b2b1a;
+    border: 1px solid var(--brand);
     box-shadow: 0 1px 2px 0 rgba(10,13,20,.06);
   }
-  .guest-btn-primary:hover { background: #3f3f28; border-color: #3f3f28; }
+  .guest-btn-primary:hover { filter: brightness(1.18); }
   .guest-btn-ghost {
     background: #ffffff;
     color: #171717;
@@ -181,8 +212,8 @@
 
 <div class="guest-modal" id="guestModal" role="dialog" aria-modal="true" aria-labelledby="guestModalTitle">
   <div class="guest-modal-card">
-    <div class="guest-modal-img" aria-hidden="true">
-      <img class="guest-modal-mark" src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt="">
+    <div class="guest-modal-img" aria-hidden="true"@if($guestShot) style="background-image:url('{{ $guestShot }}')"@endif>
+      @if($guestMark)<img class="guest-modal-mark" src="{{ asset($guestMark) }}" alt="">@endif
     </div>
     <div class="guest-modal-body">
       <h3 id="guestModalTitle">{{ __('Creá tu cuenta para continuar') }}</h3>
