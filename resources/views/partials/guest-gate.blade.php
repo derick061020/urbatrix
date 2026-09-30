@@ -36,7 +36,8 @@
     // en algún checkout quedó suelto el de otro proyecto, así que se busca por
     // orden de preferencia y se comprueba que exista: primero el nombre
     // genérico (Bahía Mar) y luego el que lleva el nombre de la marca.
-    $guestMark = collect(['images/brand/logo-mark.png', 'images/brand/logo-mark-white.png'])
+    // El blanco primero: el sello del popup va en el color de la marca.
+    $guestMark = collect(['images/brand/logo-mark-white.png', 'images/brand/logo-mark.png'])
         ->merge(collect(glob(public_path('images/brand/*-logo-mark.svg')))
             ->map(fn ($f) => 'images/brand/' . basename($f)))
         ->first(fn ($rel) => is_file(public_path($rel)));
@@ -103,8 +104,8 @@
 
   /* ── Popup ─────────────────────────────────────────────────────────────
      Mismo lenguaje que el modal de unidad de la home (.mt-shell): velo
-     oscuro con blur, radio 20px, borde claro y sombra profunda. Ninguna
-     regla de font-family: todo hereda la Open Sans global. */
+     oscuro con blur, borde claro y sombra profunda. Ninguna regla de
+     font-family: todo hereda la Open Sans global. */
   .guest-modal {
     position: fixed;
     inset: 0;
@@ -121,51 +122,79 @@
   .guest-modal-card {
     position: relative;
     width: 100%;
-    max-width: 440px;
+    max-width: 420px;
     background: #ffffff;
     border: 1px solid #eaecf0;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 32px 80px rgba(10, 13, 20, 0.35);
-    animation: guest-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    text-align: center;
+    animation: guest-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   @keyframes guest-pop {
     from { opacity: 0; transform: translateY(14px) scale(0.97); }
     to   { opacity: 1; transform: none; }
   }
-  /* El render se funde hacia abajo para que el texto arranque sin corte. */
+  /* Cabecera: render del proyecto fundido a blanco, para que el sello y el
+     texto arranquen sin un corte duro. */
   .guest-modal-img {
     position: relative;
-    height: 168px;
-    background-position: center 62%;
+    height: 150px;
+    background-position: center 60%;
     background-size: cover;
   }
   .guest-modal-img::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(30,28,26,0) 45%, rgba(255,255,255,0.85) 88%, #ffffff 100%);
+    background: linear-gradient(to bottom, rgba(30,28,26,0.10) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.72) 82%, #ffffff 100%);
   }
+  /* Sello de marca centrado, montado sobre el borde de la foto. */
   .guest-modal-mark {
     position: absolute;
-    top: 16px; left: 18px;
-    width: 34px; height: 34px;
-    z-index: 1;
-    opacity: 0.95;
-    filter: drop-shadow(0 2px 8px rgba(30,28,26,0.45));
+    left: 50%;
+    bottom: -30px;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 4px solid #ffffff;
+    box-shadow: 0 6px 18px rgba(10, 13, 20, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .guest-modal-body { padding: 4px 26px 26px; }
-  .guest-modal-body h3 {
-    margin: 0 0 8px;
-    font-size: 19px;
+  .guest-modal-mark img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+  .guest-modal-body { padding: 46px 32px 30px; }
+  .guest-modal-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: -0.2px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--brand);
+    opacity: 0.85;
+  }
+  .guest-modal-body h3 {
+    margin: 0 0 10px;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
     color: #1e1c1a;
   }
   .guest-modal-body p {
-    margin: 0 0 20px;
-    font-size: 13px;
-    line-height: 1.55;
+    margin: 0 auto 24px;
+    max-width: 34ch;
+    font-size: 13.5px;
+    line-height: 1.6;
     color: #6b6660;
   }
   .guest-modal-actions { display: flex; flex-direction: column; gap: 10px; }
@@ -179,9 +208,8 @@
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
   }
-  /* Color de marca de cada proyecto: --brand ya está definido en su CSS. */
   .guest-btn-primary {
     background: var(--brand);
     color: #ffffff;
@@ -213,9 +241,12 @@
 <div class="guest-modal" id="guestModal" role="dialog" aria-modal="true" aria-labelledby="guestModalTitle">
   <div class="guest-modal-card">
     <div class="guest-modal-img" aria-hidden="true"@if($guestShot) style="background-image:url('{{ $guestShot }}')"@endif>
-      @if($guestMark)<img class="guest-modal-mark" src="{{ asset($guestMark) }}" alt="">@endif
+      @if($guestMark)
+        <span class="guest-modal-mark"><img src="{{ asset($guestMark) }}" alt=""></span>
+      @endif
     </div>
     <div class="guest-modal-body">
+      <span class="guest-modal-eyebrow">{{ config('company.project') }}</span>
       <h3 id="guestModalTitle">{{ __('Creá tu cuenta para continuar') }}</h3>
       <p>{{ __('El catálogo completo, los planos de cada unidad y la reserva en línea están disponibles al registrarte. Toma menos de un minuto.') }}</p>
       <div class="guest-modal-actions">
