@@ -60,7 +60,10 @@ Route::get('/admin/google-calendar/callback', [\App\Http\Controllers\Admin\Googl
 // Cambio de idioma — disponible sin autenticación
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
-Route::get('/', [HomeController::class, 'index'])->middleware('auth');
+// Escaparate abierto: el visitante ve el catálogo y la interfaz, pero
+// difuminados y sin poder operar — cualquier interacción le abre el registro
+// (ver el bloque «modo invitado» en home.blade.php).
+Route::get('/', [HomeController::class, 'index']);
 
 // Reservation routes
 Route::post('/reservations', [ReservationController::class, 'store']);
@@ -194,7 +197,8 @@ Route::get('/api/active-users', [ActiveUserController::class, 'getActiveUsersCou
 Route::post('/api/update-last-seen', [ActiveUserController::class, 'updateLastSeen']);
 
 // Home page API routes
-Route::get('/api/home-units', [HomeController::class, 'homeUnits'])->middleware('auth')->name('home.units');
+// Sin auth: alimenta el scroll infinito del escaparate para el visitante.
+Route::get('/api/home-units', [HomeController::class, 'homeUnits'])->name('home.units');
 Route::get('/api/units/{unitId}', [HomeController::class, 'getUnitDetails']);
 Route::post('/api/units/{unitId}/view', [HomeController::class, 'recordView']);
 Route::post('/api/units/filter', [HomeController::class, 'filterUnits']);

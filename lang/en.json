@@ -2769,5 +2769,10 @@
   "Eliminar cuota": "Delete installment",
   "¿Eliminar esta cuota del calendario?": "Delete this installment from the schedule?",
   "Esta cuota tiene $:monto ya registrados como pagados y se borrará junto con su comprobante. ¿Eliminarla igual?": "This installment has $:monto already recorded as paid and will be deleted along with its receipt. Delete it anyway?",
-  "Cuota eliminada: ": "Installment deleted: "
+  "Cuota eliminada: ": "Installment deleted: ",
+  "Estás viendo una vista previa": "You're viewing a preview",
+  "Crea tu cuenta para explorar las unidades, ver planos y reservar.": "Create your account to explore the units, view floor plans and book.",
+  "Creá tu cuenta para continuar": "Create your account to continue",
+  "El catálogo completo, los planos de cada unidad y la reserva en línea están disponibles al registrarte. Toma menos de un minuto.": "The full catalogue, each unit's floor plans and online booking are available once you register. It takes less than a minute.",
+  "Ya tengo cuenta": "I already have an account"
 }
