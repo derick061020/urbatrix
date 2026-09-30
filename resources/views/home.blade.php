@@ -17,7 +17,7 @@
 @stack('styles')
 </head>
 
-<body data-view="grid">
+<body data-view="grid"@guest data-guest="1"@endguest>
 
   <!-- ░░░ SIEBE LOADING SCREEN ░░░ -->
   <div id="siebeLoader" aria-hidden="true">
@@ -5846,6 +5846,11 @@
   })();
 </script>
 @stack('scripts')
+@guest
+  {{-- Escaparate: catálogo visible pero desenfocado y sin operar (ver partial). --}}
+  @include('partials.guest-gate')
+@endguest
+
 </body>
 
 </html>
