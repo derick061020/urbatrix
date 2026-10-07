@@ -88,6 +88,62 @@
                 </div>
             </div>
 
+            {{-- ── Origen de la operación (plegable) ──────────────────────────
+                 Quién trajo al cliente y para qué proyecto. Va plegado porque
+                 no siempre aplica, pero se abre solo si algo quedó cargado. --}}
+            @php
+                $nrProyectos = \App\Models\Project::orderBy('name')->get(['id', 'name']);
+                // Sugerencias a partir de lo ya cargado: brokers con cuenta en
+                // el sistema + los nombres escritos a mano en otras reservas.
+                $nrBrokers = \App\Models\User::where('role', 'broker')->orderBy('name')->pluck('name')
+                    ->merge(\App\Models\Reservation::whereNotNull('broker_name')->distinct()->pluck('broker_name'))
+                    ->merge(\App\Models\User::whereNotNull('broker')->distinct()->pluck('broker'))
+                    ->filter()->unique()->sort()->values();
+                $nrAgencias = \App\Models\Reservation::whereNotNull('agency')->distinct()->pluck('agency')
+                    ->merge(\App\Models\User::whereNotNull('agency')->distinct()->pluck('agency'))
+                    ->filter()->unique()->sort()->values();
+            @endphp
+            <div class="rounded-xl border border-ink-200 overflow-hidden">
+                <button type="button" data-origen-toggle
+                        class="w-full px-4 py-2.5 flex items-center justify-between bg-ink-50 hover:bg-ink-100 transition-colors">
+                    <span class="text-[11px] uppercase tracking-wide font-semibold text-ink-500">{{ __('Origen de la operación') }}</span>
+                    <span class="text-[11px] text-ink-500 flex items-center gap-1">
+                        <span data-origen-label>{{ __('Añadir') }}</span>
+                        <i class="pi pi-chevron-down text-[10px]" data-origen-chevron></i>
+                    </span>
+                </button>
+                <div class="hidden p-4 space-y-3" data-origen-panel>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Proyecto') }}</label>
+                        <select name="project_id" class="crm-input pl-3 mt-1">
+                            <option value="">{{ __('El de la unidad') }}</option>
+                            @foreach($nrProyectos as $p)
+                                <option value="{{ $p->id }}">{{ $p->name }}</option>
+                            @endforeach
+                        </select>
+                        <span class="text-[10px] text-ink-400">{{ __('Si se deja vacío se toma el proyecto al que pertenece la unidad.') }}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[12px] font-semibold text-ink-700">{{ __('Broker que trajo al cliente') }}</label>
+                            <input type="text" name="broker_name" list="nr-brokers" autocomplete="off"
+                                   class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre del broker') }}">
+                            <datalist id="nr-brokers">
+                                @foreach($nrBrokers as $b)<option value="{{ $b }}">@endforeach
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="text-[12px] font-semibold text-ink-700">{{ __('Agencia') }}</label>
+                            <input type="text" name="agency" list="nr-agencias" autocomplete="off"
+                                   class="crm-input pl-3 mt-1" placeholder="{{ __('Agencia del broker') }}">
+                            <datalist id="nr-agencias">
+                                @foreach($nrAgencias as $a)<option value="{{ $a }}">@endforeach
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- ── Comprobante de la seña (opcional) ── --}}
             {{-- Se sube por chunks (evita 413); aquí sólo viaja su ruta. --}}
             <input type="hidden" name="receipt_path" id="nr-receipt-path" value="">
@@ -224,6 +280,24 @@
 // Sube el comprobante de la seña por chunks (~512 KB) para evitar el 413.
 // UploadMorph.chunked sube y dibuja el progreso; acá sólo guardamos la ruta.
 (function () {
+    // Plegable de «Origen de la operación»: se abre al pulsar y queda abierto
+    // si ya hay algo escrito (p. ej. al volver con errores de validación).
+    (function () {
+        var box = document.querySelector('[data-origen-panel]');
+        var btn = document.querySelector('[data-origen-toggle]');
+        if (!box || !btn) return;
+        var chev  = btn.querySelector('[data-origen-chevron]');
+        var label = btn.querySelector('[data-origen-label]');
+        function open(show) {
+            box.classList.toggle('hidden', !show);
+            if (chev) chev.style.transform = show ? 'rotate(180deg)' : '';
+            if (label) label.textContent = show ? @json(__('Ocultar')) : @json(__('Añadir'));
+        }
+        btn.addEventListener('click', function () { open(box.classList.contains('hidden')); });
+        var lleno = Array.prototype.some.call(box.querySelectorAll('input, select'), function (el) { return el.value; });
+        if (lleno) open(true);
+    })();
+
     var input  = document.getElementById('nr-receipt-file');
     var pathEl = document.getElementById('nr-receipt-path');
     var upEl   = document.getElementById('nr-uploading');

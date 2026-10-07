@@ -55,6 +55,10 @@ class Reservation extends Model
         'id_type',
         'document_number',
         'unit_id',
+        // Origen comercial de la operación (ver migración de 2026-10-07).
+        'project_id',
+        'broker_name',
+        'agency',
         'unit_name',
         'unit_price',
         'reservation_code',
@@ -87,6 +91,12 @@ class Reservation extends Model
     public function isBudgetSent(): bool
     {
         return $this->budget_status === 'sent';
+    }
+
+    /** Proyecto para el que se registró la reserva (puede diferir del de la unidad). */
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function unit()

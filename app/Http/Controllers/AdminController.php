@@ -2977,6 +2977,10 @@ class AdminController extends Controller
             'fecha'          => 'required|date',
             'monto'          => 'required|numeric|min:0',
             'receipt_path'   => 'nullable|string|max:255',
+            // Origen de la operación: quién trajo al cliente y para qué proyecto.
+            'project_id'     => 'nullable|exists:projects,id',
+            'broker_name'    => 'nullable|string|max:255',
+            'agency'         => 'nullable|string|max:255',
         ]);
 
         $unit = Unit::find($data['unit_id']);
@@ -3000,6 +3004,11 @@ class AdminController extends Controller
             // La fecha de la reserva es la del primer pago (seña): ancla también
             // el arranque del plan de pagos (cuotas) salvo que se cambie luego.
             'payment_start_date' => $data['fecha'],
+            // Origen comercial. Sin proyecto elegido se hereda el de la unidad,
+            // que es lo que ocurre en la mayoría de las cargas.
+            'project_id'  => $data['project_id'] ?: $unit?->project_id,
+            'broker_name' => $data['broker_name'] ?: null,
+            'agency'      => $data['agency'] ?: null,
         ];
         // Backfill any not-null columns the legacy schema requires
         $required = ['unit_name', 'unit_price', 'unit_developer'];
@@ -3015,6 +3024,26 @@ class AdminController extends Controller
         }
 
         $reservation = Reservation::create($reservationData);
+
+        // La ficha del cliente muestra broker/agencia/proyecto (vienen del CRM
+        // anterior). Se rellenan si estaban vacíos, sin pisar lo que ya hubiera:
+        // el dato de la reserva manda sobre la operación, no sobre el cliente.
+        if ($client['user_id'] && ($data['broker_name'] || $data['agency'] || $reservationData['project_id'])) {
+            $user = User::find($client['user_id']);
+            if ($user) {
+                $faltantes = array_filter([
+                    'broker'  => $data['broker_name'] ?: null,
+                    'agency'  => $data['agency'] ?: null,
+                    'project' => $reservationData['project_id']
+                        ? Project::find($reservationData['project_id'])?->name
+                        : null,
+                ], fn ($v, $col) => $v !== null && blank($user->$col), ARRAY_FILTER_USE_BOTH);
+
+                if ($faltantes !== []) {
+                    $user->forceFill($faltantes)->save();
+                }
+            }
+        }
 
         if ($data['monto'] > 0) {
             Payment::create([

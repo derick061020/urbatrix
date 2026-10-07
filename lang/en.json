@@ -2774,5 +2774,14 @@
   "Crea tu cuenta para explorar las unidades, ver planos y reservar.": "Create your account to explore the units, view floor plans and book.",
   "Creá tu cuenta para continuar": "Create your account to continue",
   "El catálogo completo, los planos de cada unidad y la reserva en línea están disponibles al registrarte. Toma menos de un minuto.": "The full catalogue, each unit's floor plans and online booking are available once you register. It takes less than a minute.",
-  "Ya tengo cuenta": "I already have an account"
+  "Ya tengo cuenta": "I already have an account",
+  "Origen de la operación": "Deal origin",
+  "Añadir": "Add",
+  "Ocultar": "Hide",
+  "El de la unidad": "Same as the unit",
+  "Si se deja vacío se toma el proyecto al que pertenece la unidad.": "If left empty, the unit's project is used.",
+  "Broker que trajo al cliente": "Broker who referred the client",
+  "Nombre del broker": "Broker name",
+  "Agencia": "Agency",
+  "Agencia del broker": "Broker's agency"
 }
