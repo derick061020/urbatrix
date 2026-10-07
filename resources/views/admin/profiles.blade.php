@@ -1,12 +1,38 @@
 @extends('layouts.admin_crm')
-@section('title', __('Usuarios — CRM Siebe'))
+@section('title', __('Usuarios — CRM Duna Makai'))
 @section('page_title', __('Usuarios'))
 @section('page_breadcrumb', __('Equipo · Usuarios del sistema'))
 @php $activeRoute = 'profiles'; @endphp
 
 @section('content')
 @php
-    $clientsQuery = \App\Models\User::where('role', 'user');
+    // ── Filtros de la barra ──────────────────────────────────────────────
+    // Van por querystring y se resuelven en SQL: con 4.000+ usuarios y 50 por
+    // página, filtrar en el navegador sólo afectaría a la página visible.
+    $q    = trim((string) request('q', ''));
+    $tab  = request('tab', 'todos');
+    $role = request('role', 'user');     // por defecto, clientes
+
+    // «Al día» = tiene una reserva con documentos y ninguno sin aprobar. Es la
+    // misma regla que pinta la columna Estado más abajo, puesta en SQL.
+    $alDia = fn ($r) => $r->whereHas('documents')
+        ->whereDoesntHave('documents', fn ($d) => $d->where('status', '!=', 'approved'));
+
+    $clientsQuery = \App\Models\User::query()
+        ->when($role !== 'all', fn ($w) => $w->where('role', $role))
+        ->when($q !== '', function ($w) use ($q) {
+            $w->where(function ($or) use ($q) {
+                foreach (['name', 'email', 'phone', 'document_number', 'crm_id'] as $col) {
+                    $or->orWhere($col, 'like', '%' . $q . '%');
+                }
+            });
+        })
+        ->when($tab === 'con-unidad', fn ($w) => $w->whereHas('reservations'))
+        ->when($tab === 'al-dia', fn ($w) => $w->whereHas('reservations', $alDia))
+        ->when($tab === 'en-gestion', fn ($w) => $w
+            ->whereHas('reservations')
+            ->whereDoesntHave('reservations', $alDia));
+
     $users = (clone $clientsQuery)->orderBy('created_at', 'desc')->paginate(50);
     $userIds = $users->getCollection()->pluck('id');
     $reservationsByUser = \App\Models\Reservation::with(['unit','documents'])
@@ -15,9 +41,11 @@
         ->get()
         ->groupBy('user_id');
 
-    $totalUsers = (clone $clientsQuery)->count();
+    // Las cifras de cabecera describen el padrón completo, no el filtro activo.
+    $allClients = \App\Models\User::where('role', 'user');
+    $totalUsers = (clone $allClients)->count();
     $conUnidad  = \App\Models\Reservation::whereNotNull('user_id')
-        ->whereIn('user_id', (clone $clientsQuery)->pluck('id'))
+        ->whereIn('user_id', (clone $allClients)->select('id'))
         ->distinct('user_id')->count('user_id');
     $sinUnidad  = $totalUsers - $conUnidad;
     $admins     = \App\Models\User::where('role', 'admin')->count();
@@ -46,7 +74,7 @@
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         @php $kpis = [
-            ['Total registrados', $totalUsers, '#2b2b1a'],
+            ['Total registrados', $totalUsers, '#5c7c68'],
             ['Con unidad',        $conUnidad,  '#1fc16b'],
             ['Sin unidad',        $sinUnidad,  '#fa7319'],
             ['Administradores',   $admins,     '#335cff'],
@@ -104,18 +132,47 @@
     <div class="crm-card">
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-                @foreach (['Todos','Con unidad','En gestión','Al día'] as $i => $tab)
-                    <button class="crm-tab {{ $i === 0 ? 'active' : '' }}">{{ $tab }}</button>
+                @foreach ([
+                    'todos'      => __('Todos'),
+                    'con-unidad' => __('Con unidad'),
+                    'en-gestion' => __('En gestión'),
+                    'al-dia'     => __('Al día'),
+                ] as $slug => $label)
+                    <a href="{{ request()->fullUrlWithQuery(['tab' => $slug, 'page' => null]) }}"
+                       class="crm-tab {{ $tab === $slug ? 'active' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+            {{-- GET: el filtro queda en la URL, así se puede compartir y la
+                 paginación lo arrastra con withQueryString(). --}}
+            <form method="GET" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto">
+                <input type="hidden" name="tab" value="{{ $tab }}">
                 <div class="relative w-full sm:w-64">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                    <input type="text" placeholder="{{ __('Buscar usuario…') }}" class="crm-input pr-3">
+                    <input type="search" name="q" value="{{ $q }}"
+                           placeholder="{{ __('Nombre, correo, teléfono…') }}" class="crm-input pr-3">
                 </div>
-                <button class="crm-btn crm-btn-ghost"><i class="pi pi-filter"></i> {{ __('Filtros') }}</button>
-            </div>
+                <select name="role" onchange="this.form.submit()" class="crm-input pl-3 w-full sm:w-40">
+                    @foreach ([
+                        'user'   => __('Clientes'),
+                        'admin'  => __('Administradores'),
+                        'broker' => __('Brokers'),
+                        'all'    => __('Todos los roles'),
+                    ] as $val => $label)
+                        <option value="{{ $val }}" {{ $role === $val ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="crm-btn crm-btn-ghost"><i class="pi pi-search"></i> {{ __('Buscar') }}</button>
+                @if($q !== '' || $tab !== 'todos' || $role !== 'user')
+                    <a href="{{ route('admin.profiles') }}" class="crm-btn crm-btn-ghost" title="{{ __('Limpiar filtros') }}"><i class="pi pi-times"></i></a>
+                @endif
+            </form>
         </div>
+        @if($q !== '' || $tab !== 'todos' || $role !== 'user')
+            <div class="px-4 pb-1 text-[12px] text-ink-500">
+                {{ trans_choice('{0}Ningún usuario coincide|{1}1 usuario|[2,*]:count usuarios', $users->total(), ['count' => $users->total()]) }}
+                @if($q !== '') · «{{ $q }}» @endif
+            </div>
+        @endif
 
         <div class="overflow-x-auto">
             <table class="w-full crm-table">
@@ -132,7 +189,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#2b2b1a']; @endphp
+                    @php $avBg = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68']; @endphp
                     @forelse($users as $u)
                         @php
                             $fullName = trim(($u->first_name ?? '').' '.($u->last_name ?? '')) ?: ($u->name ?? '—');
@@ -180,7 +237,7 @@
                             <td>
                                 @if($r)
                                     <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : 'Siebe Residences' }}</div>
+                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : 'Makai Residences' }}</div>
                                 @else
                                     <span class="text-[12px] text-ink-400">—</span>
                                 @endif
