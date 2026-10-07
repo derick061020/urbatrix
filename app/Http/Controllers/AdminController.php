@@ -2973,7 +2973,10 @@ class AdminController extends Controller
             // Correos adicionales del cliente: sólo contacto, no reciben la invitación.
             'cliente_emails_extra'   => 'nullable|array|max:10',
             'cliente_emails_extra.*' => 'nullable|email|max:255',
-            'unit_id'        => 'required|exists:units,id',
+            // La unidad es opcional: se registran clientes que aún están
+            // decidiendo. Antes había que elegir una «para que deje guardar»,
+            // y eso ensuciaba la disponibilidad.
+            'unit_id'        => 'nullable|exists:units,id',
             'fecha'          => 'required|date',
             'monto'          => 'required|numeric|min:0',
             'receipt_path'   => 'nullable|string|max:255',
@@ -3011,12 +3014,15 @@ class AdminController extends Controller
             'agency'      => $data['agency'] ?: null,
         ];
         // Backfill any not-null columns the legacy schema requires
+        // Sin unidad se dejan en null (la migración de 2026-10-07 las hizo
+        // nulables) para que la ficha muestre «sin unidad» y no un precio 0
+        // que parecería real.
         $required = ['unit_name', 'unit_price', 'unit_developer'];
         foreach ($required as $col) {
             if (\Illuminate\Support\Facades\Schema::hasColumn('reservations', $col)) {
                 $reservationData[$col] = match ($col) {
-                    'unit_name'      => $unit?->name ?? $unit?->custom_id ?? '—',
-                    'unit_price'     => (string) ($unit?->price ?? 0),
+                    'unit_name'      => $unit?->name ?? $unit?->custom_id,
+                    'unit_price'     => $unit ? (string) $unit->price : null,
                     'unit_developer' => 'Makai',
                     default          => '',
                 };

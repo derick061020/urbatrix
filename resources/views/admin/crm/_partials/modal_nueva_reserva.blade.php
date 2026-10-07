@@ -62,7 +62,7 @@
             {{-- ── Datos de la reserva ── --}}
             <div class="grid grid-cols-2 gap-3 pt-1">
                 <div>
-                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Unidad') }}</label>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Unidad') }} <span class="text-ink-400 font-normal">({{ __('opcional') }})</span></label>
                     <div class="relative mt-1" data-combobox>
                         <input type="hidden" name="unit_id" data-combobox-value>
                         <input type="text" data-combobox-search autocomplete="off" placeholder="{{ __('Buscar unidad…') }}" class="crm-input pl-3">
@@ -241,14 +241,9 @@
     const unitBox    = form.querySelector('[name="unit_id"]');
     const unitSearch = unitBox.closest('[data-combobox]').querySelector('[data-combobox-search]');
 
-    // Validación: unidad obligatoria + cliente seleccionado en modo existente
+    // La unidad es opcional: se puede registrar un cliente que aún no decidió.
+    // Lo que sí se valida es que, en modo «cliente existente», haya uno elegido.
     form.addEventListener('submit', e => {
-        if (!unitBox.value) {
-            e.preventDefault();
-            unitSearch.focus();
-            alert('{{ __('Selecciona una unidad del listado.') }}');
-            return;
-        }
         if (hidden.value === 'existing' && !existingValue.value) {
             e.preventDefault();
             existingSearch.focus();
