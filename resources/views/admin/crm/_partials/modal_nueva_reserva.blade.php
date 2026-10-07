@@ -93,14 +93,18 @@
                  no siempre aplica, pero se abre solo si algo quedó cargado. --}}
             @php
                 $nrProyectos = \App\Models\Project::orderBy('name')->get(['id', 'name']);
-                // Sugerencias a partir de lo ya cargado: brokers con cuenta en
-                // el sistema + los nombres escritos a mano en otras reservas.
+                // Sugerencias: brokers con cuenta en el sistema y lo ya escrito
+                // en otras reservas.
+                //
+                // NO se usan users.broker / users.agency: esas columnas vienen
+                // de la importación del CRM anterior y están mal mapeadas —
+                // `broker` guarda el proyecto (Makai, Naviva, LIV), `agency`
+                // guarda nacionalidades (Canadian, USA) y `project`, ciudades—,
+                // así que sugerirlas aquí sólo confundiría.
                 $nrBrokers = \App\Models\User::where('role', 'broker')->orderBy('name')->pluck('name')
                     ->merge(\App\Models\Reservation::whereNotNull('broker_name')->distinct()->pluck('broker_name'))
-                    ->merge(\App\Models\User::whereNotNull('broker')->distinct()->pluck('broker'))
                     ->filter()->unique()->sort()->values();
                 $nrAgencias = \App\Models\Reservation::whereNotNull('agency')->distinct()->pluck('agency')
-                    ->merge(\App\Models\User::whereNotNull('agency')->distinct()->pluck('agency'))
                     ->filter()->unique()->sort()->values();
             @endphp
             <div class="rounded-xl border border-ink-200 overflow-hidden">

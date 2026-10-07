@@ -3022,25 +3022,10 @@ class AdminController extends Controller
 
         $reservation = Reservation::create($reservationData);
 
-        // La ficha del cliente muestra broker/agencia/proyecto (vienen del CRM
-        // anterior). Se rellenan si estaban vacíos, sin pisar lo que ya hubiera:
-        // el dato de la reserva manda sobre la operación, no sobre el cliente.
-        if ($client['user_id'] && ($data['broker_name'] || $data['agency'] || $reservationData['project_id'])) {
-            $user = User::find($client['user_id']);
-            if ($user) {
-                $faltantes = array_filter([
-                    'broker'  => $data['broker_name'] ?: null,
-                    'agency'  => $data['agency'] ?: null,
-                    'project' => $reservationData['project_id']
-                        ? Project::find($reservationData['project_id'])?->name
-                        : null,
-                ], fn ($v, $col) => $v !== null && blank($user->$col), ARRAY_FILTER_USE_BOTH);
-
-                if ($faltantes !== []) {
-                    $user->forceFill($faltantes)->save();
-                }
-            }
-        }
+        // No se copia nada a users.broker / users.agency / users.project: esas
+        // columnas vienen del CRM anterior mal mapeadas (guardan proyecto,
+        // nacionalidad y ciudad respectivamente). El origen de la operación
+        // vive sólo en la reserva, que es además donde corresponde.
 
         if ($data['monto'] > 0) {
             Payment::create([
