@@ -1076,7 +1076,14 @@ class AdminController extends Controller
         // ── Estado / etapa del proceso ──
         $verif = $user->verification_status ?? 'approved';
         $approvedDocs = $reservation ? $reservation->documents->where('status', 'approved')->count() : 0;
+        // Ojo con el texto de la etapa: se mostraba como «3 / 6», que se lee
+        // como «3 de 6 documentos». Es el número de etapa, así que se escribe
+        // «Etapa 3 de 6» en la vista.
         if (! $reservation) {
+            $stage = ['1 / 6', 'Registro']; $estado = ['Sin unidad', 'info'];
+        } elseif (! $reservation->unit_id) {
+            // Reserva creada sin unidad todavía: sigue siendo registro, no
+            // documentación.
             $stage = ['1 / 6', 'Registro']; $estado = ['Sin unidad', 'info'];
         } elseif ($verif === 'pending') {
             $stage = ['2 / 6', 'KYC / Docs']; $estado = ['KYC pendiente', 'warn'];
