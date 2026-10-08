@@ -272,6 +272,7 @@
                                             data-phone="{{ $u->phone }}"
                                             data-country="{{ $u->country }}"
                                             data-role="{{ $u->role }}"
+                                            data-project="{{ $u->project_id }}"
                                             class="inline-flex items-center gap-1 text-[12px] text-ink-600 font-semibold hover:text-brand">
                                         <i class="pi pi-pencil text-[11px]"></i> Editar
                                     </button>
@@ -344,6 +345,15 @@
                     <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="{{ __('Colombia') }}">
                 </div>
                 <div>
+                    <label class="text-[12px] font-semibold text-ink-700">{{ __('Proyecto de interés') }}</label>
+                    <select name="project_id" id="eu-project" class="crm-input pl-3 mt-1">
+                        <option value="">{{ __('Sin definir') }}</option>
+                        @foreach(\App\Models\Project::orderBy('name')->get(['id','name']) as $p)
+                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Rol') }}</label>
                     <select name="role" id="eu-role" class="crm-input pl-3 mt-1">
                         <option value="user">{{ __('Usuario') }}</option>
@@ -388,6 +398,7 @@
         document.getElementById('eu-phone').value   = d.phone || '';
         document.getElementById('eu-country').value = d.country || '';
         document.getElementById('eu-role').value    = d.role || 'user';
+        document.getElementById('eu-project').value = d.project || '';
         euSetExtraEmails(d.extra);
         f.querySelector('input[name=password]').value = '';
         f.querySelector('input[name=password_confirmation]').value = '';
