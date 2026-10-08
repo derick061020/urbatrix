@@ -78,6 +78,8 @@ class User extends Authenticatable
         'name', 'first_name', 'last_name', 'email', 'extra_emails', 'password', 'role',
         'last_seen', 'google_id', 'apple_id', 'avatar',
         'phone', 'country', 'verification_status', 'kyc_id_document', 'kyc_id_document_back',
+        // Proyecto por el que el cliente está interesado (ver migración 2026-10-08).
+        'project_id',
     ];
 
     protected function casts(): array
@@ -185,6 +187,17 @@ class User extends Authenticatable
     public function assignedUnits()
     {
         return $this->belongsToMany(Unit::class, 'broker_unit')->withTimestamps();
+    }
+
+    /**
+     * Proyecto por el que el cliente está interesado.
+     *
+     * Ojo: la columna `project` (varchar) es otra cosa — viene del CRM anterior
+     * y guarda ciudades. La relación buena es esta.
+     */
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function brokerDocuments()

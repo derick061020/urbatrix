@@ -4636,6 +4636,8 @@ class AdminController extends Controller
             'phone'      => ['nullable', 'string', 'max:30'],
             'country'    => ['nullable', 'string', 'max:10'],
             'role'       => ['nullable', 'in:user,admin'],
+            // Proyecto por el que el cliente está interesado.
+            'project_id' => ['nullable', 'exists:projects,id'],
             'avatar'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_avatar' => ['nullable', 'boolean'],
             'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
@@ -4668,6 +4670,13 @@ class AdminController extends Controller
         $user->country    = $data['country'] ?? $user->country;
         if (!empty($data['role'])) {
             $user->role = $data['role'];
+        }
+
+        // Proyecto de interés. Se usa array_key_exists y no ?? para que dejarlo
+        // en «Sin definir» (cadena vacía) sí lo borre, en vez de conservar el
+        // anterior.
+        if (array_key_exists('project_id', $data)) {
+            $user->project_id = $data['project_id'] ?: null;
         }
 
         $composed = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
