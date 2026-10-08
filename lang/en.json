@@ -2784,5 +2784,7 @@
   "Nombre del broker": "Broker name",
   "Agencia": "Agency",
   "Agencia del broker": "Broker's agency",
-  "Proyecto de interés": "Project of interest"
+  "Proyecto de interés": "Project of interest",
+  "Etapa :n de :total": "Step :n of :total",
+  "Agente": "Agent"
 }

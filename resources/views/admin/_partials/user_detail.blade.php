@@ -2,11 +2,22 @@
     $fullName = trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: ($user->name ?? '—');
     $parts = preg_split('/\s+/', trim($fullName !== '—' ? $fullName : 'U'));
     $init  = strtoupper(substr($parts[0] ?? 'U', 0, 1).substr($parts[1] ?? '', 0, 1));
-    $avBg  = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#2b2b1a'];
+    $avBg  = ['#7cb8e7','#f3b04f','#a5b0c5','#d6a3c6','#d56a6a','#cdd6df','#a6c5b3','#5c7c68'];
     $bg    = $avBg[$user->id % count($avBg)];
-    $agente = $reservation?->budget_configured_by ?: '—';
+    // «Agente»: antes imprimía budget_configured_by tal cual, que es el ID del
+    // admin que configuró el presupuesto —un número, y vacío mientras nadie lo
+    // haya tocado—, así que nunca mostraba a nadie. Ahora manda quien trajo al
+    // cliente y, si no consta, el asesor que configuró el presupuesto, ya
+    // resuelto a nombre.
+    $agente = $reservation?->broker_name
+        ?: ($reservation?->budget_configured_by
+            ? (\App\Models\User::find($reservation->budget_configured_by)?->name ?: '—')
+            : '—');
+    $agencia = $reservation?->agency;
+    // «3 / 6» a secas se leía como «3 de 6 documentos»; es el número de etapa.
+    [$stageN, $stageTot] = array_map('trim', explode('/', $stage[0]));
     $unitName = $unit ? ($unit->custom_id ?? $unit->name ?? '—') : '—';
-    $project  = $unit?->project?->name ?? ($reservation ? 'Siebe Residences' : '—');
+    $project  = $unit?->project?->name ?? ($reservation ? 'Makai Residences' : '—');
     $extraEmails = $user->extraEmails();
     $editData = \Illuminate\Support\Js::from([
         'id' => $user->id, 'first' => $user->first_name, 'last' => $user->last_name,
@@ -27,7 +38,8 @@
     </div>
     <div class="text-right shrink-0">
         <span class="crm-pill bg-{{ $estado[1] }}-soft text-{{ $estado[1] }} uppercase">{{ $estado[0] }}</span>
-        <div class="text-[11px] text-ink-400 mt-2">Agente: {{ $agente }}</div>
+        <div class="text-[11px] text-ink-400 mt-2">{{ __('Agente') }}: {{ $agente }}</div>
+        @if($agencia)<div class="text-[11px] text-ink-400">{{ $agencia }}</div>@endif
     </div>
     <button type="button" onclick="closeUserDetail()" class="text-ink-400 hover:text-ink-700 p-1 -mt-1"><i class="pi pi-times text-[12px]"></i></button>
 </div>
@@ -78,6 +90,7 @@
                             ['País', $user->country ?: '—'],
                             ['Registro', optional($user->created_at)->format('Y-m-d') ?? '—'],
                             ['Agente asignado', $agente],
+                            ['Agencia', $agencia ?: '—'],
                         ]
                     );
                 @endphp
@@ -98,7 +111,9 @@
                 </div>
                 <div class="py-2.5 flex items-center justify-between">
                     <span class="text-[12px] text-ink-500">{{ __('Etapa') }}</span>
-                    <span class="text-[13px] font-semibold text-ink-900">{{ $stage[0] }} — {{ $stage[1] }}</span>
+                    {{-- «3 / 6» a secas se leía como «3 de 6 documentos»; es el
+                         número de etapa del proceso. --}}
+                    <span class="text-[13px] font-semibold text-ink-900">{{ __('Etapa :n de :total', ['n' => $stageN, 'total' => $stageTot]) }} · {{ $stage[1] }}</span>
                 </div>
                 <div class="py-2.5 flex items-center justify-between">
                     <span class="text-[12px] text-ink-500">{{ __('Última acción') }}</span>
@@ -216,7 +231,11 @@
 {{-- ===== FOOTER ===== --}}
 <div class="px-6 py-4 border-t border-ink-100 flex items-center justify-end gap-2">
     <button type="button" onclick="closeUserDetail()" class="crm-btn crm-btn-ghost">{{ __('Cerrar') }}</button>
-    <button type="button" onclick='closeUserDetail(); openEditUserObj({{ $editData }})' class="crm-btn crm-btn-ghost"><i class="pi pi-pencil"></i> {{ __('Editar') }}</button>
+    {{-- Atributo con comillas DOBLES a propósito: Js::from() genera
+         JSON.parse('…') con comillas simples, así que entre comillas simples el
+         atributo se cortaba en la primera y el onclick quedaba roto
+         («Unexpected end of input»); el botón no hacía nada. --}}
+    <button type="button" onclick="closeUserDetail(); openEditUserObj({{ $editData }})" class="crm-btn crm-btn-ghost"><i class="pi pi-pencil"></i> {{ __('Editar') }}</button>
     @if($reservation)
         <a href="{{ route('admin.crm.expediente.detalle', $reservation->id) }}" class="crm-btn crm-btn-ghost">{{ __('Ver expediente →') }}</a>
     @endif

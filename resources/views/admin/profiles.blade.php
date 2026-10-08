@@ -25,6 +25,11 @@
                 foreach (['name', 'email', 'phone', 'document_number', 'crm_id'] as $col) {
                     $or->orWhere($col, 'like', '%' . $q . '%');
                 }
+                // Ahora que se muestran en la tabla, se puede buscar por ellos.
+                $or->orWhereHas('reservations', function ($r) use ($q) {
+                    $r->where('broker_name', 'like', '%' . $q . '%')
+                      ->orWhere('agency', 'like', '%' . $q . '%');
+                });
             });
         })
         ->when($tab === 'con-unidad', fn ($w) => $w->whereHas('reservations'))
@@ -181,6 +186,8 @@
                         <th class="w-6"><input type="checkbox" class="w-4 h-4 accent-brand"></th>
                         <th>{{ __('Usuario') }}</th>
                         <th>{{ __('Rol') }}</th>
+                        <th>{{ __('Broker') }}</th>
+                        <th>{{ __('Agencia') }}</th>
                         <th>{{ __('Unidad') }}</th>
                         <th>{{ __('Progreso de compra') }}</th>
                         <th>{{ __('Estado') }}</th>
@@ -234,6 +241,24 @@
                                 </div>
                             </td>
                             <td><span class="crm-pill bg-{{ $rolePill[1] }}-soft text-{{ $rolePill[1] }}">{{ $rolePill[0] }}</span></td>
+                            {{-- Broker y agencia salen de la reserva, no de
+                                 users.broker / users.agency: esas columnas
+                                 vienen del CRM anterior mal mapeadas (guardan
+                                 el proyecto y la nacionalidad). --}}
+                            <td>
+                                @if($r?->broker_name)
+                                    <div class="text-[13px] text-ink-800">{{ $r->broker_name }}</div>
+                                @else
+                                    <span class="text-[12px] text-ink-400">—</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($r?->agency)
+                                    <span class="crm-pill bg-ink-100 text-ink-600">{{ $r->agency }}</span>
+                                @else
+                                    <span class="text-[12px] text-ink-400">—</span>
+                                @endif
+                            </td>
                             <td>
                                 @if($r)
                                     <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
@@ -283,7 +308,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay usuarios.') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Crear uno') }}</button></td></tr>
+                        <tr><td colspan="10" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay usuarios.') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Crear uno') }}</button></td></tr>
                     @endforelse
                 </tbody>
             </table>
