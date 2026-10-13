@@ -2795,5 +2795,13 @@
   "hab.": "bed",
   "baños": "bath",
   "Invitado": "Guest",
-  "Creá tu cuenta para reservar": "Create your account to reserve"
+  "Creá tu cuenta para reservar": "Create your account to reserve",
+  "Bienvenido a bordo": "Welcome aboard",
+  "Bienvenido a :project": "Welcome to :project",
+  "Estás viendo una vista previa. Creá tu cuenta para explorar las unidades, ver los planos de cada una y reservar en línea.": "You're viewing a preview. Create your account to explore the units, see each floor plan and reserve online.",
+  "Recomendado": "Recommended",
+  "Quiero explorar las unidades disponibles y encontrar mi propiedad.": "I want to explore the available units and find my property.",
+  "Entrá para retomar donde lo dejaste.": "Sign in to pick up where you left off.",
+  "Lo decido luego": "I'll decide later",
+  "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.": "You can keep browsing the project; the units open once you create an account."
 }
