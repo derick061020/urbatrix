@@ -1224,7 +1224,6 @@
   "Lun–Vie · horario AST": "Lun–Vie · horario AST",
   "SIEBE · Activar cuenta": "SIEBE · Activar cuenta",
   "SIEBE · Siebe Property Group": "SIEBE · Siebe Property Group",
-  "SIEBE · Siebe Property Group": "SIEBE · Siebe Property Group",
   "SIEBE · Recuperar contraseña": "SIEBE · Recuperar contraseña",
   "SIEBE · Soporte": "SIEBE · Soporte",
   "Main Website (EN)": "Main Website (EN)",
@@ -2752,5 +2751,8 @@
   "El monto pagado no puede superar el monto programado de la cuota.": "El monto pagado no puede superar el monto programado de la cuota.",
   "Pago actualizado correctamente.": "Pago actualizado correctamente.",
   "Registro fiscal / RNC": "Registro fiscal / RNC",
-  "firmado": "firmado"
+  "firmado": "firmado",
+  "Invitado": "Invitado",
+  "Creá tu cuenta para reservar": "Creá tu cuenta para reservar",
+  "Ya tengo cuenta": "Ya tengo cuenta"
 }
