@@ -2215,6 +2215,12 @@
             }
             $activeFloorPlanImg = $floorPlanImageMap[$activeFloor] ?? $floorPlanFallback;
 
+            // Puntos calculados sobre cada plano subido por el admin
+            // (`php artisan plan:anchors`): uno por unidad del piso, siempre
+            // sobre planta dibujada. Si un piso no los tiene, se usa la lista
+            // genérica de abajo.
+            $planAnchorsByFloor = \App\Models\Setting::get('floor_plan_anchors', []) ?: [];
+
             // Posiciones de las chinchetas sobre el plano, en porcentaje del
             // ANCHO y el ALTO de la imagen (no del lienzo: ver fitPlanLayer()).
             //
@@ -2362,7 +2368,9 @@
             @foreach($floorOrder as $floorLabel)
               @foreach($floorBuckets[$floorLabel]->values() as $idx => $unit)
                 @php
-                  $anchor   = $anchorPoints[$idx % count($anchorPoints)];
+                  $floorKey = ($floorLabel === 'Ground') ? 'ground' : $floorLabel;
+                  $points   = $planAnchorsByFloor[$floorKey] ?? $anchorPoints;
+                  $anchor   = $points[$idx % count($points)];
                   $leftPct  = $anchor['x'];
                   $topPct   = $anchor['y'];
                   $state    = $markerStateFor($unit);
@@ -2857,11 +2865,29 @@
         // los lados o arriba y abajo. Las chinchetas van en porcentajes del
         // plano, así que la capa que las contiene tiene que calzar con el
         // rectángulo que ocupa la imagen y no con el lienzo entero.
+        // Debajo de este ancho el lienzo tiene alto fijo y se navega con
+        // zoom/arrastre: ahí la proporción no se toca.
+        const planDesktop = window.matchMedia('(min-width: 761px)');
+
         function fitPlanLayer() {
           if (!planLayer || !planImg) return;
           const nw = planImg.naturalWidth, nh = planImg.naturalHeight;
+          if (!nw || !nh) return;
+
+          // El lienzo nacía con la proporción del masterplan (1366x769). Los
+          // planos por piso son casi cuadrados, así que quedaban reducidos al
+          // centro con medio lienzo en blanco y las chinchetas amontonadas.
+          // Se le da la proporción de la imagen, acotada para que no se
+          // desmadre el alto con un plano muy vertical.
+          if (planDesktop.matches) {
+            const ratio = Math.min(2.2, Math.max(0.9, nw / nh));
+            canvas.style.aspectRatio = ratio.toFixed(4) + ' / 1';
+          } else {
+            canvas.style.aspectRatio = '';
+          }
+
           const cw = planImg.clientWidth, ch = planImg.clientHeight;
-          if (!nw || !nh || !cw || !ch) return;
+          if (!cw || !ch) return;
           const scale = Math.min(cw / nw, ch / nh);
           const w = nw * scale, h = nh * scale;
           planLayer.style.left   = ((cw - w) / 2) + 'px';
