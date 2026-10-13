@@ -5095,6 +5095,16 @@
       }});
     }
 
+    // El «atrás» del navegador, estando dentro de un modelo, devuelve a la
+    // portada de tipos en vez de sacar del sitio. Lo consulta el partial de
+    // retención (partials/exit-intent) antes de ofrecer la salida; devolver
+    // true significa «este atrás lo gasté yo, no lo trates como una salida».
+    window.__handleBackNavigation = function () {
+        if (!currentFilters.model) return false;
+        backToVillaTypes();
+        return true;
+    };
+
     function backToVillaTypes() {
       // Volver a la portada limpia el modelo y los filtros, y recarga el
       // catálogo completo por detrás: si desde aquí se pasa a Lista/Planta, lo
@@ -6594,6 +6604,9 @@
   {{-- Escaparate: catálogo visible pero desenfocado y sin operar (ver partial). --}}
   @include('partials.guest-gate')
 @endguest
+
+{{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
+@include('partials.exit-intent')
 
 </body>
 
