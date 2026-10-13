@@ -2031,14 +2031,20 @@
           <div style="position:relative;">
             <button type="button" onclick="toggleProfileMenu()" aria-label="{{ __('Profile') }}" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
               <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
-                <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Samuel' }}</span>
-                <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ auth()->check() && (auth()->user()->role ?? '') === 'admin' ? __('Admin') : __('Agente') }}</span>
+                @auth
+                  <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ explode(' ', auth()->user()->name)[0] }}</span>
+                  <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ (auth()->user()->role ?? '') === 'admin' ? __('Admin') : __('Agente') }}</span>
+                @else
+                  {{-- Sin sesión no hay a quién nombrar: se invita a entrar. --}}
+                  <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ __('Mi cuenta') }}</span>
+                  <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ __('Iniciar sesión') }}</span>
+                @endauth
               </span>
               @if(auth()->check() && auth()->user()->avatar)
                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="display:inline-block;width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" aria-hidden="true">
               @else
                 <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#074540;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;flex-shrink:0;" aria-hidden="true">
-                  {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
+                  @auth{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}@else<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>@endauth
                 </span>
               @endif
             </button>
@@ -2053,13 +2059,18 @@
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" style="position:absolute;width:100%;height:100%;object-fit:cover;border-radius:999px;" />
                   @else
                     <span style="position:absolute;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;background:#074540;color:white;font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;border-radius:999px;">
-                      {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'S' }}
+                      @auth{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}@else<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>@endauth
                     </span>
                   @endif
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
-                  <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
-                  <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->email : 'samuelurbi@gmail.com' }}</div>
+                  @auth
+                    <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->user()->name }}</div>
+                    <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->user()->email }}</div>
+                  @else
+                    <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ __('Invitado') }}</div>
+                    <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ __('Creá tu cuenta para reservar') }}</div>
+                  @endauth
                 </div>
                 <div style="position:relative;">
                   <button type="button" class="fg-filter-btn" onclick="toggleCurrencyDropdown()" id="currencyBtn">
@@ -2112,6 +2123,7 @@
                 </div>
               </div>
 
+@auth
               <!-- Menu Items -->
               <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.crm.dashboard') : route('dashboard') }}" style="text-decoration:none;display:block;width:100%">
                 <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
@@ -2161,6 +2173,7 @@
               </a>
               @endif
 
+@endauth
               <!-- Divider -->
               <div style="display:flex;align-items:center;justify-content:center;padding:1.5px 0;width:100%;flex-shrink:0;">
                 <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
@@ -2175,6 +2188,7 @@
                 <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Contactar agente') }}</div>
               </div>
 
+@auth
               <a href="{{ route('support') }}" style="text-decoration:none;display:block;width:100%">
                 <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
                   <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
@@ -2200,6 +2214,7 @@
                 </div>
               </a>
 
+@endauth
               @php
                 // ── Menú del cliente configurable (Configuración → Menú del cliente).
                 //    Cada ítem es un enlace externo o un documento que se abre en modal.
@@ -2292,6 +2307,7 @@
                 <div style="background:#ebebeb;flex:1;height:1px;min-width:0;"></div>
               </div>
 
+@auth
               <!-- Sign Out -->
               <form method="POST" action="/logout" style="margin:0;width:100%;flex-shrink:0;" data-logout-confirm>
                 @csrf
@@ -2307,6 +2323,36 @@
                 </button>
               </form>
 
+@else
+
+              <!-- Sin sesión: los dos caminos para tenerla -->
+              <a href="{{ route('register') }}" style="text-decoration:none;display:block;width:100%">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand);">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <line x1="19" y1="8" x2="19" y2="14"></line>
+                      <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:var(--brand);letter-spacing:-0.084px;">{{ __('Crear cuenta') }}</div>
+                </div>
+              </a>
+
+              <a href="{{ route('login') }}" style="text-decoration:none;display:block;width:100%">
+                <div class="menu-item" style="background:white;display:flex;gap:8px;align-items:center;overflow:hidden;padding:8px;border-radius:12px;width:100%;flex-shrink:0;cursor:pointer;">
+                  <div style="position:relative;width:20px;height:20px;flex-shrink:0;overflow:hidden;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5c5c5c;">
+                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                      <polyline points="10 17 15 12 10 7"></polyline>
+                      <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                  </div>
+                  <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;">{{ __('Ya tengo cuenta') }}</div>
+                </div>
+              </a>
+@endauth
               <!-- Footer -->
               <div style="background:white;display:flex;align-items:center;overflow:hidden;padding:8px;width:100%;flex-shrink:0;">
                 <div style="flex:1;min-width:0;font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;line-height:16px;">v.1.0.1 · {{ __('Términos y condiciones') }}</div>
