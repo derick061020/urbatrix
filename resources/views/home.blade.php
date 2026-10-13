@@ -5897,6 +5897,9 @@
   @include('partials.guest-gate')
 @endguest
 
+{{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
+@include('partials.exit-intent')
+
 </body>
 
 </html>
