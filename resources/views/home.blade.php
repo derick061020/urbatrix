@@ -2132,6 +2132,9 @@
           @include('partials.home-unit-card')
         @endforeach
       </div>
+      {{-- Qué se ve cuando la búsqueda o los filtros no devuelven nada. --}}
+      @include('partials.empty-results')
+
       <!-- Infinite-scroll sentinel for the grid (revealed batch by batch). -->
       <div class="fg-lazy-more" id="gridLazyMore" aria-hidden="true">
         <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
@@ -4445,6 +4448,7 @@
           updateMatchCount(data.total);
           updateListMatchCount(listMatchCount());
           updateLazyLoaders();
+          if (typeof window.renderEmptyResults === 'function') window.renderEmptyResults(data.total);
           if (options.onDone) options.onDone(data);
         })
         .catch(() => {})
