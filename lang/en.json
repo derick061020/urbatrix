@@ -2803,5 +2803,18 @@
   "Quiero explorar las unidades disponibles y encontrar mi propiedad.": "I want to explore the available units and find my property.",
   "Entrá para retomar donde lo dejaste.": "Sign in to pick up where you left off.",
   "Lo decido luego": "I'll decide later",
-  "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.": "You can keep browsing the project; the units open once you create an account."
+  "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.": "You can keep browsing the project; the units open once you create an account.",
+  "Cerrar y quedarme": "Close and stay",
+  "Espera un momento": "Hold on a second",
+  "¿Seguro que querés irte?": "Sure you want to leave?",
+  "Estás a un paso de encontrar tu lugar en :project. Lo que estuviste viendo se pierde si salís ahora.": "You're one step away from finding your place at :project. What you've been looking at is lost if you leave now.",
+  "Quedan :count disponibles": ":count still available",
+  "Desde :price": "From :price",
+  "Seguir explorando": "Keep exploring",
+  "No, gracias. Quiero salir": "No thanks, I want to leave",
+  "¿Preferís que te avisemos de nuevas unidades? Guardá tu selección creando tu cuenta — :free.": "Want us to tell you about new units? Save your selection by creating an account — :free.",
+  "es gratis": "it's free",
+  "Tu lista de guardados y tus reservas te esperan en :dashboard.": "Your saved list and your reservations are waiting in :dashboard.",
+  "tu escritorio": "your dashboard",
+  "{1}:n unidad|[2,*]:n unidades": "{1}:n unit|[2,*]:n units"
 }

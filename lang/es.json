@@ -2770,5 +2770,18 @@
   "Quiero explorar las unidades disponibles y encontrar mi propiedad.": "Quiero explorar las unidades disponibles y encontrar mi propiedad.",
   "Entrá para retomar donde lo dejaste.": "Entrá para retomar donde lo dejaste.",
   "Lo decido luego": "Lo decido luego",
-  "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.": "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta."
+  "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.": "Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.",
+  "Cerrar y quedarme": "Cerrar y quedarme",
+  "Espera un momento": "Espera un momento",
+  "¿Seguro que querés irte?": "¿Seguro que querés irte?",
+  "Estás a un paso de encontrar tu lugar en :project. Lo que estuviste viendo se pierde si salís ahora.": "Estás a un paso de encontrar tu lugar en :project. Lo que estuviste viendo se pierde si salís ahora.",
+  "Quedan :count disponibles": "Quedan :count disponibles",
+  "Desde :price": "Desde :price",
+  "Seguir explorando": "Seguir explorando",
+  "No, gracias. Quiero salir": "No, gracias. Quiero salir",
+  "¿Preferís que te avisemos de nuevas unidades? Guardá tu selección creando tu cuenta — :free.": "¿Preferís que te avisemos de nuevas unidades? Guardá tu selección creando tu cuenta — :free.",
+  "es gratis": "es gratis",
+  "Tu lista de guardados y tus reservas te esperan en :dashboard.": "Tu lista de guardados y tus reservas te esperan en :dashboard.",
+  "tu escritorio": "tu escritorio",
+  "{1}:n unidad|[2,*]:n unidades": "{1}:n unidad|[2,*]:n unidades"
 }
