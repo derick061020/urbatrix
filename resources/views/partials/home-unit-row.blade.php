@@ -45,7 +45,7 @@
                         <div style="font-size:10px;color:#92400e;margin-top:2px;">{{ __('Expira') }} {{ \Carbon\Carbon::parse($unit->reserved_until)->diffForHumans() }}</div>
                     @endif
                 </td>
-                <td>{{ isset($floorDisplay) ? $floorDisplay($unit->floor) : ($unit->floor ? ucfirst($unit->floor) : __('Ground')) }}</td>
+                <td>{{ \App\Support\UnitOptions::floorShort($unit->floor) }}</td>
                 <td>{{ ($unit->bedrooms ?? 0) }} {{ __('Bed') }}</td>
                 <td>
                     {{ strtoupper($unit->direction ?? '—') }}
@@ -58,9 +58,6 @@
                 <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
                 <td>
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
-                  @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="price-meta" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m²</span>
-                  @endif
                 </td>
                 <td>
                   <div class="fg-list-actions">

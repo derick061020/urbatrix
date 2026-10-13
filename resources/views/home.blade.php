@@ -148,17 +148,12 @@
     $floorLabels   = \App\Support\UnitOptions::map('floors');
     $typeLabels    = \App\Support\UnitOptions::map('types');
 
-    // Etiqueta legible y traducible para un valor de piso. Las plantas baja se
-    // muestran traducidas (Planta baja / Ground Floor); el resto usa la etiqueta
-    // configurada en el admin (1°, 2°, …) y, como fallback, el valor capitalizado.
-    // Se usa en grid, list y plan para que el piso se vea igual en todas las vistas.
-    $floorDisplay = function ($value) use ($floorLabels) {
-        $v = trim((string) $value);
-        if ($v === '' || strcasecmp($v, 'ground') === 0 || strcasecmp($v, 'pb') === 0) {
-            return __('Ground Floor');
-        }
-        return $floorLabels[$v] ?? $floorLabels[strtolower($v)] ?? ucfirst($v);
-    };
+    // Etiquetas de piso. Viven en UnitOptions para que las tarjetas que llegan
+    // por AJAX (que no reciben las variables de esta vista) muestren lo mismo
+    // que las pintadas acá: antes caían al valor crudo de la base y en español
+    // se leía «2nd Piso».
+    $floorDisplay = fn ($value) => \App\Support\UnitOptions::floorShort($value);
+    $floorPhrase  = fn ($value) => \App\Support\UnitOptions::floorPhrase($value);
   @endphp
 
   <!-- MORE INFO MODAL — Figma 220:20041 (modal-tipologia) -->
@@ -202,32 +197,16 @@
 
           <div class="mt-left-inner">
 
-            <!-- Discount chip -->
-            <span class="mt-discount-chip">{{ __('Unlock :amount Discount', ['amount' => '$20,000']) }}</span>
-
             <!-- Price block -->
             <div class="mt-price-block">
               <div class="mt-price-row">
                 <span class="mt-price" id="modalPrice">$450 000</span>
-                <div class="mt-currency-toggle">
-                  <button type="button" class="active" data-cur="USD">USD</button>
-                  <button type="button" data-cur="EUR">EUR</button>
-                  <button type="button" data-cur="CAD">CAD</button>
-                  <button type="button" data-cur="MXN">MXN</button>
-                </div>
               </div>
               <div class="mt-price-meta">
-                <span class="muted">$450/m²</span>
-                <span class="sep"></span>
                 <span class="success">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z" transform="rotate(180 12 12)"/></svg>
                   {{ __('12% below Cap Cana avg.') }}
                 </span>
-              </div>
-              <div class="mt-price-meta">
-                <span class="warning">{{ __('Reserve from $5,000') }}</span>
-                <span class="sep"></span>
-                <span class="muted">{{ __('Not refundable') }}</span>
               </div>
             </div>
 
@@ -272,132 +251,6 @@
 
             <div class="mt-divider"></div>
 
-            <!-- For Investment / For Living toggle -->
-            <div class="mt-buyer-toggle" role="tablist">
-              <button type="button" class="active" data-buyer="investment">{{ __('For Investment') }}</button>
-              <button type="button" data-buyer="living">{{ __('For Living') }}</button>
-            </div>
-
-            
-
-            {{-- ══════════════ PARA INVERSIÓN ══════════════ --}}
-
-            <!-- A · Precio inteligente -->
-            <div class="mt-block mt-investment-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Smart entry price') }}</span>
-              </div>
-              <div class="mt-b-value"><span id="modalSmartPpm">—</span> · <span class="accent">{{ __('12% below the area average') }}</span></div>
-              <p class="mt-b-micro">{{ __('Average based on comparable transactions in the zone.') }}</p>
-            </div>
-
-            <!-- B · Valorización (histórica → escenario) -->
-            <div class="mt-block mt-block--green mt-investment-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Appreciation') }}</span>
-              </div>
-              <div class="mt-vrow">
-                <span class="k">{{ __('Historical') }}</span>
-                <span class="v">+8% {{ __('avg./yr') }} · 2018–2024</span>
-              </div>
-              <div class="mt-vrow" id="modalProjected" style="display:none;">
-                <span class="k">{{ __('Scenario') }}</span>
-                <span class="v"><span id="modalProjectedNow">$0</span> <span class="arrow">→</span> <span id="modalProjectedFuture">—</span> <span class="hint" id="modalProjectedHint">—</span></span>
-              </div>
-              <p class="mt-b-micro">{{ __('Reference scenario built on the area\'s historical appreciation. Not a guarantee or offer of return.') }}</p>
-            </div>
-
-            <!-- C · Renta estimada -->
-            <div class="mt-block mt-investment-only" id="modalRentBlock" >
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Estimated rental income') }}</span>
-              </div>
-              <div class="mt-b-value"><span id="modalRentVal">—</span><span class="unit">/{{ __('mo') }}</span> <span id="modalRentYield"></span></div>
-              <p class="mt-b-body">{{ __('Based on comparable-unit rates and average occupancy in the area.') }}</p>
-              <p class="mt-b-micro">{{ __('Reference estimate, not guaranteed.') }}</p>
-            </div>
-
-            <!-- D · CONFOTUR (factual) -->
-            <div class="mt-block mt-block--gold mt-investment-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
-                <span class="mt-eyebrow">{{ __('CONFOTUR benefits') }}</span>
-              </div>
-              <div class="mt-b-value">{{ __('15-year property-tax exemption + 0% transfer tax') }}</div>
-              <p class="mt-b-body">{{ __('CONFOTUR-approved project: save the 3% transfer tax') }} (<span id="modalConfoturSavings">—</span>) {{ __('plus the annual property tax for 15 years.') }}</p>
-              <p class="mt-b-micro">{{ __('Benefit subject to Law 158-01 (CONFOTUR) and the project\'s current qualification.') }}</p>
-            </div>
-
-            <!-- Investment commentary (optional, from DB) -->
-            <div class="mt-compare mt-investment-only" id="modalCompare" style="display:none;">
-              <span class="bullet"></span>
-              <span id="modalCompareText">—</span>
-            </div>
-
-            <!-- For-investment longform description (optional, from DB) -->
-            <p class="mt-section-text mt-investment-only" id="modalInvestmentText" style="display:none;"></p>
-
-            {{-- ══════════════ PARA VIVIR ══════════════ --}}
-
-            <!-- 1 · Tu espacio -->
-            <div class="mt-block mt-living-only" id="modalSpaceBlock" style="display:none;">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Your space') }}</span>
-              </div>
-              <div class="mt-b-value" id="modalSpaceVal">—</div>
-              <p class="mt-b-body">{{ __('A terrace that extends your living room outdoors: open-air breakfasts and sunset views.') }}</p>
-            </div>
-
-            <!-- 2 · Un día aquí -->
-            <div class="mt-block mt-living-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
-                <span class="mt-eyebrow">{{ __('A day here') }}</span>
-              </div>
-              <p class="mt-b-body" id="modalLivingText">{{ __('Mornings at the beach club, afternoons on the tennis court, dinners steps from the restaurant. All within the community.') }}</p>
-            </div>
-
-            <!-- 3 · Amenidades -->
-            <div class="mt-block mt-living-only" id="modalAmenBlock" style="display:none;">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-                <span class="mt-eyebrow" id="modalLifestyleLabel">{{ __('Amenities & Lifestyle') }}</span>
-              </div>
-              <div id="modalRowAmen"><span id="modalAmenities">—</span></div>
-            </div>
-
-            <!-- 4 · Dónde estás -->
-            <div class="mt-block mt-living-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Where you are') }}</span>
-              </div>
-              <div class="mt-chips">
-                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18c2 0 2-1.5 4-1.5S8 18 10 18s2-1.5 4-1.5S16 18 18 18s2-1.5 4-1.5"/></svg>3 min {{ __('beach') }}</span>
-                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5l7-2v4"/><circle cx="6" cy="18" r="3"/></svg>5 min {{ __('golf') }}</span>
-                <span class="mt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a1.8 1.8 0 0 0-2.5-2.5L13.5 8 5.3 6.2a1 1 0 0 0-.9 1.7L9 11l-2 2-2-.5-1 1 3 2 2 3 1-1L11 15l2-2 3.4 4.6a1 1 0 0 0 1.7-.9z"/></svg>15 min {{ __('airport') }}</span>
-              </div>
-            </div>
-
-            <!-- 5 · Sin preocupaciones -->
-            <div class="mt-block mt-living-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-                <span class="mt-eyebrow">{{ __('Peace of mind') }}</span>
-              </div>
-              <div class="mt-calm">
-                <span>{{ __('24/7 security') }}</span>
-                <span>{{ __('Managed & maintained') }}</span>
-                <span>{{ __('Private community') }}</span>
-              </div>
-            </div>
-
-            <div class="mt-divider"></div>
-
             <!-- Floor plan downloads -->
             <p class="mt-section-label">{{ __('Floor Plan Downloads') }}</p>
             <div class="mt-fancy-row">
@@ -411,28 +264,6 @@
               </button>
             </div>
 
-            <!-- Advisor card -->
-            @php
-              $advisorName = $admin->name ?? 'Tu asesor';
-              $advisorParts = preg_split('/\s+/', trim($advisorName));
-              $advisorInit = strtoupper(mb_substr($advisorParts[0] ?? '', 0, 1) . mb_substr($advisorParts[1] ?? '', 0, 1)) ?: 'AS';
-            @endphp
-            <div class="mt-advisor">
-              <div class="mt-advisor-left">
-                <div class="mt-avatar">
-                  <span class="mt-avatar-letter">{{ $advisorInit }}</span>
-                  <span class="mt-avatar-status"></span>
-                </div>
-                <div>
-                  <div class="mt-advisor-name">{{ $advisorName }}</div>
-                  <div class="mt-advisor-status">{{ __('Available right now') }}</div>
-                </div>
-              </div>
-              <button type="button" class="mt-advisor-chat" onclick="window.open('{{ route('dashboard.messages') }}', '_blank')">
-                {{ __('Chat') }}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
-            </div>
           </div>
 
           <!-- Sticky bottom -->
@@ -1619,7 +1450,7 @@
           <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;line-height:20px;letter-spacing:1.12px;color:var(--brand);text-align:center;white-space:nowrap;text-transform:uppercase;">{{ __(':sold OF :total UNITS SOLD', ['sold' => $soldCount ?? 0, 'total' => $totalUnits ?? 0]) }}</span>
           <div class="nav-online" style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:6px;height:6px;background:#db5858;border-radius:50%;box-shadow:0 0 6px rgba(219,88,88,0.6);animation:pulse 1.5s infinite;"></span>
-            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>32</span> {{ __('online_users') }}</span>
+            <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;line-height:20px;letter-spacing:0.2px;color:#db5858;white-space:nowrap;text-transform:uppercase;"><span data-active-users>{{ max(1, (int) ($activeUsers ?? 1)) }}</span> {{ __('online_users') }}</span>
           </div>
         </div>
         <style>
@@ -1640,20 +1471,6 @@
 
         <!-- RIGHT: Saved counter + Avatar + Hamburger -->
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
-
-          <!-- Currency selector (header) -->
-          <div class="nav-hide-mobile" style="position:relative;flex-shrink:0;">
-            <button type="button" class="fg-filter-btn" onclick="toggleHeaderCurrencyDropdown()" id="headerCurrencyBtn" style="height:34px;padding:6px 10px 6px 14px;border-radius:9999px;gap:6px;">
-              <span id="headerCurrencyLabel" style="font-weight:600;color:#374151;">USD $</span>
-              <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </button>
-            <div id="headerCurrencyDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:200;background:white;border:1px solid #ebebeb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);min-width:148px;padding:6px;">
-              <button type="button" class="hcur-item" onclick="selectCurrency('USD')"><span>USD</span><span class="hcur-sym">$</span></button>
-              <button type="button" class="hcur-item" onclick="selectCurrency('EUR')"><span>EUR</span><span class="hcur-sym">€</span></button>
-              <button type="button" class="hcur-item" onclick="selectCurrency('CAD')"><span>CAD</span><span class="hcur-sym">C$</span></button>
-              <button type="button" class="hcur-item" onclick="selectCurrency('MXN')"><span>MXN</span><span class="hcur-sym">MX$</span></button>
-            </div>
-          </div>
 
           <!-- Language toggle (header) -->
           <div class="lang-toggle nav-hide-mobile" style="flex-shrink:0;">
@@ -1715,20 +1532,6 @@
                 <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1;min-width:0;">
                   <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->name : 'Samuel Urbina' }}</div>
                   <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->check() ? auth()->user()->email : 'samuelurbi@gmail.com' }}</div>
-                </div>
-                <div style="position:relative;">
-                  <button type="button" class="fg-filter-btn" onclick="toggleCurrencyDropdown()" id="currencyBtn">
-                    <span id="currencyLabel">USD</span>
-                    <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  </button>
-                  <div id="currencyDropdown" class="filter-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:50;background:white;border:1px solid #ebebeb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:100px;padding:8px;">
-                    <div style="font-family:'Poppins',sans-serif;">
-                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('USD')">USD</label>
-                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('EUR')">EUR</label>
-                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('CAD')">CAD</label>
-                      <label style="display:block;font-family:'Poppins',sans-serif;font-weight:500;font-size:14px;color:#5c5c5c;letter-spacing:-0.084px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.15s;" onmouseover="this.style.background='#f2f5f8'" onmouseout="this.style.background='transparent'" onclick="selectCurrency('MXN')">MXN</label>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -2412,22 +2215,56 @@
             }
             $activeFloorPlanImg = $floorPlanImageMap[$activeFloor] ?? $floorPlanFallback;
 
-            // Distinct, well-spread anchor coords across the 1366×769 planview.
-            // Markers cycle through this list per floor; "side" flips to keep the
-            // tail pointing into the canvas. Add more entries if a floor has more.
+            // Posiciones de las chinchetas sobre el plano, en porcentaje del
+            // ANCHO y el ALTO de la imagen (no del lienzo: ver fitPlanLayer()).
+            //
+            // Las anteriores eran doce puntos sueltos en coordenadas de un
+            // lienzo 1366x769 que no es el de esta imagen, así que caían
+            // corridos —uno quedaba sobre la piscina— y, al haber 36 unidades
+            // por piso, se apilaban de a tres en el mismo sitio. Estos cuarenta
+            // están tomados sobre la huella construida del masterplan y
+            // separados entre sí, uno por unidad.
             $anchorPoints = [
-                ['x'=>1184,   'y'=>295,   'side'=>'left'],
-                ['x'=>289,    'y'=>349,   'side'=>'right'],
-                ['x'=>1129,   'y'=>394,   'side'=>'left'],
-                ['x'=>375,    'y'=>412,   'side'=>'right'],
-                ['x'=>1082.5, 'y'=>474.5, 'side'=>'left'],
-                ['x'=>460,    'y'=>500,   'side'=>'right'],
-                ['x'=>980,    'y'=>540,   'side'=>'left'],
-                ['x'=>560,    'y'=>360,   'side'=>'right'],
-                ['x'=>880,    'y'=>320,   'side'=>'left'],
-                ['x'=>650,    'y'=>440,   'side'=>'right'],
-                ['x'=>790,    'y'=>250,   'side'=>'left'],
-                ['x'=>320,    'y'=>260,   'side'=>'right'],
+                ['x'=>12.20, 'y'=>17.46, 'side'=>'right'],
+                ['x'=>78.05, 'y'=>17.46, 'side'=>'left'],
+                ['x'=>88.06, 'y'=>17.46, 'side'=>'left'],
+                ['x'=>40.65, 'y'=>18.47, 'side'=>'right'],
+                ['x'=>21.16, 'y'=>19.49, 'side'=>'right'],
+                ['x'=>48.02, 'y'=>21.53, 'side'=>'right'],
+                ['x'=>72.26, 'y'=>21.53, 'side'=>'left'],
+                ['x'=>56.98, 'y'=>22.54, 'side'=>'left'],
+                ['x'=>65.94, 'y'=>23.56, 'side'=>'left'],
+                ['x'=>83.85, 'y'=>25.59, 'side'=>'left'],
+                ['x'=>28.01, 'y'=>27.63, 'side'=>'right'],
+                ['x'=>22.74, 'y'=>29.66, 'side'=>'right'],
+                ['x'=>36.96, 'y'=>30.68, 'side'=>'right'],
+                ['x'=>78.58, 'y'=>31.69, 'side'=>'left'],
+                ['x'=>54.87, 'y'=>32.71, 'side'=>'left'],
+                ['x'=>72.78, 'y'=>32.71, 'side'=>'left'],
+                ['x'=>63.83, 'y'=>33.73, 'side'=>'left'],
+                ['x'=>16.94, 'y'=>34.75, 'side'=>'right'],
+                ['x'=>83.85, 'y'=>35.76, 'side'=>'left'],
+                ['x'=>28.01, 'y'=>37.80, 'side'=>'right'],
+                ['x'=>45.92, 'y'=>37.80, 'side'=>'right'],
+                ['x'=>89.11, 'y'=>39.83, 'side'=>'left'],
+                ['x'=>79.63, 'y'=>41.86, 'side'=>'left'],
+                ['x'=>74.36, 'y'=>42.88, 'side'=>'left'],
+                ['x'=>32.75, 'y'=>43.90, 'side'=>'right'],
+                ['x'=>41.70, 'y'=>44.92, 'side'=>'right'],
+                ['x'=>50.66, 'y'=>45.93, 'side'=>'left'],
+                ['x'=>23.79, 'y'=>46.95, 'side'=>'right'],
+                ['x'=>59.61, 'y'=>46.95, 'side'=>'left'],
+                ['x'=>68.57, 'y'=>47.97, 'side'=>'left'],
+                ['x'=>86.48, 'y'=>50.00, 'side'=>'left'],
+                ['x'=>81.21, 'y'=>52.03, 'side'=>'left'],
+                ['x'=>32.75, 'y'=>54.07, 'side'=>'right'],
+                ['x'=>43.28, 'y'=>55.08, 'side'=>'right'],
+                ['x'=>75.42, 'y'=>57.12, 'side'=>'left'],
+                ['x'=>68.57, 'y'=>58.14, 'side'=>'left'],
+                ['x'=>37.49, 'y'=>60.17, 'side'=>'right'],
+                ['x'=>84.37, 'y'=>62.20, 'side'=>'left'],
+                ['x'=>73.31, 'y'=>68.31, 'side'=>'left'],
+                ['x'=>80.16, 'y'=>73.39, 'side'=>'left'],
             ];
 
             $markerStateFor = function($u) {
@@ -2472,7 +2309,7 @@
                 <div class="fg-plan-piso-picker" id="fgFloorPicker">
                   <button type="button" class="fg-plan-piso-left fg-plan-piso-trigger"
                           id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
+                    <span id="fgPlanPisoLabel">{{ strtoupper($floorPhrase($activeFloor)) }}</span>
                     <span class="fg-plan-piso-caret" aria-hidden="true">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5c7c68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </span>
@@ -2490,7 +2327,7 @@
                 </div>
               @else
                 <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
-                  {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
+                  {{ strtoupper($floorPhrase($activeFloor)) }}
                 </div>
               @endif
               <div class="fg-plan-piso-right" id="fgPlanPisoCount">
@@ -2514,13 +2351,20 @@
                  draggable="false">
 
             {{-- Render one marker per real unit, grouped by floor. JS toggles
-                 visibility based on the active floor chip. --}}
+                 visibility based on the active floor chip.
+
+                 Van dentro de .fg-plan-layer, que fitPlanLayer() ajusta al
+                 rectángulo que ocupa de verdad la imagen: con `object-fit:
+                 contain` el plano no llena el lienzo si las proporciones no
+                 coinciden, y posicionar sobre el lienzo corría todas las
+                 chinchetas (una terminaba sobre la piscina). --}}
+            <div class="fg-plan-layer" id="fgPlanLayer">
             @foreach($floorOrder as $floorLabel)
               @foreach($floorBuckets[$floorLabel]->values() as $idx => $unit)
                 @php
                   $anchor   = $anchorPoints[$idx % count($anchorPoints)];
-                  $leftPct  = ($anchor['x'] / 1366) * 100;
-                  $topPct   = ($anchor['y'] / 769) * 100;
+                  $leftPct  = $anchor['x'];
+                  $topPct   = $anchor['y'];
                   $state    = $markerStateFor($unit);
                   $side     = $anchor['side'];
                   $unitId   = $unit->id;
@@ -2558,6 +2402,7 @@
                 </button>
               @endforeach
             @endforeach
+            </div><!-- /.fg-plan-layer -->
             </div><!-- /.fg-plan-stage -->
 
             <!-- Zoom controls (mobile pan/zoom map) -->
@@ -2762,18 +2607,6 @@
           if (unitPrice) {
             unitPrice.dataset.usd = unit.price || 0;
             unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
-            // Default the modal currency toggle to whatever was picked on the
-            // home (hamburger menu), persisted in localStorage.
-            const selectedCur = localStorage.getItem('selectedCurrency') || 'USD';
-            const modalToggle = document.querySelector('#moreInfoModal .mt-currency-toggle');
-            if (modalToggle) {
-              modalToggle.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-              const curBtn = modalToggle.querySelector(`button[data-cur="${selectedCur}"]`)
-                          || modalToggle.querySelector('button[data-cur="USD"]');
-              if (curBtn) curBtn.classList.add('active');
-            }
-            // Render the price in that currency (only if a real price exists).
-            if (unit.price) updateModalCurrencyDisplay(selectedCur);
           }
 
           // Stat boxes — populate from DB; show — when missing
@@ -2838,183 +2671,6 @@
           toggleRow('modalRowFees',   'modalFees',  feesSum);
           toggleRow('modalRowRates',  'modalRates', unit.rates);
 
-          // Living extras
-          const setTextRow = (rowId, valId, value) => {
-              const row = document.getElementById(rowId);
-              const val = document.getElementById(valId);
-              if (!row || !val) return;
-              if (value !== null && value !== undefined && value !== '') {
-                  val.textContent = value;
-                  row.style.display = '';
-              } else { row.style.display = 'none'; }
-          };
-          // Amenities with icons
-          const amenRow = document.getElementById('modalRowAmen');
-          const amenVal = document.getElementById('modalAmenities');
-          if (amenRow && amenVal) {
-              const amenities = unit.amenities || [];
-              if (Array.isArray(amenities) && amenities.length > 0) {
-                  const amenityIcons = {
-                      'pool': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>',
-                      'gym': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6 20v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/></svg>',
-                      'beach_club': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M12 2v20"/><path d="M4 12c0-4 3-7 8-7s8 3 8 7"/></svg>',
-                      'restaurant': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
-                      'spa': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>',
-                      'tennis': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2v20"/><path d="M4.93 4.93l14.14 14.14"/><path d="M19.07 4.93L4.93 19.07"/></svg>',
-                      'golf': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 13v8"/><path d="M9 6l3-4 3 4"/></svg>',
-                      'security': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-                      'parking': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15V9"/><path d="M17 15V9"/></svg>',
-                      'concierge': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-                      'playground': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
-                      'bbq': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M6 12v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/><path d="M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>',
-                  };
-                  const amenityLabels = {
-                      'pool': 'Pool',
-                      'gym': 'Gym',
-                      'beach_club': 'Beach Club',
-                      'restaurant': 'Restaurant',
-                      'spa': 'Spa',
-                      'tennis': 'Tennis Court',
-                      'golf': 'Golf Course',
-                      'security': '24/7 Security',
-                      'parking': 'Parking',
-                      'concierge': 'Concierge',
-                      'playground': 'Playground',
-                      'bbq': 'BBQ Area',
-                  };
-                  const amenityBenefits = {
-                      'pool': @json(__('oceanfront pool')),
-                      'gym': @json(__('fully equipped, on-site')),
-                      'beach_club': @json(__('direct beach access')),
-                      'restaurant': @json(__('dining steps away')),
-                      'spa': @json(__('wellness & rest')),
-                      'tennis': @json(__('on-site court')),
-                      'golf': @json(__('golf within the community')),
-                      'security': @json(__('round-the-clock peace of mind')),
-                      'parking': @json(__('private parking')),
-                      'concierge': @json(__('concierge service')),
-                      'playground': @json(__('space for the kids')),
-                      'bbq': @json(__('shared BBQ area')),
-                  };
-                  let html = '<div class="mt-amenities-grid">';
-                  let renderedAmenities = 0;
-                  amenities.forEach(key => {
-                      const label = amenityLabels[key] || String(key).replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-                      const icon = amenityIcons[key] || '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
-                      const ben = amenityBenefits[key] || '';
-                      html += '<div class="mt-amenity-card">'
-                            +   '<div class="mt-amenity-top"><span class="mt-amenity-ico">' + icon + '</span><span class="mt-amenity-name">' + label + '</span></div>'
-                            +   (ben ? '<div class="mt-amenity-ben">' + ben + '</div>' : '')
-                            + '</div>';
-                      renderedAmenities++;
-                  });
-                  html += '</div>';
-                  if (renderedAmenities > 0) {
-                      amenVal.innerHTML = html;
-                      amenRow.style.display = '';
-                  } else {
-                      amenRow.style.display = 'none';
-                  }
-              } else {
-                  amenRow.style.display = 'none';
-              }
-          }
-          // Show the "Amenities" block only when amenities exist
-          const amenBlock = document.getElementById('modalAmenBlock');
-          if (amenBlock) {
-              const anyVisible = document.getElementById('modalRowAmen')?.style.display !== 'none';
-              amenBlock.style.display = anyVisible ? '' : 'none';
-          }
-
-          // Investment longform (optional) + "A day here" (DB overrides the default copy)
-          const showText = (id, text) => {
-              const el = document.getElementById(id);
-              if (!el) return;
-              if (text && String(text).trim() !== '') { el.textContent = text; el.style.display = ''; }
-              else { el.style.display = 'none'; }
-          };
-          showText('modalInvestmentText', unit.for_investment_text);
-          if (unit.for_living_text && String(unit.for_living_text).trim() !== '') {
-              const lt = document.getElementById('modalLivingText');
-              if (lt) lt.textContent = unit.for_living_text;
-          }
-
-          // A · Precio inteligente — $/m² calculado
-          const area = Number(unit.total_area || unit.internal_area || 0);
-          const ppm  = (area > 0 && unit.price) ? Math.round(Number(unit.price) / area) : 0;
-          const smartPpm = document.getElementById('modalSmartPpm');
-          if (smartPpm) smartPpm.textContent = ppm > 0 ? '$' + number_format(ppm, 0, ',', ',') + '/m²' : '—';
-
-          // B · Valorización — escenario, como en el mock: siempre visible.
-          // Usa projected_value si está cargado; si no, lo estima desde el precio
-          // con la plusvalía histórica de la zona (8%/año) a 5 años.
-          const HIST_APPRECIATION = 0.08;
-          const PROJ_HORIZON      = 5;
-          const basePrice = Number(unit.price || 0);
-          let   proj      = Number(unit.projected_value || 0);
-          let   projYear  = unit.projected_value_year || '';
-          const roi       = unit.roi_percent ? Number(unit.roi_percent) : null;
-          if (proj <= 0 && basePrice > 0) {
-              proj     = Math.round(basePrice * Math.pow(1 + HIST_APPRECIATION, PROJ_HORIZON));
-              projYear = projYear || String(new Date().getFullYear() + PROJ_HORIZON);
-          }
-          const projBox   = document.getElementById('modalProjected');
-          if (projBox) {
-              if (proj > 0 && basePrice > 0) {
-                  document.getElementById('modalProjectedNow').textContent    = '$' + number_format(basePrice, 0, ',', ',');
-                  document.getElementById('modalProjectedFuture').textContent = '$' + number_format(proj, 0, ',', ',');
-                  document.getElementById('modalProjectedHint').textContent   = projYear ? ('est. ' + projYear) : (roi !== null ? roi + '% ROI' : '');
-                  projBox.style.display = '';
-              } else { projBox.style.display = 'none'; }
-          }
-
-          // C · Renta estimada — como en el mock: siempre visible.
-          // Usa est_rental si está cargado; si no, lo estima desde el precio con
-          // un rendimiento bruto de referencia (~7.5% anual, igual que el mock).
-          const REF_GROSS_YIELD = 0.075;
-          const price     = Number(unit.price || 0);
-          let   rent      = Number(unit.est_rental || 0);
-          if (rent <= 0 && price > 0) rent = Math.round((price * REF_GROSS_YIELD) / 12);
-          const rentBlock = document.getElementById('modalRentBlock');
-          if (rentBlock) {
-              if (rent > 0) {
-                  document.getElementById('modalRentVal').textContent = '$' + number_format(rent, 0, ',', ',');
-                  const yieldEl = document.getElementById('modalRentYield');
-                  if (yieldEl) {
-                      const gy = price > 0 ? (rent * 12 / price) * 100 : REF_GROSS_YIELD * 100;
-                      yieldEl.textContent = '· ~' + gy.toFixed(1) + '% {{ __('gross') }}';
-                  }
-                  rentBlock.style.display = '';
-              } else { rentBlock.style.display = 'none'; }
-          }
-
-          // D · CONFOTUR — ahorro de transferencia (3% del precio)
-          const confSav = document.getElementById('modalConfoturSavings');
-          if (confSav) confSav.textContent = unit.price ? '~$' + number_format(Number(unit.price) * 0.03, 0, ',', ',') : '~3%';
-
-          // 1 · Tu espacio — interiores + terraza
-          const spaceBlock = document.getElementById('modalSpaceBlock');
-          const spaceVal   = document.getElementById('modalSpaceVal');
-          if (spaceBlock && spaceVal) {
-              const inA = Number(unit.internal_area || 0), exA = Number(unit.external_area || 0);
-              if (inA > 0 || exA > 0) {
-                  let s = '';
-                  if (inA > 0) s += number_format(inA, 0, ',', ',') + ' m² {{ __('indoor') }}';
-                  if (exA > 0) s += (s ? ' + ' : '') + number_format(exA, 0, ',', ',') + ' m² {{ __('terrace') }}';
-                  spaceVal.textContent = s;
-                  spaceBlock.style.display = '';
-              } else { spaceBlock.style.display = 'none'; }
-          }
-
-          // Comparison text (investment)
-          const cmpBox = document.getElementById('modalCompare');
-          if (cmpBox) {
-              if (unit.comparison_text && String(unit.comparison_text).trim() !== '') {
-                  document.getElementById('modalCompareText').textContent = unit.comparison_text;
-                  cmpBox.style.display = '';
-              } else { cmpBox.style.display = 'none'; }
-          }
-
           // Reflect availability — disable Reserve Online if the unit is on hold or sold
           const statusRaw = (unit.status || 'AVAILABLE').toString().toLowerCase();
           const isReserved = statusRaw === 'reserved';
@@ -3065,22 +2721,25 @@
           
           // Build description
           const outlookLabels = @json($outlookLabels);
-          let description = '';
-          if (unit.floor) description += unit.floor.charAt(0).toUpperCase() + unit.floor.slice(1);
-          if (unit.bedrooms) description += ` | ${unit.bedrooms} Bed`;
-          if (unit.bathrooms) description += ` | ${unit.bathrooms} Bath`;
-          if (unit.direction) description += ` | ${unit.direction.toUpperCase()}`;
-          if (unit.outlook) description += ` | ${outlookLabels[unit.outlook] || unit.outlook}`;
-          if (unitDesc) unitDesc.textContent = description || 'Unit details';
+          // Piso traducido por valor guardado ('ground' => 'Planta baja', '2nd' => 'Piso 2').
+          const FLOOR_PHRASES = @json(
+              collect(\App\Support\UnitOptions::get('floors'))
+                  ->pluck('value')
+                  ->push('ground')
+                  ->unique()
+                  ->mapWithKeys(fn ($v) => [$v => \App\Support\UnitOptions::floorPhrase($v)])
+                  ->all()
+          );
+          const descParts = [];
+          if (unit.floor) descParts.push(FLOOR_PHRASES[unit.floor] || unit.floor);
+          if (unit.bedrooms)  descParts.push(`${unit.bedrooms} {{ __('hab.') }}`);
+          if (unit.bathrooms) descParts.push(`${unit.bathrooms} {{ __('baños') }}`);
+          if (unit.direction) descParts.push(unit.direction.toUpperCase());
+          if (unit.outlook)   descParts.push(outlookLabels[unit.outlook] || unit.outlook);
+          if (unitDesc) unitDesc.textContent = descParts.join(' | ') || @json(__('Unit details'));
 
           // Update images — se dividen en apartados (Propiedad / Amenidades)
           loadModalImageGroups(unit.images);
-
-          // Re-apply current buyer mode to hide/show the right blocks
-          if (typeof window.applyBuyerMode === 'function') {
-            const activeBtn = document.querySelector('.mt-buyer-toggle button.active');
-            window.applyBuyerMode(activeBtn?.dataset.buyer || 'investment');
-          }
 
           // Show modal
           const modal = document.getElementById('moreInfoModal');
@@ -3179,32 +2838,6 @@
           }
         });
       }
-      // Currency toggle (modal only)
-      document.querySelectorAll('.mt-currency-toggle button').forEach(function (b) {
-        b.addEventListener('click', function () {
-          this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-          this.classList.add('active');
-          const cur = this.dataset.cur || 'USD';
-          updateModalCurrencyDisplay(cur);
-        });
-      });
-      // Buyer toggle — toggles a `living-mode` class on .mt-shell; CSS does the rest
-      function applyBuyerMode(mode) {
-        const shell = document.querySelector('#moreInfoModal .mt-shell');
-        if (!shell) return;
-        shell.classList.toggle('living-mode', mode === 'living');
-      }
-      window.applyBuyerMode = applyBuyerMode;
-      const activeBuyerBtn = document.querySelector('.mt-buyer-toggle button.active');
-      if (activeBuyerBtn) applyBuyerMode(activeBuyerBtn.dataset.buyer || 'investment');
-
-      document.querySelectorAll('.mt-buyer-toggle button').forEach(function (b) {
-        b.addEventListener('click', function () {
-          this.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-          this.classList.add('active');
-          applyBuyerMode(this.dataset.buyer || 'investment');
-        });
-      });
       // Plan floor chips / mobile select → filter markers + update floor label
       (function () {
         const chips     = document.querySelectorAll('.fg-chip-floor');
@@ -3216,7 +2849,39 @@
         const labelEl   = document.getElementById('fgPlanPisoLabel');
         const countEl   = document.getElementById('fgPlanPisoCount');
         const planImg   = document.getElementById('fgPlanImg');
+        const planLayer = document.getElementById('fgPlanLayer');
         if ((!chips.length && !menu) || !canvas) return;
+
+        // La imagen del plano se dibuja con `object-fit: contain`: si su
+        // proporción no es la del lienzo queda centrada y con bandas vacías a
+        // los lados o arriba y abajo. Las chinchetas van en porcentajes del
+        // plano, así que la capa que las contiene tiene que calzar con el
+        // rectángulo que ocupa la imagen y no con el lienzo entero.
+        function fitPlanLayer() {
+          if (!planLayer || !planImg) return;
+          const nw = planImg.naturalWidth, nh = planImg.naturalHeight;
+          const cw = planImg.clientWidth, ch = planImg.clientHeight;
+          if (!nw || !nh || !cw || !ch) return;
+          const scale = Math.min(cw / nw, ch / nh);
+          const w = nw * scale, h = nh * scale;
+          planLayer.style.left   = ((cw - w) / 2) + 'px';
+          planLayer.style.top    = ((ch - h) / 2) + 'px';
+          planLayer.style.width  = w + 'px';
+          planLayer.style.height = h + 'px';
+        }
+
+        if (planImg) {
+          if (planImg.complete) fitPlanLayer();
+          // Al cambiar de piso cambia la imagen, y puede traer otra proporción.
+          planImg.addEventListener('load', fitPlanLayer);
+          // El plano arranca oculto (la home abre en grid): mientras no se ve
+          // mide 0 y no hay nada que ajustar, así que se recalcula en cuanto
+          // toma tamaño, y también al redimensionar la ventana.
+          if (window.ResizeObserver) {
+            new ResizeObserver(fitPlanLayer).observe(planImg);
+          }
+          window.addEventListener('resize', fitPlanLayer);
+        }
 
         // Mapa piso → imagen de plano subida por el admin. Si un piso no tiene
         // imagen propia se usa el plano general (data-fallback).
@@ -3226,10 +2891,11 @@
         // Cadenas traducidas (Blade → JS) para que la etiqueta PISO y el contador
         // se rerendericen en el idioma activo al cambiar de piso.
         const I18N = {
-          piso:      @json(__('Piso')),
           ground:    @json(__('Ground Floor')),
           available: @json(__('Unidades disponibles')),
+          // Etiqueta corta para el chip y frase completa para el rótulo PISO.
           names:     @json($floorOrder->mapWithKeys(fn($f) => [$f => $floorDisplay($f)])->all()),
+          phrases:   @json($floorOrder->mapWithKeys(fn($f) => [$f => $floorPhrase($f)])->all()),
         };
 
         function activate(floor) {
@@ -3294,9 +2960,7 @@
             setTimeout(() => piso.classList.remove('is-changing'), 320);
           }
           if (labelEl) {
-            labelEl.textContent = (floor === 'Ground')
-              ? I18N.ground.toUpperCase()
-              : (I18N.piso + ' ' + (I18N.names[floor] || floor)).toUpperCase();
+            labelEl.textContent = (I18N.phrases[floor] || floor).toUpperCase();
           }
           if (countEl) {
             countEl.textContent = available + ' ' + I18N.available.toUpperCase();
@@ -3668,54 +3332,16 @@
       document.getElementById('reservePage').scrollTo(0, 0);
     }
 
-    // Active Users System
+    // Active Users System — la cuenta sale de /api/active-users (sesiones con
+    // actividad en los últimos 5 minutos). No se maquilla: si hay dos personas
+    // mirando, dice dos.
     let activeUsersInterval;
     let heartbeatInterval;
-    let dynamicUsersInterval;
-    const MIN_DYNAMIC_USERS = 22;
-    let currentDynamicUsers = 0;
 
-    // Function to calculate dynamic users based on timezone
-    function calculateDynamicUsers() {
-      const now = new Date();
-      const hour = now.getHours();
-
-      // Base users based on time of day (peak hours: 9-12, 14-18, 19-22)
-      let baseUsers;
-      if (hour >= 9 && hour < 12) {
-        baseUsers = Math.floor(Math.random() * 12) + 42; // 42-53 users
-      } else if (hour >= 14 && hour < 18) {
-        baseUsers = Math.floor(Math.random() * 15) + 50; // 50-64 users
-      } else if (hour >= 19 && hour < 22) {
-        baseUsers = Math.floor(Math.random() * 10) + 36; // 36-45 users
-      } else if (hour >= 6 && hour < 9) {
-        baseUsers = Math.floor(Math.random() * 8) + 28; // 28-35 users
-      } else if (hour >= 22 || hour < 6) {
-        baseUsers = Math.floor(Math.random() * 6) + 22; // 22-27 users
-      } else {
-        baseUsers = Math.floor(Math.random() * 10) + 32; // 32-41 users
-      }
-
-      return baseUsers;
-    }
-
-    // Function to update dynamic users with fluctuation
-    function updateDynamicUsers() {
-      const change = Math.random() > 0.5 ? 1 : -1;
-      const shouldChange = Math.random() > 0.7; // 30% chance to change
-
-      if (shouldChange) {
-        currentDynamicUsers = Math.max(MIN_DYNAMIC_USERS, currentDynamicUsers + change);
-
-        // Occasionally reset to base calculation
-        if (Math.random() > 0.95) {
-          currentDynamicUsers = calculateDynamicUsers();
-        }
-      }
-
-      const elements = document.querySelectorAll('[data-active-users]');
-      elements.forEach(element => {
-        element.textContent = currentDynamicUsers;
+    function paintActiveUsers(count) {
+      if (!Number.isFinite(count)) return;
+      document.querySelectorAll('[data-active-users]').forEach(el => {
+        el.textContent = count;
       });
     }
 
@@ -3723,32 +3349,8 @@
     function updateActiveUsersCount() {
       fetch('/api/active-users')
         .then(response => response.json())
-        .then(data => {
-          const elements = document.querySelectorAll('[data-active-users]');
-          elements.forEach(element => {
-            // If real count is below the floor, use dynamic fake count
-            if (data.count < MIN_DYNAMIC_USERS) {
-              if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
-                currentDynamicUsers = calculateDynamicUsers();
-              }
-              element.textContent = currentDynamicUsers;
-            } else {
-              element.textContent = data.count;
-              currentDynamicUsers = data.count;
-            }
-          });
-        })
-        .catch(error => {
-          console.error('Error fetching active users:', error);
-          // Fallback to dynamic users on error
-          if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
-            currentDynamicUsers = calculateDynamicUsers();
-          }
-          const elements = document.querySelectorAll('[data-active-users]');
-          elements.forEach(element => {
-            element.textContent = currentDynamicUsers;
-          });
-        });
+        .then(data => paintActiveUsers(Number(data.count)))
+        .catch(error => console.error('Error fetching active users:', error));
     }
 
     // Function to send heartbeat (update last seen)
@@ -3762,21 +3364,7 @@
         })
         .then(response => response.json())
         .then(data => {
-          if (data.count !== undefined) {
-            const elements = document.querySelectorAll('[data-active-users]');
-            elements.forEach(element => {
-              // If real count is below the floor, use dynamic fake count
-              if (data.count < MIN_DYNAMIC_USERS) {
-                if (currentDynamicUsers < MIN_DYNAMIC_USERS) {
-                  currentDynamicUsers = calculateDynamicUsers();
-                }
-                element.textContent = currentDynamicUsers;
-              } else {
-                element.textContent = data.count;
-                currentDynamicUsers = data.count;
-              }
-            });
-          }
+          if (data.count !== undefined) paintActiveUsers(Number(data.count));
         })
         .catch(error => console.error('Error sending heartbeat:', error));
     }
@@ -3792,9 +3380,6 @@
       // Update count every 30 seconds
       activeUsersInterval = setInterval(updateActiveUsersCount, 30000);
 
-      // Update dynamic users every 5-10 seconds (fluctuation)
-      dynamicUsersInterval = setInterval(updateDynamicUsers, 7000);
-
       // Send initial heartbeat
       sendHeartbeat();
     }
@@ -3806,7 +3391,6 @@
     window.addEventListener('beforeunload', () => {
       if (activeUsersInterval) clearInterval(activeUsersInterval);
       if (heartbeatInterval) clearInterval(heartbeatInterval);
-      if (dynamicUsersInterval) clearInterval(dynamicUsersInterval);
     });
 
     // ============================
@@ -4069,43 +3653,6 @@
       }
     }
 
-    // Currency selection
-    function setCurrency(currency) {
-      // Remove active state from all currency buttons
-      const currencyButtons = ['currency-usd', 'currency-eur', 'currency-rd'];
-      currencyButtons.forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-          btn.style.background = '#fff';
-          btn.style.color = '#374151';
-          btn.style.borderColor = '#d1d5db';
-        }
-      });
-      
-      // Set active state for selected currency
-      const activeBtn = document.getElementById('currency-' + currency.toLowerCase());
-      if (activeBtn) {
-        activeBtn.style.background = '#111827';
-        activeBtn.style.color = '#fff';
-        activeBtn.style.borderColor = '#111827';
-      }
-      
-      // Update the select dropdown value
-      const currencySelect = document.getElementById('currencySelect');
-      if (currencySelect) {
-        currencySelect.value = currency;
-      }
-      
-      // Store currency preference
-      localStorage.setItem('selectedCurrency', currency);
-
-      // Keep the visible labels in sync (e.g. on page load with a saved currency)
-      if (typeof updateCurrencyLabels === 'function') updateCurrencyLabels(currency);
-
-      // Update currency display throughout the page
-      updateCurrencyDisplay(currency);
-    }
-
     // Language selection — actualiza la UI del toggle y persiste el idioma en el backend.
     // El backend almacena el locale en sesión + cookie y se recarga la página para que
     // todos los `__('...')` se rerendericen en el nuevo idioma.
@@ -4156,83 +3703,6 @@
       });
     }
 
-    // Exchange rates (relative to 1 USD)
-    const EXCHANGE_RATES = {
-      USD: 1,
-      EUR: 0.92,
-      CAD: 1.36,
-      MXN: 17.45,
-      DOP: 58.5,
-    };
-
-    const CURRENCY_SYMBOLS = {
-      USD: '$',
-      EUR: '€',
-      CAD: 'C$',
-      MXN: 'MX$',
-      DOP: 'RD$',
-    };
-
-    // Update currency display — converts all prices marked with data-usd
-    function updateCurrencyDisplay(currency) {
-      const rate = EXCHANGE_RATES[currency] || 1;
-      const symbol = CURRENCY_SYMBOLS[currency] || '$';
-
-      // Convert all .price elements with data-usd (cards + list)
-      document.querySelectorAll('.price[data-usd]').forEach(el => {
-        const usd = parseFloat(el.dataset.usd);
-        if (!isNaN(usd)) {
-          const converted = Math.round(usd * rate);
-          el.textContent = symbol + number_format(converted, 0, ' ', ' ');
-        }
-      });
-
-      // Convert all .sqft and .price-meta with data-usd-sqft
-      document.querySelectorAll('[data-usd-sqft]').forEach(el => {
-        const usd = parseFloat(el.dataset.usdSqft || el.dataset.usd_sqft);
-        if (!isNaN(usd)) {
-          const converted = Math.round(usd * rate);
-          el.textContent = symbol + number_format(converted, 0) + '/m²';
-        }
-      });
-
-      // Convert modal price
-      const modalPrice = document.getElementById('modalPrice');
-      if (modalPrice && modalPrice.dataset.usd) {
-        const usd = parseFloat(modalPrice.dataset.usd);
-        if (!isNaN(usd)) {
-          const converted = Math.round(usd * rate);
-          modalPrice.textContent = symbol + number_format(converted, 0, ' ', ' ');
-        }
-      }
-    }
-
-    // Update modal currency display only — converts only modal prices
-    function updateModalCurrencyDisplay(currency) {
-      const rate = EXCHANGE_RATES[currency] || 1;
-      const symbol = CURRENCY_SYMBOLS[currency] || '$';
-
-      // Convert modal price only
-      const modalPrice = document.getElementById('modalPrice');
-      if (modalPrice && modalPrice.dataset.usd) {
-        const usd = parseFloat(modalPrice.dataset.usd);
-        if (!isNaN(usd)) {
-          const converted = Math.round(usd * rate);
-          modalPrice.textContent = symbol + number_format(converted, 0, ' ', ' ');
-        }
-      }
-
-      // Convert modal sqft price if exists
-      const modalSqft = document.getElementById('modalSqft');
-      if (modalSqft && modalSqft.dataset.usdSqft) {
-        const usd = parseFloat(modalSqft.dataset.usdSqft);
-        if (!isNaN(usd)) {
-          const converted = Math.round(usd * rate);
-          modalSqft.textContent = symbol + number_format(converted, 0) + '/m²';
-        }
-      }
-    }
-
     // Update language display
     function updateLanguageDisplay(lang) {
       // This function can be expanded to update all text content
@@ -4240,40 +3710,15 @@
       // You can add logic here to update text throughout the page
     }
 
-    // Initialize currency and language on page load.
+    // Initialize language on page load.
     // Para el idioma usamos lo que el servidor ya resolvió (html lang) y NO escribimos
     // localStorage hasta que el usuario haga clic — así evitamos un reload infinito.
     document.addEventListener('DOMContentLoaded', function() {
-      const savedCurrency = localStorage.getItem('selectedCurrency') || 'USD';
       const serverLang = (document.documentElement.getAttribute('lang') || 'es').toLowerCase().split('-')[0];
 
-      setCurrency(savedCurrency);
       // skipServer: solo refleja el idioma actual del servidor en la UI del toggle.
       setLanguage(serverLang, { skipServer: true });
     });
-
-    // Buyer profile toggle (Para Vivir / Para Invertir)
-    function setBuyerProfile(profile) {
-      const btnVivir = document.getElementById('btnProfileVivir');
-      const btnInvertir = document.getElementById('btnProfileInvertir');
-      const financial = document.getElementById('financialBlock');
-      const lifestyle = document.getElementById('lifestyleBlock');
-      if (!btnVivir || !btnInvertir) return;
-      const activeStyle = 'background:rgb(102,123,106);color:white;';
-      const inactiveStyle = 'background:transparent;color:rgb(98,84,65);';
-      const baseStyle = 'border:none;padding:3px 10px;border-radius:9999px;cursor:pointer;font-weight:600;';
-      if (profile === 'vivir') {
-        btnVivir.style.cssText = baseStyle + activeStyle;
-        btnInvertir.style.cssText = baseStyle + inactiveStyle;
-        if (financial) financial.style.display = 'none';
-        if (lifestyle) lifestyle.style.display = 'block';
-      } else {
-        btnInvertir.style.cssText = baseStyle + activeStyle;
-        btnVivir.style.cssText = baseStyle + inactiveStyle;
-        if (financial) financial.style.display = 'flex';
-        if (lifestyle) lifestyle.style.display = 'none';
-      }
-    }
 
     // (shareMatches is defined earlier near the share modal — opens the share
     // dialog with the current filtered/grid URL pre-filled.)
@@ -4641,73 +4086,6 @@
       }
     }
 
-    // Toggle currency dropdown
-    function toggleCurrencyDropdown() {
-      const dropdown = document.getElementById('currencyDropdown');
-      if (!dropdown) return;
-      
-      // Close all other dropdowns first
-      document.querySelectorAll('.filter-dropdown').forEach(d => {
-        if (d !== dropdown) d.style.display = 'none';
-      });
-      
-      // Toggle current dropdown
-      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-      
-      // Close on outside click
-      if (dropdown.style.display === 'block') {
-        setTimeout(() => {
-          document.addEventListener('click', function closeDropdown(e) {
-            if (!dropdown.contains(e.target) && !e.target.closest('#currencyBtn')) {
-              dropdown.style.display = 'none';
-              document.removeEventListener('click', closeDropdown);
-            }
-          });
-        }, 10);
-      }
-    }
-
-    // Toggle the header currency dropdown (mirrors toggleCurrencyDropdown)
-    function toggleHeaderCurrencyDropdown() {
-      const dropdown = document.getElementById('headerCurrencyDropdown');
-      if (!dropdown) return;
-
-      document.querySelectorAll('.filter-dropdown').forEach(d => {
-        if (d !== dropdown) d.style.display = 'none';
-      });
-
-      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-
-      if (dropdown.style.display === 'block') {
-        setTimeout(() => {
-          document.addEventListener('click', function closeDropdown(e) {
-            if (!dropdown.contains(e.target) && !e.target.closest('#headerCurrencyBtn')) {
-              dropdown.style.display = 'none';
-              document.removeEventListener('click', closeDropdown);
-            }
-          });
-        }, 10);
-      }
-    }
-
-    // Select currency — keeps both the profile and header labels/dropdowns in sync
-    function selectCurrency(currency) {
-      updateCurrencyLabels(currency);
-      const d1 = document.getElementById('currencyDropdown');
-      if (d1) d1.style.display = 'none';
-      const d2 = document.getElementById('headerCurrencyDropdown');
-      if (d2) d2.style.display = 'none';
-      setCurrency(currency);
-    }
-
-    // Update every currency label on the page (profile shows the code, header adds the symbol)
-    function updateCurrencyLabels(currency) {
-      const profileLabel = document.getElementById('currencyLabel');
-      if (profileLabel) profileLabel.textContent = currency;
-      const headerLabel = document.getElementById('headerCurrencyLabel');
-      if (headerLabel) headerLabel.textContent = currency + ' ' + (CURRENCY_SYMBOLS[currency] || '');
-    }
-
     // Apply price filter
     // Separador de miles según el idioma del usuario: español usa punto (40.000),
     // inglés usa coma (40,000). Permite leer de un vistazo si es 40k, 400k o 4M.
@@ -4797,32 +4175,36 @@
       setFilterActive('priceLabel', active);
     }
 
+    // Textos de los botones de filtro, en el idioma activo.
+    const FILTER_LABELS = {
+      type:      { off: @json(__('Tipo de unidad')), on: @json(__('Types')) },
+      direction: { off: @json(__('Direction')),      on: @json(__('Directions')) },
+      outlook:   { off: @json(__('Outlook')),        on: @json(__('Outlooks')) },
+      floor:     { off: @json(__('Piso')),           on: @json(__('Floors')) },
+    };
+
+    function paintFilterLabel(id, key, count) {
+      const label = document.getElementById(id);
+      if (!label) return;
+      const t = FILTER_LABELS[key];
+      label.textContent = count > 0 ? `${t.on} (${count})` : t.off;
+      setFilterActive(id, count > 0);
+    }
+
     function updateTypeLabel() {
-      const label = document.getElementById('typeLabel');
-      const active = currentFilters.types.length > 0;
-      label.textContent = active ? `Types (${currentFilters.types.length})` : 'Unit Type';
-      setFilterActive('typeLabel', active);
+      paintFilterLabel('typeLabel', 'type', currentFilters.types.length);
     }
 
     function updateDirectionLabel() {
-      const label = document.getElementById('directionLabel');
-      const active = currentFilters.directions.length > 0;
-      label.textContent = active ? `Directions (${currentFilters.directions.length})` : 'Direction';
-      setFilterActive('directionLabel', active);
+      paintFilterLabel('directionLabel', 'direction', currentFilters.directions.length);
     }
 
     function updateOutlookLabel() {
-      const label = document.getElementById('outlookLabel');
-      const active = currentFilters.outlooks.length > 0;
-      label.textContent = active ? `Outlooks (${currentFilters.outlooks.length})` : 'Outlook';
-      setFilterActive('outlookLabel', active);
+      paintFilterLabel('outlookLabel', 'outlook', currentFilters.outlooks.length);
     }
 
     function updateFloorLabel() {
-      const label = document.getElementById('floorLabel');
-      const active = currentFilters.floors.length > 0;
-      label.textContent = active ? `Floors (${currentFilters.floors.length})` : 'Floor';
-      setFilterActive('floorLabel', active);
+      paintFilterLabel('floorLabel', 'floor', currentFilters.floors.length);
     }
 
     function updateSortLabel() {
@@ -4938,8 +4320,6 @@
           tbody.appendChild(node);
         });
       }
-      // Freshly inserted prices must reflect the currently selected currency.
-      try { updateCurrencyDisplay(localStorage.getItem('selectedCurrency') || 'USD'); } catch (e) {}
     }
 
     // Status tabs (list view) are applied client-side over the loaded rows.
@@ -5127,106 +4507,6 @@
 
     // Legacy stubs kept for any external callers — no-ops now (client-side filter).
     function updateUnitsGrid() {}
-    function createUnitCard(unit) {
-      const div = document.createElement('div');
-      div.style.cssText = 'position:relative;width:100%;max-width:24rem;overflow:hidden;background:rgb(249,248,246);border-radius:1rem;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1);';
-      
-      // Status overlay
-      if (unit.status === 'sold' || unit.status === 'pending') {
-        const statusDiv = document.createElement('div');
-        statusDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(67,58,45,0.8);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:7rem;cursor:not-allowed;';
-        statusDiv.innerHTML = `<span style="color:white;font-size:1.5rem;font-weight:700;letter-spacing:0.15em;">${unit.status.toUpperCase()}</span>`;
-        div.appendChild(statusDiv);
-      }
-
-      const isAvailable = unit.status !== 'sold' && unit.status !== 'pending';
-      const viewers = Math.floor(Math.random() * 11) + 8;
-
-      // Image section
-      const imageSection = document.createElement('div');
-      imageSection.style.cssText = 'min-height:14rem;';
-      imageSection.innerHTML = `
-        <div style="position:relative;overflow:hidden;">
-          ${unit.images && unit.images.length > 0
-            ? `<img src="${unit.images[0].path}" alt="Unit Render" style="width:100%;object-fit:cover;display:block;${unit.status === 'sold' ? 'filter:grayscale(20%);' : ''}" onerror="this.style.height='200px';this.style.background='rgb(218,211,200)'">`
-            : '<div style="width:100%;height:200px;background:rgb(218,211,200);display:flex;align-items:center;justify-content:center;color:rgb(98,84,65);">No Image Available</div>'
-          }
-          ${isAvailable
-            ? `<div class="live-viewers" style="position:absolute;top:0.5rem;left:0.5rem;background:rgba(0,0,0,0.55);color:white;font-size:0.62rem;font-weight:600;padding:3px 8px;border-radius:9999px;display:flex;align-items:center;gap:5px;letter-spacing:0.02em;">
-                 <span style="width:6px;height:6px;border-radius:50%;background:rgb(34,197,94);" class="advisor-dot"></span>
-                 <span>${viewers} viendo ahora</span>
-               </div>`
-            : ''
-          }
-        </div>
-      `;
-      div.appendChild(imageSection);
-
-      // Details section
-      const pricePerSqft = unit.internal_area && unit.internal_area > 0
-        ? `<span style="display:block;font-size:0.62rem;color:rgb(98,84,65);opacity:0.75;line-height:1.2;">$${number_format(Math.round(unit.price / unit.internal_area), 0)}/m² <span style="color:rgb(34,197,94);font-weight:600;">· -12% mercado</span></span>`
-        : '';
-      const detailsSection = document.createElement('div');
-      detailsSection.style.cssText = 'position:relative;padding:1.25rem 1.5rem 0.5rem 1.5rem;';
-      detailsSection.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div style="text-align:left;">
-            <span style="display:block;font-weight:700;color:rgb(98,84,65);font-size:1rem;">${unit.custom_id || unit.name}</span>
-            <span style="display:block;font-weight:600;font-size:0.875rem;color:rgb(98,84,65);">${unit.floor ? ucfirst(unit.floor) : 'Ground Floor'}</span>
-            <span style="font-size:0.8rem;color:rgb(98,84,65);max-width:10rem;display:block;">${unit.bedrooms} Bed ${unit.bathrooms ? '| ' + unit.bathrooms + ' Bath' : ''} ${unit.direction ? '| ' + unit.direction.toUpperCase() : ''} ${unit.outlook ? '| ' + unit.outlook : ''}</span>
-          </div>
-          <div style="text-align:right;position:absolute;right:1.25rem;top:1.25rem;">
-            ${unit.status === 'sold' || unit.status === 'pending'
-              ? `<span style="font-size:1rem;font-weight:800;color:rgb(98,84,65);">${unit.status.toUpperCase()}</span>`
-              : `<div style="display:inline-block;text-align:right;">
-                  <span style="display:block;font-weight:800;background:linear-gradient(to bottom right,rgb(210,182,144),rgb(107,80,43));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.1rem;">$${number_format(unit.price, 0, ' ', ' ')}</span>
-                  ${pricePerSqft}
-                  <span style="display:block;font-size:0.6rem;color:rgb(180,134,72);font-weight:600;line-height:1.2;margin-top:1px;">Reserva desde $5000</span>
-                  ${unit.discount && unit.discount > 0
-                    ? `<button title="Válido hasta el 30 de abril" style="background:rgb(34,197,94);color:white;font-size:0.65rem;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;line-height:1.4;font-weight:600;margin-top:3px;">UNLOCK <b>$${number_format(unit.discount, 0, ' ', ' ')}</b><br>DISCOUNT</button>`
-                    : ''
-                  }
-                </div>`
-            }
-          </div>
-        </div>
-      `;
-      div.appendChild(detailsSection);
-
-      // Action buttons
-      const actionButtons = document.createElement('div');
-      actionButtons.style.cssText = 'display:flex;flex-direction:row;';
-      const rightButton = unit.status === 'sold'
-        ? `<button style="width:50%;height:2.5rem;background:rgb(98,84,65);color:white;border:none;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;cursor:not-allowed;opacity:0.9;">SOLD</button>`
-        : unit.status === 'pending'
-        ? `<button style="width:50%;height:2.5rem;background:rgb(180,180,180);color:white;border:none;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;cursor:not-allowed;">PENDING</button>`
-        : `<button onclick="openReservePage('${unit.id}')" style="width:50%;height:2.5rem;background:rgb(102,123,106);color:white;border:none;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;cursor:pointer;">RESERVE</button>`;
-      actionButtons.innerHTML = `
-        <button onclick="openMoreInfo('${unit.id}')" style="width:50%;height:2.5rem;background:rgb(239,235,230);color:rgb(98,84,65);border:none;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;cursor:pointer;">MORE INFO</button>
-        ${rightButton}
-      `;
-      div.appendChild(actionButtons);
-
-      // Advisor live + video call CTA
-      if (isAvailable) {
-        const advisorBlock = document.createElement('div');
-        advisorBlock.style.cssText = 'padding:0.5rem 0.75rem 0.75rem 0.75rem;display:flex;flex-direction:column;align-items:center;gap:0.4rem;';
-        advisorBlock.innerHTML = `
-          <div class="advisor-live" role="button" tabindex="0" title="Chatear ahora con el administrador" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}" style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:rgb(34,150,80);font-weight:600;cursor:pointer;">
-            <span class="advisor-dot" style="width:7px;height:7px;border-radius:50%;background:rgb(34,197,94);"></span>
-            <span>Tu asesor está disponible ahora mismo</span>
-          </div>
-          <button onclick="openAdvisorVideoCall('${unit.id}')" style="display:inline-flex;align-items:center;gap:6px;background:white;color:rgb(98,84,65);border:1px solid rgb(218,211,200);border-radius:0.5rem;padding:5px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.02em;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="rgb(180,134,72)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-            Agendar una Videollamada
-          </button>
-        `;
-        div.appendChild(advisorBlock);
-      }
-
-      return div;
-    }
-
     // Pulse the pill briefly whenever its number changes — small visual cue
     // that the filter just updated.
     function pulseMatchPill(pill, newCount) {

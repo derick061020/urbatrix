@@ -2752,5 +2752,12 @@
   "El monto pagado no puede superar el monto programado de la cuota.": "El monto pagado no puede superar el monto programado de la cuota.",
   "Pago actualizado correctamente.": "Pago actualizado correctamente.",
   "Registro fiscal / RNC": "Registro fiscal / RNC",
-  "firmado": "firmado"
+  "firmado": "firmado",
+  "Floor :n": "Piso :n",
+  "Types": "Tipos",
+  "Directions": "Orientaciones",
+  "Outlooks": "Vistas",
+  "Floors": "Pisos",
+  "hab.": "hab.",
+  "baños": "baños"
 }

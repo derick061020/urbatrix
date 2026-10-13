@@ -5,7 +5,6 @@
           $isPending   = $st === 'pending';
           $isHighDem   = !empty($unit->is_high_demand) || ($unit->demand_level ?? '') === 'high';
           $isSecond    = !empty($unit->is_second_chance);
-          $hasDiscount = !empty($unit->discount) && $unit->discount > 0;
           $cardCls = 'fg-card';
           if ($isSold)         $cardCls .= ' is-sold';
           elseif ($isReserved) $cardCls .= ' is-reserved';
@@ -100,9 +99,6 @@
                 </button>
               </div>
 
-              <!-- Gold "RESERVE FROM $5000" banner -->
-              <div class="fg-reserve-banner" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('Reserve from $5000') }}</div>
-
               @if($isSold)
                 <!-- SOLD overlay (Figma 125:5048) -->
                 <div class="fg-sold-badge"><span>{{ __('SOLD') }}</span></div>
@@ -121,22 +117,14 @@
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
-                  {{ ($floorRaw !== '' && strcasecmp($floorRaw, 'ground') !== 0)
-                        ? (isset($floorDisplay) ? $floorDisplay($unit->floor) : ucfirst($unit->floor)) . ' ' . __('Floor')
-                        : __('Ground Floor') }}
+                  {{ \App\Support\UnitOptions::floorPhrase($unit->floor) }}
                   @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
                   @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>
                 <div class="fg-card-divider"></div>
                 <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
-                  @if($unit->internal_area && $unit->internal_area > 0)
-                    <span class="sqft" data-usd-sqft="{{ round($unit->price / $unit->internal_area) }}">${{ number_format($unit->price / $unit->internal_area, 0) }}/m</span>
-                  @endif
                 </div>
-                @if($hasDiscount)
-                  <button type="button" class="fg-discount" title="{{ __('Limited time offer') }}">{{ __('Unlock :amount Discount', ['amount' => '$'.number_format($unit->discount, 0, ',', ',')]) }}</button>
-                @endif
               </div>
 
               <!-- Stats row (6 boxes) -->
@@ -204,10 +192,6 @@
                       </svg>
                       {{ __('Book Video Call') }}
                     </button>
-                  </div>
-                  <div class="fg-card-availability advisor-live" role="button" tabindex="0" title="{{ __('Chat now with the administrator') }}" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
-                    <span class="dot"></span>
-                    <span>{{ __('An advisor is available right now.') }}</span>
                   </div>
                 @endif
               </div>

@@ -1305,9 +1305,6 @@
       margin: 0 auto;
       align-items: start;
     }
-    @media (min-width: 1600px) {
-      .fg-units-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-    }
     @media (max-width: 1280px) {
       .fg-units-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
@@ -1608,30 +1605,6 @@
     .fg-status-badge.second      { background: #5b8def; }
     .fg-status-badge.sold        { background: #e2534e; }
     .fg-status-badge.reserved    { background: #dc2626; }
-    /* Gold "RESERVE FROM $5000" banner at bottom of image */
-    .fg-reserve-banner {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      padding: 8px 10px;
-      /* velo oscuro esmerilado: el dorado se lee sobre cualquier foto */
-      background: linear-gradient(to top, rgba(12, 18, 24, 0.72), rgba(12, 18, 24, 0.5));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      /* mismo redondeo inferior que el marco de la imagen (.fg-card-img) */
-      border-bottom-left-radius: 24px;
-      border-bottom-right-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 18px;
-      letter-spacing: 0.96px;
-      color: #ffc93c;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-      text-transform: uppercase;
-    }
     /* Bottom status strip (HIGH DEMAND / PENDING / 2ND CHANCE / SOLD card) */
     .fg-card-status-strip {
       position: relative;
@@ -2712,6 +2685,12 @@
       height: 100%;
       transform-origin: 0 0;
       will-change: transform;
+    }
+    /* Capa de chinchetas: JS (fitPlanLayer) la encaja con el rectángulo que
+       ocupa realmente la imagen del plano dentro del lienzo. */
+    .fg-plan-layer {
+      position: absolute;
+      inset: 0;
     }
     .fg-plan-img {
       position: absolute;

@@ -64,10 +64,15 @@ class HomeController extends Controller
             ? \App\Models\Wishlist::where('user_id', Auth::id())->pluck('unit_id')->all()
             : [];
 
-        // Admin shown on the unit modal advisor card ("Chat" with an admin)
-        $admin = \App\Models\User::where('role', 'admin')->orderBy('id')->first();
+        // Gente mirando ahora mismo: sesiones con actividad en los últimos 5
+        // minutos (las mantiene ActiveUserController). Se pinta ya en el HTML
+        // para que el número no empiece en un valor de relleno y salte después.
+        $activeUsers = count(array_filter(
+            \Illuminate\Support\Facades\Cache::get('active_guests', []),
+            fn ($ts) => $ts > now()->subMinutes(5)->timestamp
+        ));
 
-        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds', 'admin'));
+        return view('home', compact('units', 'gridUnits', 'soldCount', 'totalUnits', 'wishlistIds', 'activeUsers'));
     }
 
     /**

@@ -642,8 +642,6 @@
                                 </button>
                             </div>
 
-                            <div class="fg-reserve-banner">{{ __('Reserve from $5000') }}</div>
-
                             @if($isSold)
                                 <div class="fg-sold-badge"><span>SOLD</span></div>
                             @endif
@@ -658,20 +656,14 @@
                                     @endif
                                 </div>
                                 <div class="fg-card-subtitle">
-                                    {{ $unit->floor ? ucfirst($unit->floor) . ' Floor' : 'Ground Floor' }}
+                                    {{ \App\Support\UnitOptions::floorPhrase($unit->floor) }}
                                     @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
                                     @if($unit->outlook) · {{ $unit->outlook }} {{ str_contains(strtolower($unit->outlook), 'view') ? '' : 'View' }} @endif
                                 </div>
                                 <div class="fg-card-divider"></div>
                                 <div class="fg-card-price">
                                     <span class="price">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
-                                    @if($unit->internal_area && $unit->internal_area > 0)
-                                        <span class="sqft">${{ number_format($unit->price / $unit->internal_area, 0) }}/m²</span>
-                                    @endif
                                 </div>
-                                @if($hasDiscount)
-                                    <button type="button" class="fg-discount" title="{{ __('Limited time offer') }}">Unlock ${{ number_format($unit->discount, 0, ',', ',') }} Discount</button>
-                                @endif
                             </div>
 
                             <div class="fg-stats">
@@ -737,10 +729,6 @@
                                             </svg>
                                             Book Video Call
                                         </a>
-                                    </div>
-                                    <div class="fg-card-availability" role="button" tabindex="0" title="{{ __('Chatear ahora con el administrador') }}" style="cursor:pointer;" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}">
-                                        <span class="dot"></span>
-                                        <span>{{ __('An advisor is available right now.') }}</span>
                                     </div>
                                 @endif
                             </div>

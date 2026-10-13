@@ -2786,5 +2786,12 @@
   "Agencia del broker": "Broker's agency",
   "Proyecto de interés": "Project of interest",
   "Etapa :n de :total": "Step :n of :total",
-  "Agente": "Agent"
+  "Agente": "Agent",
+  "Floor :n": "Floor :n",
+  "Types": "Types",
+  "Directions": "Directions",
+  "Outlooks": "Outlooks",
+  "Floors": "Floors",
+  "hab.": "bed",
+  "baños": "bath"
 }
