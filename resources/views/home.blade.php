@@ -2314,6 +2314,9 @@
       {{-- Qué se ve cuando la búsqueda o los filtros no devuelven nada. --}}
       @include('partials.empty-results')
 
+      {{-- La barra de filtros y el contador se quedan fijos al hacer scroll. --}}
+      @include('partials.sticky-filters')
+
       <!-- Infinite-scroll sentinel for the grid (revealed batch by batch). -->
       <div class="fg-lazy-more" id="gridLazyMore" aria-hidden="true">
         <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
