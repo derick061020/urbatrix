@@ -16,6 +16,13 @@
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
+  {{-- Capa «lujo» (diseño de Samuel, repo urbatrix-bahia-mar-lujo): las dos
+       familias de la landing de Bahía Mar. Italiana para nombres y títulos;
+       Archivo para todo lo demás y SIEMPRE para las cifras, porque en Italiana
+       el 4 y el 6 se confunden. La hoja de la capa se carga al final del body. --}}
+  <link rel="preload" href="{{ asset('lujo/lujo.css') }}" as="style">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Italiana&display=swap">
 </head>
 
 <body data-view="grid"@guest data-guest="1"@endguest>
@@ -6498,7 +6505,7 @@
     var total = cells.length;
     if(total < 2) return; // sin imágenes no hay carrusel
 
-    var DURATION = 5000; // ms por slide
+    var DURATION = 8000; // ms por slide (capa lujo: antes 5000, «que pasen más lento»)
     stage.style.setProperty('--hs-duration', DURATION + 'ms');
 
     var cur = 0, timer = null, started = false;
@@ -6614,6 +6621,20 @@
 
 {{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
 @include('partials.exit-intent')
+
+{{-- Capa «lujo» — diseño de Samuel (repo urbatrix-bahia-mar-lujo), publicado en
+     urbatrix-bahia-mar-lujo.vercel.app. Reescribe la capa de marca —tipografía,
+     color, espaciado, ritmo— y quita lo que no es dato de la villa. El JS no
+     añade bloques: reordena y reetiqueta lo que esta vista ya pinta.
+
+     Va la última a propósito: tiene que ganar a los <style> en línea de aquí.
+
+     LUJO_PUBLICADO apaga el panel «Propuestas» —el conmutador de variantes, que
+     el autor marca como «solo en el clon»— y fija lo que eligió Samuel en la
+     ronda 4: portadas y transición hoja. --}}
+<script>window.LUJO_PUBLICADO = true;</script>
+<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
+<script src="{{ asset('lujo/lujo.js') }}" defer></script>
 
 </body>
 

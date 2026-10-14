@@ -1,0 +1,1442 @@
+/* ============================================================================
+   CAPA DE MARCA «LUJO» — Bahía Mar sobre la plataforma Urbatrix
+   ============================================================================
+
+   Qué es: una capa que se carga DESPUÉS de todo el CSS del sitio (al final del
+   <body>) y cambia la marca —tipografía, color, espaciado, detalle y ritmo—
+   sin tocar la estructura: el mismo header, el mismo hero, una fila por
+   tipología, las mismas cards y la misma ficha.
+
+   Por qué así: Urbatrix es una plantilla que se adapta a cada promotora. Todo
+   lo que es «Bahía Mar» está en los tokens de la sección 0. Para otra marca se
+   cambian esos tokens (y las dos familias tipográficas) y lo demás se queda.
+
+   Criterio (Miguel, 12 oct; Samuel): «el lujo no tiene efectos, el lujo es
+   menos». Nada nuevo compite con la villa. Los movimientos que hay son lentos
+   y uno a la vez; con prefers-reduced-motion no hay ninguno.
+
+   De dónde sale el lenguaje: la landing de Bahía Mar (bahiamarterrenas.com,
+   repo clon-era-residence): Italiana para títulos, Archivo para el resto, el
+   verde #04332F sobre el claro #EFEEE9, curvas 0.76/0/0.24/1 y 0.25/1/0.5/1.
+
+   Mapa:
+     0. Tokens de marca              7. Cards del catálogo
+     1. Tipografía base              8. Estados: reservada y vendida
+     2. Header                       9. Ficha de unidad (popup)
+     3. Hero                        10. Registro: cliente o broker
+     4. Filtros y toggle            11. Pantallas grandes
+     5. Bandas de tipología         12. Foco de teclado
+     6. Banda verde (compromiso)    13. prefers-reduced-motion
+   ========================================================================== */
+
+/* Las fuentes (Italiana y Archivo 300–600, Google Fonts) se piden con un
+   <link> en el <head> —ver LUJO_HEAD en servir.py—, no con @import aquí: un
+   @import dentro de esta hoja no empieza a descargarse hasta que llega la
+   hoja, y retrasa la primera pintura. */
+
+/* ── 0. TOKENS DE MARCA ───────────────────────────────────────────────────
+   Lo único que cambia de una promotora a otra. Valores de la landing de
+   Bahía Mar (styles/theme.css del repo de la landing). */
+:root{
+  /* Color */
+  --lx-ink:      #04332F;               /* texto y acciones */
+  --lx-deep:     #022725;               /* superficies oscuras */
+  --lx-paper:    #EFEEE9;               /* fondo de página */
+  --lx-surface:  #F7F6F2;               /* tarjetas y paneles sobre el papel */
+  --lx-sand:     #E8D8C8;               /* acento cálido, muy puntual */
+  --lx-muted:    rgba(4,51,47,.78);     /* texto secundario: 6,1:1 sobre papel */
+  --lx-faint:    rgba(4,51,47,.68);     /* etiquetas pequeñas: 4,7:1 (con .56 daba 3,4 y no llegaba al 4,5 AA) */
+  --lx-line:     rgba(4,51,47,.16);     /* filetes */
+  --lx-hair:     rgba(4,51,47,.09);
+  --lx-on-dark:  #EFEEE9;
+  --lx-reserved: #7A5C33;               /* bronce apagado: «reservada» (5,3:1 con texto claro) */
+  --lx-sold:     #5B625F;               /* gris verdoso: «vendida» */
+
+  /* Tipografía */
+  --lx-font-display: 'Italiana', 'Optima', 'Candara', serif;
+  --lx-font-ui:      'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --lx-track-eyebrow: .26em;
+  --lx-track-button:  .14em;
+
+  /* Forma */
+  /* Redondeo. El sitio original usa 28 px en las tarjetas, 20 en la ficha y
+     10 en los botones; la landing, píldoras de 40 y casi todo recto. Aquí, una
+     escala propia entre los dos: suave, sin llegar a «app». */
+  --lx-radius-lg:   22px;               /* ficha y registro (lo que flota) */
+  --lx-radius:      18px;               /* tarjetas */
+  --lx-radius-sm:   10px;               /* recuadros dentro de un panel */
+  --lx-radius-xs:   6px;                /* miniaturas, lotes de la planta */
+  --lx-radius-pill: 999px;              /* botones y chips */
+  --lx-shadow:      0 1px 2px rgba(2,39,37,.05), 0 12px 32px -18px rgba(2,39,37,.22);
+
+  /* Ritmo */
+  --lx-ease:     cubic-bezier(.76,0,.24,1);
+  --lx-ease-out: cubic-bezier(.25,1,.5,1);
+  --lx-dur-s: .4s;
+  --lx-dur-m: .8s;
+  --lx-dur-l: 1.2s;
+
+  /* Variables del propio sitio que pasan a la marca */
+  --brand:    var(--lx-ink);
+  --eco-page: var(--lx-paper);
+}
+
+/* ── 1. TIPOGRAFÍA BASE ───────────────────────────────────────────────────
+   El sitio escribe Poppins/Montserrat/Antonio en línea en muchos sitios
+   (style=""), por eso el !important: es la única forma de que una capa
+   externa gane a un atributo style. Los iconos de PrimeIcons van en <i class="pi">
+   y no se tocan. Los títulos en Italiana llevan su propio !important más abajo,
+   con más especificidad, y ganan a esta regla. */
+body,
+body :is(button,input,select,textarea,span,div,p,a,label,td,th,li,b,strong,small,em,h1,h2,h3,h4,h5,h6,sup){
+  font-family: var(--lx-font-ui) !important;
+}
+body{
+  background: var(--lx-paper);
+  color: var(--lx-ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "lnum";
+}
+::selection{ background: var(--lx-ink); color: var(--lx-paper); }
+
+/* ── 2. HEADER ────────────────────────────────────────────────────────────
+   La misma píldora, más quieta: papel translúcido en vez de blanco con cuatro
+   sombras, un filete en vez de sombra, y en el centro una sola línea. */
+#mainPage > nav > div{
+  background: rgba(247,246,242,.86) !important;
+  -webkit-backdrop-filter: saturate(1.1) blur(14px);
+  backdrop-filter: saturate(1.1) blur(14px);
+  box-shadow: 0 0 0 1px var(--lx-hair), 0 10px 30px -22px rgba(2,39,37,.35) !important;
+}
+/* Centro: disponibilidad (dato real, reescrito por lujo.js) en una línea.
+   Fuera el «N users online right now», que el original rellena con una cifra
+   falsa cuando hay pocos visitantes, y la línea eco, que son datos de ejemplo
+   pendientes de confirmar (ver README). */
+.nav-center .nav-online,
+.nav-center .eco-counter,
+.nav-center > :not(:first-child){ display: none !important; }
+.nav-center > span:first-child{
+  font-weight: 400 !important;
+  font-size: 11px !important;
+  letter-spacing: var(--lx-track-eyebrow) !important;
+  color: var(--lx-muted) !important;
+}
+.nav-center > span:first-child b{
+  font-weight: 500; color: var(--lx-ink);
+}
+#mainPage > nav [data-saved-count],
+#mainPage > nav .nav-hide-mobile span{ letter-spacing: .02em !important; }
+#mainPage > nav button[aria-label="Profile"] > span:last-child{
+  background: var(--lx-ink) !important;
+  font-weight: 400 !important;
+}
+#headerCurrencyBtn{
+  background: transparent !important;
+  box-shadow: 0 0 0 1px var(--lx-line) !important;
+  border-color: transparent !important;
+}
+#headerCurrencyLabel{ font-weight: 500 !important; color: var(--lx-ink) !important; }
+.lang-toggle{ background: transparent !important; box-shadow: 0 0 0 1px var(--lx-line); }
+.lang-toggle .lang-btn{ font-weight: 500 !important; letter-spacing: .12em !important; }
+.lang-toggle .lang-btn.is-active{ background: var(--lx-ink) !important; color: var(--lx-paper) !important; }
+
+/* ── 3. HERO ──────────────────────────────────────────────────────────────
+   Misma escena (cielo, nombre del lugar, villa). Cambia la letra del nombre y
+   el paso de las imágenes: fundido lento en vez de desplazamiento lateral, y
+   8 s por imagen en vez de 5 (servir.py → PARCHES). */
+.fg-hero-text{
+  font-family: var(--lx-font-display) !important;
+  font-weight: 400 !important;
+}
+.fg-hero-word{
+  font-family: var(--lx-font-display) !important;
+  font-weight: 400 !important;
+  font-size: clamp(30px, 7.4vw, 150px) !important;
+  letter-spacing: .1em !important;
+  margin-right: -.1em !important;
+  line-height: 1;
+  background: linear-gradient(to bottom, rgba(255,255,255,.96), rgba(255,255,255,.80)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+.fg-hero-sub{
+  font-family: var(--lx-font-ui) !important;
+  font-weight: 500 !important;
+  font-size: clamp(10px, .8vw, 15px) !important;
+  letter-spacing: .5em !important;
+  margin-right: -.5em !important;
+  margin-bottom: 1.6em !important;
+  color: rgba(255,255,255,.92) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.92) !important;
+}
+
+/* Fundido en lugar de carril: las celdas se apilan y la activa sube de
+   opacidad. El JS del sitio sigue moviendo el track con translateX y marcando
+   aria-hidden en cada celda; aquí se anula el desplazamiento y se lee el
+   aria-hidden. */
+.fg-stage.has-slider .hs-track{
+  display: grid !important;
+  transform: none !important;
+  transition: none !important;
+}
+.fg-stage.has-slider .hs-cell{
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 1.6s var(--lx-ease) !important;
+}
+.fg-stage.has-slider .hs-cell[aria-hidden="false"],
+.fg-stage.has-slider .hs-cell:first-child:not([aria-hidden]){ opacity: 1; z-index: 1; }
+/* Acercamiento casi imperceptible mientras la imagen está en pantalla. */
+.fg-stage.has-slider .hs-cell-img{
+  transform: scale(1.0);
+  transition: opacity 1.6s var(--lx-ease), transform 9s linear !important;
+}
+.fg-stage.has-slider .hs-cell-img[aria-hidden="false"]{ transform: scale(1.045); }
+
+/* El difuminado inferior funde con el papel, no con blanco. */
+.fg-hero::after,
+.hs-cell-img::after{
+  background: linear-gradient(to top, var(--lx-paper) 0%, rgba(239,238,233,.85) 30%, rgba(239,238,233,0) 100%) !important;
+}
+/* Indicador del carrusel: dos trazos finos en vez de la píldora de cristal. */
+.hs-slider-nav{
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  gap: 10px !important;
+}
+.hs-pill-seg{
+  width: 34px !important; height: 2px !important; min-width: 0 !important;
+  padding: 0 !important; border-radius: 0 !important;
+  background: rgba(255,255,255,.45) !important;
+}
+.hs-pill-seg.is-active{ width: 54px !important; }
+.hs-pill-fill{ background: #fff !important; border-radius: 0 !important; }
+
+/* ── 3b. HERO PROPIO (lujo.js → hero) ─────────────────────────────────────
+   Sustituye a la escena del sitio (cielo + «LAS TERRENAS» + render) dentro
+   del mismo .fg-stage, así hereda su encuadre: 1366/670 en escritorio y
+   --hero-h en móvil. El slider del sitio sigue corriendo debajo, oculto. */
+.fg-stage.lx-hero-on > .hs-track,
+.fg-stage.lx-hero-on > .hs-slider-nav{ visibility: hidden !important; }
+.lx-hero{ position: absolute; inset: 0; z-index: 3; overflow: hidden; background: var(--lx-deep); }
+/* Ronda 4: hero más compacto en escritorio (antes 1366/670, ~700 px a 1440).
+   La transición Hoja mide sobre offsetHeight, así que sigue sola. */
+@media (min-width: 901px){
+  .fg-stage{ aspect-ratio: auto !important; height: clamp(440px, 36vw, 640px) !important; }
+}
+@media (max-width: 900px){
+  .fg-stage{ aspect-ratio: auto !important; height: clamp(340px, 46vh, 420px) !important; }
+}
+.lx-hero-capas{ position: absolute; inset: 0; display: grid; }
+.lx-telon-capa img{ object-position: 50% 60%; }
+/* La villa en hora azul está a la derecha (deja aire al texto en escritorio);
+   en pantallas estrechas el recorte se centra en ella. */
+/* Entre 601 y 900 px (hasta 600 hay versión cuadrada propia, <picture>). */
+.lx-telon-capa picture{ display: contents; }
+@media (min-width: 601px) and (max-width: 900px){
+  .lx-telon-capa[data-img="01-villa-hora-azul"] img{ object-position: 79% 60%; }
+}
+@media (max-width: 600px){
+  .lx-telon-capa[data-img="01-villa-hora-azul"] img{ object-position: 50% 50%; }
+}
+.lx-telon-capa .lx-hero-video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+/* Velo inferior: solo lo justo para que el pie se lea sobre cualquier imagen. */
+.lx-hero::after{
+  content: ""; position: absolute; inset: auto 0 0 0; height: 46%; z-index: 3; pointer-events: none;
+  background: linear-gradient(to top, rgba(2,39,37,.62), rgba(2,39,37,0));
+}
+.lx-hero-pie{
+  position: absolute; z-index: 4;
+  left: clamp(24px, 5vw, 80px); bottom: clamp(26px, 4.6vw, 64px);
+  color: var(--lx-on-dark);
+}
+.lx-hero-ola{
+  display: block; width: 34px; height: 25px; margin-bottom: 16px;
+  background: currentColor;
+  -webkit-mask: url('/lujo/img/isotipo-ola.png') center / contain no-repeat;
+          mask: url('/lujo/img/isotipo-ola.png') center / contain no-repeat;
+  opacity: .9;
+}
+.lx-hero-marca{
+  margin: 0; font-family: var(--lx-font-display) !important; font-weight: 400;
+  font-size: clamp(30px, 3.1vw, 54px); line-height: 1; letter-spacing: .04em;
+}
+.lx-hero-sub{
+  margin: 12px 0 0; font-size: clamp(10px, .78vw, 12px); font-weight: 500;
+  letter-spacing: .28em; text-transform: uppercase; opacity: .86;
+}
+.lx-hero-indice{
+  position: absolute; z-index: 4; right: clamp(24px, 5vw, 80px); bottom: clamp(30px, 4.8vw, 68px);
+  display: flex; align-items: center; gap: 4px;
+}
+.lx-hero-indice button{
+  border: 0; background: none; cursor: pointer; padding: 6px 7px;
+  color: rgba(239,238,233,.55); font-size: 11px; font-weight: 500; letter-spacing: .14em;
+  font-variant-numeric: tabular-nums; transition: color var(--lx-dur-s) var(--lx-ease-out);
+}
+.lx-hero-indice button[aria-pressed="true"], .lx-hero-indice button:hover{ color: var(--lx-on-dark); }
+.lx-hero-indice button:focus-visible{ outline: 1px solid var(--lx-on-dark); outline-offset: 2px; }
+.lx-hero-linea{ order: -1; width: 64px; height: 1px; margin-right: 12px; background: rgba(239,238,233,.3); overflow: hidden; }
+.lx-hero-linea i{ display: block; height: 100%; background: var(--lx-on-dark); transform-origin: 0 50%; transform: scaleX(0); }
+.lx-hero-linea i.is-corriendo{ animation: lx-progreso 8s linear forwards; }
+.lx-hero-ir{
+  margin-top: 22px; padding: 0 0 5px; border: 0; background: none; cursor: pointer;
+  border-bottom: 1px solid rgba(239,238,233,.7); color: var(--lx-on-dark);
+  font-size: 10.5px; font-weight: 500; letter-spacing: var(--lx-track-button); text-transform: uppercase;
+  transition: opacity var(--lx-dur-s) var(--lx-ease-out);
+}
+.lx-hero-ir:hover{ opacity: .7; }
+.lx-hero-ir:focus-visible{ outline: 1px solid var(--lx-on-dark); outline-offset: 4px; }
+@media (max-width: 768px){
+  /* En móvil el índice no cabe junto al pie: queda solo la línea de
+     progreso, arriba a la derecha del pie. */
+  .lx-hero-indice{ bottom: auto; top: 96px; }
+  .lx-hero-indice button{ display: none; }
+  .lx-hero-linea{ width: 44px; margin: 0; }
+  .lx-hero-sub{ letter-spacing: .2em; line-height: 1.7; max-width: 30ch; }
+  .lx-hero-ir{ margin-top: 14px; }
+}
+
+/* ── 3c. DEL HERO A LAS VILLAS: TRES TRANSICIONES (lujo.js → transiciones)
+   html.lx-tr-1 | lx-tr-2 | lx-tr-3, elegible en el panel «Propuestas».
+   --lx-p va de 0 a 1 según lo bajado sobre el alto del hero (solo sin
+   reducir movimiento; con reducir movimiento se queda en 0 y cada
+   propuesta muestra su forma estática). */
+html[class*="lx-tr-"] .fg-hero-spacer{ display: none !important; }
+html[class*="lx-tr-"] #main-unit-reserve-list,
+html[class*="lx-tr-"] .fg-footer{ position: relative; z-index: 2; }
+html[class*="lx-tr-"] .fg-footer{ background: var(--lx-paper); }
+/* La barra Grid/List (fija) vive dentro de la lista: con la lista por debajo
+   del footer, el footer la tapaba al final de la página (ver hueco() en JS). */
+html[class*="lx-tr-"] #main-unit-reserve-list{ z-index: 3; }
+.fg-footer{ padding-bottom: calc(var(--lx-pie-hueco, 0px) + 8px) !important; }
+.lx-hero.is-tipo .lx-hero-indice{ display: none; }
+.lx-capa-tipo img{ object-position: 50% 45%; }
+/* En móvil la foto de la portada es vertical con la villa arriba. */
+@media (max-width: 600px){ .lx-capa-tipo img{ object-position: 50% 0%; } }
+.lx-hero-sombra{ position: absolute; inset: 0; z-index: 5; pointer-events: none; background: #011b19; opacity: 0; }
+
+/* 1 · HOJA — el hero queda fijo y la página sube encima con el borde curvo. */
+html.lx-tr-1 .fg-stage{ position: sticky !important; top: 0; z-index: 0; }
+html.lx-tr-1 #main-unit-reserve-list{
+  margin-top: calc(-1 * var(--lx-curva, 32px)) !important;
+  padding-top: var(--lx-curva, 32px);
+  border-radius: var(--lx-curva, 32px) var(--lx-curva, 32px) 0 0;
+  background: var(--lx-paper) !important;
+  box-shadow: 0 -26px 50px -30px rgba(2,39,37,.55);
+}
+html.lx-tr-1 .lx-hero-sombra{ opacity: calc(var(--lx-p, 0) * .55); }
+html.lx-tr-1 .lx-hero-capas{ transform: scale(calc(1 + var(--lx-p, 0) * .05)); transform-origin: 50% 40%; }
+html.lx-tr-1 .lx-hero-pie,
+html.lx-tr-1 .lx-hero-indice{ opacity: calc(1 - var(--lx-p, 0) * 1.8); transform: translateY(calc(var(--lx-p, 0) * -24px)); }
+
+/* 2 · TARJETA — a sangre con las esquinas de abajo redondeadas y un filo de
+   papel; al bajar se recoge hasta ser una tarjeta. Solo clip-path: barato. */
+html.lx-tr-2 .fg-stage{
+  --lx-i: calc(var(--lx-filo, 14px) + var(--lx-p, 0) * 26px);
+  --lx-r: calc(var(--lx-radius-lg) + var(--lx-p, 0) * 10px);
+  clip-path: inset(calc(var(--lx-p, 0) * 26px) var(--lx-i) var(--lx-i) var(--lx-i) round calc(var(--lx-p, 0) * var(--lx-r)) calc(var(--lx-p, 0) * var(--lx-r)) var(--lx-r) var(--lx-r));
+}
+html.lx-tr-2 .fg-stage:not([style*="--lx-p"]){ clip-path: inset(0 var(--lx-filo, 14px) var(--lx-filo, 14px) round 0 0 var(--lx-radius-lg) var(--lx-radius-lg)); }
+html.lx-tr-2 .lx-hero-sombra{ opacity: calc(var(--lx-p, 0) * .3); }
+html.lx-tr-2 #main-unit-reserve-list{ margin-top: 0 !important; padding-top: 18px; }
+
+/* 3 · TELÓN — el borde inferior del hero es la diagonal del telón (más
+   abajo a la izquierda, donde va el pie) y una planta crece desde el papel
+   y cruza a la foto por la derecha. */
+html.lx-tr-3 .fg-stage{
+  --lx-d: calc(var(--lx-diag, clamp(48px, 7vw, 130px)) * (1 + var(--lx-p, 0) * .5));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--lx-d)), 0 100%);
+}
+html.lx-tr-3 #main-unit-reserve-list{ margin-top: 0 !important; }
+html.lx-tr-3 .lx-hero-indice{ bottom: calc(clamp(48px, 7vw, 130px) + 26px); }
+.lx-puente{ position: absolute; right: 0; top: 0; width: 0; height: 0; z-index: 3; pointer-events: none; }
+.lx-puente .lx-planta{
+  position: absolute; right: 0; bottom: -24px; top: auto;
+  width: clamp(240px, 22vw, 380px);
+  transform: scale(-1, -1);            /* nace abajo a la derecha y sube */
+}
+
+@media (max-width: 900px){
+  html.lx-tr-1{ --lx-curva: 24px; }
+  html.lx-tr-2{ --lx-filo: 8px; }
+  html.lx-tr-3{ --lx-diag: 34px; }
+  html.lx-tr-3 .lx-hero-indice{ bottom: auto; }
+  .lx-puente .lx-planta{ width: 150px; bottom: -36px; }
+}
+@media (prefers-reduced-motion: reduce){
+  html.lx-tr-1 .fg-stage{ position: relative !important; }
+  .lx-hero-sombra{ display: none; }
+}
+
+/* Panel «Propuestas» (lujo.js → propuestas). Solo del clon. */
+.lx-propuestas{
+  position: fixed; left: 18px; bottom: 20px; z-index: 96;
+  width: 268px; overflow: hidden;
+  border-radius: var(--lx-radius);
+  background: var(--lx-ink); color: var(--lx-on-dark);
+  box-shadow: 0 18px 44px -18px rgba(2,39,37,.65);
+  transition: width var(--lx-dur-m) var(--lx-ease);
+}
+.lx-prop-cab{
+  display: flex; align-items: baseline; gap: 8px; width: 100%;
+  padding: 14px 16px 10px; border: 0; background: none; color: inherit; cursor: pointer; text-align: left;
+}
+.lx-prop-cab span{ font-family: var(--lx-font-display) !important; font-size: 21px; letter-spacing: .02em; }
+.lx-prop-cab small{ font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
+.lx-prop-cab i{ margin-left: auto; width: 9px; height: 9px; border-right: 1px solid; border-bottom: 1px solid; transform: rotate(45deg); align-self: center; transition: transform var(--lx-dur-s) var(--lx-ease-out); }
+.lx-propuestas.is-plegado .lx-prop-cab i{ transform: rotate(-135deg); }
+.lx-propuestas.is-plegado{ width: 208px; }
+.lx-propuestas.is-plegado .lx-prop-cuerpo{ display: none; }
+.lx-propuestas.is-plegado .lx-prop-cab{ padding-bottom: 14px; }
+.lx-prop-cuerpo{ padding: 0 12px 14px; display: grid; gap: 12px; }
+.lx-prop-titulo{ display: block; margin: 0 4px 6px; font-size: 9.5px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; opacity: .72; }
+.lx-prop-ops{ display: flex; gap: 4px; }
+.lx-prop-ops a{
+  flex: 1; display: grid; justify-items: center; gap: 2px; padding: 8px 4px 7px;
+  border-radius: var(--lx-radius-sm); text-decoration: none; color: inherit;
+  font-size: 10.5px; letter-spacing: .04em; background: rgba(239,238,233,.08);
+  transition: background-color var(--lx-dur-s) var(--lx-ease-out);
+}
+.lx-prop-ops a b{ font-size: 13px; font-weight: 500; letter-spacing: .1em; }
+.lx-prop-ops a:hover{ background: rgba(239,238,233,.16); }
+.lx-prop-ops a[aria-current="true"]{ background: var(--lx-paper); color: var(--lx-ink); }
+.lx-prop-ops a:focus-visible, .lx-prop-cab:focus-visible{ outline: 1px solid var(--lx-paper); outline-offset: 2px; }
+@media (max-width: 600px){
+  .lx-propuestas{ left: 10px; bottom: auto; top: 84px; width: 240px; }
+  .lx-propuestas.is-plegado{ width: 170px; }
+  .lx-prop-cab span{ font-size: 18px; }
+}
+
+/* Hueco entre el hero y el contenido: el sitio lo pinta de blanco a gris. */
+.fg-hero-spacer{ background: var(--lx-paper) !important; }
+
+/* ── 4. FILTROS Y TOGGLE GRID / LIST ──────────────────────────────────────── */
+.fg-filter-bar > .fg-filters-left,
+.fg-filter-bar > .fg-pill-matches{
+  background: var(--lx-surface) !important;
+  box-shadow: 0 0 0 1px var(--lx-hair), 0 10px 30px -24px rgba(2,39,37,.4) !important;
+}
+.fg-filter-bar .fg-filter-btn,
+.fg-filter-bar .fg-search input,
+.fg-filter-bar .fg-pill-matches{
+  font-weight: 400 !important;
+  color: var(--lx-ink) !important;
+  letter-spacing: .02em;
+}
+.fg-filter-bar .fg-search{ background: rgba(4,51,47,.05) !important; }
+.fg-toggle-container .fg-toggle,
+.fg-location-btn{
+  background: rgba(247,246,242,.9) !important;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 0 0 1px var(--lx-hair), 0 14px 34px -20px rgba(2,39,37,.45) !important;
+}
+.fg-toggle button span{ font-weight: 400 !important; letter-spacing: .04em; }
+.fg-toggle-bg-active{ background: var(--lx-ink) !important; box-shadow: none !important; }
+.fg-location-btn{ color: var(--lx-ink) !important; }
+
+/* Cabecera del catálogo («Tipos de villa ← · Villas disponibles · Horizonte») */
+.fg-catalog-title [data-catalog-model-name]{
+  font-family: var(--lx-font-display) !important;
+  font-weight: 400 !important;
+  font-size: clamp(34px, 3vw, 52px) !important;
+  letter-spacing: .02em;
+  color: var(--lx-ink) !important;
+}
+.fg-catalog-title .eyebrow,
+.fg-catalog-back{
+  font-weight: 500 !important;
+  font-size: 11px !important;
+  letter-spacing: var(--lx-track-eyebrow) !important;
+  text-transform: uppercase;
+  color: var(--lx-faint) !important;
+}
+
+/* ── 5. BANDAS DE TIPOLOGÍA ───────────────────────────────────────────────
+   Se mantiene la fila por tipología (foto a sangre + panel) y el zigzag.
+   Cambia:
+   · el precio «desde» baja de la foto al panel: sobre la foto lo tapaba el
+     difuminado del hero («efecto nube») y era otro elemento compitiendo con
+     la villa. En el panel ordena la lectura: nombre → frase → specs → precio;
+   · fuera el número gigante de fondo (01, 02…) y el velo superior de la foto;
+   · la frase de cada tipología (la de las fichas del cliente, la misma que la
+     landing) llena el vacío del panel con algo que sí dice algo;
+   · botones finos: un texto subrayado y una píldora de 1 px.
+   La grid del panel gana una fila para el precio: 1fr auto auto auto 1fr. */
+.fg-types-grid{ background: var(--lx-paper) !important; padding-bottom: 96px !important; }
+body:not(.is-catalog) .fg-types-grid::before{ display: none !important; }
+.fg-type-band{
+  --band-page: var(--lx-paper);
+  --band-ink: var(--lx-ink);
+  --band-muted: var(--lx-muted);
+  background: var(--lx-paper) !important;
+}
+@media (min-width: 901px){
+  .fg-type-band .fg-card-inner{ grid-template-rows: 1fr auto auto auto 1fr !important; }
+}
+.fg-type-band .fg-band-num{ display: none !important; }
+.fg-type-band .fg-card-img::before{ display: none !important; }
+.fg-type-band .fg-card-img > img{
+  transform: scale(1.001);
+  transition: transform 1.6s var(--lx-ease-out) !important;
+}
+@media (hover:hover){
+  .fg-type-band:hover .fg-card-img > img{ transform: scale(1.025); }
+}
+
+.fg-type-band .fg-card-body{ grid-row: 2 !important; max-width: 520px; }
+.fg-type-band .fg-card-price{ grid-row: 3 !important; }
+.fg-type-band .fg-card-actions{ grid-row: 4 !important; margin-top: 40px !important; }
+/* Apilada (≤900 px, como en el sitio): foto, texto, precio, botones. */
+@media (max-width: 900px){
+  /* Una sola columna explícita: la sombra eco pide la columna 2 en las bandas
+     pares y, sin esto, el grid crea una implícita y parte la banda en dos. */
+  .fg-type-band .fg-card-inner{
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto auto !important;
+  }
+  .fg-type-band .eco-shade{ grid-column: 1 !important; grid-row: 2 / -1 !important; }
+  .fg-type-band .fg-card-img,
+  .fg-type-band:nth-child(odd) .fg-card-img,
+  .fg-type-band:nth-child(even) .fg-card-img{ grid-column: 1 !important; grid-row: 1 !important; height: 300px !important; }
+  .fg-type-band .fg-card-body,
+  .fg-type-band .fg-card-price,
+  .fg-type-band .fg-card-actions,
+  .fg-type-band:nth-child(odd)  .fg-card-price,
+  .fg-type-band:nth-child(even) .fg-card-price{ grid-column: 1 !important; }
+  .fg-type-band .fg-card-body{ padding-top: 40px !important; }
+  .fg-type-band .fg-card-actions{ margin-top: 30px !important; padding-bottom: 56px !important; }
+  .fg-type-band .lx-mar{ display: none; }
+}
+.fg-type-band .fg-card-body,
+.fg-type-band .fg-card-price,
+.fg-type-band .fg-card-actions{ padding-inline: clamp(32px, 6.2vw, 120px) !important; }
+
+.fg-type-band .fg-card-subtitle{
+  font-weight: 500 !important;
+  font-size: 11px !important;
+  letter-spacing: var(--lx-track-eyebrow) !important;
+  color: var(--lx-faint) !important;
+  margin-bottom: 18px !important;
+}
+.fg-type-band .fg-card-title-row .name{
+  font-family: var(--lx-font-display) !important;
+  font-weight: 400 !important;
+  font-size: clamp(44px, 4.4vw, 84px) !important;
+  line-height: .98 !important;
+  letter-spacing: .01em;
+  color: var(--lx-ink) !important;
+}
+.lx-tagline{
+  margin: 18px 0 0;
+  max-width: 34ch;
+  font-weight: 300;
+  font-size: clamp(16px, 1.15vw, 21px);
+  line-height: 1.5;
+  color: var(--lx-muted);
+}
+.fg-type-band .fg-card-specs{
+  margin-top: 26px !important;
+  padding-top: 18px;
+  border-top: 1px solid var(--lx-line);
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  letter-spacing: .04em;
+  color: var(--lx-muted) !important;
+}
+/* El precio, ya en el panel: etiqueta pequeña + cifra en Italiana. */
+.fg-type-band .fg-card-price{
+  position: static !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 22px clamp(32px, 6.2vw, 120px) 0 !important;
+  border-radius: 0 !important;
+  align-self: start;
+}
+@media (min-width: 901px){
+  .fg-type-band:nth-child(odd)  .fg-card-price{ grid-column: 1 !important; }
+  .fg-type-band:nth-child(even) .fg-card-price{ grid-column: 2 !important; }
+}
+.fg-type-band .fg-card-price::before{
+  font-weight: 500 !important;
+  font-size: 10px !important;
+  letter-spacing: var(--lx-track-eyebrow) !important;
+  color: var(--lx-faint) !important;
+  margin-bottom: 8px !important;
+}
+.fg-type-band .fg-card-price .price{
+  font-family: var(--lx-font-ui) !important;      /* Italiana no sirve para cifras: sus 4 y 6 se confunden */
+  font-weight: 300 !important;
+  font-size: clamp(28px, 2.1vw, 40px) !important;
+  letter-spacing: .01em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--lx-ink) !important;
+}
+
+/* Botones de las bandas: «Ver villas» es la acción principal (es lo que
+   hace un broker aquí: entrar en la tipología), así que es la píldora de 1 px
+   que se rellena al pasar; «Agendar videollamada» queda como enlace
+   subrayado al lado. */
+.fg-type-band .fg-card-buttons{ gap: 30px !important; }
+.fg-type-band .fg-btn-info,
+.fg-type-band .fg-btn-cta{
+  font-weight: 500 !important;
+  font-size: 11px !important;
+  letter-spacing: var(--lx-track-button) !important;
+  text-transform: uppercase;
+}
+.fg-type-band .fg-btn-info,
+.lx-btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 0 !important;
+  height: 46px;
+  padding: 0 30px !important;
+  border-radius: var(--lx-radius-pill) !important;
+  background: transparent !important;
+  color: var(--lx-ink) !important;
+  border: 1px solid var(--lx-ink) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  cursor: pointer;
+  transition: background-color var(--lx-dur-m) var(--lx-ease), color var(--lx-dur-m) var(--lx-ease) !important;
+}
+.fg-type-band .fg-btn-info:hover,
+.lx-btn:hover{ background: var(--lx-ink) !important; color: var(--lx-paper) !important; }
+.lx-btn--lleno{ background: var(--lx-ink) !important; color: var(--lx-paper) !important; }
+.lx-btn--lleno:hover{ background: var(--lx-deep) !important; }
+.fg-type-band .fg-btn-cta,
+.lx-enlace{
+  min-width: 0 !important;
+  height: auto;
+  padding: 6px 0 !important;
+  background: none !important; box-shadow: none !important; filter: none !important;
+  border: 0 !important; border-radius: 0 !important;
+  border-bottom: 1px solid currentColor !important;
+  color: var(--lx-ink) !important;
+  cursor: pointer;
+  transition: opacity var(--lx-dur-s) var(--lx-ease-out) !important;
+}
+.fg-type-band .fg-btn-cta:hover,
+.lx-enlace:hover{ opacity: .6; color: var(--lx-ink) !important; }
+.fg-type-band .fg-btn-cta svg{ display: none !important; }
+
+
+/* Plantas en vídeo (lujo.js → PLANTAS): en la esquina superior o inferior
+   derecha del panel claro, el lado contrario al texto. El clip entra desde
+   arriba a la izquierda; scaleX(-1) lo lleva arriba a la derecha y
+   scale(-1,-1) abajo a la derecha. Por debajo del texto en la pila, aunque
+   por geometría no lo tocan (medido). */
+.lx-planta{
+  position: absolute; top: 0; z-index: 0; pointer-events: none;
+  width: clamp(190px, 21vw, 340px); aspect-ratio: 1;
+  transform: scaleX(-1);
+}
+.fg-type-band:nth-child(odd)  .lx-planta{ right: 50%; }
+.fg-type-band:nth-child(even) .lx-planta{ right: 0; }
+.lx-planta--abajo{ top: auto; bottom: 0; transform: scale(-1, -1); width: clamp(170px, 18vw, 300px); }
+.lx-planta video, .lx-planta img{ display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (min-width: 901px) and (max-width: 1300px){
+  /* Panel estrecho: el texto llega más cerca del borde derecho. */
+  .lx-planta{ width: clamp(130px, 13vw, 170px); }
+  .lx-planta--abajo{ width: clamp(120px, 12vw, 160px); }
+}
+@media (max-width: 900px){
+  /* Apilada: el texto ocupa todo el ancho, así que la planta pasa a la
+     esquina superior derecha de la foto (el cielo del render), pequeña. */
+  .fg-type-band:nth-child(odd) .lx-planta,
+  .fg-type-band:nth-child(even) .lx-planta,
+  .lx-planta--abajo{ top: 0; bottom: auto; right: 0; width: 120px; transform: scaleX(-1); z-index: 2; }
+}
+
+/* El detalle de la otra esquina: un trozo del mar de Las Terrenas, fundido.
+   Una sola vez por banda, en la esquina opuesta a la sombra de hoja, detrás
+   del texto. Es una mancha de color tan baja que se lee como luz reflejada,
+   no como una foto. */
+.lx-mar{
+  position: absolute; z-index: -1; pointer-events: none;
+  bottom: 0; width: 46%; aspect-ratio: 2.4;
+  background: url('/lujo/img/mar-las-terrenas.webp') center / cover no-repeat;
+  opacity: .16;
+  filter: saturate(.75);
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 100% 100%, #000 0%, rgba(0,0,0,.5) 45%, transparent 75%);
+          mask-image: radial-gradient(ellipse 70% 80% at 100% 100%, #000 0%, rgba(0,0,0,.5) 45%, transparent 75%);
+}
+.fg-type-band:nth-child(odd)  .lx-mar{ right: 50%; }   /* panel a la izquierda */
+.fg-type-band:nth-child(even) .lx-mar{ right: 0; }
+
+/* ── 5b. TELÓN (transición de la landing de Bahía Mar) ────────────────────
+   La de su hero (lib/animations/reveal.ts → animateSlide): la imagen que
+   entra se abre en diagonal de derecha a izquierda mientras su foto se
+   desamplía; la que sale se cierra hacia la izquierda mientras se amplía.
+   1,2 s con la curva 0.75/0/0.25/1. Mismos polígonos que allí; aquí en CSS
+   (la landing usa GSAP). Lo usan el hero y la variante B. */
+@keyframes lx-telon-entra{
+  from{ clip-path: polygon(100% 0%, 100% 0%, 101% 100%, 125% 100%); }
+  to  { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+}
+@keyframes lx-telon-sale{
+  from{ clip-path: polygon(0% 0%, 100% 0%, 125% 100%, 0% 100%); }
+  to  { clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%); }
+}
+@keyframes lx-telon-foto-entra{ from{ transform: scale(1.5) translateX(25%); } to{ transform: none; } }
+@keyframes lx-telon-foto-sale { from{ transform: none; } to{ transform: scale(1.5) translateX(-25%); } }
+:root{ --lx-telon: 1.2s cubic-bezier(.75,0,.25,1); }
+
+/* ── 5c. VARIANTE B: PORTADAS (lujo.js → portadas) ──────────────────────
+   Una fila por tipología, como en la A, pero la foto ocupa la fila entera y
+   el texto va en una ficha de papel centrada en vertical (izquierda en las
+   impares, derecha en las pares), con el mismo aire arriba, abajo y al
+   lado: el alto de la fila lo da la ficha. La planta vive en su esquina.
+   Ronda 4: fotos propias (lujo/portadas/, outpainting de los renders con la
+   villa intacta) con la casa en el lado contrario a la ficha; lujo.js las
+   pone en un <picture> (escritorio / móvil).
+   Mismo orden, tipografía y botones que la A; solo cambia la composición.
+   La sombra eco y el recorte de mar no tienen panel claro donde caer: fuera. */
+html.lx-var-b .fg-type-band{
+  height: auto !important; min-height: 0 !important; overflow: visible !important;
+  margin-bottom: var(--lx-b-aire) !important;
+}
+html.lx-var-b{ --lx-b-aire: clamp(14px, 1.6vw, 32px); }
+html.lx-var-b .fg-type-band .eco-shade,
+html.lx-var-b .fg-type-band .lx-mar{ display: none !important; }
+html.lx-var-b .fg-type-band .fg-card-inner{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+  height: auto !important; min-height: 0 !important;
+  overflow: visible !important;
+  margin-inline: var(--lx-b-aire);
+}
+html.lx-var-b .fg-type-band .fg-card-img{
+  grid-area: 1 / 1 !important; position: relative !important;
+  width: 100% !important; height: auto !important; min-height: 0 !important; align-self: stretch !important;
+  border-radius: var(--lx-radius-lg); overflow: hidden;
+}
+/* La foto no da alto a la fila (absoluta): lo da la ficha. Se recorta por el
+   lado de la ficha, que en las fotos nuevas es entorno. */
+html.lx-var-b .fg-type-band .fg-card-img img{
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: 100% 50%;
+}
+html.lx-var-b .fg-type-band:nth-child(even) .fg-card-img img{ object-position: 0% 50%; }
+html.lx-var-b .fg-card-img picture{ display: contents; }
+.lx-portada{
+  grid-area: 1 / 1; align-self: center; justify-self: start;
+  position: relative; z-index: 2;
+  width: min(500px, 40%);
+  margin: clamp(20px, 2.6vw, 52px);
+  padding: clamp(34px, 3vw, 56px) 0 clamp(34px, 3vw, 52px);
+  border-radius: var(--lx-radius-lg);
+  background: var(--lx-paper);
+  box-shadow: 0 30px 60px -40px rgba(2,39,37,.6);
+}
+html.lx-var-b .fg-type-band:nth-child(even) .lx-portada{ justify-self: end; }
+html.lx-var-b .lx-portada :is(.fg-card-body, .fg-card-price, .fg-card-actions){
+  padding-inline: clamp(28px, 3vw, 56px) !important; max-width: none;
+}
+html.lx-var-b .lx-portada .fg-card-actions{ margin-top: 30px !important; padding-bottom: 0 !important; }
+html.lx-var-b .lx-portada .fg-card-title-row .name{ font-size: clamp(40px, 3.6vw, 72px) !important; }
+/* La planta, como en la A, vive en el papel: cortada por la esquina de
+   arriba a la derecha de la ficha, que es donde el clip trae su corte (si se
+   suelta sobre la foto se ve el corte y se lee como pegatina). */
+.lx-portada{ overflow: hidden; }
+html.lx-var-b .fg-type-band .lx-portada .lx-planta{
+  top: 0 !important; bottom: auto !important; right: 0 !important; left: auto !important;
+  width: clamp(140px, 11vw, 210px) !important;
+  transform: scaleX(-1) !important; z-index: -1;
+}
+html.lx-var-b .lx-portada > :not(.lx-planta){ position: relative; z-index: 1; }
+@media (max-width: 900px){
+  html.lx-var-b .fg-type-band .fg-card-inner{
+    grid-template-rows: auto auto !important; height: auto !important;
+  }
+  /* La foto de móvil (1080 × 1600) entera, y la ficha subida sobre su 35 %
+     de abajo, que en la foto nueva es jardín. */
+  html.lx-var-b{ --lx-b-foto: calc((100vw - 2 * var(--lx-b-aire)) * 1600 / 1080); }
+  html.lx-var-b .fg-type-band .fg-card-img,
+  html.lx-var-b .fg-type-band:nth-child(n) .fg-card-img{
+    grid-area: 1 / 1 !important; height: var(--lx-b-foto) !important;
+  }
+  html.lx-var-b .fg-type-band:nth-child(n) .fg-card-img img{ object-position: 50% 0%; }
+  .lx-portada,
+  html.lx-var-b .fg-type-band:nth-child(even) .lx-portada{
+    grid-area: 2 / 1; justify-self: stretch; align-self: start; width: auto;
+    margin: calc(var(--lx-b-foto) * -.35) 12px 0; padding: 32px 0 30px;
+  }
+  html.lx-var-b .lx-portada .fg-card-body{ padding-top: 0 !important; }
+  html.lx-var-b .fg-type-band .lx-portada .lx-planta{ width: 110px !important; }
+}
+
+.lx-telon-capa{ grid-area: 1 / 1; margin: 0; overflow: hidden; clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%); }
+.lx-telon-capa.is-activa{ clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); z-index: 2; }
+.lx-telon-capa.is-saliendo{ z-index: 1; animation: lx-telon-sale var(--lx-telon) both; }
+.lx-telon-capa.is-entrando{ animation: lx-telon-entra var(--lx-telon) both; }
+.lx-telon-capa img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.lx-telon-capa.is-entrando img{ animation: lx-telon-foto-entra var(--lx-telon) both; }
+.lx-telon-capa.is-saliendo img{ animation: lx-telon-foto-sale var(--lx-telon) both; }
+
+@media (prefers-reduced-motion: reduce){
+  .lx-telon-capa, .lx-telon-capa img{ animation: none !important; }
+  .lx-hero-linea{ display: none !important; }
+}
+
+/* ── 6. BANDA VERDE (compromiso) ──────────────────────────────────────────
+   La de la capa eco. Mismo contenido; título en Italiana, cifras finas. */
+.eco-band{ background-color: var(--lx-deep) !important; }
+/* En la B, la banda se porta como una portada más: mismo margen lateral,
+   mismas esquinas y su aire arriba y abajo (antes tocaba la foto de Ámbar). */
+html.lx-var-b .eco-band{
+  margin: 0 var(--lx-b-aire) var(--lx-b-aire) !important;
+  border-radius: var(--lx-radius-lg) !important; overflow: hidden !important;
+}
+.eco-band h2, .eco-band .eco-band-title, .eco-band [class*="titular"]{
+  font-family: var(--lx-font-display) !important;
+  font-weight: 400 !important;
+  letter-spacing: .01em;
+}
+.eco-band-stat b{
+  font-family: var(--lx-font-ui) !important;        /* cifras en Archivo fino: Italiana las hace ilegibles */
+  font-weight: 300 !important;
+  letter-spacing: .01em;
+  font-variant-numeric: lining-nums;
+}
+.eco-band-eyebrow, .eco-band-stat span{ font-weight: 500 !important; letter-spacing: var(--lx-track-eyebrow) !important; }
+
+/* Botón flotante de WhatsApp: el verde #25D366 saturado era lo más llamativo
+   de la pantalla. Mismo botón, en la tinta de la marca y con el icono claro;
+   se sigue reconociendo por la forma del icono. */
+.fg-wa-float button{
+  background: var(--lx-ink) !important;
+  box-shadow: 0 12px 30px -14px rgba(2,39,37,.6) !important;
+  width: 3.25rem !important; height: 3.25rem !important;
+}
+.fg-wa-float button svg{ width: 22px; height: 22px; }
+.fg-wa-float button svg, .fg-wa-float button svg *{ fill: var(--lx-paper) !important; }
+
+/* ── 7. CARDS DEL CATÁLOGO ────────────────────────────────────────────────
+   Misma card, mismo grid. Lo que cambia es la jerarquía (precio y
+   disponibilidad primero), la letra y el detalle:
+   · foto a sangre arriba, sin marco redondeado dentro de la tarjeta;
+   · chips de estado y vista sobre la foto; el corazón, solo icono;
+   · nombre en Italiana con el número aparte; specs con etiqueta en vez de
+     seis iconos sin nombre; parqueos solo si hay;
+   · una superficie para todas (fuera el verde salvia que la capa eco daba a
+     una de cada tres) y la hoja en todas, arriba a la derecha.
+   Los bloques nuevos (.lx-chips, .lx-specs, .lx-reserva, .lx-hoja) los
+   inserta lujo.js; .fg-stats, el banner «Reserve from» y el texto del
+   corazón se ocultan aquí. */
+.fg-units-grid{ gap: 28px 22px !important; padding-top: 8px !important; align-items: stretch !important; }
+/* Misma altura en toda la fila: la card llena su casilla (el grid del sitio
+   alineaba al inicio) y los botones bajan siempre al fondo, aunque una villa
+   tenga menos datos (vendida sin precio, sin parqueos…). */
+.fg-units-grid > .fg-card{ height: 100%; }
+.fg-units-grid > .fg-card .fg-card-inner{ flex: 1 1 auto; display: flex !important; flex-direction: column !important; }
+.fg-units-grid > .fg-card .fg-card-body{ flex: 1 1 auto; display: flex !important; flex-direction: column !important; }
+.fg-units-grid > .fg-card .fg-card-actions{ margin-top: auto !important; padding-top: 20px; }
+.fg-units-grid > .fg-card,
+.fg-units-grid > .fg-card .fg-card-inner{
+  background: var(--lx-surface) !important;
+  border-radius: var(--lx-radius) !important;
+}
+.fg-units-grid > .fg-card{
+  box-shadow: 0 0 0 1px var(--lx-hair) !important;
+  transition: box-shadow var(--lx-dur-m) var(--lx-ease-out) !important;
+  transform: none !important;
+}
+@media (hover:hover){
+  .fg-units-grid > .fg-card:hover{ box-shadow: 0 0 0 1px var(--lx-line), var(--lx-shadow) !important; }
+}
+.fg-units-grid > .fg-card .fg-card-inner{ padding: 0 !important; gap: 0 !important; }
+.fg-units-grid > .fg-card .fg-card-img{
+  height: auto !important; aspect-ratio: 4 / 3.1;
+  border-radius: var(--lx-radius) var(--lx-radius) 0 0 !important;
+  background: #E3E1DA !important;
+}
+.fg-units-grid > .fg-card .fg-card-img > img{
+  transition: transform 1.4s var(--lx-ease-out), filter var(--lx-dur-m) var(--lx-ease-out), opacity .6s var(--lx-ease-out) !important;
+}
+/* Foto aún sin cargar: el hueco ya está reservado (aspect-ratio + fondo);
+   la foto entra con un fundido en vez de aparecer de golpe (lujo.js 5b). */
+.fg-units-grid > .fg-card .fg-card-img > img.lx-img-espera{ opacity: 0 !important; }
+@media (hover:hover){
+  .fg-units-grid > .fg-card:hover .fg-card-img > img{ transform: scale(1.03); }
+}
+.fg-units-grid > .fg-card .fg-reserve-banner,
+.fg-units-grid > .fg-card .fg-stats,
+.fg-units-grid > .fg-card .eco-shade-card,
+.fg-units-grid > .fg-card .fg-card-body::before,
+.fg-units-grid > .fg-card .fg-sold-badge,
+.fg-units-grid > .fg-card .fg-card-status-strip,
+.fg-units-grid > .fg-card .fg-card-status-overlay,
+.fg-units-grid > .fg-card .fg-add-to-list .text{ display: none !important; }
+.fg-units-grid > .fg-card .fg-card-img::after{ content: none !important; }
+
+/* Corazón: círculo de papel, solo icono. */
+.fg-units-grid > .fg-card .fg-chip-row{ padding: 14px !important; justify-content: flex-end !important; }
+.fg-units-grid > .fg-card .fg-chip-row > span:empty{ display: none; }
+.fg-units-grid > .fg-card .fg-add-to-list{
+  width: 36px !important; height: 36px !important; padding: 0 !important;
+  justify-content: center !important;
+  border-radius: 50% !important; border: 0 !important;
+  background: rgba(247,246,242,.88) !important;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.fg-units-grid > .fg-card .fg-add-to-list .heart svg{ color: var(--lx-ink) !important; width: 16px; height: 16px; }
+
+.lx-chips{
+  position: absolute; z-index: 6; left: 14px; top: 14px;
+  display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100% - 70px);
+}
+.lx-chip{
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 26px; padding: 0 11px;
+  border-radius: var(--lx-radius-pill);
+  background: rgba(247,246,242,.9);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: var(--lx-ink);
+  font-size: 10px !important; font-weight: 500 !important;
+  letter-spacing: .14em; text-transform: uppercase; white-space: nowrap;
+}
+.lx-chip--available::before,
+.lx-chip--reserved::before,
+.lx-chip--sold::before{
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3E7A5C;
+}
+.lx-chip--reserved::before{ background: var(--lx-reserved); }
+.lx-chip--sold::before{ background: var(--lx-sold); }
+
+.fg-units-grid > .fg-card .fg-card-body{
+  position: relative; gap: 0 !important;
+  padding: 22px 24px 22px !important;
+}
+.fg-units-grid > .fg-card .fg-card-body > :not(.lx-hoja){ position: relative; z-index: 1; }
+.fg-units-grid > .fg-card .fg-card-title-row{ margin-top: 0 !important; }
+.fg-units-grid > .fg-card .fg-card-title-row .name{
+  display: flex; align-items: baseline; gap: 10px;
+  color: var(--lx-ink) !important;
+}
+.lx-nombre{
+  font-family: var(--lx-font-display) !important;
+  font-size: 30px; line-height: 1.05; letter-spacing: .01em;
+}
+.lx-num{
+  font-size: 12px; font-weight: 500; letter-spacing: .16em; color: var(--lx-faint);
+}
+.fg-units-grid > .fg-card .fg-card-subtitle{
+  margin-top: 6px;
+  font-weight: 400 !important; font-size: 13px !important; line-height: 1.5 !important;
+  color: var(--lx-muted) !important;
+}
+.fg-units-grid > .fg-card .fg-card-divider{ background: var(--lx-line) !important; margin: 16px 0 14px !important; }
+.fg-units-grid > .fg-card .fg-card-price{
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+.fg-units-grid > .fg-card .fg-card-price .price{
+  font-weight: 300 !important; font-size: 26px !important;
+  letter-spacing: .005em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--lx-ink) !important;
+  text-decoration: none !important;
+}
+.fg-units-grid > .fg-card .fg-card-price .sqft{
+  font-size: 12px !important; font-weight: 400 !important; color: var(--lx-muted) !important;
+}
+.lx-reserva{
+  margin-top: 4px;
+  font-size: 12px; letter-spacing: .02em; color: var(--lx-muted);
+}
+
+.lx-specs{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  margin: 18px 0 0; padding: 14px 0 0;
+  border-top: 1px solid var(--lx-line);
+}
+.lx-specs > div{ padding-right: 8px; }
+.lx-specs > div + div{ padding-left: 12px; border-left: 1px solid var(--lx-hair); }
+.lx-specs dt{
+  font-size: 9.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--lx-faint); white-space: nowrap;
+}
+.lx-specs dd{
+  margin: 4px 0 0; font-size: 15px; font-weight: 400; color: var(--lx-ink);
+  font-variant-numeric: lining-nums; white-space: nowrap;
+}
+
+.fg-units-grid > .fg-card .fg-card-actions{ gap: 12px !important; }
+.fg-units-grid > .fg-card .fg-card-buttons{
+  display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px !important;
+}
+.fg-units-grid > .fg-card .fg-card-buttons .lx-btn{
+  height: auto; min-height: 46px; padding: 8px 12px !important;
+  font-size: 10px !important; font-weight: 500 !important; line-height: 1.35;
+  letter-spacing: .1em !important; text-transform: uppercase; text-align: center;
+  white-space: normal;
+}
+.fg-units-grid > .fg-card .fg-card-availability{
+  justify-content: center !important; text-align: center;   /* centrado (ronda 3) */
+  font-size: 11.5px !important; font-weight: 400 !important;
+  color: var(--lx-muted) !important;
+}
+.fg-units-grid > .fg-card .fg-card-availability .dot{
+  background: #3E7A5C !important; box-shadow: none !important; animation: none !important;
+}
+
+/* La hoja: la misma sombra de la capa eco, en todas las tarjetas, arriba a
+   la derecha del cuerpo (el aire que deja el nombre), en multiply y muy
+   baja. No se anima: en un grid de 25 tarjetas, 25 hojas meciéndose serían
+   ruido. */
+.lx-hoja,
+.fg-units-grid > .fg-card .fg-card-body > .lx-hoja{   /* la capa eco pone relative a todo hijo del cuerpo */
+  position: absolute !important; z-index: 0; pointer-events: none;
+  top: -6px; right: -18px; width: 58%; aspect-ratio: 1.3258;
+  background: var(--eco-sombra-fronda, url('/images/eco/eco-sombra-fronda.webp')) right top / 100% 100% no-repeat;
+  transform: scaleX(-1);
+  mix-blend-mode: multiply;
+  opacity: .30;
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 0% 0%, #000 30%, transparent 78%);
+          mask-image: radial-gradient(ellipse 85% 85% at 0% 0%, #000 30%, transparent 78%);
+}
+.lx-hoja--monstera{ background-image: var(--eco-sombra-monstera, url('/images/eco/eco-sombra-monstera.webp')); opacity: .22; }
+
+/* Vistas Lista y Planta: la misma paleta, sin tocar su estructura. Estados en
+   tinta, bronce y gris en vez de verde, rojo y azul de semáforo. */
+.fg-list-table, .fg-list-table th, .fg-list-table td{ color: var(--lx-ink); }
+.fg-list-table th{ font-weight: 500 !important; letter-spacing: .14em; color: var(--lx-faint) !important; }
+.fg-list-table td b{ font-weight: 500 !important; }
+.fg-list-table .price{ color: var(--lx-ink) !important; font-weight: 400 !important; font-variant-numeric: tabular-nums; }
+.fg-list-status{ background: transparent !important; color: var(--lx-ink) !important; font-weight: 500 !important; letter-spacing: .12em !important; font-size: 10px !important; padding-left: 0 !important; }
+.fg-list-status::before{ background: #3E7A5C !important; }
+.fg-list-status.reserved::before{ background: var(--lx-reserved) !important; }
+.fg-list-status.sold::before{ background: var(--lx-sold) !important; }
+.fg-list-tab{ font-weight: 400 !important; }
+.fg-list-tab.active, .fg-list-tab[data-tab].active{ color: var(--lx-ink) !important; }
+.fg-list-tab .badge, .fg-list-tab[data-tab].active .badge{ background: rgba(4,51,47,.07) !important; color: var(--lx-ink) !important; }
+.fg-list-info-btn, .fg-list-cta{
+  height: 32px; border-radius: var(--lx-radius-pill) !important; box-shadow: none !important;
+  font-size: 10px !important; font-weight: 500 !important; letter-spacing: .12em !important; text-transform: uppercase;
+}
+.fg-list-info-btn{ background: transparent !important; border: 1px solid var(--lx-line) !important; color: var(--lx-ink) !important; }
+.fg-list-cta{ background: var(--lx-ink) !important; border: 1px solid var(--lx-ink) !important; color: var(--lx-paper) !important; }
+#fgPlanWrap{ --m-ink: var(--lx-ink); --m-disp: #3B6B5C; --m-res: var(--lx-reserved); --m-sold: var(--lx-sold); }
+#fgPlanWrap .fg-lot{ border-radius: var(--lx-radius-xs) !important; font-weight: 500 !important; letter-spacing: .04em; }
+
+/* ── 8. ESTADOS: RESERVADA Y VENDIDA ──────────────────────────────────────
+   Cada estado se lee de un vistazo sin rojo ni desenfoque (el sitio
+   difuminaba la foto de la vendida y pintaba la reservada de rojo).
+   · Reservada: la foto apenas apagada, precio en gris, y las acciones de
+     quien llega tarde: avisar si se libera / ver similares.
+   · Vendida: foto en grises, un sello fino en Italiana, sin precio, y el
+     desvío a villas similares / avisos de reventa. */
+.fg-units-grid > .fg-card[data-lx-estado="reserved"] .fg-card-img > img{ filter: saturate(.55) !important; opacity: 1 !important; }
+.fg-units-grid > .fg-card[data-lx-estado="reserved"] .fg-card-price .price{ color: var(--lx-muted) !important; }
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .fg-card-img > img{ filter: grayscale(1) contrast(.92) brightness(1.04) !important; }
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .fg-card-price{ display: none !important; }
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .fg-card-title-row .name,
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .lx-specs dd{ color: var(--lx-muted) !important; }
+/* Oculta pero ocupando su línea: así los botones de todas las cards de una
+   fila quedan a la misma altura. */
+.fg-units-grid > .fg-card:is([data-lx-estado="sold"],[data-lx-estado="reserved"]) .fg-card-availability{ visibility: hidden !important; }
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .fg-card-buttons .lx-btn--lleno{ background: var(--lx-sold) !important; border-color: var(--lx-sold) !important; }
+.fg-units-grid > .fg-card[data-lx-estado="reserved"] .fg-card-buttons .lx-btn--lleno{ background: var(--lx-reserved) !important; border-color: var(--lx-reserved) !important; }
+.fg-units-grid > .fg-card:is(.is-reserved,.is-sold,.is-pending){ box-shadow: 0 0 0 1px var(--lx-hair) !important; }
+.lx-sello{
+  position: absolute; z-index: 5; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 26px;
+  border: 1px solid rgba(255,255,255,.85);
+  border-radius: var(--lx-radius-sm);
+  color: #fff;
+  font-family: var(--lx-font-display) !important;
+  font-size: 26px; letter-spacing: .24em; text-transform: uppercase;
+  border-radius: var(--lx-radius-sm);
+  background: rgba(2,39,37,.28);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+/* Lista: mismo criterio, sin rojo. */
+.fg-list-table tr.is-sold td{ color: var(--lx-faint) !important; }
+.fg-list-table tr.is-reserved td{ color: var(--lx-muted) !important; }
+
+/* ── 9. FICHA DE UNIDAD (popup) ───────────────────────────────────────────
+   Misma ficha: cabecera, columna de datos a la izquierda, galería a la
+   derecha y la barra de acciones abajo. Cambia:
+   · más grande (las fotos son el argumento de venta) y en papel;
+   · la columna izquierda la pinta lujo.js (.lx-ficha) solo con datos de la
+     villa; lo demás del original se oculta aquí (ver el porqué en lujo.js);
+   · fuera «Last inquiry 2 hours ago · Shortlisted by 7 others» (texto fijo);
+   · se quedan descargar, aviso legal, compartir, guardar y el broker por
+     WhatsApp, con la misma letra fina que el resto;
+   · galería con autoplay, fundido y una línea de progreso de 1 px. */
+.mt-overlay .mt-backdrop{ background: rgba(2,39,37,.55) !important; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.mt-shell{
+  max-width: 1320px !important;
+  height: min(860px, calc(100vh - 48px)) !important;
+  background: var(--lx-paper) !important;
+  border: 0 !important;
+  border-radius: var(--lx-radius-lg) !important;
+  box-shadow: 0 50px 120px -50px rgba(2,39,37,.75) !important;
+}
+.mt-header{
+  background: #fff !important;                 /* blanco: más contraste con el papel del cuerpo (Samuel, ronda 3) */
+  border-bottom: 1px solid var(--lx-hair) !important;
+  padding-inline: 24px !important;
+}
+.mt-header-unit{ font-weight: 400 !important; letter-spacing: .08em; color: var(--lx-muted) !important; font-size: 12px !important; text-transform: uppercase; }
+#modalStatusBadge{
+  background: transparent !important; color: var(--lx-ink) !important;
+  border: 1px solid var(--lx-line) !important; border-radius: var(--lx-radius-pill) !important;
+  font-size: 10px !important; font-weight: 500 !important; letter-spacing: .14em !important;
+}
+#modalStatusBadge .dot{ background: #3E7A5C !important; box-shadow: none !important; }
+#moreInfoModal[data-lx-estado="reserved"] #modalStatusBadge .dot{ background: var(--lx-reserved) !important; }
+#moreInfoModal[data-lx-estado="sold"] #modalStatusBadge .dot{ background: var(--lx-sold) !important; }
+.mt-header-right > .mt-pill-soft{ display: none !important; }
+.mt-pill-wa{
+  background: transparent !important; color: var(--lx-ink) !important;
+  border: 1px solid var(--lx-line) !important; border-radius: var(--lx-radius-pill) !important;
+  font-size: 11px !important; font-weight: 400 !important; letter-spacing: .04em;
+  transition: border-color var(--lx-dur-s) var(--lx-ease-out) !important;
+}
+.mt-pill-wa:hover{ border-color: var(--lx-ink) !important; }
+.mt-pill-wa svg{ color: var(--lx-ink) !important; fill: var(--lx-ink) !important; }
+.mt-close{ background: transparent !important; border: 1px solid var(--lx-line) !important; color: var(--lx-ink) !important; }
+
+.mt-body{ grid-template-columns: minmax(380px, 440px) minmax(0, 1fr) !important; }
+.mt-left{ background: #fff !important; border-right: 1px solid var(--lx-hair) !important; }
+.mt-peopleview{ display: none !important; }
+.mt-left-inner{ padding: 34px 36px 28px !important; }
+/* Todo lo del original menos la ficha nueva. */
+.mt-left-inner > :not(.lx-ficha){ display: none !important; }
+
+.lx-ficha .lx-eyebrow{ margin-bottom: 10px; }
+.lx-ficha-nombre{
+  margin: 0; font-family: var(--lx-font-display) !important; font-weight: 400;
+  font-size: 46px; line-height: 1.02; letter-spacing: .01em; color: var(--lx-ink);
+}
+.lx-ficha-nombre .lx-num{ font-family: var(--lx-font-ui) !important; font-size: 15px; vertical-align: middle; margin-left: 6px; }
+.lx-ficha-precio{ display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 22px; }
+.lx-ficha-precio #modalPrice{
+  font-weight: 300 !important; font-size: 36px !important; letter-spacing: .005em;
+  font-variant-numeric: lining-nums tabular-nums; color: var(--lx-ink) !important;
+}
+.lx-ficha-vendida{ font-family: var(--lx-font-display) !important; font-size: 30px; letter-spacing: .18em; text-transform: uppercase; color: var(--lx-sold); }
+.lx-ficha-precio .mt-currency-toggle{ gap: 2px !important; }
+.lx-ficha-precio .mt-currency-toggle button{
+  background: transparent !important; border: 0 !important; box-shadow: none !important;
+  padding: 4px 6px !important; font-size: 10.5px !important; font-weight: 500 !important;
+  letter-spacing: .1em; color: var(--lx-faint) !important; border-radius: 0 !important;
+}
+.lx-ficha-precio .mt-currency-toggle button.active{ color: var(--lx-ink) !important; box-shadow: inset 0 -1px 0 var(--lx-ink) !important; }
+.lx-ficha-ppm{ margin: 6px 0 0; font-size: 13px; color: var(--lx-muted); }
+/* Condiciones de reserva: lo que Miguel quiere que se lea bien. */
+.lx-ficha-reserva{
+  margin-top: 24px; padding: 16px 18px;
+  border: 1px solid var(--lx-line); border-radius: var(--lx-radius-sm);
+  background: var(--lx-surface);
+}
+.lx-ficha-reserva .lx-eyebrow{ display: block; margin-bottom: 6px; font-size: 10.5px; }
+.lx-ficha-reserva p{ margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.lx-ficha-reserva b{ font-weight: 500; font-size: 17px; color: var(--lx-ink); }
+.lx-ficha-reserva span{ font-size: 14px; color: var(--lx-muted); }
+.lx-ficha-desc{ margin: 26px 0 0; font-size: 15px; font-weight: 300; line-height: 1.7; color: var(--lx-ink); }
+.lx-ficha-sub{ margin-top: 30px !important; }
+.lx-ficha-datos{ margin: 0; display: grid; grid-template-columns: 1fr; }
+.lx-ficha-datos > div{ display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--lx-hair); }
+.lx-ficha-datos dt{ font-size: 13px; color: var(--lx-muted); }
+.lx-ficha-datos dd{ margin: 0; font-size: 13.5px; font-weight: 500; color: var(--lx-ink); text-align: right; white-space: nowrap; font-variant-numeric: lining-nums; }
+.lx-ficha-extra{ margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--lx-ink); }
+
+/* Barra de acciones */
+.mt-cta-row{ background: #fff !important; border-top: 1px solid var(--lx-hair) !important; padding: 16px 36px !important; gap: 10px !important; }
+.mt-cta-row > button{
+  flex: 1; height: 48px !important; padding: 0 16px !important;
+  border-radius: var(--lx-radius-pill) !important; box-shadow: none !important; filter: none !important;
+  font-size: 11px !important; font-weight: 500 !important; letter-spacing: var(--lx-track-button) !important; text-transform: uppercase;
+  transition: background-color var(--lx-dur-m) var(--lx-ease), color var(--lx-dur-m) var(--lx-ease) !important;
+}
+.mt-cta-row .mt-btn-secondary{ background: transparent !important; border: 1px solid var(--lx-ink) !important; color: var(--lx-ink) !important; }
+.mt-cta-row .mt-btn-secondary:hover:not(:disabled){ background: var(--lx-ink) !important; color: var(--lx-paper) !important; }
+.mt-cta-row .mt-btn-primary{ background: var(--lx-ink) !important; border: 1px solid var(--lx-ink) !important; color: var(--lx-paper) !important; }
+.mt-cta-row .mt-btn-primary:hover{ background: var(--lx-deep) !important; }
+.mt-cta-row .mt-btn-primary svg{ width: 15px; height: 15px; }
+.mt-cta-row .mt-btn-secondary:disabled{ opacity: .5 !important; }
+#moreInfoModal:is([data-lx-estado="reserved"],[data-lx-estado="sold"]) #modalReserveBtn{ display: none !important; }
+
+/* Derecha: pestañas, selector propiedad/amenidades y galería */
+.mt-right{ background: var(--lx-paper) !important; }
+.mt-tabs{ background: var(--lx-paper) !important; border-bottom: 1px solid var(--lx-hair) !important; }
+.mt-tab{ font-weight: 500 !important; font-size: 10px !important; letter-spacing: .16em !important; color: var(--lx-muted) !important; padding-block: 13px !important; }
+.mt-tab:hover{ color: var(--lx-ink) !important; }
+.mt-tab-middle{ border-color: var(--lx-hair) !important; }
+/* Property / Amenities: switcher en píldora sobre la foto, arriba a la
+   izquierda (lujo.js lo mete dentro de .mt-gallery). Papel translúcido con
+   desenfoque para que se lea sobre cielo, fachada o interior; el activo en
+   tinta. Arriba a la izquierda no hay nada: lupa abajo a la izquierda,
+   flechas a media altura, contador abajo a la derecha. */
+.mt-gallery > .mt-cat-toggle{
+  position: absolute !important; top: 14px; left: 14px; z-index: 4;
+  margin: 0 !important; padding: 0 !important; background: transparent !important;
+}
+.mt-cat-pill{
+  flex: 0 0 auto !important; display: inline-flex !important; gap: 2px !important; padding: 4px !important;
+  background: rgba(247,246,242,.84) !important; border: 0 !important; border-radius: var(--lx-radius-pill) !important;
+  box-shadow: 0 6px 20px -10px rgba(2,39,37,.45) !important;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.mt-cat-btn{
+  flex: 0 0 auto !important; background: transparent !important; box-shadow: none !important;
+  border-radius: var(--lx-radius-pill) !important;
+  padding: 8px 15px !important; font-size: 10.5px !important; font-weight: 500 !important; letter-spacing: .16em !important;
+  color: var(--lx-muted) !important;
+  transition: background-color var(--lx-dur-s) var(--lx-ease-out), color var(--lx-dur-s) var(--lx-ease-out) !important;
+}
+.mt-cat-btn:not(.active):not(:disabled):hover{ color: var(--lx-ink) !important; }
+.mt-cat-btn.active{ background: var(--lx-ink) !important; color: var(--lx-paper) !important; }
+@media (max-width: 600px){
+  .mt-gallery > .mt-cat-toggle{ top: 10px; left: 10px; }
+  .mt-cat-btn{ padding: 7px 12px !important; font-size: 10px !important; letter-spacing: .14em !important; }
+}
+.mt-cat-swap{ display: none !important; }
+.mt-gallery{ background: #E3E1DA !important; }
+.mt-gallery-img{ transition: opacity var(--lx-dur-s) var(--lx-ease-out); }
+.lx-velo{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; pointer-events: none; z-index: 1;
+  opacity: 1; transition: opacity 1.1s var(--lx-ease);
+}
+.lx-velo.is-plan{ object-fit: contain; background: #fff; }
+.lx-velo.is-fuera{ opacity: 0; }
+.lx-velo:not([src]), .lx-velo[src=""]{ display: none; }
+.mt-arrow, .mt-zoom-hint, .mt-counter{ z-index: 3 !important; }
+.mt-arrow{
+  background: rgba(247,246,242,.82) !important; color: var(--lx-ink) !important;
+  border: 0 !important; box-shadow: none !important;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  opacity: 0; transition: opacity var(--lx-dur-s) var(--lx-ease-out) !important;
+}
+.mt-gallery:hover .mt-arrow, .mt-arrow:focus-visible{ opacity: 1; }
+@media (hover:none){ .mt-arrow{ opacity: 1; } }
+.mt-zoom-hint{ background: rgba(247,246,242,.82) !important; color: var(--lx-ink) !important; box-shadow: none !important; }
+.mt-counter{
+  background: rgba(2,39,37,.5) !important; color: #fff !important;
+  font-size: 11px !important; font-weight: 400 !important; letter-spacing: .12em; font-variant-numeric: tabular-nums;
+}
+.lx-progreso{
+  position: absolute; left: 0; bottom: 0; z-index: 3; height: 1px; width: 100%;
+  background: rgba(255,255,255,.95); transform-origin: 0 50%; transform: scaleX(0);
+}
+.lx-progreso.is-corriendo{ animation: lx-progreso 6s linear forwards; }
+.mt-gallery.is-pausada .lx-progreso{ animation-play-state: paused; }
+@keyframes lx-progreso{ to{ transform: scaleX(1); } }
+.lx-ficha-video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; background: #000; }
+.mt-thumbs{ background: var(--lx-paper) !important; gap: 6px !important; padding: 10px 14px !important; }
+.mt-thumb{ border-radius: var(--lx-radius-xs) !important; opacity: .55; transition: opacity var(--lx-dur-s) var(--lx-ease-out) !important; border: 0 !important; box-shadow: none !important; }
+.mt-thumb:hover, .mt-thumb.active, .mt-thumb.is-active{ opacity: 1; }
+.mt-thumb.active, .mt-thumb.is-active{ box-shadow: inset 0 0 0 1px var(--lx-ink), 0 0 0 1px var(--lx-ink) !important; }
+
+/* Lightbox del zoom y modal del aviso legal: misma tinta */
+.iz-overlay{ background: rgba(2,39,37,.94) !important; }
+
+/* ── 10. REGISTRO: CLIENTE O BROKER ───────────────────────────────────────
+   Sustituye al popup «Create your account». Primero quién es (comprador o
+   broker), luego su formulario. Ver lujo.js → registro. */
+.lx-sin-scroll, .lx-sin-scroll body{ overflow: hidden !important; }
+.guest-modal{ display: none !important; }            /* lo sustituye .lx-reg */
+.guest-ribbon{ background: rgba(2,39,37,.92) !important; }
+.guest-ribbon strong{ font-weight: 500 !important; }
+.guest-ribbon a{ background: var(--lx-paper) !important; color: var(--lx-ink) !important; font-weight: 500 !important; letter-spacing: .08em; }
+
+.lx-reg{
+  position: fixed; inset: 0; z-index: 10050;
+  display: grid; place-items: center;
+  visibility: hidden; opacity: 0;
+  transition: opacity var(--lx-dur-m) var(--lx-ease-out), visibility 0s var(--lx-dur-m);
+}
+.lx-reg.is-open{ visibility: visible; opacity: 1; transition: opacity var(--lx-dur-m) var(--lx-ease-out); }
+.lx-reg-fondo{ position: absolute; inset: 0; background: rgba(2,39,37,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.lx-reg-caja{
+  position: relative; width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px); overflow: auto;
+  padding: 56px 56px 44px;
+  background: var(--lx-paper); color: var(--lx-ink);
+  border-radius: var(--lx-radius-lg);
+  box-shadow: 0 40px 90px -40px rgba(2,39,37,.7);
+  transform: translateY(12px);
+  transition: transform var(--lx-dur-l) var(--lx-ease-out);
+}
+.lx-reg.is-open .lx-reg-caja{ transform: none; }
+.lx-reg-cerrar{
+  position: absolute; top: 14px; right: 16px;
+  width: 40px; height: 40px; border: 0; background: none; cursor: pointer;
+  font-size: 26px; line-height: 1; color: var(--lx-ink);
+}
+.lx-eyebrow{
+  margin: 0 0 14px; font-size: 11px; font-weight: 500;
+  letter-spacing: var(--lx-track-eyebrow); text-transform: uppercase; color: var(--lx-faint);
+}
+.lx-reg-titulo{
+  margin: 0; font-family: var(--lx-font-display) !important; font-weight: 400;
+  font-size: 44px; line-height: 1.05; letter-spacing: .01em;
+}
+.lx-reg-intro{ margin: 18px 0 30px; font-size: 15px; font-weight: 300; line-height: 1.6; color: var(--lx-muted); }
+.lx-reg-opciones{ display: grid; gap: 10px; }
+.lx-reg-opcion{
+  display: grid; gap: 4px; text-align: left; cursor: pointer;
+  padding: 20px 22px; border: 1px solid var(--lx-line); border-radius: var(--lx-radius-sm);
+  background: var(--lx-surface); color: var(--lx-ink);
+  transition: border-color var(--lx-dur-s) var(--lx-ease-out), background-color var(--lx-dur-s) var(--lx-ease-out);
+}
+.lx-reg-opcion:hover, .lx-reg-opcion:focus-visible{ border-color: var(--lx-ink); background: #fff; }
+.lx-reg-opcion b{ font-family: var(--lx-font-display) !important; font-weight: 400; font-size: 26px; }
+.lx-reg-opcion span{ font-size: 13.5px; color: var(--lx-muted); }
+.lx-reg-ya{ display: inline-block; margin-top: 26px; font-size: 11px; font-weight: 500; letter-spacing: var(--lx-track-button); text-transform: uppercase; text-decoration: none; }
+.lx-reg-volver{
+  margin: -24px 0 18px; padding: 0; border: 0; background: none; cursor: pointer;
+  font-size: 11px; font-weight: 500; letter-spacing: var(--lx-track-button); text-transform: uppercase; color: var(--lx-faint);
+}
+.lx-reg-campos{ display: grid; gap: 16px; margin-bottom: 28px; }
+.lx-campo{ display: grid; gap: 6px; }
+.lx-campo span{ font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--lx-faint); }
+.lx-campo input{
+  height: 44px; padding: 0; border: 0; border-bottom: 1px solid var(--lx-line);
+  background: transparent; color: var(--lx-ink); font-size: 16px; outline: none;
+  transition: border-color var(--lx-dur-s) var(--lx-ease-out);
+}
+.lx-campo input:focus{ border-bottom-color: var(--lx-ink); }
+.lx-reg-enviar{ width: 100%; height: 50px; font-size: 11px !important; letter-spacing: var(--lx-track-button) !important; text-transform: uppercase; font-weight: 500 !important; }
+@media (max-width: 560px){
+  .lx-reg-caja{ padding: 48px 26px 32px; }
+  .lx-reg-titulo{ font-size: 36px; }
+}
+
+/* ── 11. PANTALLAS GRANDES ────────────────────────────────────────────────
+   Los brokers lo van a mirar en monitores grandes y un rato largo. El sitio
+   está maquetado en px fijos (header de 1280, ficha de 1100, textos de 11 a
+   14 px), así que a 2560 todo se queda en una isla pequeña en medio.
+   En vez de reescribir cada tamaño, se escala la interfaz entera por tramos
+   con `zoom` (estándar desde 2024; Chrome, Edge, Safari y Firefox ≥126): el
+   layout se recalcula al tamaño escalado, no es una lupa sobre píxeles. Las
+   fotos a sangre siguen ocupando el ancho, porque van en % y vw. */
+@media (min-width: 1800px){ html{ zoom: 1.15; } }
+@media (min-width: 2200px){ html{ zoom: 1.3; } }
+@media (min-width: 2800px){ html{ zoom: 1.5; } }
+
+/* Vídeo del hero (lujo.js → MEDIOS.heroVideo). Mientras no llegue, nada. */
+.lx-hero-video{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+.fg-hero.lx-con-video .fg-hero-sky,
+.fg-hero.lx-con-video .fg-hero-building{ visibility: hidden; }
+.fg-units-grid > .fg-card[data-lx-estado="sold"] .fg-card-divider{ display: none !important; }
+
+/* ── 12. FOCO DE TECLADO ──────────────────────────────────────────────────
+   Un anillo fino en la tinta de la marca, solo con teclado. */
+.lx-btn:focus-visible, .lx-enlace:focus-visible, .lx-reg-opcion:focus-visible,
+.fg-type-band .fg-btn-info:focus-visible, .fg-type-band .fg-btn-cta:focus-visible,
+.mt-cta-row > button:focus-visible, .mt-tab:focus-visible, .mt-cat-btn:focus-visible,
+.fg-add-to-list:focus-visible, .lx-reg-cerrar:focus-visible{
+  outline: 1px solid var(--lx-ink) !important; outline-offset: 3px !important;
+}
+
+/* ── 13. PREFERS-REDUCED-MOTION ───────────────────────────────────────────
+   Sin fundidos, acercamientos ni autoplay (este último lo corta lujo.js).
+   Los cambios de imagen siguen ocurriendo, pero en seco. */
+@media (prefers-reduced-motion: reduce){
+  .fg-stage.has-slider .hs-cell,
+  .fg-stage.has-slider .hs-cell-img,
+  .fg-type-band .fg-card-img > img,
+  .fg-units-grid > .fg-card .fg-card-img > img,
+  .lx-velo, .lx-reg, .lx-reg-caja,
+  .lx-btn, .fg-type-band .fg-btn-info{ transition: none !important; }
+  .fg-stage.has-slider .hs-cell-img[aria-hidden="false"],
+  .fg-type-band:hover .fg-card-img > img,
+  .fg-units-grid > .fg-card:hover .fg-card-img > img{ transform: none !important; }
+  .lx-progreso{ display: none !important; }
+}
+
+/* Ficha en móvil: la cabecera no cabe entera; se queda la unidad, el estado,
+   WhatsApp y cerrar. */
+@media (max-width: 600px){
+  .mt-header-logo, .mt-header-dot{ display: none !important; }
+  .mt-header{ padding-inline: 14px !important; }
+}
+
+/* Donde hay planta, no hay mar: tres detalles en un mismo panel ya cargan. */
+.fg-card-inner:has(.lx-planta) .lx-mar{ display: none; }
+
+/* Entrada al hacer scroll (lujo.js → revelar). Lo pone el JS: sin JS, nada
+   queda oculto. La espera escalonada: precio y botones llegan un poco
+   después que el nombre. */
+html.lx-revela [data-lx-rev]{
+  opacity: 0; transform: translateY(24px);
+  transition: opacity var(--lx-dur-l) var(--lx-ease-out), transform var(--lx-dur-l) var(--lx-ease-out);
+}
+html.lx-revela .fg-type-band .fg-card-price[data-lx-rev]{ transition-delay: .12s; }
+html.lx-revela .fg-type-band .fg-card-actions[data-lx-rev]{ transition-delay: .24s; }
+html.lx-revela [data-lx-rev].is-visto{ opacity: 1; transform: none; }
+
+/* ── 14. ENTRAR EN UNA TIPOLOGÍA Y VOLVER (lujo.js 5b) ─────────────────────
+   .lx-paso es una copia fija de la foto que va de la portada a la pantalla
+   entera y de ahí al hero de la tipología (y al revés). Debajo de la
+   cabecera (z 100) y encima de todo lo demás. Mientras dura el cambio, el
+   catálogo viejo no se enseña. */
+.lx-paso{
+  position: fixed; inset: 0; z-index: 98; overflow: hidden; pointer-events: none;
+  will-change: clip-path; transition: opacity .35s var(--lx-ease-out);
+}
+.lx-paso img{ display: block; width: 100%; height: 100%; object-fit: cover; transform-origin: 0 0; will-change: transform; }
+.lx-paso.is-fuera{ opacity: 0; transition: opacity .25s var(--lx-ease-out) !important; }
+html.lx-cambiando .fg-units-grid,
+html.lx-cambiando .fg-lazy-more{ visibility: hidden !important; }
+.fg-units-grid > .fg-card.lx-entra{
+  animation: lx-card-entra .6s cubic-bezier(.25,1,.5,1) both;
+  animation-delay: calc(var(--lx-i, 0) * 55ms + var(--lx-entra-d, 60ms));
+}
+@keyframes lx-card-entra{ from{ opacity: 0; transform: translateY(26px); } }
+@media (prefers-reduced-motion: reduce){
+  .fg-units-grid > .fg-card.lx-entra{ animation: none !important; }
+  .fg-units-grid > .fg-card .fg-card-img > img{ transition: none !important; }
+  .fg-units-grid > .fg-card .fg-card-img > img.lx-img-espera{ opacity: 1 !important; }
+}
+
+/* Paso 2 (Fundido) y 3 (Telón): una cortina fija entre la cabecera (z 100) y
+   todo lo demás. Paso 4 (Viaje): View Transitions; la foto de la portada y la
+   del hero comparten nombre (lx-foto) y el navegador interpola la caja. */
+.lx-cortina{ position: fixed; inset: 0; z-index: 98; opacity: 1; }
+.lx-cortina.is-papel{ background: var(--lx-paper); opacity: 0; }
+.lx-cortina.is-tinta{ background: var(--lx-deep); clip-path: polygon(100% 0%, 100% 0%, 101% 100%, 125% 100%); }
+:root{ --lx-viaje: .56s; }
+/* La foto: la caja viaja de la portada al hero (o al revés) con una curva
+   larga y suave. Las dos instantáneas van recortadas en cover, así que al
+   cambiar de proporción la foto se recorta, nunca se estira. La nueva va
+   opaca debajo desde el principio y la vieja se funde encima en el primer
+   tercio: un solo encuadre a la vista, sin doble exposición. */
+:root.lx-viaje::view-transition-group(lx-foto){ animation-duration: var(--lx-viaje); animation-timing-function: cubic-bezier(.65,0,.15,1); }
+:root.lx-viaje::view-transition-image-pair(lx-foto){ overflow: hidden; isolation: auto; }
+:root.lx-viaje::view-transition-old(lx-foto),
+:root.lx-viaje::view-transition-new(lx-foto){ width: 100%; height: 100%; object-fit: cover; mix-blend-mode: normal; }
+:root.lx-viaje::view-transition-new(lx-foto){ animation: none; opacity: 1; }
+:root.lx-viaje::view-transition-old(lx-foto){ animation: lx-vt-fuera .2s ease-out both; }
+/* El texto (pie del hero o ficha de la portada) entra cuando la foto llega. */
+:root.lx-viaje::view-transition-group(lx-texto){ animation: none; }
+:root.lx-viaje::view-transition-new(lx-texto){ animation: lx-vt-dentro .42s cubic-bezier(.25,1,.5,1) calc(var(--lx-viaje) - .12s) both; }
+:root.lx-viaje::view-transition-old(lx-texto){ animation: lx-vt-fuera .12s ease-out both; }
+@keyframes lx-vt-fuera{ to{ opacity: 0; } }
+@keyframes lx-vt-dentro{ from{ opacity: 0; transform: translateY(10px); } }
+/* El resto de la página: fundido corto. */
+:root.lx-viaje::view-transition-old(root){ animation: lx-vt-fuera .22s ease-out both; }
+:root.lx-viaje::view-transition-new(root){ animation: lx-vt-dentro-suave .34s ease-out .08s both; }
+@keyframes lx-vt-dentro-suave{ from{ opacity: 0; } }
+/* Las cards: escalonadas, después de que la foto se haya colocado
+   (lujo.js les pone --lx-entra-d: 320 ms en el viaje). */
+/* La cabecera y los fijos de abajo, por encima de la foto que viaja. */
+:root.lx-viaje nav{ view-transition-name: lx-cabecera; }
+:root.lx-viaje .fg-toggle-bar{ view-transition-name: lx-barra; }
+:root.lx-viaje .lx-propuestas{ view-transition-name: lx-panel; }
+:root.lx-viaje::view-transition-group(lx-cabecera),
+:root.lx-viaje::view-transition-group(lx-barra),
+:root.lx-viaje::view-transition-group(lx-panel){ animation: none; z-index: 3; }
+:root.lx-viaje::view-transition-group(lx-foto){ z-index: 1; }
+:root.lx-viaje::view-transition-group(lx-texto){ z-index: 2; }

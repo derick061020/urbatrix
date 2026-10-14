@@ -256,6 +256,14 @@
   // ¿Hay un diálogo abierto que el «atrás» deba cerrar primero? Es lo que se
   // espera de ese botón, y además evita apilar un popup sobre otro.
   function closeOpenDialog() {
+    // En Bahía Mar, la capa «lujo» sustituye nuestro popup de bienvenida por su
+    // «Acceso privado»: hay que mirar el suyo, o el atrás se lo saltaría.
+    var reg = document.querySelector('.lx-reg.is-open');
+    if (reg) {
+      var cerrar = reg.querySelector('.lx-reg-cerrar, [data-cerrar]');
+      if (cerrar) cerrar.click(); else reg.classList.remove('is-open');
+      return true;
+    }
     var guest = document.getElementById('guestModal');
     if (guest && guest.hasAttribute('open')) {
       if (typeof window.closeGuestModal === 'function') window.closeGuestModal();
