@@ -12,9 +12,23 @@
 <style>
   /* La zona pegajosa necesita fondo propio: si no, las tarjetas se ven por
      debajo al pasar. Se toma el del contenedor del listado, que cambia por
-     proyecto (crema en Bahía Mar, gris azulado en los otros). */
-  .fg-catalog-head,
-  .fg-filter-bar {
+     proyecto (papel en Bahía Mar, gris azulado en los otros).
+
+     Pintado a sangre y no sobre el elemento: la cinta de «volver» está limitada
+     a 1440 px y la barra a 1760, así que un fondo propio dejaba las tarjetas
+     asomando por los lados en pantallas anchas. El pseudo se estira a 100vw y
+     va detrás del contenido, dentro del mismo contexto de apilamiento. */
+  body.has-sticky-filters .fg-catalog-head::before,
+  body.has-sticky-filters .fg-filter-bar::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    /* El ancho lo pone el JS: 100vw incluye la barra de scroll y sacaría una
+       barra horizontal de unos pocos píxeles. */
+    width: var(--fg-sticky-bleed, 100vw);
+    transform: translateX(-50%);
+    z-index: -1;
     background: var(--fg-sticky-bg, #f2f5f8);
   }
 
@@ -28,6 +42,14 @@
     top: calc(var(--fg-sticky-top, 88px) + var(--fg-sticky-head, 0px));
     z-index: 30;
   }
+
+  /* Pegada ocupa alto de pantalla: en cuanto se despega, la cinta respira
+     menos arriba y la barra menos abajo. Suma unos 20 px de catálogo visible. */
+     Sin transición a propósito: el alto de la cinta se vuelve a medir al
+     pegarse (es lo que separa la barra de abajo), y animarlo haría que la
+     medida cayera a mitad de camino. */
+  body.has-sticky-filters.is-filters-stuck .fg-catalog-head { padding-top: 14px; }
+  body.has-sticky-filters.is-filters-stuck .fg-filter-bar { padding-bottom: 12px; }
 
   /* Al despegarse del flujo, una sombra corta para que se lea como una barra
      por encima del listado y no como parte de él. */
@@ -46,7 +68,9 @@
   /* En pantallas estrechas sólo se fija la barra de filtros: la cinta de
      «volver» ocupa demasiado alto de un viewport de móvil. */
   @media (max-width: 760px) {
-    body.has-sticky-filters .fg-catalog-head { position: static; }
+    /* relative y no static: el fondo a sangre es un pseudo absoluto y tiene
+       que seguir anclado a la cinta. */
+    body.has-sticky-filters .fg-catalog-head { position: relative; }
     body.has-sticky-filters .fg-filter-bar { top: var(--fg-sticky-top, 72px); }
   }
 </style>
@@ -93,8 +117,17 @@
     root.style.setProperty('--fg-sticky-head', Math.round(h) + 'px');
 
     if (zone) {
-      root.style.setProperty('--fg-sticky-bg', getComputedStyle(zone).backgroundColor);
+      // Si la zona es transparente (puede pasar si otra capa la repinta), se
+      // usa la del body: un fondo a sangre transparente no tapa nada.
+      var bg = getComputedStyle(zone).backgroundColor;
+      if (!bg || bg === 'transparent' || /,\s*0\)$/.test(bg)) {
+        bg = getComputedStyle(document.body).backgroundColor;
+      }
+      root.style.setProperty('--fg-sticky-bg', bg);
     }
+
+    // clientWidth excluye la barra de scroll; 100vw no.
+    root.style.setProperty('--fg-sticky-bleed', root.clientWidth + 'px');
   }
 
   // El observador de abajo mira las clases del body, y medir también las tocaba:
