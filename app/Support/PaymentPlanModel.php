@@ -27,7 +27,10 @@ use Illuminate\Support\Facades\Schema;
  */
 class PaymentPlanModel
 {
-    /** Por debajo de esto no hay de dónde deducir: mejor no enseñar nada. */
+    /** Sube cuando cambie la forma del array devuelto (ver rules()). */
+    private const CACHE_KEY = 'payment_plan_model.v2';
+
+    /** Por debajo de esto no hay de dónde deducir: se usa el de referencia. */
     private const MINIMO_PLANES = 5;
 
     /** Los tramos, en el orden en que los paga el cliente. */
@@ -77,15 +80,23 @@ class PaymentPlanModel
      */
     public static function rules(): array
     {
-        return Cache::remember('payment_plan_model', now()->addHours(12), function () {
+        // La versión va en la clave: al cambiar la forma del array, lo
+        // guardado antes se ignora en vez de llegar incompleto a la vista.
+        // Un despliegue con una caché de 12 horas por delante dejó la home de
+        // Makai en error 500 justo por esto.
+        $reglas = Cache::remember(self::CACHE_KEY, now()->addHours(12), function () {
             return self::deducir() ?? self::POR_DEFECTO;
         });
+
+        // Cinturón además del tirante: aunque viniera algo incompleto, la vista
+        // recibe siempre todas las claves.
+        return is_array($reglas) ? $reglas + self::POR_DEFECTO : self::POR_DEFECTO;
     }
 
     /** Vacía la caché: útil tras cargar o corregir planes. */
     public static function forget(): void
     {
-        Cache::forget('payment_plan_model');
+        Cache::forget(self::CACHE_KEY);
     }
 
     private static function deducir(): ?array
