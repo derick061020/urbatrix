@@ -1604,6 +1604,20 @@ class AdminController extends Controller
         $unitId = $request->get('unit_id');
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
+        // Expediente o registro. Desde que se puede dar de alta a un cliente
+        // sin unidad, los dos viven en `reservations` y salían mezclados: el
+        // equipo veía los registros del día entre los expedientes de quien ya
+        // reservó y está pagando. Lo que los separa es tener unidad asignada:
+        // de los 100 de Makai, 38 la tienen (29 con plan de pago ya firmado) y
+        // los 62 restantes son altas de cliente sin reserva.
+        $tipo = $request->get('tipo', 'reserva');
+        if (! in_array($tipo, ['reserva', 'registro', 'todos'], true)) {
+            $tipo = 'reserva';
+        }
+
+        $conUnidad = fn ($q) => $q->whereNotNull('unit_id')->where('unit_id', '!=', '');
+        $sinUnidad = fn ($q) => $q->where(fn ($w) => $w->whereNull('unit_id')->orWhere('unit_id', ''));
+
         $query = Reservation::with(['unit', 'documents', 'payments']);
 
         $this->scopeReservationQueryForBroker($query);
@@ -1639,7 +1653,16 @@ class AdminController extends Controller
             })
             ->when($tab === 'vencido', fn ($q) => $q->whereHas('payments', fn ($p) => $p->where('status', 'overdue')))
             ->when($tab === 'al-dia', fn ($q) => $q->whereDoesntHave('payments', fn ($p) => $p->where('status', 'overdue')))
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'desc');
+
+        // Cuántos hay de cada clase con los mismos filtros puestos: si el
+        // contador no acompañara a la búsqueda, parecería que faltan fichas.
+        $totalReservas  = (clone $reservations)->where($conUnidad)->count();
+        $totalRegistros = (clone $reservations)->where($sinUnidad)->count();
+
+        $reservations = $reservations
+            ->when($tipo === 'reserva',  fn ($q) => $q->where($conUnidad))
+            ->when($tipo === 'registro', fn ($q) => $q->where($sinUnidad))
             ->paginate(20)
             ->withQueryString();
 
@@ -1650,6 +1673,9 @@ class AdminController extends Controller
         return view('admin.crm.expedientes', compact(
             'reservations',
             'tab',
+            'tipo',
+            'totalReservas',
+            'totalRegistros',
             'search',
             'unitId',
             'dateFrom',
