@@ -2834,5 +2834,19 @@
   "tipo": "type",
   "piso": "floor",
   "orientación": "direction",
-  "vista": "outlook"
+  "vista": "outlook",
+  "Vista al campo de golf": "Golf Course View",
+  "Vista al lago": "Lake View",
+  "Vista al mar y al lago": "Ocean & Lake View",
+  "Vista al mar": "Ocean View",
+  "Vista a la montaña": "Mountain View",
+  "Vista al Jardín": "Garden View",
+  "1 Bed": "1 Bed",
+  "1 Bed & Family Room": "1 Bed & Family Room",
+  "1 Bed & Studio Lock-off": "1 Bed & Studio Lock-off",
+  "2 Bed": "2 Bed",
+  "3 Bed": "3 Bed",
+  "Penthouse 1 Bed": "Penthouse 1 Bed",
+  "Penthouse 2 Bed": "Penthouse 2 Bed",
+  "Planta baja": "Ground Floor"
 }

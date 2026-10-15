@@ -2801,5 +2801,19 @@
   "tipo": "tipo",
   "piso": "piso",
   "orientación": "orientación",
-  "vista": "vista"
+  "vista": "vista",
+  "Vista al campo de golf": "Vista al campo de golf",
+  "Vista al lago": "Vista al lago",
+  "Vista al mar y al lago": "Vista al mar y al lago",
+  "Vista al mar": "Vista al mar",
+  "Vista a la montaña": "Vista a la montaña",
+  "Vista al Jardín": "Vista al jardín",
+  "1 Bed": "1 habitación",
+  "1 Bed & Family Room": "1 habitación y sala familiar",
+  "1 Bed & Studio Lock-off": "1 habitación y estudio independiente",
+  "2 Bed": "2 habitaciones",
+  "3 Bed": "3 habitaciones",
+  "Penthouse 1 Bed": "Penthouse de 1 habitación",
+  "Penthouse 2 Bed": "Penthouse de 2 habitaciones",
+  "Planta baja": "Planta baja"
 }

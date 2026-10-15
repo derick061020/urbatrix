@@ -133,10 +133,17 @@ class BuildPlanAnchors extends Command
     /**
      * Elige `$want` puntos separados entre sí, sobre zonas con planta dibujada.
      *
-     * El plano es dibujo oscuro sobre blanco: donde hay apartamentos la tinta
-     * es densa (paredes, muebles, cotas) y alrededor es blanco. Se descarta el
-     * verde —la cubierta de vidrio sobre la piscina— porque es la zona en la
-     * que no debería caer ningún marcador.
+     * Se busca la banda construida, no «donde hay tinta». La primera versión
+     * medía densidad de trazo y los marcadores acababan repartidos también por
+     * el replanteo de alrededor: Miguel los vio «muy regados y algunos que no
+     * encajan». La planta construida es lo único cálido del dibujo (los suelos
+     * y las terrazas tiran a rosa); el jardín, las cubiertas y el fondo son
+     * blancos, y la cubierta de vidrio sobre la piscina es verdosa.
+     *
+     * Esa mancha cálida es fina —los interiores van casi en blanco, con el
+     * mobiliario dibujado—, así que se engorda pidiendo que haya planta cálida
+     * en un radio amplio. Queda una banda que sigue la forma del edificio, y
+     * los puntos se reparten a lo largo de ella bien separados.
      *
      * @return list<array{x: float, y: float, side: string}>
      */
@@ -159,7 +166,7 @@ class BuildPlanAnchors extends Command
             return [];
         }
 
-        // 1 donde hay dibujo de planta, 0 en el blanco y en el verde.
+        // 1 donde el dibujo tira a cálido (planta construida), 0 en el resto.
         $ink = [];
         for ($y = 0; $y < $th; $y++) {
             $row = [];
@@ -168,9 +175,7 @@ class BuildPlanAnchors extends Command
                 $r = ($rgb >> 16) & 0xFF;
                 $g = ($rgb >> 8) & 0xFF;
                 $b = $rgb & 0xFF;
-                $lum = 0.299 * $r + 0.587 * $g + 0.114 * $b;
-                $green = $g > $r + 6 && $g > $b + 6;
-                $row[$x] = ($lum < 232 && ! $green) ? 1 : 0;
+                $row[$x] = (($r - $b) >= 10 && $r > 170) ? 1 : 0;
             }
             $ink[] = $row;
         }
@@ -187,7 +192,8 @@ class BuildPlanAnchors extends Command
             }
         }
 
-        $r = 4;
+        // Radio amplio y umbral bajo: es engordar la silueta, no buscar tinta.
+        $r = (int) round($tw * 9 / 420);
         $cands = [];
         for ($y = 0; $y < $th; $y++) {
             $y0 = max(0, $y - $r);
@@ -198,7 +204,7 @@ class BuildPlanAnchors extends Command
                 $area = ($y1 - $y0 + 1) * ($x1 - $x0 + 1);
                 $tot = $sum[$y1 + 1][$x1 + 1] - $sum[$y0][$x1 + 1] - $sum[$y1 + 1][$x0] + $sum[$y0][$x0];
                 $d = $tot / $area;
-                if ($d >= 0.35) {
+                if ($d >= 0.10) {
                     $cands[] = [$d, $x, $y];
                 }
             }
@@ -208,14 +214,18 @@ class BuildPlanAnchors extends Command
             return [];
         }
 
-        // Más denso primero: así los puntos caen en el centro de la planta y no
-        // en el borde, donde la chincheta se saldría del dibujo.
+        // Más adentro primero: así la chincheta cae sobre el edificio y no en el
+        // filo, donde se saldría del dibujo.
         usort($cands, fn ($a, $b) => $b[0] <=> $a[0]);
 
-        // Se empieza con una separación holgada y se afloja hasta que entren
-        // todas las unidades del piso.
+        // Se empieza con una separación holgada —que es lo que hace que se vean
+        // ordenados— y sólo se afloja si no entran todas las unidades del piso.
         $chosen = [];
-        for ($gap = 14.0; $gap >= 3.0; $gap -= 1.0) {
+        // 30 px de miniatura son ~122 de pantalla, justo el ancho de la vieja
+        // chincheta: por eso se tocaban. Con la chincheta a 68 px, 26 ya las
+        // separa, y si el piso va apretado el bucle afloja solo.
+        $gapIni = $tw * 26 / 420;
+        for ($gap = $gapIni; $gap >= 6.0; $gap -= 1.0) {
             $chosen = [];
             foreach ($cands as [$d, $x, $y]) {
                 $ok = true;
