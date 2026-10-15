@@ -87,6 +87,9 @@ class BuildPlanAnchors extends Command
             }
 
             $anchors[$floorKey] = $points;
+            // Siete planos de ~4500x3800 en la misma ejecución: sin esto, a los
+            // últimos ya no les quedaba memoria y se saltaban en silencio.
+            gc_collect_cycles();
             $this->info(sprintf('  %-7s %d unidades → %d puntos', $floorKey, $want, count($points)));
         }
 
@@ -195,10 +198,11 @@ class BuildPlanAnchors extends Command
         // Radio amplio y umbral bajo: es engordar la silueta, no buscar tinta.
         $r = (int) round($tw * 9 / 420);
         $cands = [];
-        for ($y = 0; $y < $th; $y++) {
+        $paso = 2;   // uno de cada dos: la separación mínima es muy superior
+        for ($y = 0; $y < $th; $y += $paso) {
             $y0 = max(0, $y - $r);
             $y1 = min($th - 1, $y + $r);
-            for ($x = 0; $x < $tw; $x++) {
+            for ($x = 0; $x < $tw; $x += $paso) {
                 $x0 = max(0, $x - $r);
                 $x1 = min($tw - 1, $x + $r);
                 $area = ($y1 - $y0 + 1) * ($x1 - $x0 + 1);
@@ -209,6 +213,9 @@ class BuildPlanAnchors extends Command
                 }
             }
         }
+
+        // La tabla acumulada ya no hace falta y es lo más pesado de todo.
+        unset($sum, $ink);
 
         if ($cands === []) {
             return [];
