@@ -82,7 +82,7 @@ class BuildPlanAnchors extends Command
 
             $points = $this->pickPoints($file, $want);
             if ($points === []) {
-                $this->warn("  {$floorKey}: no se pudo leer el plano");
+                $this->warn("  {$floorKey}: no se reconoció la planta en el plano (¿otro estilo de exportación?)");
                 continue;
             }
 
@@ -169,20 +169,55 @@ class BuildPlanAnchors extends Command
             return [];
         }
 
-        // 1 donde el dibujo tira a cálido (planta construida), 0 en el resto.
-        $ink = [];
+        // Los píxeles del plano, una sola lectura: luego se prueban dos formas
+        // de reconocer la planta sobre ellos.
+        $px = [];
         for ($y = 0; $y < $th; $y++) {
-            $row = [];
+            $fila = [];
             for ($x = 0; $x < $tw; $x++) {
                 $rgb = imagecolorat($small, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-                $row[$x] = (($r - $b) >= 10 && $r > 170) ? 1 : 0;
+                $fila[$x] = [($rgb >> 16) & 0xFF, ($rgb >> 8) & 0xFF, $rgb & 0xFF];
             }
-            $ink[] = $row;
+            $px[] = $fila;
         }
         imagedestroy($small);
+
+        // 1 donde hay planta construida. Primero por color: en los planos de
+        // Makai los suelos y las terrazas tiran a rosa y todo lo demás es
+        // blanco, así que la mancha cálida ES el edificio.
+        $marca = function (callable $es) use ($px, $tw, $th) {
+            $m = [];
+            $n = 0;
+            for ($y = 0; $y < $th; $y++) {
+                $fila = [];
+                for ($x = 0; $x < $tw; $x++) {
+                    [$r, $g, $b] = $px[$y][$x];
+                    $v = $es($r, $g, $b) ? 1 : 0;
+                    $fila[$x] = $v;
+                    $n += $v;
+                }
+                $m[] = $fila;
+            }
+
+            return [$m, $n / ($tw * $th)];
+        };
+
+        [$ink, $cobertura] = $marca(fn ($r, $g, $b) => ($r - $b) >= 10 && $r > 170);
+
+        // Los planos del 4º y el 5º llegaron sin ese relleno de color (0,05 %
+        // de cálidos frente al 5 % de los demás), así que ahí no hay mancha que
+        // seguir. Para esos vale la tinta oscura: las paredes y el mobiliario
+        // del edificio, que el replanteo fino de alrededor no alcanza.
+        if ($cobertura < 0.005) {
+            [$ink, $cobertura] = $marca(
+                fn ($r, $g, $b) => (0.299 * $r + 0.587 * $g + 0.114 * $b) < 200
+            );
+        }
+        unset($px);
+
+        if ($cobertura <= 0) {
+            return [];
+        }
 
         // Densidad local en una ventana de 9x9, vía suma acumulada 2D.
         $sum = [];
