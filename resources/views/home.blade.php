@@ -264,6 +264,11 @@
               </div>
             </div>
 
+            {{-- Simulador del plan de pago. Sólo aparece si el proyecto tiene
+                 planes firmados de los que deducir el reparto; hoy no es el
+                 caso aquí (ver PaymentPlanModel). --}}
+            @include('partials.payment-simulator')
+
             <!-- Description -->
             <p class="mt-desc" id="modalDesc">{{ __('1st Floor &nbsp;·&nbsp; 1 Bed &amp; Family Room &nbsp;·&nbsp; SE &nbsp;·&nbsp; Lake Facing') }}</p>
 
@@ -3174,6 +3179,8 @@
           if (unitPrice) {
             unitPrice.dataset.usd = unit.price || 0;
             unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
+            // El simulador recalcula con el precio de esta unidad.
+            if (typeof window.psPrecio === 'function') window.psPrecio(unit.price);
             // Default the modal currency toggle to whatever was picked on the
             // home (hamburger menu), persisted in localStorage.
             const selectedCur = localStorage.getItem('selectedCurrency') || 'USD';

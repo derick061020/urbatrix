@@ -2827,5 +2827,22 @@
   "tipo": "type",
   "piso": "floor",
   "orientación": "direction",
-  "vista": "outlook"
+  "vista": "outlook",
+  "Simular pago": "Simulate payment",
+  "Simular mi plan de pago": "Simulate my payment plan",
+  "Entrada inicial": "Down payment",
+  "Mínimo :n%": "Minimum :n%",
+  "Cuotas durante la obra": "Instalments during construction",
+  "Entre :min y :max cuotas": "Between :min and :max instalments",
+  "Sin intereses": "Interest free",
+  "Separación al firmar": "Due on signing",
+  "Cuotas en obra": "Instalments during construction",
+  "Contra entrega": "On delivery",
+  "Tu cuota mensual": "Your monthly instalment",
+  ":n cuotas": ":n instalments",
+  ":n cuotas en obra": ":n instalments during construction",
+  "/mes": "/mo",
+  "/mes durante la obra": "/mo during construction",
+  ":n cuotas sin intereses durante la obra": ":n interest-free instalments during construction",
+  "Simulación referencial, sin intereses durante la obra. El reparto sale de los :n planes de pago ya firmados en el proyecto; el tuyo se acuerda al reservar. No es una oferta ni una aprobación de financiamiento.": "Reference simulation, interest free during construction. The split comes from the :n payment plans already signed on this project; yours is agreed when you reserve. This is not an offer or a financing approval."
 }
