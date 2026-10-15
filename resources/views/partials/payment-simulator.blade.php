@@ -19,6 +19,14 @@
 
 @if($planRules)
 <style>
+  /* En Bahía Mar la capa «lujo» oculta todo lo que no sea suyo dentro del panel
+     izquierdo de la ficha (.mt-left-inner > :not(.lx-ficha)). Se le hace sitio
+     al simulador con el id del modal por delante: la capa se carga después que
+     este partial, así que con la misma especificidad ganaría ella. En los
+     proyectos sin esa capa estas reglas no cambian nada. */
+  #moreInfoModal .mt-left-inner > .ps-teaser { display: flex !important; }
+  #moreInfoModal .mt-left-inner > .ps-acc { display: block !important; }
+
   /* Adelanto de la cuota, junto al precio */
   .ps-teaser {
     display: flex;
