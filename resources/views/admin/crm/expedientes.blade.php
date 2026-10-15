@@ -28,7 +28,8 @@
 
 @section('content')
 @php
-    $currentTab = $tab ?? request('tab', 'todos');
+    $currentTab  = $tab ?? request('tab', 'todos');
+    $currentTipo = $tipo ?? request('tipo', 'reserva');
     $hasFilters = filled($search ?? null) || filled($unitId ?? null) || filled($dateFrom ?? null) || filled($dateTo ?? null);
 @endphp
 <div class="p-4 sm:p-6 lg:p-8 space-y-4">
@@ -39,7 +40,15 @@
 
     {{-- Header counter + actions --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="text-[14px] font-semibold text-ink-700">{{ __(':count clientes activos', ['count' => $reservations->total()]) }}</div>
+        <div class="text-[14px] font-semibold text-ink-700">
+            @if($currentTipo === 'registro')
+                {{ __(':count registros de clientes', ['count' => $reservations->total()]) }}
+            @elseif($currentTipo === 'todos')
+                {{ __(':count fichas en total', ['count' => $reservations->total()]) }}
+            @else
+                {{ __(':count expedientes con reserva', ['count' => $reservations->total()]) }}
+            @endif
+        </div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-exportar-expedientes').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
             <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo Expediente') }}</button>
@@ -47,6 +56,26 @@
     </div>
 
     <div class="crm-card">
+        {{-- Expedientes y registros van separados: antes salían mezclados y el
+             equipo veía las altas del día entre los clientes que ya reservaron
+             y están pagando. Lo que los distingue es tener unidad asignada. --}}
+        <div class="px-4 pt-4 flex flex-wrap items-center gap-2">
+            @php
+                $tipos = [
+                    'reserva'  => [__('Con reserva'), $totalReservas ?? 0,  'pi-folder'],
+                    'registro' => [__('Registros'),   $totalRegistros ?? 0, 'pi-user-plus'],
+                    'todos'    => [__('Todos'),       ($totalReservas ?? 0) + ($totalRegistros ?? 0), 'pi-list'],
+                ];
+            @endphp
+            @foreach($tipos as $slug => [$label, $n, $icono])
+                <a href="{{ route('admin.crm.expedientes', array_merge(request()->except(['page', 'tipo']), ['tipo' => $slug])) }}"
+                   class="crm-tab {{ $currentTipo === $slug ? 'active' : '' }}">
+                    <i class="pi {{ $icono }}"></i> {{ $label }}
+                    <span class="ml-1 opacity-60">{{ $n }}</span>
+                </a>
+            @endforeach
+        </div>
+
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <div class="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
                 @foreach (['todos' => 'Todos','kyc' => 'KYC Pendiente','firma' => 'Firma requerida','vencido' => 'Pago Vencido','al-dia' => 'Al día'] as $slug => $label)
@@ -56,6 +85,7 @@
             <form method="GET" action="{{ route('admin.crm.expedientes') }}" class="flex flex-wrap items-center gap-2 sm:ml-auto w-full sm:w-auto m-0">
                 <div class="relative w-full sm:w-64">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
+                    <input type="hidden" name="tipo" value="{{ $currentTipo }}">
                     <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
                     <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Buscar expediente…') }}" class="crm-input pr-3">
                 </div>
