@@ -20,9 +20,10 @@ use Illuminate\Support\Facades\Schema;
  * atípicos —uno a 48 cuotas, otro pagado casi al contado— que arrastrarían la
  * media hacia un plan que nadie ha firmado.
  *
- * Si no hay planes suficientes no se inventa nada: devuelve null y la ficha no
- * enseña el simulador. Hoy eso es lo que pasa en Bahía Mar y en Siebe, que
- * todavía no tienen ninguna reserva con plan.
+ * Cuando un proyecto todavía no tiene planes de los que deducir —hoy Bahía Mar
+ * y Siebe, que no tienen ninguna reserva con plan— se usa el reparto de
+ * referencia de POR_DEFECTO, y el simulador lo dice en su aviso en vez de
+ * atribuirlo a planes firmados que no existen.
  */
 class PaymentPlanModel
 {
@@ -33,18 +34,51 @@ class PaymentPlanModel
     private const TRAMOS = ['reservation', 'initial', 'installment', 'delivery'];
 
     /**
-     * Reparto típico del precio, o null si el proyecto aún no tiene historia.
+     * Reparto de referencia, usado cuando el proyecto todavía no tiene planes
+     * firmados de los que deducir.
+     *
+     * No sale de la nada: son las medianas reales de Makai, que es el único
+     * proyecto con historia. Mismo promotor, mismo mercado y misma forma de
+     * vender, así que es la suposición menos mala. Las cuotas sí se alargan a
+     * 12–36, que es lo normal en un proyecto que aún no entrega.
+     *
+     * Quien lo mire tiene que saber que es una referencia: el aviso del
+     * simulador cambia según `deducido`.
+     */
+    private const POR_DEFECTO = [
+        'reserva'        => 0.015,
+        'inicial'        => 0.225,
+        'obra'           => 0.36,
+        'entrega'        => 0.40,
+        'reserva_monto'  => 5000.0,
+        'entrada_tipica' => 24,
+        'entrada_min'    => 15,
+        'entrada_max'    => 50,
+        'cuotas_min'     => 12,
+        'cuotas_max'     => 36,
+        'cuotas_tipicas' => 24,
+        'planes'         => 0,
+        'deducido'       => false,
+    ];
+
+    /**
+     * Reparto típico del precio de este proyecto.
+     *
+     * Deducido de los planes ya firmados cuando los hay; si no, el de
+     * referencia. `deducido` dice cuál de los dos es, porque el aviso que se
+     * enseña al cliente no puede ser el mismo.
      *
      * @return array{
      *     reserva: float, inicial: float, obra: float, entrega: float,
-     *     reserva_monto: float, cuotas_min: int, cuotas_max: int,
-     *     cuotas_tipicas: int, planes: int
-     * }|null
+     *     reserva_monto: float, entrada_tipica: int, entrada_min: int,
+     *     entrada_max: int, cuotas_min: int, cuotas_max: int,
+     *     cuotas_tipicas: int, planes: int, deducido: bool
+     * }
      */
-    public static function rules(): ?array
+    public static function rules(): array
     {
         return Cache::remember('payment_plan_model', now()->addHours(12), function () {
-            return self::deducir();
+            return self::deducir() ?? self::POR_DEFECTO;
         });
     }
 
@@ -133,6 +167,7 @@ class PaymentPlanModel
             'cuotas_max'     => $cuotasMax,
             'cuotas_tipicas' => min($cuotasMax, max($cuotasMin, (int) $mediana('cuotas'))),
             'planes'         => count($planes),
+            'deducido'       => true,
         ];
     }
 }

@@ -17,7 +17,6 @@
     $planRules = \App\Support\PaymentPlanModel::rules();
 @endphp
 
-@if($planRules)
 <style>
   /* En Bahía Mar la capa «lujo» oculta todo lo que no sea suyo dentro del panel
      izquierdo de la ficha (.mt-left-inner > :not(.lx-ficha)). Se le hace sitio
@@ -193,7 +192,13 @@
     </div>
 
     <p class="ps-disc">
-      {{ __('Simulación referencial, sin intereses durante la obra. El reparto sale de los :n planes de pago ya firmados en el proyecto; el tuyo se acuerda al reservar. No es una oferta ni una aprobación de financiamiento.', ['n' => $planRules['planes']]) }}
+      @if($planRules['deducido'])
+        {{-- Hay historia: se puede decir de dónde sale el reparto. --}}
+        {{ __('Simulación referencial, sin intereses durante la obra. El reparto sale de los :n planes de pago ya firmados en el proyecto; el tuyo se acuerda al reservar. No es una oferta ni una aprobación de financiamiento.', ['n' => $planRules['planes']]) }}
+      @else
+        {{-- Sin planes firmados todavía: es un plan de referencia y se dice. --}}
+        {{ __('Simulación referencial, sin intereses durante la obra, sobre un plan de pago tipo. Las condiciones de tu plan se acuerdan al reservar. No es una oferta ni una aprobación de financiamiento.') }}
+      @endif
     </p>
   </div>
 </div>
@@ -262,4 +267,3 @@
   });
 })();
 </script>
-@endif
