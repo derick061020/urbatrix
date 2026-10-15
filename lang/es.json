@@ -2815,5 +2815,22 @@
   "3 Bed": "3 habitaciones",
   "Penthouse 1 Bed": "Penthouse de 1 habitación",
   "Penthouse 2 Bed": "Penthouse de 2 habitaciones",
-  "Planta baja": "Planta baja"
+  "Planta baja": "Planta baja",
+  "Simular pago": "Simular pago",
+  "Simular mi plan de pago": "Simular mi plan de pago",
+  "Entrada inicial": "Entrada inicial",
+  "Mínimo :n%": "Mínimo :n%",
+  "Cuotas durante la obra": "Cuotas durante la obra",
+  "Entre :min y :max cuotas": "Entre :min y :max cuotas",
+  "Sin intereses": "Sin intereses",
+  "Separación al firmar": "Separación al firmar",
+  "Cuotas en obra": "Cuotas en obra",
+  "Contra entrega": "Contra entrega",
+  "Tu cuota mensual": "Tu cuota mensual",
+  ":n cuotas": ":n cuotas",
+  ":n cuotas en obra": ":n cuotas en obra",
+  "/mes": "/mes",
+  "/mes durante la obra": "/mes durante la obra",
+  ":n cuotas sin intereses durante la obra": ":n cuotas sin intereses durante la obra",
+  "Simulación referencial, sin intereses durante la obra. El reparto sale de los :n planes de pago ya firmados en el proyecto; el tuyo se acuerda al reservar. No es una oferta ni una aprobación de financiamiento.": "Simulación referencial, sin intereses durante la obra. El reparto sale de los :n planes de pago ya firmados en el proyecto; el tuyo se acuerda al reservar. No es una oferta ni una aprobación de financiamiento."
 }

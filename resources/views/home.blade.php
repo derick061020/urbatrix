@@ -210,6 +210,11 @@
               </div>
             </div>
 
+            {{-- Simulador del plan de pago: adelanto de cuota + simulador.
+                 Sale solo si el proyecto tiene planes firmados de los que
+                 deducir el reparto (ver PaymentPlanModel). --}}
+            @include('partials.payment-simulator')
+
             <!-- Description -->
             <p class="mt-desc" id="modalDesc">{{ __('1st Floor &nbsp;·&nbsp; 1 Bed &amp; Family Room &nbsp;·&nbsp; SE &nbsp;·&nbsp; Lake Facing') }}</p>
 
@@ -250,8 +255,6 @@
             </div>
 
             <div class="mt-divider"></div>
-
-          </div>
 
           </div>
 
@@ -2662,6 +2665,8 @@
           if (unitPrice) {
             unitPrice.dataset.usd = unit.price || 0;
             unitPrice.textContent = unit.price ? `$${number_format(unit.price, 0, ' ', ' ')}` : 'Price not available';
+            // El simulador recalcula con el precio de esta unidad.
+            if (typeof window.psPrecio === 'function') window.psPrecio(unit.price);
           }
 
           // Stat boxes — populate from DB; show — when missing
