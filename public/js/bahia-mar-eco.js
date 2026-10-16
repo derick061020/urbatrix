@@ -236,11 +236,12 @@
   function pintarBandaCompromiso() {
     if (document.querySelector('.eco-band')) return;
 
-    const bandas = [...document.querySelectorAll('.fg-type-band')];
-    if (!bandas.length) return;
-
-    const grid = bandas[0].parentElement;
-    if (!grid) return;
+    // Va al pie de la página, justo encima del footer. Antes vivía en medio de
+    // las tipologías, lo que obligaba a repartir `order` para no romper el
+    // zigzag; fuera de la rejilla ese problema desaparece y las villas quedan
+    // en su orden natural.
+    const footer = document.querySelector('.fg-footer');
+    if (!footer) return;
 
     const sec = document.createElement('section');
     sec.className = 'eco-band';
@@ -254,8 +255,7 @@
         ).join('')}
       </div>`;
 
-    grid.appendChild(sec);          // al final: no toca la paridad de nadie
-    colocarBanda();
+    footer.parentNode.insertBefore(sec, footer);
   }
 
   /* Reparte `order` para que la banda caiga en el medio. Hay que numerar
@@ -264,6 +264,18 @@
      recalcular la posición cada vez: si el re-render deja otro número de
      tipologías, la banda se recoloca sola. */
   function colocarBanda() {
+    // Ya no hace falta: la banda salió de la rejilla de tipologías y vive
+    // encima del footer. Se conserva la función porque la llaman desde el
+    // re-render del grid, y de paso limpia el `order` que pudiera haber
+    // dejado una versión anterior en las villas.
+    document.querySelectorAll('.fg-type-band[style*="order"]').forEach(function (b) {
+      b.style.order = '';
+    });
+  }
+
+  // El reparto de `order` que hacía falta cuando la banda vivía dentro de la
+  // rejilla queda aquí por si algún día vuelve a su sitio de antes.
+  function colocarBandaEnRejilla() {
     const sec = document.querySelector('.eco-band');
     if (!sec) return;
 
