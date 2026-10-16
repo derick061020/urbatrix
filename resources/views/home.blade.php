@@ -6643,6 +6643,9 @@
 <link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
 <script src="{{ asset('lujo/lujo.js') }}" defer></script>
 
+{{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
+@include('partials.lujo-acciones')
+
 </body>
 
 </html>
