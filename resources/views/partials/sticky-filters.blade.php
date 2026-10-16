@@ -80,6 +80,17 @@
     box-shadow: inset 0 -1px 0 var(--brand-soft-3, rgba(16,24,40,.12));
   }
 
+  /* La barra de arriba es una píldora que flota con los lados y el hueco
+     superior transparentes, así que las fotos de las tarjetas se veían pasar
+     por detrás de ella. Pegada, el papel de la banda sube hasta el borde de la
+     pantalla y la píldora queda apoyada encima, que es lo que pidió Miguel:
+     «que el sticky de los filtros incluya al header». El JS marca cuál es la
+     primera pieza pegada, porque en Makai y Siebe no hay cinta de tipos y la
+     primera es la barra de filtros. */
+  body.has-sticky-filters.is-filters-stuck .is-sticky-first::before {
+    top: calc(-1 * var(--fg-sticky-top, 88px));
+  }
+
   /* En pantallas estrechas sólo se fija la barra de filtros: la cinta de
      «volver» ocupa demasiado alto de un viewport de móvil. */
   @media (max-width: 760px) {
@@ -148,6 +159,13 @@
     // sólo se ve dentro del catálogo.
     var h = (head && head.offsetParent !== null) ? head.getBoundingClientRect().height / z : 0;
     root.style.setProperty('--fg-sticky-head', Math.round(h) + 'px');
+
+    // Cuál es la primera pieza pegada: su fondo es el que sube a tapar el
+    // hueco de la barra superior.
+    var primera = (head && head.offsetParent !== null) ? head : bar;
+    [head, bar].forEach(function (el) {
+      if (el) el.classList.toggle('is-sticky-first', el === primera);
+    });
 
     if (zone) {
       // Si la zona es transparente (puede pasar si otra capa la repinta), se
