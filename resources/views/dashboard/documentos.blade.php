@@ -71,12 +71,12 @@
                 <div class="w-9 h-9 rounded-full bg-err-soft border border-err/30 flex items-center justify-center text-err shrink-0"><i class="pi pi-exclamation-circle"></i></div>
                 <div class="flex-1 min-w-0">
                     <div class="text-[14px] font-bold text-ink-950">
-                        {{ $kycRejected ? __('Acción requerida: tu KYC fue rechazado') : __('Acción requerida: completá tu KYC') }}
+                        {{ $kycRejected ? __('Acción requerida: tu KYC fue rechazado') : __('Acción requerida: completa tu KYC') }}
                     </div>
                     <div class="text-[12px] text-ink-600 mt-0.5">
                         {{ $kycRejected
-                            ? __('Tu formulario de verificación fue rechazado. Volvé a completar el formulario KYC para continuar con tu expediente.')
-                            : __('Necesitamos verificar tu identidad para continuar con tu expediente. Completá el formulario KYC con tus datos personales y de contacto.') }}
+                            ? __('Tu formulario de verificación ha sido rechazado. Vuelve a completar el formulario KYC para continuar con tu expediente.')
+                            : __('Necesitamos verificar tu identidad para continuar con tu expediente. Completa el formulario KYC con tus datos personales y de contacto.') }}
                     </div>
                     <a href="{{ url('/form') }}" class="cli-btn cli-btn-primary text-[12px] py-2 mt-3 inline-flex">
                         <i class="pi pi-id-card text-[10px]"></i> {{ $kycRejected ? __('Volver a completar KYC') : __('Completar formulario KYC') }}
@@ -104,7 +104,7 @@
                 <div class="w-9 h-9 rounded-full bg-err-soft border border-err/30 flex items-center justify-center text-err shrink-0"><i class="pi pi-exclamation-circle"></i></div>
                 <div class="flex-1 min-w-0">
                     <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos requeridos') }}</div>
-                    <div class="text-[12px] text-ink-600 mt-0.5">{{ __('Completá estos documentos para avanzar tu expediente.') }}</div>
+                    <div class="text-[12px] text-ink-600 mt-0.5">{{ __('Completa estos documentos para avanzar tu expediente.') }}</div>
                 </div>
             </div>
             <div class="divide-y divide-ink-100">

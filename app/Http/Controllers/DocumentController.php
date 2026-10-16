@@ -93,7 +93,7 @@ class DocumentController extends Controller
             $accepted = $reservation && ($reservation->budget_status === 'approved'
                 || in_array($reservation->status, ['contract_signed', 'signed']));
             if (! $accepted) {
-                abort(403, __('Tenés que marcar como conforme el plan de pagos antes de descargarlo.'));
+                abort(403, __('Tienes que marcar como conforme el plan de pagos antes de descargarlo.'));
             }
         }
 
@@ -314,13 +314,13 @@ class DocumentController extends Controller
             if (! $planDoc || ! in_array($planDoc->status, ['signed', 'approved'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('Primero tenés que firmar el plan de pagos.'),
+                    'message' => __('Primero tienes que firmar el plan de pagos.'),
                 ], 400);
             }
             if ($document->document_type === 'contract' && empty(data_get($document->metadata, 'accepted_at'))) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('Aceptá el contrato antes de firmarlo.'),
+                    'message' => __('Acepta el contrato antes de firmarlo.'),
                 ], 400);
             }
         }

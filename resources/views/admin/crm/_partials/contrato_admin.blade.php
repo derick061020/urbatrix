@@ -104,7 +104,7 @@
                     <input type="checkbox" class="mt-0.5" onchange="document.getElementById('manual-doc-{{ $d->id }}').classList.toggle('hidden', !this.checked)">
                     <span>
                         <span class="text-[12px] font-semibold text-ink-700">{{ __('Saltar la confirmación del cliente') }}</span>
-                        <span class="block text-[11px] text-ink-500">{{ __('Subí la versión ya firmada como archivo. Quedará aprobada sin esperar al cliente.') }}</span>
+                        <span class="block text-[11px] text-ink-500">{{ __('Sube la versión ya firmada como archivo. Quedará aprobada sin esperar al cliente.') }}</span>
                     </span>
                 </label>
                 <form id="manual-doc-{{ $d->id }}" data-signed-upload data-url="{{ route('admin.crm.contract.manual-sign', $d->id) }}" class="hidden mt-3 space-y-3 m-0">

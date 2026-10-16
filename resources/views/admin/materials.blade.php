@@ -177,7 +177,7 @@
                         </button>
                     @endforeach
                 </div>
-                <span class="block text-[11px] text-ink-400 mt-1.5">{{ __('Dejalo en “automático” para detectarlo según el formato del archivo.') }}</span>
+                <span class="block text-[11px] text-ink-400 mt-1.5">{{ __('Déjalo en “automático” para detectarlo según el formato del archivo.') }}</span>
             </div>
 
             <div class="pt-1">
@@ -219,7 +219,7 @@
         <div class="p-6 text-center">
             <div class="w-12 h-12 mx-auto rounded-full bg-err-soft flex items-center justify-center text-err mb-3"><i class="pi pi-trash text-[20px]"></i></div>
             <div class="text-[15px] font-bold text-ink-900">{{ __('Eliminar material') }}</div>
-            <p class="text-[13px] text-ink-500 mt-1.5">{{ __('¿Seguro que querés eliminar') }} <b class="text-ink-700" id="matDeleteName">{{ __('este material') }}</b>{{ __('? Esta acción no se puede deshacer.') }}</p>
+            <p class="text-[13px] text-ink-500 mt-1.5">{{ __('¿Seguro que quieres eliminar') }} <b class="text-ink-700" id="matDeleteName">{{ __('este material') }}</b>{{ __('? Esta acción no se puede deshacer.') }}</p>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex justify-center gap-2">
             <button type="button" onclick="this.closest('dialog').close()" class="crm-btn crm-btn-ghost">{{ __('Cancelar') }}</button>

@@ -2081,7 +2081,7 @@
                     <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ auth()->user()->email }}</div>
                   @else
                     <div style="font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:#171717;letter-spacing:-0.084px;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ __('Invitado') }}</div>
-                    <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ __('Creá tu cuenta para reservar') }}</div>
+                    <div style="font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;color:#a3a3a3;max-width: 100% !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{ __('Crea tu cuenta para reservar') }}</div>
                   @endauth
                 </div>
                 <div style="position:relative;">

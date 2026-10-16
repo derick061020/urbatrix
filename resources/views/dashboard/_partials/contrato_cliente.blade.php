@@ -29,13 +29,13 @@
             <div class="text-[14px] font-bold text-ink-950">{{ $title }}</div>
             <div class="text-[12px] text-ink-500">
                 @if($signed)
-                    {{ __('Documento firmado. Podés descargarlo.') }}
+                    {{ __('Documento firmado. Ya puedes descargarlo.') }}
                 @elseif($accepted)
-                    {{ __('Aceptaste el contrato. Ahora podés firmarlo.') }}
+                    {{ __('Has aceptado el contrato. Ya puedes firmarlo.') }}
                 @elseif($awaitingAdmin)
                     {{ __('Tu asesor está revisando tu observación.') }}
                 @else
-                    {{ __('Revisá el contrato y enviá observaciones o aceptalo para firmar.') }}
+                    {{ __('Revisa el contrato y envía observaciones o acéptalo para firmar.') }}
                 @endif
             </div>
         </div>
@@ -99,7 +99,7 @@
     @if(! $accepted && ! $signed)
         <form id="contract-obs-{{ $d->id }}" method="POST" action="{{ $obsRoute }}" class="hidden px-5 pb-4 space-y-2 m-0">
             @csrf
-            <textarea name="message" rows="3" required maxlength="2000" placeholder="{{ __('Indicá qué cambios necesitás en el contrato…') }}" class="cli-input w-full pl-3 pt-2 h-auto resize-none"></textarea>
+            <textarea name="message" rows="3" required maxlength="2000" placeholder="{{ __('Indica qué cambios necesitas en el contrato…') }}" class="cli-input w-full pl-3 pt-2 h-auto resize-none"></textarea>
             <div class="flex items-center gap-2 justify-end">
                 <button type="button" onclick="document.getElementById('contract-obs-{{ $d->id }}').classList.add('hidden')" class="cli-btn cli-btn-ghost text-[12px]">{{ __('Cancelar') }}</button>
                 <button type="submit" class="cli-btn cli-btn-primary text-[12px]"><i class="pi pi-send text-[10px]"></i> {{ __('Enviar observación') }}</button>

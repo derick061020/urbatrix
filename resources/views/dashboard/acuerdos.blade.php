@@ -549,7 +549,7 @@
                         {{-- ============ RESUMEN PANEL ============ --}}
                         <div class="acm-panel" data-acm-panel="resumen">
                             <div class="text-[12px] text-ink-700 mb-3">
-                                {{ __('Así quedará el documento con tu firma. Revisá la vista previa de la izquierda y confirmá para firmar de forma definitiva.') }}
+                                {{ __('Así quedará el documento con tu firma. Revisa la vista previa de la izquierda y confirma para firmar de forma definitiva.') }}
                             </div>
 
                             <div class="rounded-xl border border-ink-200 bg-ink-50 p-3 space-y-2">
@@ -674,9 +674,9 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
     if (!$signed && $isContract) {
         $planDoc = $reservation?->documents->firstWhere('document_type', 'payment_plan');
         if (!$planDoc || !in_array($planDoc->status, ['signed','approved'])) {
-            $signBlocked = __('Primero tenés que firmar el plan de pagos. Una vez firmado, podrás continuar con este contrato.');
+            $signBlocked = __('Primero tienes que firmar el plan de pagos. Una vez firmado, podrás continuar con este contrato.');
         } elseif (!$isPromise && !$accepted) {
-            $signBlocked = __('Aceptá el contrato antes de firmarlo (botón "Aceptar contrato" en Revisar).');
+            $signBlocked = __('Acepta el contrato antes de firmarlo (botón "Aceptar contrato" en Revisar).');
         }
     }
 
@@ -714,7 +714,7 @@ $__acuerdosData = $allPending->merge($allCompleted)->merge($signedDocs)->unique(
         'awaiting_admin' => $awaitingAdmin,
         'created'      => ($d['created_at'] ?? '') ? \Carbon\Carbon::parse($d['created_at'])->locale(app()->getLocale())->isoFormat('D MMM YYYY · h:mm A') : '',
         'advisor'      => $advisorName,
-        'advisor_msg'  => $advisorMsg ?: __('Te dejo este documento para que lo revises. Cualquier consulta, me avisás por el chat.'),
+        'advisor_msg'  => $advisorMsg ?: __('Te dejo este documento para que lo revises. Cualquier consulta, me avisas por el chat.'),
         'observations' => collect($observations)->map(function($o) {
             return [
                 'from'    => $o['from'] ?? 'admin',
@@ -851,9 +851,9 @@ function acmBuildResumen() {
 function acmGoResumen() {
     const name = document.getElementById('acm-sig-name').value.trim();
     const accept = document.getElementById('acm-sig-accept').checked;
-    if (name.length < 3) { acmToast(@json(__('Escribí tu nombre completo.')), 'err'); return; }
+    if (name.length < 3) { acmToast(@json(__('Escribe tu nombre completo.')), 'err'); return; }
     if (!acmHasStroke)   { acmToast(@json(__('Falta tu firma manuscrita.')), 'err'); return; }
-    if (!accept)         { acmToast(@json(__('Aceptá los términos para continuar.')), 'err'); return; }
+    if (!accept)         { acmToast(@json(__('Acepta los términos para continuar.')), 'err'); return; }
     acmGoTab('resumen');
 }
 
@@ -1020,7 +1020,7 @@ document.getElementById('acm-obs-text').addEventListener('input', e => {
 function submitAcuerdoObservation() {
     if (!acmCurrentDoc || !acmCurrentDoc.obs_url) return;
     const txt = document.getElementById('acm-obs-text').value.trim();
-    if (txt.length < 5) { acmToast('Contanos al menos en una frase qué necesitás ajustar.', 'err'); return; }
+    if (txt.length < 5) { acmToast('Cuéntanos al menos en una frase qué necesitas ajustar.', 'err'); return; }
     const btn = document.getElementById('acm-obs-send');
     btn.disabled = true; const original = btn.innerHTML;
     btn.innerHTML = '<i class="pi pi-spin pi-spinner text-[11px]"></i> Enviando…';
@@ -1142,9 +1142,9 @@ function submitSignAcuerdo() {
     if (!acmCurrentDoc || !acmCurrentDoc.sign_url) return;
     const name = document.getElementById('acm-sig-name').value.trim();
     const accept = document.getElementById('acm-sig-accept').checked;
-    if (name.length < 3) { acmToast(@json(__('Escribí tu nombre completo.')), 'err'); return; }
+    if (name.length < 3) { acmToast(@json(__('Escribe tu nombre completo.')), 'err'); return; }
     if (!acmHasStroke)   { acmToast(@json(__('Falta tu firma manuscrita.')), 'err'); return; }
-    if (!accept)         { acmToast(@json(__('Aceptá los términos para continuar.')), 'err'); return; }
+    if (!accept)         { acmToast(@json(__('Acepta los términos para continuar.')), 'err'); return; }
 
     const canvas = document.getElementById('acm-sig-canvas');
     const sigData = canvas.toDataURL('image/png');

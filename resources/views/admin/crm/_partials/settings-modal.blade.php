@@ -603,9 +603,9 @@
                                 <div class="st-2fa-qr" id="st2faQr"></div>
                                 <div class="st-2fa-steps">
                                     <p class="st-2fa-help">{{ __('1. Escaneá el código QR con Google Authenticator, Authy, 1Password o similar.') }}</p>
-                                    <p class="st-2fa-help">{{ __('2. ¿No podés escanear? Cargá esta clave manualmente:') }}</p>
+                                    <p class="st-2fa-help">{{ __('2. ¿No puedes escanear? Introduce esta clave manualmente:') }}</p>
                                     <code class="st-2fa-secret" id="st2faSecret">—</code>
-                                    <p class="st-2fa-help">{{ __('3. Ingresá el código de 6 dígitos que muestra la app:') }}</p>
+                                    <p class="st-2fa-help">{{ __('3. Introduce el código de 6 dígitos que muestra la app:') }}</p>
                                     <div class="flex items-center gap-2">
                                         <input type="text" id="st2faConfirmCode" inputmode="numeric" maxlength="6"
                                                class="crm-input pl-3" style="max-width:160px; letter-spacing:.25em; text-align:center;" placeholder="000000">
@@ -642,7 +642,7 @@
 
                     <div class="st-collapse" id="st2faCodesPanel">
                         <p class="st-2fa-help" style="margin-bottom:8px;">
-                            Guardá estos códigos en un lugar seguro. Cada uno sirve una sola vez para entrar si perdés tu dispositivo.
+                            Guarda estos códigos en un lugar seguro. Cada uno sirve una sola vez para entrar si pierdes tu dispositivo.
                         </p>
                         <div class="st-2fa-codes" id="st2faCodesList"></div>
                         <div class="flex items-center gap-2 mt-3">
@@ -739,7 +739,7 @@
                             <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Entidad / representación') }}</div>
                             <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="{{ __('Ej: En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L.') }}"
                                    style="width:100%; max-width:420px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
-                            <div class="st-row-desc" style="margin-top:6px;">{{ __('Si dejás estos campos vacíos, el contrato usa los datos por defecto del documento.') }}</div>
+                            <div class="st-row-desc" style="margin-top:6px;">{{ __('Si dejas estos campos vacíos, el contrato usa los datos por defecto del documento.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -761,7 +761,7 @@
                         <div style="margin-bottom:14px;">
                             <div class="st-row-label">{{ __('Ítems del menú del cliente') }}</div>
                             <div class="st-row-desc">
-                                {{ __('Estos ítems aparecen en el menú desplegable del cliente (Brochure, Plantas, ROIs, etc.). Vos decidís cuáles mostrar: cada ítem puede ser un enlace externo o un documento que se abre en una ventana.') }}
+                                {{ __('Estos ítems aparecen en el menú desplegable del cliente (Brochure, Plantas, ROIs, etc.). Tú decides cuáles mostrar: cada ítem puede ser un enlace externo o un documento que se abre en una ventana.') }}
                             </div>
                         </div>
 
@@ -781,7 +781,7 @@
                         <div style="margin-bottom:14px;">
                             <div class="st-row-label">{{ __('Imágenes del slider') }}</div>
                             <div class="st-row-desc">
-                                {{ __('Estas imágenes se muestran en un carrusel debajo del hero de la página principal, una vez que termina la animación de entrada. Subí varias y se alternarán automáticamente. Recomendado: formato apaisado (ej. 1600×600).') }}
+                                {{ __('Estas imágenes se muestran en un carrusel debajo del hero de la página principal, una vez que termina la animación de entrada. Sube varias y se alternarán automáticamente. Recomendado: formato apaisado (ej. 1600×600).') }}
                             </div>
                         </div>
 
@@ -1120,7 +1120,7 @@
             if (window.QRCode) {
                 new QRCode(qrBox, { text: data.otpauth_uri, width: 152, height: 152, correctLevel: QRCode.CorrectLevel.M });
             } else {
-                qrBox.innerHTML = '<span style="font-size:11px;color:#99a0ae;text-align:center;">' + @json(__('No se pudo cargar el QR. Usá la clave manual.')) + '</span>';
+                qrBox.innerHTML = '<span style="font-size:11px;color:#99a0ae;text-align:center;">' + @json(__('No se pudo cargar el QR. Usa la clave manual.')) + '</span>';
             }
         } catch (e) { stShowAlert(e.message, 'err'); }
     };
@@ -1150,7 +1150,7 @@
         if (!password) { stShowAlert('Ingresá tu contraseña para desactivar la 2FA.', 'err'); return; }
         st2faConfirm2({
             title: '{{ __("Desactivar autenticación 2FA") }}',
-            text: '{{ __("Tu cuenta quedará protegida únicamente por la contraseña. Podés volver a activarla cuando quieras.") }}',
+            text: '{{ __("Tu cuenta quedará protegida únicamente por la contraseña. Puedes volver a activarla cuando quieras.") }}',
             confirmLabel: 'Desactivar',
             icon: 'pi pi-shield',
             onConfirm: async () => {
@@ -1534,7 +1534,7 @@
                     body: fd,
                     credentials: 'same-origin',
                 });
-                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño. Subí el límite de subida de nginx (client_max_body_size).');
+                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño. Sube el límite de subida de nginx (client_max_body_size).');
                 const d = await res.json().catch(() => ({}));
                 if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir el archivo.');
 

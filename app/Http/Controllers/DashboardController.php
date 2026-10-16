@@ -165,7 +165,7 @@ class DashboardController extends Controller
     public function sendMessage(Request $request)
     {
         $reservation = $this->resolveReservation($request);
-        if (! $reservation) abort(404, __('No tenés un expediente activo.'));
+        if (! $reservation) abort(404, __('No tienes un expediente activo.'));
         if ($reservation->user_id !== Auth::id()) abort(403);
 
         $data = $request->validate(['body' => 'required|string|max:5000']);
@@ -288,7 +288,7 @@ class DashboardController extends Controller
         // Gate: the payment plan must be signed before any contract can be accepted/signed
         $planDoc = $reservation->documents->firstWhere('document_type', 'payment_plan');
         if (! $planDoc || ! in_array($planDoc->status, ['signed', 'approved'])) {
-            return back()->with('error', __('Primero tenés que firmar el plan de pagos.'));
+            return back()->with('error', __('Primero tienes que firmar el plan de pagos.'));
         }
 
         $meta = $document->metadata ?? [];
@@ -308,7 +308,7 @@ class DashboardController extends Controller
             'status'   => 'generated',
         ]);
 
-        return back()->with('success', __('Contrato aceptado. Podés proceder a firmarlo.'));
+        return back()->with('success', __('Contrato aceptado. Ya puedes firmarlo.'));
     }
 
     public function acceptBudget(Request $request, Reservation $reservation)

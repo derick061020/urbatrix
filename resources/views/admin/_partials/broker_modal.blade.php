@@ -115,7 +115,7 @@
                                     onclick="openBrokerDocDelete({{ \Illuminate\Support\Js::from(['url'=>route('admin.agents.documents.destroy', [$b->id, $doc->id]),'title'=>$doc->title]) }})"><i class="pi pi-trash"></i></button>
                             </div>
                         @empty
-                            <div class="px-4 py-8 text-center text-[12px] text-ink-400">{{ __('Este broker todavía no tiene contratos. Subí el primero arriba.') }}</div>
+                            <div class="px-4 py-8 text-center text-[12px] text-ink-400">{{ __('Este broker todavía no tiene contratos. Sube el primero arriba.') }}</div>
                         @endforelse
                     </div>
                 </div>

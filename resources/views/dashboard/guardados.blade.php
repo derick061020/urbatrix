@@ -566,7 +566,7 @@
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto" style="background:#f3f4f6;color:#9ca3af;">
                 <i class="pi pi-heart text-[22px]"></i>
             </div>
-            <div class="mt-3 text-[15px] font-bold" style="color:#171717;">{{ __('Aún no tenés propiedades guardadas') }}</div>
+            <div class="mt-3 text-[15px] font-bold" style="color:#171717;">{{ __('Aún no tienes propiedades guardadas') }}</div>
             <p class="text-[12px] mt-1 max-w-md mx-auto" style="color:#717784;">
                 Tocá el corazón en cualquier unidad del listado para agregarla a tu lista de guardados y revisarla después.
             </p>

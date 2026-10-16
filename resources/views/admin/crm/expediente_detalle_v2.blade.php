@@ -724,7 +724,7 @@ window.crmConfirm = function (opts) {
     const okBtn  = document.getElementById('confirmSignedOk');
     const cancel = document.getElementById('confirmSignedCancel');
     document.getElementById('confirmSignedTitle').textContent = opts.title || 'Confirmar acción';
-    document.getElementById('confirmSignedBody').textContent  = opts.body  || '¿Confirmás esta acción?';
+    document.getElementById('confirmSignedBody').textContent  = opts.body  || '¿Confirmas esta acción?';
     okBtn.innerHTML = (opts.icon ? '<i class="pi ' + opts.icon + '"></i> ' : '') + (opts.ok || 'Confirmar');
 
     return new Promise((resolve) => {
