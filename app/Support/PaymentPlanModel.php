@@ -156,7 +156,10 @@ class PaymentPlanModel
 
         // Lo que el cliente pone antes de empezar la obra: la reserva más la
         // separación al firmar. Es el tramo que el simulador deja mover.
-        $entrada = (int) round(($mediana('reserva') + $mediana('inicial')) * 100);
+        // Redondeada al 5% más cercano: la mediana de lo firmado da 24,3%, que
+        // es el 25% que cotiza el equipo con el redondeo de cada contrato. El
+        // simulador tiene que hablar el mismo idioma que la oferta.
+        $entrada = (int) round(($mediana('reserva') + $mediana('inicial')) * 100 / 5) * 5;
 
         // El tope deja siempre algo en obra: si la entrada se comiera todo lo
         // que no es contra-entrega, no habría cuotas que simular.
