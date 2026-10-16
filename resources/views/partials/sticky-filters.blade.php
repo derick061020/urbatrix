@@ -65,6 +65,21 @@
   }
   body.has-sticky-filters.is-filters-stuck .fg-filter-bar::after { opacity: 1; }
 
+  /* Pegada, la banda necesita leerse como una capa por encima del listado.
+     Miguel: «cuando haces scroll se mezcla todo del mismo color». No se mete
+     un color nuevo —rompería la paleta del proyecto—: se usa la tinta de la
+     marca a muy baja opacidad sobre el mismo papel, más un filo de 1px. Así
+     la frontera existe en los tres proyectos sin desentonar en ninguno. */
+  body.has-sticky-filters.is-filters-stuck .fg-catalog-head::before,
+  body.has-sticky-filters.is-filters-stuck .fg-filter-bar::before {
+    background:
+      linear-gradient(var(--brand-soft-2, rgba(16,24,40,.04)), var(--brand-soft-2, rgba(16,24,40,.04))),
+      var(--fg-sticky-bg, #f2f5f8);
+  }
+  body.has-sticky-filters.is-filters-stuck .fg-filter-bar::before {
+    box-shadow: inset 0 -1px 0 var(--brand-soft-3, rgba(16,24,40,.12));
+  }
+
   /* En pantallas estrechas sólo se fija la barra de filtros: la cinta de
      «volver» ocupa demasiado alto de un viewport de móvil. */
   @media (max-width: 760px) {
@@ -107,13 +122,31 @@
     return 0;
   }
 
+  // En Bahía Mar la capa «lujo» escala la interfaz entera con `zoom` en
+  // pantallas anchas (1,15 desde 1800px; 1,3 desde 2200; 1,5 desde 2800).
+  // Con zoom, getBoundingClientRect() devuelve píxeles de PANTALLA, pero una
+  // longitud en CSS se interpreta sin escalar: escribir top:101px acaba
+  // empujando 101×1,15 = 116px reales. Esa diferencia es exactamente el hueco
+  // por el que se veían pasar las tarjetas entre la cinta y la barra, y por eso
+  // crecía con el ancho. Se divide por el zoom acumulado.
+  function zoomAcumulado() {
+    var z = 1, e = bar;
+    while (e && e.nodeType === 1) {
+      var v = parseFloat(getComputedStyle(e).zoom);
+      if (v && v > 0 && v !== 1) z *= v;
+      e = e.parentElement;
+    }
+    return z || 1;
+  }
+
   function measure() {
-    var top = topBarHeight();
+    var z = zoomAcumulado();
+    var top = topBarHeight() / z;
     root.style.setProperty('--fg-sticky-top', Math.round(top) + 'px');
 
     // La cinta de «volver» sólo existe en los proyectos con tipos de villa, y
     // sólo se ve dentro del catálogo.
-    var h = (head && head.offsetParent !== null) ? head.getBoundingClientRect().height : 0;
+    var h = (head && head.offsetParent !== null) ? head.getBoundingClientRect().height / z : 0;
     root.style.setProperty('--fg-sticky-head', Math.round(h) + 'px');
 
     if (zone) {
@@ -126,8 +159,10 @@
       root.style.setProperty('--fg-sticky-bg', bg);
     }
 
-    // clientWidth excluye la barra de scroll; 100vw no.
-    root.style.setProperty('--fg-sticky-bleed', root.clientWidth + 'px');
+    // clientWidth excluye la barra de scroll (100vw no) y, a diferencia de
+    // getBoundingClientRect, YA viene en unidades sin escalar: aquí no hay que
+    // dividir por el zoom o la banda se queda corta por los lados.
+    root.style.setProperty('--fg-sticky-bleed', Math.ceil(root.clientWidth) + 'px');
   }
 
   // El observador de abajo mira las clases del body, y medir también las tocaba:
@@ -150,7 +185,7 @@
     bar.parentNode.insertBefore(sentinel, head || bar);
     new IntersectionObserver(function (entries) {
       document.body.classList.toggle('is-filters-stuck', !entries[0].isIntersecting);
-    }, { rootMargin: '-' + (Math.round(topBarHeight()) + 1) + 'px 0px 0px 0px', threshold: 0 })
+    }, { rootMargin: '-' + (Math.round(topBarHeight() / zoomAcumulado()) + 1) + 'px 0px 0px 0px', threshold: 0 })
       .observe(sentinel);
   }
 
