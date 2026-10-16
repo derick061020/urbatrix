@@ -221,7 +221,7 @@
         </div>
 
         <div class="px-6 py-3 border-b border-ink-100">
-            <p class="text-[12px] text-ink-500">{{ __('Subí la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso.') }}</p>
+            <p class="text-[12px] text-ink-500">{{ __('Sube la imagen del plano de cada piso. Esa imagen se muestra en la vista "Plano" de la home al seleccionar ese piso.') }}</p>
         </div>
 
         <div id="fp-alert" class="hidden mx-6 mt-3 px-4 py-2 rounded-lg text-[12px]"></div>
@@ -323,7 +323,7 @@
                     body: fd,
                     credentials: 'same-origin',
                 });
-                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (subí client_max_body_size en nginx).');
+                if (res.status === 413) throw new Error('El servidor rechazó el envío por tamaño (sube client_max_body_size en nginx).');
                 const d = await res.json().catch(() => ({}));
                 if (!res.ok || d.success === false) throw new Error(d.message || 'No se pudo subir la imagen.');
 
@@ -666,7 +666,7 @@
             const ids = selectedIds();
             if (ids.length === 0) {
                 e.preventDefault();
-                alert('{{ __("Seleccioná al menos una propiedad en la tabla.") }}');
+                alert('{{ __("Selecciona al menos una propiedad en la tabla.") }}');
                 return;
             }
             ids.forEach(id => {

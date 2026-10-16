@@ -25,7 +25,7 @@
         <div class="flex-1 min-w-0">
             <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Nueva unidad') }}</div>
             <div class="text-[20px] font-bold text-ink-950 leading-tight">{{ __('Crear una unidad') }}</div>
-            <div class="text-[12px] text-ink-500 mt-0.5">{{ __('Completá los datos básicos. Las imágenes se pueden subir tras crearla.') }}</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">{{ __('Completa los datos básicos. Las imágenes se pueden subir tras crearla.') }}</div>
         </div>
         <div class="flex items-center gap-2">
             <button type="submit" form="unit-create-form" class="crm-btn crm-btn-primary"><i class="pi pi-check"></i> {{ __('Crear unidad') }}</button>

@@ -13,7 +13,7 @@
 
     Se engancha SOLO a los enlaces same-origin cuya ruta termina en "/download"
     (las tres rutas del proyecto: documents.download, broker.materials.download y
-    broker.documents.download). Para excluir uno, marcalo data-no-morph.
+    broker.documents.download). Para excluir uno, márcalo data-no-morph.
 
     Un <a download> no reporta progreso, así que leemos el cuerpo con fetch +
     ReadableStream y comparamos contra Content-Length. Si algo no da (navegador

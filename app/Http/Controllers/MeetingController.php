@@ -58,7 +58,7 @@ class MeetingController extends Controller
 
         $client = Auth::user();
         if (! $client) {
-            return response()->json(['error' => __('Tenés que iniciar sesión para agendar.')], 401);
+            return response()->json(['error' => __('Tienes que iniciar sesión para agendar.')], 401);
         }
 
         if (! $client->email) {
@@ -72,13 +72,13 @@ class MeetingController extends Controller
         );
 
         if ($startsAt->isPast()) {
-            return response()->json(['error' => __('No podés agendar en una fecha pasada.')], 422);
+            return response()->json(['error' => __('No puedes agendar en una fecha pasada.')], 422);
         }
 
         $advisor = $this->findAvailableAdvisor($unit, $startsAt);
         if (! $advisor) {
             return response()->json([
-                'error' => __('Ese horario ya no está disponible. Elegí otro horario o fecha.'),
+                'error' => __('Ese horario ya no está disponible. Elige otra hora u otra fecha.'),
             ], 409);
         }
 
@@ -116,7 +116,7 @@ class MeetingController extends Controller
         } catch (Throwable $e) {
             Log::error('Google Calendar createEvent failed', ['error' => $e->getMessage()]);
             return response()->json([
-                'error' => __('No pudimos crear la videollamada en Google. Probá de nuevo en unos minutos.'),
+                'error' => __('No pudimos crear la videollamada en Google. Inténtalo de nuevo en unos minutos.'),
             ], 502);
         }
 

@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div>
-                <label class="text-[12px] font-semibold text-ink-700">{{ __('Archivo') }} <span class="font-normal text-ink-400">{{ __('(opcional: dejá el actual o elegí otro)') }}</span></label>
+                <label class="text-[12px] font-semibold text-ink-700">{{ __('Archivo') }} <span class="font-normal text-ink-400">{{ __('(opcional: deja el actual o elige otro)') }}</span></label>
                 <div class="text-[11px] text-ink-500 mt-0.5 flex items-center gap-1"><i class="pi pi-paperclip text-[10px]"></i> <span id="ed-current-file">—</span></div>
                 <div class="mt-1.5" id="ed-morph"></div>
                 <input type="file" id="ed-file" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
@@ -54,7 +54,7 @@
                 <input type="date" name="generated_at" id="ed-date" class="crm-input pl-3 mt-1">
             </div>
             <div id="ed-plan-warning" class="hidden rounded-lg border border-warn/30 bg-warn-soft/40 px-3 py-2 text-[11px] text-warn-dark">
-                <i class="pi pi-info-circle"></i> {{ __('Un plan de pagos en estado firmado o aprobado bloquea la tarjeta del plan en la pestaña Pagos. Si lo pasás a otro estado, el plan vuelve a quedar editable.') }}
+                <i class="pi pi-info-circle"></i> {{ __('Un plan de pagos en estado firmado o aprobado bloquea la tarjeta del plan en la pestaña Pagos. Si lo pasas a otro estado, el plan vuelve a quedar editable.') }}
             </div>
         </div>
         <div class="px-6 py-4 border-t border-ink-100 flex items-center gap-2 justify-end bg-ink-50">

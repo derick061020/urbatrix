@@ -41,7 +41,7 @@ class SignNowDiagnose extends Command
         if (! $matched) {
             $this->error('Ningún entorno aceptó el API key.');
             $this->line('Verificá en signnow.com → API → que la key esté activa.');
-            $this->line('Si la copiaste hace tiempo, podría haber expirado — regenerala.');
+            $this->line('Si la copiaste hace tiempo, podría haber caducado: regenérala.');
             return self::FAILURE;
         }
 

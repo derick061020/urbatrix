@@ -151,7 +151,7 @@
     function rpBeforeSubmit(form) {
         var upEl = document.getElementById('rp-uploading');
         if (upEl && upEl.value === '1') {
-            alert(@json(__('Esperá a que termine la subida del comprobante.')));
+            alert(@json(__('Espera a que termine la subida del comprobante.')));
             return false;
         }
         return true;

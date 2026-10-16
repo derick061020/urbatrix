@@ -2,4 +2,4 @@
 @section('title', __('Demasiados intentos'))
 @section('code', '429')
 @section('heading', __('Demasiados intentos seguidos'))
-@section('message', __('Esperá unos segundos y volvé a intentarlo.'))
+@section('message', __('Espera unos segundos y vuelve a intentarlo.'))

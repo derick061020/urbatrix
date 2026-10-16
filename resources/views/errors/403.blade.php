@@ -1,5 +1,5 @@
 @extends('errors.layout')
 @section('title', __('Sin permiso'))
 @section('code', '403')
-@section('heading', __('No tenés acceso a esta sección'))
-@section('message', __('Si creés que deberías tenerlo, pedile acceso al administrador del sistema.'))
+@section('heading', __('No tienes acceso a esta sección'))
+@section('message', __('Si crees que deberías tenerlo, pide acceso al administrador del sistema.'))

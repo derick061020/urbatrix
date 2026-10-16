@@ -416,11 +416,11 @@ class AdminController extends Controller
             report($e);
 
             return redirect()->back()->withInput()
-                ->with('error', __('No pudimos crear la unidad. Revisá los datos e intentá de nuevo; si el problema sigue, avisale al equipo técnico.'));
+                ->with('error', __('No pudimos crear la unidad. Revisa los datos e inténtalo de nuevo; si el problema sigue, avisa al equipo técnico.'));
         }
 
         return redirect()->route('admin.units.edit', $unit->id)
-            ->with('success', __('Unidad creada. Ahora podés subir imágenes y completar el resto de la información.'));
+            ->with('success', __('Unidad creada. Ahora puedes subir imágenes y completar el resto de la información.'));
     }
 
     public function updateUnit(Request $request, Unit $unit)
@@ -504,7 +504,7 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            $message = __('No pudimos guardar los cambios. Revisá los datos e intentá de nuevo; si el problema sigue, avisale al equipo técnico.');
+            $message = __('No pudimos guardar los cambios. Revisa los datos e inténtalo de nuevo; si el problema sigue, avisa al equipo técnico.');
 
             if ($request->expectsJson()) {
                 return response()->json(['ok' => false, 'message' => $message], 422);

@@ -212,7 +212,7 @@
                 <input type="checkbox" class="mt-0.5" onchange="document.getElementById('manual-plan-fields-{{ $r->id }}').classList.toggle('hidden', !this.checked)">
                 <span>
                     <span class="text-[12px] font-semibold text-ink-700">{{ __('Saltar la confirmación del cliente') }}</span>
-                    <span class="block text-[11px] text-ink-500">{{ __('Subí el plan de pagos ya firmado. Se guardará con esta misma configuración (porcentajes y cuotas) y quedará aprobado sin esperar al cliente.') }}</span>
+                    <span class="block text-[11px] text-ink-500">{{ __('Sube el plan de pagos ya firmado. Se guardará con esta misma configuración (porcentajes y cuotas) y quedará aprobado sin esperar al cliente.') }}</span>
                 </span>
             </label>
             <div id="manual-plan-fields-{{ $r->id }}" class="hidden mt-3">
@@ -336,7 +336,7 @@ window.submitSignedPlan = async function (btn) {
 
     if (!file) {
         document.getElementById('manual-plan-fields-' + '{{ $r->id }}')?.classList.remove('hidden');
-        if (window.crmToast) crmToast(@json(__('Seleccioná el archivo firmado.')), 'err');
+        if (window.crmToast) crmToast(@json(__('Selecciona el archivo firmado.')), 'err');
         return;
     }
     const okConfirm = window.crmConfirm

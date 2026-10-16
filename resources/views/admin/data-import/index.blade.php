@@ -23,8 +23,8 @@
         @endif
 
         <ol class="mb-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500">
-            <li><span class="font-semibold text-[#5c6b4a]">1.</span> {{ __('Descargá el CSV de ejemplo') }}</li>
-            <li><span class="font-semibold text-[#5c6b4a]">2.</span> {{ __('Subí tu CSV') }}</li>
+            <li><span class="font-semibold text-[#5c6b4a]">1.</span> {{ __('Descarga el CSV de ejemplo') }}</li>
+            <li><span class="font-semibold text-[#5c6b4a]">2.</span> {{ __('Sube tu CSV') }}</li>
             <li><span class="font-semibold text-[#5c6b4a]">3.</span> {{ __('Mapeá las columnas') }}</li>
             <li><span class="font-semibold text-[#5c6b4a]">4.</span> {{ __('Importá') }}</li>
         </ol>

@@ -176,7 +176,7 @@
                 {{-- LEFT: payment form --}}
                 <div>
                     <div class="mb-6">
-                        <h1 class="font-display text-[24px] font-medium text-ink-950 leading-8">{{ __('Completá tu reserva') }}</h1>
+                        <h1 class="font-display text-[24px] font-medium text-ink-950 leading-8">{{ __('Completa tu reserva') }}</h1>
                         <p class="text-[14px] text-ink-500 mt-1">{{ __('Abona la seña para asegurar la unidad. El cobro se realiza una sola vez.') }}</p>
                     </div>
 

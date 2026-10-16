@@ -222,7 +222,7 @@
     <p class="fg-empty-msg" id="fgEmptyMsg"></p>
 
     <div class="fg-empty-chips" id="fgEmptyChips" hidden>
-      <span class="fg-empty-chips-label">{{ __('Tocá un filtro para quitarlo:') }}</span>
+      <span class="fg-empty-chips-label">{{ __('Toca un filtro para quitarlo:') }}</span>
     </div>
 
     <div class="fg-empty-actions" id="fgEmptyActions"></div>
@@ -237,8 +237,8 @@
 
     <div class="fg-empty-lead">
       <div class="fg-empty-lead-t">
-        <div class="h">{{ __('¿No encontrás lo que buscás?') }}</div>
-        <div class="s">{{ __('Contanos qué estás buscando y te avisamos cuando haya algo que encaje.') }}</div>
+        <div class="h">{{ __('¿No encuentras lo que buscas?') }}</div>
+        <div class="s">{{ __('Cuéntanos qué estás buscando y te avisamos cuando haya algo que encaje.') }}</div>
       </div>
       <a href="https://wa.me/18097109044" target="_blank" rel="noopener">{{ __('Hablar con un asesor') }}</a>
     </div>
@@ -254,7 +254,7 @@
     noUnit:      @json(__('No encontramos la unidad :q')),
     noUnitMsg:   @json(__('No hay ninguna que coincida con :q. Puede que ese número no exista aquí, o que esté escrito de otra forma.')),
     noMatch:     @json(__('Nada cumple todos los filtros')),
-    noMatchMsg:  @json(__('La combinación que elegiste es muy específica. Probá quitando un filtro para ver más opciones.')),
+    noMatchMsg:  @json(__('La combinación que has elegido es muy específica. Prueba a quitar un filtro para ver más opciones.')),
     back:        @json(__('Volver a los resultados')),
     clearSearch: @json(__('Limpiar búsqueda')),
     clearAll:    @json(__('Quitar todos los filtros')),
