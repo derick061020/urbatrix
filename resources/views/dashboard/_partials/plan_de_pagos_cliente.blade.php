@@ -31,7 +31,7 @@
                 @elseif($needsAdminAction)
                     {{ __('Tu asesor está revisando tu observación.') }}
                 @elseif($isSent)
-                    {{ __('Revisalo, escribí tus observaciones o marcalo como conforme para continuar.') }}
+                    {{ __('Revísalo, escribe tus observaciones o márcalo como conforme para continuar.') }}
                 @endif
             </div>
         </div>

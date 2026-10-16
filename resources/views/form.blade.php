@@ -258,7 +258,7 @@
 
                     <div class="sm:col-span-2">
                         <label class="field-label">{{ __('Foto del documento de identidad') }} <span class="field-required">*</span></label>
-                        <p class="text-[11px] text-ink-500 -mt-1 mb-3">{{ __('Subí el') }} <b>{{ __('frente') }}</b> {{ __('y el') }} <b>{{ __('reverso') }}</b> {{ __('de tu documento · PDF, JPG o PNG · máx. 4 MB') }}</p>
+                        <p class="text-[11px] text-ink-500 -mt-1 mb-3">{{ __('Sube el') }} <b>{{ __('frente') }}</b> {{ __('y el') }} <b>{{ __('reverso') }}</b> {{ __('de tu documento · PDF, JPG o PNG · máx. 4 MB') }}</p>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 

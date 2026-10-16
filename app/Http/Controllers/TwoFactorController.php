@@ -61,7 +61,7 @@ class TwoFactorController extends Controller
             return response()->json(['message' => __('La 2FA ya está confirmada.')], 422);
         }
         if (! Totp::verify($user->two_factor_secret, $data['code'])) {
-            return response()->json(['message' => __('El código no es válido. Probá de nuevo.')], 422);
+            return response()->json(['message' => __('El código no es válido. Inténtalo de nuevo.')], 422);
         }
 
         $codes = User::generateRecoveryCodes();

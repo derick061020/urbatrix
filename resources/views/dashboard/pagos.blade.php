@@ -548,7 +548,7 @@ function openReceiptModal(url, signUrl, alreadySigned) {
         dlBtn.disabled = false;
         dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         const hint = document.getElementById('receipt-sign-hint');
-        hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+        hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya puedes descargarlo.') }}`;
     } else {
         panel.style.display = '';
         panel.classList.remove('opacity-50', 'pointer-events-none');
@@ -625,9 +625,9 @@ function receiptEmbedSignature(sigData) {
 function receiptSign() {
     const name = document.getElementById('receipt-sig-name').value.trim();
     const accept = document.getElementById('receipt-sig-accept');
-    if (name.length < 3) { alert("{{ __('Escribí tu nombre completo.') }}"); return; }
+    if (name.length < 3) { alert("{{ __('Escribe tu nombre completo.') }}"); return; }
     if (!receiptSigHasStroke) { alert("{{ __('Falta tu firma manuscrita.') }}"); return; }
-    if (accept && !accept.checked) { alert("{{ __('Confirmá la recepción para continuar.') }}"); return; }
+    if (accept && !accept.checked) { alert("{{ __('Confirma la recepción para continuar.') }}"); return; }
     if (!receiptSignUrl) { alert("{{ __('No se pudo registrar la firma.') }}"); return; }
 
     const canvas = document.getElementById('receipt-sig-canvas');
@@ -660,7 +660,7 @@ function receiptSign() {
             dlBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             document.getElementById('receipt-sign-panel').style.display = 'none';
             const hint = document.getElementById('receipt-sign-hint');
-            hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya podés descargarlo.') }}`;
+            hint.innerHTML = `<i class="pi pi-check-circle text-[10px] text-ok"></i> {{ __('Comprobante firmado. Ya puedes descargarlo.') }}`;
         } else {
             alert(d.message || "{{ __('No se pudo registrar la firma.') }}");
             btn.disabled = false; btn.innerHTML = original;
@@ -671,7 +671,7 @@ function receiptSign() {
 
 // Download/print the receipt — only after signing.
 function printReceipt() {
-    if (!receiptSigned) { alert("{{ __('Firmá el comprobante antes de descargarlo.') }}"); return; }
+    if (!receiptSigned) { alert("{{ __('Firma el comprobante antes de descargarlo.') }}"); return; }
     const frame = document.getElementById('receipt-iframe');
     if (frame && frame.contentWindow) {
         frame.contentWindow.focus();

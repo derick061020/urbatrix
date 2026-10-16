@@ -258,7 +258,7 @@
       @endif
       <span class="guest-modal-eyebrow">{{ __('Bienvenido a bordo') }}</span>
       <h3 id="guestModalTitle">{{ __('Bienvenido a :project', ['project' => $guestProject]) }}</h3>
-      <p>{{ __('Estás viendo una vista previa. Creá tu cuenta para explorar las unidades, ver los planos de cada una y reservar en línea.') }}</p>
+      <p>{{ __('Estás viendo una vista previa. Crea tu cuenta para explorar las unidades, ver los planos de cada una y reservar en línea.') }}</p>
     </div>
 
     <div class="guest-options">
@@ -280,7 +280,7 @@
         </span>
         <span class="guest-txt">
           <h4>{{ __('Ya tengo cuenta') }}</h4>
-          <div class="guest-desc">{{ __('Entrá para retomar donde lo dejaste.') }}</div>
+          <div class="guest-desc">{{ __('Entra para retomar donde lo dejaste.') }}</div>
         </span>
         <span class="guest-go">
           <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
@@ -290,7 +290,7 @@
 
     <div class="guest-modal-foot">
       <button type="button" class="guest-skip" onclick="closeGuestModal()">{{ __('Lo decido luego') }} →</button>
-      <p class="guest-hint">{{ __('Podés seguir mirando el proyecto; las unidades se abren al crear la cuenta.') }}</p>
+      <p class="guest-hint">{{ __('Puedes seguir mirando el proyecto; las unidades se abren al crear la cuenta.') }}</p>
     </div>
 
   </div>

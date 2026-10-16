@@ -90,7 +90,7 @@
             </form>
         @else
             <div class="px-4 py-3 border-t border-ink-100 text-center text-[12px] text-ink-500">
-                Necesitás una reserva activa para chatear con tu asesor.
+                Necesitas una reserva activa para chatear con tu asesor.
             </div>
         @endif
     </div>

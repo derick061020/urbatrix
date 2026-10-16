@@ -222,7 +222,7 @@ class SignNowService
             $resp = Http::withToken($token)->get(self::workingBaseUrl().'/user');
             if (! $resp->successful()) {
                 Log::warning('SignNow /user lookup failed', ['status' => $resp->status(), 'body' => $resp->body()]);
-                throw new \RuntimeException(__('No se pudo obtener el email de la cuenta SignNow (revisá el API key).'));
+                throw new \RuntimeException(__('No se pudo obtener el email de la cuenta SignNow (revisa la API key).'));
             }
             // SignNow returns email in different shapes depending on plan;
             // try the common ones in order of preference.

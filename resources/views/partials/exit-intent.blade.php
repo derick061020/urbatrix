@@ -198,8 +198,8 @@
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h14v-9"/><path d="M9 21v-6h6v6"/></svg>
       </span>
       <span class="exit-eyebrow">{{ __('Espera un momento') }}</span>
-      <h3 id="exitModalTitle">{{ __('¿Seguro que querés irte?') }}</h3>
-      <p class="exit-lead">{{ __('Estás a un paso de encontrar tu lugar en :project. Lo que estuviste viendo se pierde si salís ahora.', ['project' => config('company.project')]) }}</p>
+      <h3 id="exitModalTitle">{{ __('¿Seguro que quieres irte?') }}</h3>
+      <p class="exit-lead">{{ __('Estás a un paso de encontrar tu lugar en :project. Lo que has visto se perderá si sales ahora.', ['project' => config('company.project')]) }}</p>
 
       @if($exitCount > 0 || $exitFrom > 0)
         <div class="exit-hooks">
@@ -229,7 +229,7 @@
 
     <div class="exit-foot">
       @guest
-        <p>{!! __('¿Preferís que te avisemos de nuevas unidades? Guardá tu selección creando tu cuenta — :free.', ['free' => '<b>'.__('es gratis').'</b>']) !!}</p>
+        <p>{!! __('¿Prefieres que te avisemos de nuevas unidades? Guarda tu selección creando tu cuenta — :free.', ['free' => '<b>'.__('es gratis').'</b>']) !!}</p>
       @else
         <p>{!! __('Tu lista de guardados y tus reservas te esperan en :dashboard.', ['dashboard' => '<b>'.__('tu escritorio').'</b>']) !!}</p>
       @endguest

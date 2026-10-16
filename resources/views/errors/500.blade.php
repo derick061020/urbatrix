@@ -2,4 +2,4 @@
 @section('title', __('Error del servidor'))
 @section('code', '500')
 @section('heading', __('Algo salió mal de nuestro lado'))
-@section('message', __('Ya registramos el problema. Probá de nuevo en un momento; si sigue pasando, avisale al equipo técnico.'))
+@section('message', __('Ya hemos registrado el problema. Inténtalo de nuevo en un momento; si sigue pasando, avisa al equipo técnico.'))

@@ -23,10 +23,10 @@
         <code class="token">{{ $token }}</code>
         <h3>{{ __('Pasos finales:') }}</h3>
         <ol>
-            <li>{{ __('Copiá ese valor.') }}</li>
-            <li>Pegalo en <code>.env</code> reemplazando <code>GOOGLE_CALENDAR_REFRESH_TOKEN=…</code></li>
+            <li>{{ __('Copia ese valor.') }}</li>
+            <li>Pégalo en <code>.env</code> reemplazando <code>GOOGLE_CALENDAR_REFRESH_TOKEN=…</code></li>
             <li>{{ __('Corré en la terminal:') }}<br><code>php artisan cache:forget google_calendar_access_token &amp;&amp; php artisan config:clear</code></li>
-            <li>{{ __('Probá agendar una videollamada de nuevo.') }}</li>
+            <li>{{ __('Prueba a agendar una videollamada de nuevo.') }}</li>
         </ol>
         <details>
             <summary>{{ __('Respuesta completa de Google') }}</summary>

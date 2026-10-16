@@ -253,7 +253,7 @@
         // No enviar mientras el comprobante aún se sube.
         if (document.getElementById('nr-uploading')?.value === '1') {
             e.preventDefault();
-            alert('{{ __('Esperá a que termine la subida del comprobante.') }}');
+            alert('{{ __('Espera a que termine la subida del comprobante.') }}');
         }
     });
 
