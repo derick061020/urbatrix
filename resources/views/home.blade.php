@@ -2733,6 +2733,9 @@
       {{-- La barra de filtros y el contador se quedan fijos al hacer scroll. --}}
       @include('partials.sticky-filters')
 
+      {{-- Zonas de toque de 44px en móvil, sin cambiar lo que se ve. --}}
+      @include('partials.toque-movil')
+
       <!-- Infinite-scroll sentinel for the grid (revealed batch by batch). -->
       <div class="fg-lazy-more" id="gridLazyMore" aria-hidden="true">
         <span class="fg-lazy-dots"><span></span><span></span><span></span></span>
