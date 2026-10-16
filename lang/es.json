@@ -2838,5 +2838,8 @@
   ":count registros de clientes": ":count registros de clientes",
   ":count fichas en total": ":count fichas en total",
   "Con reserva": "Con reserva",
-  "Registros": "Registros"
+  "Registros": "Registros",
+  "Completivo al firmar": "Completivo al firmar",
+  "Completivo hasta el :pct%": "Completivo hasta el :pct%",
+  "La reserva va incluida": "La reserva va incluida"
 }

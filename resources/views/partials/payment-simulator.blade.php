@@ -161,7 +161,7 @@
       </div>
       <input type="range" id="psEntrada" min="{{ $planRules['entrada_min'] }}" max="{{ $planRules['entrada_max'] }}" step="1" value="{{ $planRules['entrada_tipica'] }}">
       <div class="ps-row">
-        <span class="ps-s">{{ __('Mínimo :n%', ['n' => $planRules['entrada_min']]) }}</span>
+        <span class="ps-s">{{ __('La reserva va incluida') }}</span>
         <span class="ps-s" id="psEntradaMonto">—</span>
       </div>
     </div>
@@ -180,7 +180,7 @@
 
     <div class="ps-break">
       <div class="ps-break-row"><span class="ps-break-k">{{ __('Reserva') }}</span><span class="ps-break-v" id="psReserva">—</span></div>
-      <div class="ps-break-row"><span class="ps-break-k">{{ __('Separación al firmar') }}</span><span class="ps-break-v" id="psSeparacion">—</span></div>
+      <div class="ps-break-row"><span class="ps-break-k" id="psSeparacionK">{{ __('Completivo al firmar') }}</span><span class="ps-break-v" id="psSeparacion">—</span></div>
       <div class="ps-break-row"><span class="ps-break-k" id="psObraK">{{ __('Cuotas en obra') }}</span><span class="ps-break-v" id="psObra">—</span></div>
       <div class="ps-break-row"><span class="ps-break-k">{{ __('Contra entrega') }}</span><span class="ps-break-v" id="psEntrega">—</span></div>
     </div>
@@ -231,7 +231,10 @@
     $('psEntradaMonto').textContent = dinero(entrada);
     $('psCuotasVal').textContent    = @json(__(':n cuotas')).replace(':n', meses);
     $('psReserva').textContent      = dinero(reserva);
+    // La reserva va DENTRO de la entrada: el completivo es lo que falta para
+    // llegar al porcentaje elegido, no un pago añadido.
     $('psSeparacion').textContent   = dinero(entrada - reserva);
+    $('psSeparacionK').textContent  = @json(__('Completivo hasta el :pct%')).replace(':pct', Math.round(entradaPct * 100));
     $('psObraK').textContent        = @json(__(':n cuotas en obra')).replace(':n', meses);
     $('psObra').textContent         = dinero(obra);
     $('psEntrega').textContent      = dinero(entrega);

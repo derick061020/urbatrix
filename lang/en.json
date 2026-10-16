@@ -2871,5 +2871,8 @@
   ":count registros de clientes": ":count client registrations",
   ":count fichas en total": ":count records in total",
   "Con reserva": "With reservation",
-  "Registros": "Registrations"
+  "Registros": "Registrations",
+  "Completivo al firmar": "Balance on signing",
+  "Completivo hasta el :pct%": "Balance up to :pct%",
+  "La reserva va incluida": "Reservation included"
 }
