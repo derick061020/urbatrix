@@ -58,6 +58,18 @@
   };
   const reducido = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* La planta llega como el valor crudo de la base ('1st', '2nd', 'ground'):
+     en estos proyectos se cargó en inglés y se colaba sin traducir en la
+     página en español. Se arma a partir del número, así sale igual en los dos
+     idiomas y no depende de cómo esté puesta la etiqueta en el admin. */
+  const planta = v => {
+    const x = String(v == null ? '' : v).trim();
+    if (!x) return '';
+    if (/^(ground|pb)$/i.test(x)) return t('Planta baja', 'Ground Floor');
+    const n = (x.match(/\d+/) || [])[0];
+    return n ? t(`Piso ${n}`, `Floor ${n}`) : x;
+  };
+
   /* ── 1. CABECERA: disponibilidad en vez de «0 of 233 units sold» ─────────
      Mismo dato que el sitio (vendidas y total), contado al revés: a un broker
      le interesa cuántas quedan. */
@@ -529,7 +541,12 @@
 
   function valorStat(card, titulo) {
     const s = $(`.fg-stat[title="${titulo}"] .v`, card);
-    return s ? s.textContent.replace(/m2$|m²$/, '').trim() : '';
+    if (!s) return '';
+    const v = s.textContent.replace(/m2$|m²$/, '').trim();
+    // Los baños vienen de un decimal en la base y el sitio los escribe «1.0».
+    // En una ficha de lujo eso canta: si no hay media parte, se quita la coma.
+    // Se deja «1.5», que sí quiere decir algo (un baño y un aseo).
+    return /^\d+\.0+$/.test(v) ? String(parseInt(v, 10)) : v;
   }
 
   function boton(texto, clase, accion) {
@@ -567,7 +584,13 @@
       const sub = $('.fg-card-subtitle', card);
       if (sub && d.filterBedrooms) {
         const hab = d.filterBedrooms;
-        sub.textContent = t(`Villa de ${hab} hab · ${d.filterFloor}`, `${hab}-bedroom villa · ${d.filterFloor}`);
+        // La planta NO se saca de data-filter-floor: ahí está el valor crudo de
+        // la base, que en estos proyectos se cargó en inglés ('1st', '2nd') y
+        // se colaba sin traducir en la página en español. El subtítulo que ya
+        // pintó el servidor la trae traducida («Piso 1»), así que se reutiliza
+        // su primer segmento y sólo se vuelve a componer la frase.
+        const planta = (sub.dataset.lxPlanta ??= sub.textContent.split('·')[0].trim());
+        sub.textContent = t(`Villa de ${hab} hab · ${planta}`, `${hab}-bedroom villa · ${planta}`);
       }
 
       // Reserva desde $5,000: la condición real del banner, bajo el precio.
@@ -814,7 +837,7 @@
     const fila = $('.mt-price-row', modal);
     [$('#modalPrice'), $('#moreInfoModal .mt-currency-toggle')].forEach(n => { if (n && fila && caja.contains(n)) fila.appendChild(n); });
     caja.innerHTML = `
-      <p class="lx-eyebrow">${FICHA.eyebrow(modeloNombre, u.floor)}</p>
+      <p class="lx-eyebrow">${FICHA.eyebrow(modeloNombre, planta(u.floor))}</p>
       <h2 class="lx-ficha-nombre">${nombreFicha(u.name || u.custom_id)}</h2>
       <div class="lx-ficha-precio" data-slot-precio></div>
       ${ppm && estado !== 'sold' ? `<p class="lx-ficha-ppm">$${num(ppm)} / ${FICHA.m2int}</p>` : ''}
