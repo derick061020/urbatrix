@@ -1,5 +1,5 @@
 @extends('layouts.admin_crm')
-@section('title', __('Usuarios — CRM Duna Makai'))
+@section('title', __('Usuarios — CRM') . ' ' . config('company.project'))
 @section('page_title', __('Usuarios'))
 @section('page_breadcrumb', __('Equipo · Usuarios del sistema'))
 @php $activeRoute = 'profiles'; @endphp
@@ -262,7 +262,7 @@
                             <td>
                                 @if($r)
                                     <div class="text-[13px] font-semibold text-ink-900">{{ $r->unit->name ?? $r->unit->custom_id ?? '—' }}</div>
-                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : 'Makai Residences' }}</div>
+                                    <div class="text-[11px] text-ink-500">{{ $userReservations->count() > 1 ? '+'.($userReservations->count()-1).' más' : config('company.project') }}</div>
                                 @else
                                     <span class="text-[12px] text-ink-400">—</span>
                                 @endif

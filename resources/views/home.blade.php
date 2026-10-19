@@ -12,13 +12,14 @@
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=29">
-  {{-- Capa «lujo» (la misma de Bahía Mar, adaptada a Siebe): sus dos familias.
-       Bodoni Moda para nombres y títulos —es la didona del logotipo—; Archivo
-       para todo lo demás y SIEMPRE para las cifras. La hoja de la capa se
-       carga al final del body, pero se precarga aquí. --}}
+  {{-- Capa de marca de Siebe (Samuel, repo urbatrix-siebe-lujo): sus dos
+       familias, las de sieberesidences.com. Cormorant Garamond para títulos y
+       cifras grandes; Poppins para el resto. La hoja se carga al final del
+       body —tiene que ganar a los <style> en línea de esta vista— pero se
+       precarga aquí. --}}
   <link rel="preload" href="{{ asset('lujo/lujo.css') }}" as="style">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Bodoni+Moda:opsz@6..96&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -3077,10 +3078,10 @@
           const btn     = document.getElementById('modalReserveBtn');
 
           if (textEl) {
-              textEl.textContent = isSold ? 'SOLD'
-                                : isReserved ? 'RESERVED'
-                                : isPending ? 'PENDING'
-                                : 'AVAILABLE';
+              textEl.textContent = isSold ? MSG_ESTADO.sold
+                                : isReserved ? MSG_ESTADO.reserved
+                                : isPending ? MSG_ESTADO.pending
+                                : MSG_ESTADO.available;
           }
           if (badgeEl) {
               // override pill colors when not available
@@ -3584,7 +3585,12 @@
     }
 
     function closeReservePage() {
-      document.getElementById('reservePage').style.display = 'none';
+      // En Siebe no existe #reservePage, así que esto lanzaba un TypeError al
+      // pulsar Escape y se llevaba por delante el resto de cierres de la misma
+      // tecla (lo encontró Samuel el 19 de octubre).
+      const pagina = document.getElementById('reservePage');
+      if (!pagina) { clearInterval(reserveTimerInterval); reserveTimeLeft = 600; return; }
+      pagina.style.display = 'none';
       document.body.style.overflow = '';
       clearInterval(reserveTimerInterval);
       reserveTimeLeft = 600;
@@ -5295,6 +5301,19 @@
     }
     // Total public units rendered on the page (denominator for the pill text).
     const TOTAL_UNITS = {{ $units->count() }};
+    // Las dos píldoras del contador se rehacían con el texto escrito a mano en
+    // español, así que en la versión en inglés decían «Mostrando 18 de 18
+    // unidades». La frase sale ahora del fichero de idioma, igual que la que
+    // pinta el servidor más arriba.
+    const MSG_MOSTRANDO = @json(__('Mostrando :shown de :total unidades'));
+    // Y los estados del badge de la ficha, que estaban escritos a mano y
+    // salían en inglés también en español.
+    const MSG_ESTADO = {
+      sold:      @json(__('SOLD')),
+      reserved:  @json(__('RESERVED')),
+      pending:   @json(__('PENDING')),
+      available: @json(__('AVAILABLE')),
+    };
     // Update match count — the pill in the grid filter bar now reads
     // "Mostrando X de Y unidades" (X = visible/matched, Y = total).
     function updateMatchCount(count) {
@@ -5305,7 +5324,7 @@
           <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
         </svg>
-        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
+        ${MSG_MOSTRANDO.replace(':shown', count).replace(':total', TOTAL_UNITS)}`;
       pulseMatchPill(pill, count);
     }
     // The list view also has its own pill in the toolbar.
@@ -5317,7 +5336,7 @@
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
-        Mostrando ${count} de ${TOTAL_UNITS} unidades`;
+        ${MSG_MOSTRANDO.replace(':shown', count).replace(':total', TOTAL_UNITS)}`;
       pulseMatchPill(pill, count);
     }
 
@@ -5927,22 +5946,18 @@
 {{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
 @include('partials.exit-intent')
 
-{{-- Capa «lujo» — el diseño que Samuel hizo para Bahía Mar (repo
-     urbatrix-bahia-mar-lujo), traído a Siebe. Reescribe la capa de marca
-     —tipografía, color, espaciado, ritmo— sin tocar la estructura: el JS no
-     añade bloques, reordena y reetiqueta lo que esta vista ya pinta.
+{{-- Capa de marca de Siebe — diseño de Samuel, repo urbatrix-siebe-lujo.
+     Hecha a partir de la de Bahía Mar pero propia de aquí: Siebe es un solo
+     desarrollo, sin tipologías, así que se queda el hero (slider + Hoja), las
+     tarjetas, la ficha y el registro, y fuera las bandas, las portadas y el
+     paso entre tipologías. El header y el footer no se tocan: son los de
+     Urbatrix.
 
-     Lo único propio de Siebe son los tokens de color y tipografía (sección 0
-     de lujo.css), el hero —los cinco renders que mandó Miguel el 16 de
-     octubre— y los textos de marca. Lo demás se deja igual que en Bahía Mar
-     para poder seguir trayendo cambios de allí.
+     El JS no añade bloques al backend: reordena y reetiqueta lo que esta
+     vista ya pinta, y lo que no tiene dato no lo pinta.
 
      Va la última a propósito: tiene que ganar a los <style> en línea de esta
-     misma vista.
-
-     LUJO_PUBLICADO apaga el panel «Propuestas» (el conmutador de variantes,
-     que el autor marca como «solo en el clon»). --}}
-<script>window.LUJO_PUBLICADO = true;</script>
+     misma vista. --}}
 <link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
 <script src="{{ asset('lujo/lujo.js') }}" defer></script>
 
