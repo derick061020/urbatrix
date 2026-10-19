@@ -283,14 +283,26 @@
     modal.removeAttribute('open');
     document.body.style.overflow = '';
   };
+  // A dónde va quien decide marcharse: a la web del proyecto, no al historial.
+  // Con history.go(-2) acababa en la pantalla de registro —de donde muchos
+  // vienen— y Miguel lo marcó como error el 11 de octubre: «debería llevar a
+  // la web de bahía». Además, a quien entra directo por un enlace no le queda
+  // historial y el «atrás» no hacía nada.
+  //
+  // `pasos` es cuánto retroceder si no hay sitio configurado: 2 desde el popup
+  // (el estado trampa ocupa una entrada que apunta a esta misma URL) y 1 desde
+  // el «atrás» repetido, que ya ha consumido una.
+  var SITIO = @json(config('company.site'));
+  function salir(pasos) {
+    leaving = true;
+    if (SITIO) { location.href = SITIO; return; }
+    history.go(-pasos);
+  }
+
   window.exitLeave = function () {
     modal.removeAttribute('open');
     document.body.style.overflow = '';
-    leaving = true;
-    // Dos atrás, no uno: el estado trampa que metimos al cargar ocupa una
-    // entrada del historial y apunta a esta misma URL, así que un solo back
-    // dejaría al visitante donde estaba.
-    history.go(-2);
+    salir(2);
   };
 
   // Escape = quedarse, que es lo menos destructivo.
@@ -330,8 +342,7 @@
         // Ya lo vio una vez: su «atrás» manda. El navegador acaba de retroceder
         // a la entrada trampa, que es esta misma página, así que hay que dar un
         // paso más para que salga de verdad.
-        leaving = true;
-        history.back();
+        salir(1);
         return;
       }
       history.pushState({ exitGuard: true }, '', location.href);  // re-armar

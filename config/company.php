@@ -26,6 +26,13 @@ return [
     'phone'         => env('COMPANY_PHONE', '+1 849 499 2578'),
     'website'       => env('COMPANY_WEBSITE', 'makairesidences.com'),
 
+    // Web pública del proyecto. Ojo, no es la misma que `website`, que es la
+    // de la promotora: aquí va el sitio de Makai. Es a donde se manda a
+    // quien decide irse desde el popup de abandono, en vez de devolverlo al
+    // historial del navegador, que acababa en la pantalla de registro
+    // (Miguel, 11 de octubre).
+    'site'          => env('COMPANY_SITE', 'https://makairesidences.com'),
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),
