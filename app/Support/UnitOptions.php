@@ -121,6 +121,67 @@ class UnitOptions
     }
 
     /**
+     * Número de piso a partir del valor guardado ('2nd', '2', 'Piso 2'…).
+     * Devuelve null para planta baja o valores sin dígitos.
+     */
+    public static function floorNumber($value): ?int
+    {
+        $v = trim((string) $value);
+
+        if ($v === '' || strcasecmp($v, 'ground') === 0 || strcasecmp($v, 'pb') === 0) {
+            return null;
+        }
+
+        return preg_match('/\d+/', $v, $m) ? (int) $m[0] : null;
+    }
+
+    /**
+     * Etiqueta corta del piso: «Planta baja» / «Ground Floor», «2°».
+     *
+     * No se usa la etiqueta guardada cuando el valor trae número: en varios
+     * proyectos quedó cargada en inglés ('2nd') y se colaba sin traducir en
+     * páginas en español. Con número la armamos acá y queda igual en ambos
+     * idiomas; la etiqueta del admin sólo se respeta para valores sin número.
+     */
+    public static function floorShort($value): string
+    {
+        $v = trim((string) $value);
+
+        if ($v === '' || strcasecmp($v, 'ground') === 0 || strcasecmp($v, 'pb') === 0) {
+            return __('Ground Floor');
+        }
+
+        $n = self::floorNumber($v);
+        if ($n !== null) {
+            return $n . '°';
+        }
+
+        $labels = self::map('floors');
+
+        return $labels[$v] ?? $labels[strtolower($v)] ?? ucfirst($v);
+    }
+
+    /**
+     * Etiqueta completa y traducida: «Piso 2» / «Floor 2».
+     *
+     * Reemplaza al viejo `$floorDisplay($f) . ' ' . __('Floor')`, que producía
+     * «2nd Piso» cuando la tarjeta se pintaba por AJAX (ahí no llegaba el
+     * helper del Blade y caía al valor crudo de la base).
+     */
+    public static function floorPhrase($value): string
+    {
+        $v = trim((string) $value);
+
+        if ($v === '' || strcasecmp($v, 'ground') === 0 || strcasecmp($v, 'pb') === 0) {
+            return __('Ground Floor');
+        }
+
+        $n = self::floorNumber($v);
+
+        return $n !== null ? __('Floor :n', ['n' => $n]) : self::floorShort($v);
+    }
+
+    /**
      * Catálogo de íconos SVG para amenidades. La clave coincide con el campo
      * 'icon' de cada amenidad; si no hay match se usa 'check'.
      */

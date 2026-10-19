@@ -53,9 +53,9 @@
                         <div style="font-size:10px;color:#a3a3a3;line-height:1.2;">{{ $outlookLabels[$unit->outlook] ?? $unit->outlook }}</div>
                     @endif
                 </td>
-                <td>{{ ($unit->bedrooms ?? 0) }} / {{ ($unit->bathrooms ?? 0) }}</td>
-                <td>{{ number_format($unit->internal_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
-                <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">sf</sub></td>
+                <td>{{ ($unit->bedrooms ?? 0) }} / {{ (float) ($unit->bathrooms ?? 0) }}</td>
+                <td>{{ number_format($unit->internal_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">m²</sub></td>
+                <td>{{ number_format($unit->external_area ?? 0) }}<sub style="font-size:9px;color:#a3a3a3;">m²</sub></td>
                 <td>
                   <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ',', ',') }}</span>
                   @if($unit->internal_area && $unit->internal_area > 0)

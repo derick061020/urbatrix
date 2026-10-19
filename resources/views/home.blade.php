@@ -12,6 +12,13 @@
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=29">
+  {{-- Capa «lujo» (la misma de Bahía Mar, adaptada a Siebe): sus dos familias.
+       Bodoni Moda para nombres y títulos —es la didona del logotipo—; Archivo
+       para todo lo demás y SIEMPRE para las cifras. La hoja de la capa se
+       carga al final del body, pero se precarga aquí. --}}
+  <link rel="preload" href="{{ asset('lujo/lujo.css') }}" as="style">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Bodoni+Moda:opsz@6..96&display=swap">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -2514,7 +2521,7 @@
                 <div class="fg-plan-piso-picker" id="fgFloorPicker">
                   <button type="button" class="fg-plan-piso-left fg-plan-piso-trigger"
                           id="fgFloorTrigger" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="fgPlanPisoLabel">{{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}</span>
+                    <span id="fgPlanPisoLabel">{{ strtoupper(\App\Support\UnitOptions::floorPhrase($activeFloor)) }}</span>
                     <span class="fg-plan-piso-caret" aria-hidden="true">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b2b1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </span>
@@ -2532,7 +2539,7 @@
                 </div>
               @else
                 <div class="fg-plan-piso-left" id="fgPlanPisoLabel">
-                  {{ strtoupper($activeFloor === 'Ground' ? __('Ground Floor') : __('Piso').' '.$floorDisplay($activeFloor)) }}
+                  {{ strtoupper(\App\Support\UnitOptions::floorPhrase($activeFloor)) }}
                 </div>
               @endif
               <div class="fg-plan-piso-right" id="fgPlanPisoCount">
@@ -3274,6 +3281,9 @@
           ground:    @json(__('Ground Floor')),
           available: @json(__('Unidades disponibles')),
           names:     @json($floorOrder->mapWithKeys(fn($f) => [$f => $floorDisplay($f)])->all()),
+          // La frase entera («Piso 1»), ya armada en PHP. Antes el JS la
+          // componía como I18N.piso + names[piso] y salía «PISO 1°».
+          frases:    @json($floorOrder->mapWithKeys(fn($f) => [$f => \App\Support\UnitOptions::floorPhrase($f)])->all()),
         };
 
         function activate(floor) {
@@ -3340,7 +3350,7 @@
           if (labelEl) {
             labelEl.textContent = (floor === 'Ground')
               ? I18N.ground.toUpperCase()
-              : (I18N.piso + ' ' + (I18N.names[floor] || floor)).toUpperCase();
+              : (I18N.frases[floor] || (I18N.piso + ' ' + (I18N.names[floor] || floor))).toUpperCase();
           }
           if (countEl) {
             countEl.textContent = available + ' ' + I18N.available.toUpperCase();
@@ -5916,6 +5926,28 @@
 
 {{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
 @include('partials.exit-intent')
+
+{{-- Capa «lujo» — el diseño que Samuel hizo para Bahía Mar (repo
+     urbatrix-bahia-mar-lujo), traído a Siebe. Reescribe la capa de marca
+     —tipografía, color, espaciado, ritmo— sin tocar la estructura: el JS no
+     añade bloques, reordena y reetiqueta lo que esta vista ya pinta.
+
+     Lo único propio de Siebe son los tokens de color y tipografía (sección 0
+     de lujo.css), el hero —los cinco renders que mandó Miguel el 16 de
+     octubre— y los textos de marca. Lo demás se deja igual que en Bahía Mar
+     para poder seguir trayendo cambios de allí.
+
+     Va la última a propósito: tiene que ganar a los <style> en línea de esta
+     misma vista.
+
+     LUJO_PUBLICADO apaga el panel «Propuestas» (el conmutador de variantes,
+     que el autor marca como «solo en el clon»). --}}
+<script>window.LUJO_PUBLICADO = true;</script>
+<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
+<script src="{{ asset('lujo/lujo.js') }}" defer></script>
+
+{{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
+@include('partials.lujo-acciones')
 
 </body>
 

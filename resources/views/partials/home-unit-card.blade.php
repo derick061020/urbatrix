@@ -121,9 +121,7 @@
                   @endif
                 </div>
                 <div class="fg-card-subtitle">
-                  {{ ($floorRaw !== '' && strcasecmp($floorRaw, 'ground') !== 0)
-                        ? (isset($floorDisplay) ? $floorDisplay($unit->floor) : ucfirst($unit->floor)) . ' ' . __('Floor')
-                        : __('Ground Floor') }}
+                  {{ \App\Support\UnitOptions::floorPhrase($unit->floor) }}
                   @if($unit->direction) · {{ strtoupper($unit->direction) }} @endif
                   @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>

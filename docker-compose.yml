@@ -1,9 +1,15 @@
-# Stack de Siebe Residences (siebe.urbatrix.com).
+# Stack de Siebe Residences (sieberesidences.urbatrix.com).
 #
 # Mismo patrón que urbatrix (Makai) y landmass (Bahía Mar) en el servidor:
 # app php-fpm + nginx detrás de Traefik + mysql + phpmyadmin. Traefik resuelve
 # el certificado con letsencrypt, así que fuera sólo hace falta que el DNS de
-# siebe.urbatrix.com apunte al servidor.
+# sieberesidences.urbatrix.com apunte al servidor.
+#
+# El nombre viejo (siebe.urbatrix.com) sigue en la regla del router: hay
+# enlaces repartidos por WhatsApp y por correo que apuntan ahí. Traefik pide
+# el certificado para los cuatro nombres de una vez, así que los dos cargan
+# con https; lo que la aplicación escribe en sus enlaces es APP_URL, o sea el
+# nuevo. Cuando ya no entre tráfico por el viejo se puede quitar.
 #
 # Los puertos publicados no se solapan con los stacks ya montados: phpmyadmin
 # de Makai usa el 8081, así que Siebe usa el 8083.
@@ -38,7 +44,7 @@ services:
       # Traefik elige cualquiera de las dos y, si le toca siebe_default —donde
       # no está—, la petición muere en un 504.
       - "traefik.docker.network=traefik_default"
-      - "traefik.http.routers.siebe.rule=Host(`siebe.urbatrix.com`) || Host(`www.siebe.urbatrix.com`)"
+      - "traefik.http.routers.siebe.rule=Host(`sieberesidences.urbatrix.com`) || Host(`www.sieberesidences.urbatrix.com`) || Host(`siebe.urbatrix.com`) || Host(`www.siebe.urbatrix.com`)"
       - "traefik.http.routers.siebe.entrypoints=websecure"
       - "traefik.http.routers.siebe.tls.certresolver=letsencrypt"
       - "traefik.http.services.siebe.loadbalancer.server.port=80"
