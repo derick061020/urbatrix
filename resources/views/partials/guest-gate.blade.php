@@ -10,7 +10,8 @@
     detrás» sin impedir ver las propiedades, que es lo que se quiere enseñar—.
     Se ajusta con --guest-blur.
 
-    El hero queda nítido: es la carta de presentación del proyecto.
+    El hero queda nítido —es la carta de presentación del proyecto— pero el
+    clic sobre él también abre el popup (Miguel, 16 oct).
 
     El popup aparece solo a los 5 segundos de llegar, una vez por sesión. Antes
     había además una cinta fija abajo repitiendo el aviso; se quitó porque tapaba
@@ -341,13 +342,34 @@
     zone.appendChild(catcher);
   }
 
+  // El hero también abre el popup. Hasta ahora se dejaba fuera a propósito
+  // («es la carta de presentación del proyecto»), pero Miguel lo pidió el 16
+  // de octubre: «si hago clic en esa imagen no se activa el popup de
+  // registro». Sigue nítido —no se desenfoca ni se tapa con una capa—; lo que
+  // cambia es que el clic en la foto vale como invitación a registrarse.
+  //
+  // No se pone una capa encima, se escucha el clic: el hero tiene controles
+  // propios (el botón de bajar al catálogo, el índice de imágenes, el
+  // conmutador de idioma del header) y una capa los mataría todos. Un clic
+  // sobre cualquier cosa pulsable de dentro se deja pasar.
+  function mountHero() {
+    var hero = document.querySelector('.fg-stage');
+    if (!hero || hero.dataset.guestHero) return;
+    hero.dataset.guestHero = '1';
+    hero.style.cursor = 'pointer';
+    hero.addEventListener('click', function (e) {
+      if (e.target.closest('a,button,input,select,label,[role="button"],[onclick]')) return;
+      openGuestModal();
+    });
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountCatcher);
+    document.addEventListener('DOMContentLoaded', function () { mountCatcher(); mountHero(); });
   } else {
-    mountCatcher();
+    mountCatcher(); mountHero();
   }
   // El scroll infinito reemplaza el contenido de la zona: re-montar si hiciera falta.
-  setInterval(mountCatcher, 1500);
+  setInterval(function () { mountCatcher(); mountHero(); }, 1500);
 
   // El visitante se queda mirando y a los {{ $guestDelay }} segundos le salta el
   // popup. Antes dependía de que llegase scrolleando hasta las unidades, así que
