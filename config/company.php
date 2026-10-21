@@ -41,9 +41,8 @@ return [
     // pie sale apagado y sin enlace, en vez de no hacer nada al pulsarlo,
     // que es lo que pasaba (Kary, 21 oct: «no funcionan»).
     'social' => [
-        'facebook'  => env('COMPANY_FACEBOOK', 'https://www.facebook.com/profile.php?id=61574783614005'),
+        'facebook'  => env('COMPANY_FACEBOOK', 'https://www.facebook.com/makairesidences/'),
         'instagram' => env('COMPANY_INSTAGRAM', 'https://www.instagram.com/makairesidences/'),
-        'x'         => env('COMPANY_X', ''),
     ],
 
     // Firmante autorizado de los comprobantes
