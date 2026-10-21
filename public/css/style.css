@@ -1373,6 +1373,13 @@
     /* ============================================
        NAVBAR — MOBILE (leave only the essentials)
        ============================================ */
+    /* Tablet: fuera el selector de moneda y el conmutador de idioma. A este
+       ancho la cabecera no da de si y se comia el contador de unidades
+       (Kary, 21 oct). Los dos siguen estando en el menu desplegable. */
+    @media (min-width: 769px) and (max-width: 1100px) {
+      .nav-hide-tablet { display: none !important; }
+    }
+
     @media (max-width: 768px) {
       /* Hide currency selector, language toggle, saved counter, online-users
          line, the units-sold count and the avatar label — keep only logo,

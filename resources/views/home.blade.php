@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=29">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ @filemtime(public_path('css/style.css')) }}">
   {{-- Capa de marca de Siebe (Samuel, repo urbatrix-siebe-lujo): sus dos
        familias, las de sieberesidences.com. Cormorant Garamond para títulos y
        cifras grandes; Poppins para el resto. La hoja se carga al final del
@@ -1656,7 +1656,7 @@
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
 
           <!-- Currency selector (header) -->
-          <div class="nav-hide-mobile" style="position:relative;flex-shrink:0;">
+          <div class="nav-hide-mobile nav-hide-tablet" style="position:relative;flex-shrink:0;">
             <button type="button" class="fg-filter-btn" onclick="toggleHeaderCurrencyDropdown()" id="headerCurrencyBtn" style="height:34px;padding:6px 10px 6px 14px;border-radius:9999px;gap:6px;">
               <span id="headerCurrencyLabel" style="font-weight:600;color:#374151;">USD $</span>
               <svg class="fg-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -1670,12 +1670,12 @@
           </div>
 
           <!-- Language toggle (header) -->
-          <div class="lang-toggle nav-hide-mobile" style="flex-shrink:0;">
+          <div class="lang-toggle nav-hide-mobile nav-hide-tablet" style="flex-shrink:0;">
             <button type="button" data-lang="es" onclick="setLanguage('es')" class="lang-btn is-active">ES</button>
             <button type="button" data-lang="en" onclick="setLanguage('en')" class="lang-btn">EN</button>
           </div>
 
-          <span aria-hidden="true" class="nav-hide-mobile" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
+          <span aria-hidden="true" class="nav-hide-mobile nav-hide-tablet" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
 
           @php $isAdminUser = auth()->check() && (auth()->user()->role ?? '') === 'admin'; @endphp
           @if($isAdminUser)
