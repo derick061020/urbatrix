@@ -537,7 +537,13 @@
 
             <div class="flex items-center gap-3">
                 <span class="hidden sm:inline text-[14px] text-ink-600 reg-initial-only">{{ __('¿Necesitas ayuda?') }}</span>
-                <a href="#" class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
+                @php
+                    // Al correo de soporte, no a /support: esa ruta pide sesión y
+                    // aquí todavía no la hay (Kary, 21 oct: «no envía a ningún lado»).
+                    $soporte = config('company.support_email');
+                    $asunto  = rawurlencode(__('Ayuda con :project', ['project' => config('company.project')]));
+                @endphp
+                <a href="mailto:{{ $soporte }}?subject={{ $asunto }}" class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
                 <button type="button" onclick="goToLogin()" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Volver al login') }}">
                     <i class="pi pi-times text-[12px]"></i>
                 </button>
