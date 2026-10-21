@@ -24,16 +24,34 @@ class HomeController extends Controller
      * Base query for the public home catalog — single source of truth for the
      * ordering so the server-rendered first page and the AJAX pages line up.
      */
+    /**
+     * Orden del catálogo público.
+     *
+     * Primero las que se pueden comprar y después, por el número de unidad tal
+     * y como se lee en la tarjeta. El número está en `name` y es texto, así
+     * que se compara como número: sin el CAST, «1» se colaría entre «101» y
+     * «102». El segundo criterio desempata los nombres que no sean numéricos.
+     *
+     * Lo usan la home y la API para que la primera página pintada por el
+     * servidor y las que llegan por AJAX vayan seguidas.
+     */
+    private function ordenCatalogo($query)
+    {
+        return $query
+            ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 1 ELSE 0 END")
+            ->orderByRaw('CAST(name AS UNSIGNED)')
+            ->orderBy('name')
+            ->orderBy('id');
+    }
+
     private function publicUnitsQuery()
     {
-        return Unit::with(['images' => function ($query) {
-                $query->orderBy('sort_order');
-            }])
-            ->where('public', true)
-            ->orderByRaw('display_on_home_page DESC')
-            ->orderByRaw("CASE WHEN status IN ('sold', 'pending', 'reserved', 'SOLD', 'PENDING', 'RESERVED') THEN 1 ELSE 0 END")
-            ->orderBy('custom_id')
-            ->orderBy('id');
+        return $this->ordenCatalogo(
+            Unit::with(['images' => function ($query) {
+                    $query->orderBy('sort_order');
+                }])
+                ->where('public', true)
+        );
     }
 
     public function index()
@@ -405,9 +423,10 @@ class HomeController extends Controller
                 break;
             case 'custom_id':
             default:
-                $query->orderByRaw('display_on_home_page DESC')
-                      ->orderBy('custom_id')
-                      ->orderBy('id');
+                // El mismo orden que la home. Antes esta rama se olvidaba de
+                // poner al final las vendidas, así que la primera página (la
+                // del servidor) y las siguientes (AJAX) no casaban.
+                $this->ordenCatalogo($query);
                 break;
         }
 

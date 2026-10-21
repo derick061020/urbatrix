@@ -33,6 +33,10 @@ return [
     // (Miguel, 11 de octubre).
     'site'          => env('COMPANY_SITE', 'https://makairesidences.com'),
 
+    // WhatsApp de contacto, solo dígitos (formato de wa.me).
+    // El de Duna, el que ya venía escrito a mano en las vistas.
+    'whatsapp'      => env('COMPANY_WHATSAPP', '18097109044'),
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),

@@ -2,6 +2,10 @@
           $st = strtolower($unit->status ?? '');
           $isSold      = $st === 'sold';
           $isReserved  = $st === 'reserved';
+          // Fuera del mercado. Vendida y reservada se tratan igual y las dos
+          // dicen RESERVADO: el cliente no quiere publicar cuáles se vendieron
+          // (Ernesto, 19 de octubre).
+          $fueraVenta  = $isSold || $isReserved;
           $isPending   = $st === 'pending';
           $isHighDem   = !empty($unit->is_high_demand) || ($unit->demand_level ?? '') === 'high';
           $isSecond    = !empty($unit->is_second_chance);
@@ -49,9 +53,9 @@
             <!-- Image area -->
             <div class="fg-card-img">
               @if($unit->images->isNotEmpty())
-                <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" loading="lazy" decoding="async" onerror="this.style.display='none'" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
+                <img src="{{ $unit->images->first()->path }}" alt="{{ $unitId }}" loading="lazy" decoding="async" onerror="this.style.display='none'" @if(!$fueraVenta) onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer" @endif>
               @else
-                <div class="fg-card-img-noimage" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('No Image Available') }}</div>
+                <div class="fg-card-img-noimage" @if(!$fueraVenta) onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer" @endif>{{ __('No Image Available') }}</div>
               @endif
 
               <!-- Top row: status badge (left) + ADD TO LIST (right) -->
@@ -99,9 +103,10 @@
                 </button>
               </div>
 
-              @if($isSold)
-                <!-- SOLD overlay (Figma 125:5048) -->
-                <div class="fg-sold-badge"><span>{{ __('SOLD') }}</span></div>
+              @if($fueraVenta)
+                {{-- El letrero sobre la foto. Dice RESERVADO también en las
+                     vendidas: ver el porqué arriba, en $fueraVenta. --}}
+                <div class="fg-sold-badge"><span>{{ __('RESERVED') }}</span></div>
               @endif
             </div>
 
@@ -122,13 +127,21 @@
                   @if($unit->outlook) · {{ $outlookLabels[$unit->outlook] ?? $unit->outlook }} @endif
                 </div>
                 <div class="fg-card-divider"></div>
-                <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
-                  <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
-                </div>
+                @if($fueraVenta)
+                  {{-- Sin importe: en su sitio, la misma palabra. El data-usd
+                       tampoco va, que es de donde lee el conversor. --}}
+                  <div class="fg-card-price is-fuera-venta">
+                    <span class="price">{{ __('RESERVED') }}</span>
+                  </div>
+                @else
+                  <div class="fg-card-price" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
+                    <span class="price" data-usd="{{ $unit->price }}">${{ number_format($unit->price, 0, ' ', ' ') }}</span>
+                  </div>
+                @endif
               </div>
 
               <!-- Stats row (6 boxes) -->
-              <div class="fg-stats" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">
+              <div class="fg-stats" @if(!$fueraVenta) onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer" @endif>
                 <div class="fg-stat" title="{{ __('Bedrooms') }}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14v4h20v-4a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3z"/><path d="M2 14V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7"/><path d="M7 11V9h10v2"/></svg>
                   <span class="v">{{ $unit->bedrooms ?? 0 }}</span>
@@ -162,17 +175,11 @@
 
               <!-- Buttons + availability -->
               <div class="fg-card-actions">
-                @if($isSold)
+                @if($fueraVenta)
+                  {{-- Fuera «Más información»: abría la ficha. Quedan las dos
+                       acciones que no la abren, y que son las útiles aquí. --}}
                   <div class="fg-card-buttons">
                     <button class="fg-btn-info-similar" type="button" onclick="viewSimilarUnits(this)">{{ __('View Similar Units') }}</button>
-                  </div>
-                  <div class="fg-card-availability">
-                    <span class="dot"></span>
-                    <span>{{ __('This unit has been sold.') }}</span>
-                  </div>
-                @elseif($isReserved)
-                  <div class="fg-card-buttons">
-                    <button class="fg-btn-info" onclick="openMoreInfo('{{ $unitId }}')">{{ __('More Info') }}</button>
                     <button class="fg-btn-cta" type="button" onclick="notifyWhenAvailable('{{ $unitId }}')">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                       {{ __('Notificar si se libera') }}
