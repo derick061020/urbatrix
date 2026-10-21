@@ -544,10 +544,15 @@
                 @php
                     // Al correo de soporte, no a /support: esa ruta pide sesión y
                     // aquí todavía no la hay (Kary, 21 oct: «no envía a ningún lado»).
+                    $asunto  = __('Ayuda con :project', ['project' => config('company.project')]);
                     $soporte = config('company.support_email');
-                    $asunto  = rawurlencode(__('Ayuda con :project', ['project' => config('company.project')]));
+                    // Sin correo configurado no se deja un mailto vacio, que no
+                    // llevaria a ningun sitio: se usa el WhatsApp del sitio.
+                    $destino = $soporte
+                        ? 'mailto:' . $soporte . '?subject=' . rawurlencode($asunto)
+                        : 'https://wa.me/18097109044?text=' . rawurlencode($asunto);
                 @endphp
-                <a href="mailto:{{ $soporte }}?subject={{ $asunto }}" class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
+                <a href="{{ $destino }}" @if(!$soporte) target="_blank" rel="noopener" @endif class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
                 <button type="button" onclick="goToLogin()" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Volver al login') }}">
                     <i class="pi pi-times text-[12px]"></i>
                 </button>
