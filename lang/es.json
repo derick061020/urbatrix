@@ -450,7 +450,6 @@
   "Page :current of :total": "Página :current de :total",
   "Previous": "Anterior",
   "Next": "Siguiente",
-  "©2026 Duna Development — Todos los derechos reservados": "©2026 Duna Development — Todos los derechos reservados",
   "Unit details": "Detalles de la unidad",
   "AVAILABLE": "DISPONIBLE",
   "Last inquiry": "Última consulta",
@@ -2723,7 +2722,6 @@
   "“Avance obra” se sincroniza desde el módulo Avance de obra.": "“Avance obra” se sincroniza desde el módulo Avance de obra.",
   "✓ Todo al día": "✓ Todo al día",
   "Accede a Landmass Sales Platform de forma gratuita": "Accede a Landmass Sales Platform de forma gratuita",
-  "©2026 Landmass — Todos los derechos reservados": "©2026 Landmass — Todos los derechos reservados",
   "Dashboard — CRM Landmass Bahía Mar": "Dashboard — CRM Landmass Bahía Mar",
   "Aprobado por Landmass": "Aprobado por Landmass",
   "Asesor Comercial · Landmass": "Asesor Comercial · Landmass",
@@ -2920,5 +2918,6 @@
   "2 Bed": "2 habitaciones",
   "3 Bed": "3 habitaciones",
   "Penthouse 1 Bed": "Penthouse de 1 habitación",
-  "Penthouse 2 Bed": "Penthouse de 2 habitaciones"
+  "Penthouse 2 Bed": "Penthouse de 2 habitaciones",
+  "©:year Landmass — Todos los derechos reservados": "©:year Landmass — Todos los derechos reservados"
 }

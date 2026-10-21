@@ -390,7 +390,6 @@
   "Page :current of :total": "Page :current of :total",
   "Previous": "Previous",
   "Next": "Next",
-  "©2026 Duna Development — Todos los derechos reservados": "©2026 Duna Development — All rights reserved",
   "Unit details": "Unit details",
   "AVAILABLE": "AVAILABLE",
   "Last inquiry": "Last inquiry",
@@ -2856,5 +2855,6 @@
   "3 Bed": "3 Bed",
   "Penthouse 1 Bed": "Penthouse 1 Bed",
   "Penthouse 2 Bed": "Penthouse 2 Bed",
-  "Ir al inicio": "Go to home"
+  "Ir al inicio": "Go to home",
+  "©:year Landmass — Todos los derechos reservados": "©:year Landmass — All rights reserved"
 }
