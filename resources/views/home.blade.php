@@ -20,7 +20,7 @@
        familias de la landing de Bahía Mar. Italiana para nombres y títulos;
        Archivo para todo lo demás y SIEMPRE para las cifras, porque en Italiana
        el 4 y el 6 se confunden. La hoja de la capa se carga al final del body. --}}
-  <link rel="preload" href="{{ asset('lujo/lujo.css') }}" as="style">
+  <link rel="preload" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}" as="style">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Italiana&display=swap">
 </head>
@@ -6643,8 +6643,8 @@
      el autor marca como «solo en el clon»— y fija lo que eligió Samuel en la
      ronda 4: portadas y transición hoja. --}}
 <script>window.LUJO_PUBLICADO = true;</script>
-<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
-<script src="{{ asset('lujo/lujo.js') }}" defer></script>
+<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}">
+<script src="{{ asset('lujo/lujo.js') }}?v={{ @filemtime(public_path('lujo/lujo.js')) }}" defer></script>
 
 {{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
 @include('partials.lujo-acciones')
