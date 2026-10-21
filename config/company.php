@@ -45,7 +45,6 @@ return [
     'social' => [
         'facebook'  => env('COMPANY_FACEBOOK', ''),
         'instagram' => env('COMPANY_INSTAGRAM', ''),
-        'x'         => env('COMPANY_X', ''),
     ],
 
     // Firmante autorizado de los comprobantes
