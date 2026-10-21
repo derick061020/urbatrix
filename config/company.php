@@ -42,6 +42,15 @@ return [
     // salen desactivados en vez de llevar al sitio equivocado.
     'whatsapp'      => env('COMPANY_WHATSAPP', ''),
 
+    // Perfiles sociales del proyecto (URL completa). Vacío = el icono del
+    // pie sale apagado y sin enlace, en vez de no hacer nada al pulsarlo,
+    // que es lo que pasaba (Kary, 21 oct: «no funcionan»).
+    'social' => [
+        'facebook'  => env('COMPANY_FACEBOOK', ''),
+        'instagram' => env('COMPANY_INSTAGRAM', ''),
+        'x'         => env('COMPANY_X', ''),
+    ],
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Siebe Property Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),
