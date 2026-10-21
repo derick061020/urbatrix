@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=25">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ @filemtime(public_path('css/style.css')) }}">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -1478,12 +1478,12 @@
         <div style="position:relative;display:flex;align-items:center;gap:12px;flex-shrink:0;">
 
           <!-- Language toggle (header) -->
-          <div class="lang-toggle nav-hide-mobile" style="flex-shrink:0;">
+          <div class="lang-toggle nav-hide-mobile nav-hide-tablet" style="flex-shrink:0;">
             <button type="button" data-lang="es" onclick="setLanguage('es')" class="lang-btn is-active">ES</button>
             <button type="button" data-lang="en" onclick="setLanguage('en')" class="lang-btn">EN</button>
           </div>
 
-          <span aria-hidden="true" class="nav-hide-mobile" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
+          <span aria-hidden="true" class="nav-hide-mobile nav-hide-tablet" style="display:inline-block;width:1px;height:28px;background:#ebebeb;flex-shrink:0;"></span>
 
           @php $isAdminUser = auth()->check() && (auth()->user()->role ?? '') === 'admin'; @endphp
           @if($isAdminUser)
