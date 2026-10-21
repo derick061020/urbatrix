@@ -451,7 +451,6 @@
   "Page :current of :total": "Página :current de :total",
   "Previous": "Anterior",
   "Next": "Siguiente",
-  "©2026 Siebe Property Group — Todos los derechos reservados": "©2026 Siebe Property Group — Todos los derechos reservados",
   "Unit details": "Detalles de la unidad",
   "AVAILABLE": "DISPONIBLE",
   "Last inquiry": "Última consulta",
@@ -2822,5 +2821,6 @@
   "2 Bed": "2 habitaciones",
   "3 Bed": "3 habitaciones",
   "Penthouse 1 Bed": "Penthouse de 1 habitación",
-  "Penthouse 2 Bed": "Penthouse de 2 habitaciones"
+  "Penthouse 2 Bed": "Penthouse de 2 habitaciones",
+  "©:year Siebe Property Group — Todos los derechos reservados": "©:year Siebe Property Group — Todos los derechos reservados"
 }
