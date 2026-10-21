@@ -254,8 +254,12 @@
       @media (min-width: 1024px) {
           #mobile-toggle { display: none !important; }
       }
-      @media (max-width: 767px) {
+      /* La fecha se va antes que nada: el titulo manda (Kary, 21 oct). Mismo
+         corte que la cabecera publica. */
+      @media (max-width: 1100px) {
           .topbar-date { display: none !important; }
+      }
+      @media (max-width: 767px) {
           .topbar-search-wrap { display: none !important; }
           #crm-topbar { padding-left: 16px !important; padding-right: 16px !important; gap: 12px !important; }
       }
