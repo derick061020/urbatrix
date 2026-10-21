@@ -371,7 +371,10 @@
       modal.addEventListener('click', e => {
         if (e.target.closest('[data-cerrar]')) cerrar();
         const op = e.target.closest('[data-perfil]');
-        if (op) formulario(op.dataset.perfil);
+        // Directo al registro con el rol ya elegido. Antes abria un formulario
+        // aqui dentro que acababa en /register igualmente, o sea que pedia los
+        // datos dos veces (Kary, 21 oct).
+        if (op) location.href = '/register?perfil=' + encodeURIComponent(op.dataset.perfil);
         if (e.target.closest('[data-volver]')) paso('elegir');
       });
       $('form', modal).addEventListener('submit', e => {

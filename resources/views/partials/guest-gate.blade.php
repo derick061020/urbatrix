@@ -64,6 +64,21 @@
   }
   body[data-guest] #main-unit-reserve-list { position: relative; }
 
+  /* …salvo los filtros y el conmutador de vista, que viven dentro de esa zona
+     y quedaban debajo de la capa. Mirar y filtrar es libre; lo que pide cuenta
+     es abrir una unidad o reservarla (Kary, 21 oct). Se levantan por encima
+     del z-index 40 de la capa. */
+  body[data-guest] .fg-toggle-bar,
+  body[data-guest] .fg-filter-bar,
+  body[data-guest] .fg-filters-backdrop,
+  body[data-guest] .fg-filters-sheet {
+    position: relative;
+    z-index: 41;
+  }
+  /* La hoja de filtros de móvil se abre como panel flotante: necesita más. */
+  body[data-guest] .fg-filters-backdrop,
+  body[data-guest] .fg-filters-sheet { z-index: 60; }
+
   /* ── Popup ─────────────────────────────────────────────────────────────
      Ninguna regla de font-family: todo hereda la tipografía global de la
      home. El carácter editorial se consigue con pesos, tamaños y espaciado. */
