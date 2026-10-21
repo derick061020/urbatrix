@@ -1,21 +1,21 @@
 {{--
     Escaparate para visitantes sin cuenta.
 
-    La home dejó de exigir sesión: el visitante ve el catálogo y toda la
-    interfaz, y cualquier intento de USARLA (abrir una unidad, filtrar,
-    guardar, reservar) abre este popup, que lleva al registro o al login.
+    La home dejó de exigir sesión. Mirar es libre: el visitante ve el catálogo
+    nítido, puede filtrar, cambiar de vista y abrir la ficha de cualquier
+    unidad. Lo que pide cuenta son las ACCIONES — reservar, agendar la
+    videollamada, guardar —, que siguen llevando a este popup.
 
-    Las unidades se veían con un desenfoque suave; se quitó el 21 de octubre
-    (Kary, confirmado por Derick). Ahora se ven nítidas y lo que las protege es
-    sólo la capa de clics: mirar es libre, usarlas pide cuenta. Para volver
-    atrás, --guest-filter.
+    Hasta el 21 de octubre había además un desenfoque sobre las unidades y una
+    capa que se comía todos los clics de esa zona. Se quitaron las dos (Kary,
+    confirmado por Derick: «en el de Samuel está libre»). Para volver a
+    desenfocar, --guest-filter.
 
-    El hero queda nítido —es la carta de presentación del proyecto— pero el
-    clic sobre él también abre el popup (Miguel, 16 oct).
+    El popup se le recuerda igual: salta solo a los {{ $guestDelay }} segundos, una vez
+    por sesión, y también al tocar el hero.
 
-    El popup aparece solo a los 5 segundos de llegar, una vez por sesión. Antes
-    había además una cinta fija abajo repitiendo el aviso; se quitó porque tapaba
-    el hero y decía lo mismo que el popup.
+    Lo del hero lo pidió Miguel el 16 de octubre. Y antes había una cinta fija
+    abajo repitiendo el aviso; se quitó porque tapaba el hero y decía lo mismo.
 --}}
 @php
     // Isotipo del proyecto. Cada marca lo guarda distinto en images/brand/, y
@@ -54,30 +54,6 @@
     user-select: none;
   }
 
-  /* Capa que se come los clics de toda la zona desenfocada. Va por encima del
-     contenido pero por debajo del popup. */
-  body[data-guest] .guest-catch {
-    position: absolute;
-    inset: 0;
-    z-index: 40;
-    cursor: pointer;
-  }
-  body[data-guest] #main-unit-reserve-list { position: relative; }
-
-  /* …salvo los filtros y el conmutador de vista, que viven dentro de esa zona
-     y quedaban debajo de la capa. Mirar y filtrar es libre; lo que pide cuenta
-     es abrir una unidad o reservarla (Kary, 21 oct). Se levantan por encima
-     del z-index 40 de la capa. */
-  body[data-guest] .fg-toggle-bar,
-  body[data-guest] .fg-filter-bar,
-  body[data-guest] .fg-filters-backdrop,
-  body[data-guest] .fg-filters-sheet {
-    position: relative;
-    z-index: 41;
-  }
-  /* La hoja de filtros de móvil se abre como panel flotante: necesita más. */
-  body[data-guest] .fg-filters-backdrop,
-  body[data-guest] .fg-filters-sheet { z-index: 60; }
 
   /* ── Popup ─────────────────────────────────────────────────────────────
      Ninguna regla de font-family: todo hereda la tipografía global de la
@@ -347,22 +323,6 @@
     if (e.key === 'Escape') closeGuestModal();
   });
 
-  // La capa que intercepta los clics se monta sobre la zona de unidades. Se
-  // crea por JS para no tocar el marcado de la lista, que se re-renderiza al
-  // filtrar y al cargar más páginas.
-  function mountCatcher() {
-    var zone = document.getElementById('main-unit-reserve-list');
-    if (!zone || zone.querySelector('.guest-catch')) return;
-    var catcher = document.createElement('div');
-    catcher.className = 'guest-catch';
-    catcher.setAttribute('aria-hidden', 'true');
-    catcher.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      openGuestModal();
-    });
-    zone.appendChild(catcher);
-  }
 
   // El hero también abre el popup. Hasta ahora se dejaba fuera a propósito
   // («es la carta de presentación del proyecto»), pero Miguel lo pidió el 16
@@ -386,12 +346,12 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { mountCatcher(); mountHero(); });
+    document.addEventListener('DOMContentLoaded', mountHero);
   } else {
-    mountCatcher(); mountHero();
+    mountHero();
   }
   // El scroll infinito reemplaza el contenido de la zona: re-montar si hiciera falta.
-  setInterval(function () { mountCatcher(); mountHero(); }, 1500);
+  setInterval(mountHero, 1500);
 
   // El visitante se queda mirando y a los {{ $guestDelay }} segundos le salta el
   // popup. Antes dependía de que llegase scrolleando hasta las unidades, así que
