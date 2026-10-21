@@ -1112,7 +1112,7 @@ html.lx-var-b .eco-band{
 .lx-ficha .lx-eyebrow{ margin-bottom: 10px; }
 .lx-ficha-nombre{
   margin: 0; font-family: var(--lx-font-display) !important; font-weight: 400;
-  font-size: 46px; line-height: 1.02; letter-spacing: .01em; color: var(--lx-ink);
+  font-size: 28px; line-height: 1.08; letter-spacing: .01em; color: var(--lx-ink);
 }
 .lx-ficha-nombre .lx-num{ font-family: var(--lx-font-ui) !important; font-size: 15px; vertical-align: middle; margin-left: 6px; }
 .lx-ficha-precio{ display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 22px; }
