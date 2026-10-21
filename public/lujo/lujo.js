@@ -55,18 +55,23 @@
   /* ── 1. HERO ────────────────────────────────────────────────────────────
      El de Bahía Mar: slider propio a sangre dentro del .fg-stage del sitio,
      con el telón diagonal y 8 s por imagen. Los renders son los de la
-     landing de Siebe (lujo/hero/, generados de residences-landing y de
-     web/public/media): la fachada, el lobby y el rooftop (OP1_14 y OP1_18).
+     landing de Siebe (lujo/hero/, webp a 2048 y 1024): la fachada al
+     atardecer, el lobby, un dormitorio, la azotea y la fachada de dia.
      La marca, pequeña y abajo a la izquierda: el logo, la ubicación y el
      tagline de sieberesidences.com. Índice «01 — 05» con una línea fina de
      progreso; cada número salta a su imagen. Con prefers-reduced-motion:
      sin telón ni autoplay. */
+  // Las cinco que mando Miguel («Imagene slide», 16 oct). Las dos fachadas son
+  // casi el mismo encuadre a distinta hora, asi que van la primera y la ultima:
+  // separadas, no se leen como repetida. Las fachadas bajan el encuadre para no
+  // comerse la entrada ni el monolito con el logotipo, que es lo que identifica
+  // el proyecto.
   const HERO = [
-    { img: '01-fachada-atardecer', foco: '50% 55%', alt: t('Siebe Residences al atardecer', 'Siebe Residences at sunset') },
-    { img: '02-lobby',             foco: '62% 50%', alt: t('El lobby de Siebe Residences', 'The Siebe Residences lobby') },
-    { img: '03-rooftop-lounge',    foco: '50% 60%', alt: t('El rooftop: piscina y solárium', 'The rooftop: pool and sun deck') },
-    { img: '04-rooftop-terraza',   foco: '40% 55%', alt: t('El rooftop: terraza cubierta', 'The rooftop: covered terrace') },
-    { img: '05-fachada-noche',     foco: '50% 50%', alt: t('Siebe Residences de noche', 'Siebe Residences at night') },
+    { img: '01-fachada-atardecer', foco: '50% 58%', alt: t('La fachada de Siebe Residences al atardecer', 'The Siebe Residences facade at sunset') },
+    { img: '02-lobby',             foco: '50% 50%', alt: t('El lobby acristalado al anochecer', 'The glass lobby at dusk') },
+    { img: '03-interior',          foco: '50% 55%', alt: t('Dormitorio principal de una residencia', 'Main bedroom of a residence') },
+    { img: '04-azotea',            foco: '50% 60%', alt: t('La piscina de la azotea con las tumbonas', 'The rooftop pool and loungers') },
+    { img: '05-fachada-dia',       foco: '50% 58%', alt: t('La fachada de Siebe Residences de día', 'The Siebe Residences facade by day') },
   ];
   const HERO_MS = 8000;
   const MARCA = {
