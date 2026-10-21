@@ -2,13 +2,13 @@
     Escaparate para visitantes sin cuenta.
 
     La home dejó de exigir sesión: el visitante ve el catálogo y toda la
-    interfaz, pero la zona de unidades va ligeramente desenfocada y cualquier
-    intento de USARLA (abrir una unidad, filtrar, guardar, reservar) abre este
-    popup, que lleva al registro o al login.
+    interfaz, y cualquier intento de USARLA (abrir una unidad, filtrar,
+    guardar, reservar) abre este popup, que lleva al registro o al login.
 
-    El desenfoque es a propósito suave —lo justo para que se lea «hay algo aquí
-    detrás» sin impedir ver las propiedades, que es lo que se quiere enseñar—.
-    Se ajusta con --guest-blur.
+    Las unidades se veían con un desenfoque suave; se quitó el 21 de octubre
+    (Kary, confirmado por Derick). Ahora se ven nítidas y lo que las protege es
+    sólo la capa de clics: mirar es libre, usarlas pide cuenta. Para volver
+    atrás, --guest-filter.
 
     El hero queda nítido —es la carta de presentación del proyecto— pero el
     clic sobre él también abre el popup (Miguel, 16 oct).
@@ -36,13 +36,20 @@
 @endphp
 <style>
   body[data-guest] {
-    --guest-blur: 2px;
+    /* Las unidades se veían «un poco distorsionadas» desde que lo pidió Miguel
+       el 30 de septiembre. Kary pidió quitarlo el 21 de octubre y Derick lo
+       confirmó, así que ahora se ven nítidas.
+
+       Es una sola variable: para volver atrás basta con poner aquí
+       `blur(2px) saturate(0.92)`. El resto del muro no cambia — la capa que
+       se come los clics sigue puesta y el popup sigue saltando. */
+    --guest-filter: none;
   }
 
   /* Sólo la zona de unidades. `filter` crea contexto de apilamiento, así que
      se aplica al contenedor y no a cada tarjeta: más barato de componer. */
   body[data-guest] #main-unit-reserve-list {
-    filter: blur(var(--guest-blur)) saturate(0.92);
+    filter: var(--guest-filter);
     transition: filter 0.4s ease;
     user-select: none;
   }

@@ -37,6 +37,15 @@ return [
     // El de Duna, el que ya venía escrito a mano en las vistas.
     'whatsapp'      => env('COMPANY_WHATSAPP', '18097109044'),
 
+    // Perfiles sociales del proyecto (URL completa). Vacío = el icono del
+    // pie sale apagado y sin enlace, en vez de no hacer nada al pulsarlo,
+    // que es lo que pasaba (Kary, 21 oct: «no funcionan»).
+    'social' => [
+        'facebook'  => env('COMPANY_FACEBOOK', 'https://www.facebook.com/profile.php?id=61574783614005'),
+        'instagram' => env('COMPANY_INSTAGRAM', 'https://www.instagram.com/makairesidences/'),
+        'x'         => env('COMPANY_X', ''),
+    ],
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),
