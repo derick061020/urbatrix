@@ -572,11 +572,12 @@
                     $soporte = config('company.support_email');
                     // Sin correo configurado no se deja un mailto vacio, que no
                     // llevaria a ningun sitio: se usa el WhatsApp del sitio.
+                    $waNum   = preg_replace('/\D+/', '', (string) config('company.whatsapp'));
                     $destino = $soporte
                         ? 'mailto:' . $soporte . '?subject=' . rawurlencode($asunto)
-                        : 'https://wa.me/18097109044?text=' . rawurlencode($asunto);
+                        : ($waNum ? 'https://wa.me/' . $waNum . '?text=' . rawurlencode($asunto) : null);
                 @endphp
-                <a href="{{ $destino }}" @if(!$soporte) target="_blank" rel="noopener" @endif class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
+                <a @if($destino) href="{{ $destino }}" @if(!$soporte) target="_blank" rel="noopener" @endif @else aria-disabled="true" style="opacity:.45;cursor:not-allowed;pointer-events:none;" @endif class="auth-btn auth-btn-ghost reg-initial-only"><i class="pi pi-headphones text-[14px]"></i> {{ __('Contáctanos') }}</a>
                 <button type="button" onclick="goToLogin()" class="auth-btn auth-btn-ghost w-10 px-0" title="{{ __('Volver al login') }}">
                     <i class="pi pi-times text-[12px]"></i>
                 </button>

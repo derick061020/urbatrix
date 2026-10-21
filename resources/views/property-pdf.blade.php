@@ -39,7 +39,7 @@
   $advisorName   = optional($unit->agent)->name ?? 'Carlos Ramírez Méndez';
   $advisorEmail  = optional($unit->agent)->email ?? 'carlos.ramirez@landmasscapital.com';
   $advisorPhone  = '+1 (809) 710-9044';
-  $advisorWA     = '18097109044';
+  $advisorWA     = preg_replace('/\D+/', '', (string) config('company.whatsapp'));
   $advisorInitials = collect(explode(' ', $advisorName))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('');
 
   $mainImage = optional($unit->images->first())->path;

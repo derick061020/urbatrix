@@ -33,6 +33,12 @@ return [
     // (Miguel, 11 de octubre).
     'site'          => env('COMPANY_SITE', 'https://bahiamarterrenas.com'),
 
+    // WhatsApp de contacto, solo dígitos (formato de wa.me).
+    // Vacío a propósito: el que había era el de Duna/Makai y los botones
+    // llevaban a su chat. Mientras esté vacío, los botones de WhatsApp
+    // salen desactivados en vez de llevar al sitio equivocado.
+    'whatsapp'      => env('COMPANY_WHATSAPP', ''),
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Landmass'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),

@@ -240,7 +240,12 @@
         <div class="h">{{ __('¿No encuentras lo que buscas?') }}</div>
         <div class="s">{{ __('Cuéntanos qué estás buscando y te avisamos cuando haya algo que encaje.') }}</div>
       </div>
-      <a href="https://wa.me/18097109044" target="_blank" rel="noopener">{{ __('Hablar con un asesor') }}</a>
+      @php $waNum = preg_replace('/\D+/', '', (string) config('company.whatsapp')); @endphp
+      @if($waNum)
+        <a href="https://wa.me/{{ $waNum }}" target="_blank" rel="noopener">{{ __('Hablar con un asesor') }}</a>
+      @else
+        <a aria-disabled="true" style="opacity:.45;cursor:not-allowed;pointer-events:none;">{{ __('Hablar con un asesor') }}</a>
+      @endif
     </div>
   </div>
 </div>
