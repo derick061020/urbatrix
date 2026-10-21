@@ -1499,7 +1499,16 @@
 
           <!-- Profile container with dropdown -->
           <div style="position:relative;">
-            <button type="button" onclick="toggleProfileMenu()" aria-label="{{ __('Profile') }}" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
+            @php
+              // Sin sesión el chip lleva al login (Kary, 21 oct); con sesión abre
+              // el menú, que es donde están el panel, el perfil y la salida. El
+              // desplegable sigue existiendo para los dos: lo abre el botón de
+              // hamburguesa, y en móvil es la única vía al idioma y la moneda.
+              $accionPerfil = auth()->check()
+                  ? 'toggleProfileMenu()'
+                  : "window.location.href='" . route('login') . "'";
+            @endphp
+            <button type="button" onclick="{!! $accionPerfil !!}" aria-label="{{ auth()->check() ? __('Profile') : __('Iniciar sesión') }}" style="display:inline-flex;align-items:center;gap:6px;padding:0 0 0 6px;background:transparent;border:none;cursor:pointer;border-radius:9999px;">
               <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
                 @auth
                   <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ explode(' ', auth()->user()->name)[0] }}</span>
@@ -2501,7 +2510,7 @@
         
         <!-- Copyright -->
         <div class="fg-footer-copyright" data-node-id="124:3626">
-          <p>{{ __('©2026 Duna Development — Todos los derechos reservados') }}</p>
+          <p>{{ __('©:year Duna Development — Todos los derechos reservados', ['year' => date('Y')]) }}</p>
         </div>
         
         <!-- Social Icons -->
