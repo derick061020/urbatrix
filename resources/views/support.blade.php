@@ -332,7 +332,12 @@
           <div class="cn">WhatsApp</div>
           <div class="cv">{{ __('El más rápido') }}</div>
           <div class="sla">{{ __('Atendido en horario laboral (GMT-4)') }}</div>
-          <a class="cta" href="https://wa.me/18495854171" target="_blank" rel="noopener">{{ __('Abrir WhatsApp') }}</a>
+          @php $waNum = preg_replace('/\D+/', '', (string) config('company.whatsapp')); @endphp
+          @if($waNum)
+            <a class="cta" href="https://wa.me/{{ $waNum }}" target="_blank" rel="noopener">{{ __('Abrir WhatsApp') }}</a>
+          @else
+            <a class="cta" aria-disabled="true" style="opacity:.45;cursor:not-allowed;pointer-events:none;">{{ __('Abrir WhatsApp') }}</a>
+          @endif
         </div>
         <div class="ch mail">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
