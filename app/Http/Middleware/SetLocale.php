@@ -26,7 +26,7 @@ class SetLocale
         $supported = config('app.supported_locales', ['es', 'en']);
         $default   = config('app.locale', 'es');
 
-        $locale = $request->session()->get('locale')
+        $locale = $this->deSesion($request, 'locale')
             ?? $request->cookie('app_locale')
             ?? $this->fromBrowser($request, $supported)
             ?? $default;
@@ -42,7 +42,7 @@ class SetLocale
 
         // Zona horaria: sesión -> cookie -> config. Se aplica a PHP/Carbon para
         // que todas las fechas/horas se muestren en el huso elegido por el usuario.
-        $timezone = $request->session()->get('timezone')
+        $timezone = $this->deSesion($request, 'timezone')
             ?? $request->cookie('app_timezone')
             ?? config('app.timezone', 'UTC');
 
@@ -52,6 +52,21 @@ class SetLocale
         }
 
         return $next($request);
+    }
+
+    /**
+     * Un valor de la sesión, si es que hay sesión.
+     *
+     * Este middleware corre también en la pila global, para que las páginas de
+     * error —que no pasan por el grupo `web`— salgan en el idioma del
+     * visitante. Allí la sesión todavía no está arrancada y pedirla lanza una
+     * excepción, así que se comprueba antes. Cuando vuelve a correr dentro del
+     * grupo `web` la sesión ya está y manda ella, que es la elección explícita
+     * del usuario en el selector ES/EN.
+     */
+    private function deSesion(Request $request, string $clave)
+    {
+        return $request->hasSession() ? $request->session()->get($clave) : null;
     }
 
     /**
