@@ -1958,24 +1958,7 @@
             </a>
           </div>
           {{-- Selector de proyectos oculto: por ahora solo existe Bahía Mar --}}
-          <button type="button" id="projectsToggle" class="logo-trigger" onclick="toggleProjects()" aria-label="{{ __('Switch project') }}" aria-expanded="false" style="display:none;" hidden>
-            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
 
-          <!-- PROJECT SELECTOR DROPDOWN -->
-          <div class="project-selector" id="projectsDropdown" role="menu" aria-label="{{ __('Projects') }}">
-            <button type="button" class="project-card active" data-project="makai" onclick="selectProject('Bahía Mar')" aria-label="{{ __('Bahía Mar Residences') }}" role="menuitem">
-              <img src="/images/projects/makai.png" alt="{{ __('Bahía Mar Residences') }}">
-            </button>
-            <button type="button" class="project-card" data-project="naviva" onclick="selectProject('Naviva')" aria-label="{{ __('Naviva') }}" role="menuitem">
-              <img src="/images/projects/naviva.png" alt="{{ __('Naviva') }}">
-            </button>
-            <button type="button" class="project-card" data-project="liv" onclick="selectProject('Liv')" aria-label="{{ __('Liv') }}" role="menuitem">
-              <img src="/images/projects/liv.png" alt="{{ __('Liv') }}">
-            </button>
-          </div>
         </div>
 
         <!-- CENTER: Units sold + online users -->
