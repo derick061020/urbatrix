@@ -1158,15 +1158,29 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     /* ------------ Step 2 — role ------------- */
+    function marcarRol(valor) {
+        const card = document.querySelector('.role-card input[type=radio][value="' + valor + '"]')?.closest('.role-card');
+        if (!card) return false;
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const input = card.querySelector('input[type=radio]');
+        input.checked = true;
+        state.role = input.value;
+        return true;
+    }
     document.querySelectorAll('.role-card').forEach(card => {
         card.addEventListener('click', () => {
-            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            const input = card.querySelector('input[type=radio]');
-            input.checked = true;
-            state.role = input.value;
+            marcarRol(card.querySelector('input[type=radio]').value);
         });
     });
+    // ?perfil= deja el rol ya elegido: los botones «soy comprador» / «soy
+    // broker» del popup de acceso traen aqui directamente (Kary, 21 oct).
+    // Se aceptan los dos vocabularios: la capa de marca dice «cliente» y esta
+    // pantalla «buyer».
+    const perfilInicial = new URLSearchParams(location.search).get('perfil');
+    if (perfilInicial) {
+        marcarRol({ cliente: 'buyer', comprador: 'buyer', buyer: 'buyer', broker: 'broker' }[perfilInicial.toLowerCase()] || '');
+    }
     window.submitStep2 = (e) => {
         e.preventDefault();
         // Buyers don't need verification documents — skip step 3 entirely and drop any stale uploads
