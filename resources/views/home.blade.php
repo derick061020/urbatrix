@@ -1614,18 +1614,7 @@
               <img src="/images/siebe-logo.png" alt="{{ __('logo') }}" class="logo-img" style="height:32px;width:auto;max-width:160px;object-fit:contain;">
             </a>
           </div>
-          <button type="button" id="projectsToggle" class="logo-trigger" onclick="toggleProjects()" aria-label="{{ __('Switch project') }}" aria-expanded="false">
-            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
 
-          <!-- PROJECT SELECTOR DROPDOWN -->
-          <div class="project-selector" id="projectsDropdown" role="menu" aria-label="{{ __('Projects') }}">
-            <button type="button" class="project-card active" data-project="siebe" onclick="selectProject('Siebe')" aria-label="{{ __('Siebe Residences') }}" role="menuitem">
-              <img src="/images/projects/siebe.png" alt="{{ __('Siebe Residences') }}">
-            </button>
-          </div>
         </div>
 
         <!-- CENTER: Units sold + online users -->
