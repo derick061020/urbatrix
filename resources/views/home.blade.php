@@ -1348,7 +1348,7 @@
                 $optLabel = $unitOpt->name ?? $optId;
                 $optPrice = number_format((float)($unitOpt->price ?? 0), 0);
               @endphp
-              <option value="{{ $optId }}" data-price="{{ $optPrice }}">Unit {{ $optLabel }} · ${{ $optPrice }} USD</option>
+              <option value="{{ $optId }}" data-price="{{ $optPrice }}">{{ __('Unidad') }} {{ $optLabel }} · ${{ $optPrice }} USD</option>
             @endforeach
           </select>
         </div>
