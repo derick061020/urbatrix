@@ -17,7 +17,7 @@
        cifras grandes; Poppins para el resto. La hoja se carga al final del
        body —tiene que ganar a los <style> en línea de esta vista— pero se
        precarga aquí. --}}
-  <link rel="preload" href="{{ asset('lujo/lujo.css') }}" as="style">
+  <link rel="preload" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}" as="style">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
@@ -5958,8 +5958,8 @@
 
      Va la última a propósito: tiene que ganar a los <style> en línea de esta
      misma vista. --}}
-<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}">
-<script src="{{ asset('lujo/lujo.js') }}" defer></script>
+<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}">
+<script src="{{ asset('lujo/lujo.js') }}?v={{ @filemtime(public_path('lujo/lujo.js')) }}" defer></script>
 
 {{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
 @include('partials.lujo-acciones')
