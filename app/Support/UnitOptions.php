@@ -113,11 +113,31 @@ class UnitOptions
         $map = [];
         foreach (self::get($category) as $row) {
             if (isset($row['value'])) {
-                $map[$row['value']] = $row['label'] ?? $row['value'];
+                $map[$row['value']] = self::label($row['label'] ?? $row['value']);
             }
         }
 
         return $map;
+    }
+
+    /**
+     * Etiqueta de una opción en el idioma activo.
+     *
+     * Estas listas se cargan una sola vez desde el admin, así que quedan en el
+     * idioma de quien las escribió: las vistas en español («Vista al lago») y
+     * los tipos en inglés («1 Bed & Family Room»). El resultado era que cada
+     * versión del sitio enseñaba media interfaz en el otro idioma.
+     *
+     * Se pasan por el traductor: si la etiqueta tiene traducción, se usa; si es
+     * una que el admin acaba de inventar, sale tal cual la escribió, que es el
+     * comportamiento de siempre. Sólo se traduce al MOSTRAR (map): el editor de
+     * opciones usa get() y sigue viendo el texto original, que es el que edita.
+     */
+    public static function label(string $label): string
+    {
+        $traducida = __($label);
+
+        return is_string($traducida) ? $traducida : $label;
     }
 
     /**
