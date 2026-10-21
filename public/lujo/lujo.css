@@ -537,7 +537,7 @@
 }
 .lx-ficha-nombre{
   margin: 0; font-family: var(--lx-font-display) !important; font-weight: 500;
-  font-size: 44px; line-height: 1.02; letter-spacing: var(--lx-track-display);
+  font-size: 26px; line-height: 1.08; letter-spacing: var(--lx-track-display);
   text-transform: uppercase; color: var(--lx-text);
   font-variant-numeric: lining-nums;
 }
@@ -677,7 +677,7 @@
   .mt-header-logo, .mt-header-dot{ display: none !important; }
   .mt-header{ padding-inline: 14px !important; }
   .mt-left-inner{ padding: 26px 22px 22px !important; }
-  .lx-ficha-nombre{ font-size: 36px; }
+  .lx-ficha-nombre{ font-size: 22px; }
   .mt-cta-row{ padding: 12px 16px !important; }
 }
 
