@@ -343,6 +343,7 @@
   "Reserve from $5000": "Reserve from $5000",
   "SOLD": "SOLD",
   "Floor": "Floor",
+  "Floor :n": "Floor :n",
   "Ground Floor": "Ground Floor",
   "Fully furnished": "Fully furnished",
   "Limited time offer": "Limited time offer",
@@ -2848,5 +2849,12 @@
   "Simulación referencial, sin intereses durante la obra, sobre un plan de pago tipo. Las condiciones de tu plan se acuerdan al reservar. No es una oferta ni una aprobación de financiamiento.": "Reference simulation, interest free during construction, based on a standard payment plan. Your own terms are agreed when you reserve. This is not an offer or a financing approval.",
   "Completivo al firmar": "Balance on signing",
   "Completivo hasta el :pct%": "Balance up to :pct%",
-  "La reserva va incluida": "Reservation included"
+  "La reserva va incluida": "Reservation included",
+  "1 Bed": "1 Bed",
+  "1 Bed & Family Room": "1 Bed & Family Room",
+  "1 Bed & Studio Lock-off": "1 Bed & Studio Lock-off",
+  "2 Bed": "2 Bed",
+  "3 Bed": "3 Bed",
+  "Penthouse 1 Bed": "Penthouse 1 Bed",
+  "Penthouse 2 Bed": "Penthouse 2 Bed"
 }
