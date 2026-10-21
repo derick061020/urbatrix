@@ -2702,21 +2702,6 @@
           </div>
           
           <!-- Twitter/X -->
-          <div class="fg-social-icon" data-node-id="124:3632">
-            @if(!empty($redes['x']))
-              <a href="{{ $redes['x'] }}" target="_blank" rel="noopener" aria-label="X" class="fg-icon-twitter" data-node-id="124:3633">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-3.46 13.523l.916-1.115L6.644 4.236H4.853l7.234 9.06 2.632 3.317z"/>
-              </svg>
-            </a>
-            @else
-              <div class="fg-icon-twitter" aria-hidden="true" style="opacity:.4;cursor:not-allowed;" data-node-id="124:3633">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-3.46 13.523l.916-1.115L6.644 4.236H4.853l7.234 9.06 2.632 3.317z"/>
-              </svg>
-            </div>
-            @endif
-          </div>
         </div>
       </div>
     </footer>
