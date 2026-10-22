@@ -165,7 +165,10 @@
                             $ageClass  = $hrs >= 48 ? 'hot' : ($hrs >= 12 ? 'warn' : 'ok');
                             $ageLabel  = $i->date ? $i->date->diffForHumans(['short' => true, 'parts' => 1]) : '—';
                         @endphp
-                        <div class="esc-item flex items-center gap-3 px-5 py-2.5 border-b border-ink-100 last:border-b-0 cursor-pointer min-w-[560px]"
+                        {{-- En móvil, dos líneas: tipo, antigüedad y botón arriba; el título
+                             entero debajo. Antes la fila tenía 560 px fijos y lo que
+                             se cortaba era justo la antigüedad y «Revisar». --}}
+                        <div class="esc-item flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-1.5 px-4 sm:px-5 py-2.5 border-b border-ink-100 last:border-b-0 cursor-pointer sm:min-w-[560px]"
                              data-cat="{{ $i->cat }}"
                              data-ty="{{ $i->ty }}"
                              data-title="{{ $i->title }}"
@@ -175,11 +178,11 @@
                              data-action="{{ $i->action }}">
                             <input type="checkbox" class="esc-chk w-4 h-4 accent-brand shrink-0" onclick="event.stopPropagation()">
                             <span class="esc-ty" style="{{ $pillStyle[$i->cat] ?? $pillStyle['documento'] }}">{{ $pillShort[$i->cat] ?? $i->ty }}</span>
-                            <div class="flex-1 min-w-0">
+                            <div class="order-last sm:order-none basis-full sm:basis-auto flex-1 min-w-0">
                                 <div class="text-[13px] font-semibold text-ink-950 truncate">{{ $i->title }}</div>
                                 <div class="text-[11px] text-ink-500 truncate">{{ $i->sub }}</div>
                             </div>
-                            <span class="esc-age {{ $ageClass }}">{{ $ageLabel }}</span>
+                            <span class="esc-age {{ $ageClass }} ml-auto sm:ml-0">{{ $ageLabel }}</span>
                             <div class="shrink-0">
                                 <a href="{{ $i->url }}" onclick="event.stopPropagation()" class="crm-btn crm-btn-primary !py-1.5 !px-3 !text-[11.5px]">{{ $i->action }}</a>
                             </div>
