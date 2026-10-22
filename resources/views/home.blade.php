@@ -12,6 +12,14 @@
   <link rel="icon" href="{{ asset('images/favicon-urbatrix.png') }}" type="image/png">
   <link href="{{ asset('vendor/primeicons/primeicons.css') }}" rel="stylesheet" />
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ @filemtime(public_path('css/style.css')) }}">
+  {{-- Capa de marca de Makai (la de Siebe, de Samuel, con la marca de
+       makairesidences.com): sus dos familias. Cormorant Garamond para títulos
+       y cifras grandes; Poppins para el resto. La hoja se carga al final del
+       body —tiene que ganar a los <style> en línea de esta vista— pero se
+       precarga aquí. --}}
+  <link rel="preload" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}" as="style">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
 {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
 @include('partials.upload-morph')
 @stack('styles')
@@ -2754,10 +2762,10 @@
           const btn     = document.getElementById('modalReserveBtn');
 
           if (textEl) {
-              textEl.textContent = isSold ? 'SOLD'
-                                : isReserved ? 'RESERVED'
-                                : isPending ? 'PENDING'
-                                : 'AVAILABLE';
+              textEl.textContent = isSold ? @json(__('SOLD'))
+                                : isReserved ? @json(__('RESERVED'))
+                                : isPending ? @json(__('PENDING'))
+                                : @json(__('AVAILABLE'));
           }
           if (badgeEl) {
               // override pill colors when not available
@@ -3284,7 +3292,11 @@
     }
 
     function closeReservePage() {
-      document.getElementById('reservePage').style.display = 'none';
+      // En este home no existe #reservePage: sin la guarda, Escape lanzaba un
+      // TypeError y se llevaba por delante los demás cierres de esa tecla.
+      const pagina = document.getElementById('reservePage');
+      if (!pagina) { clearInterval(reserveTimerInterval); reserveTimeLeft = 600; return; }
+      pagina.style.display = 'none';
       document.body.style.overflow = '';
       clearInterval(reserveTimerInterval);
       reserveTimeLeft = 600;
@@ -5250,6 +5262,23 @@
 
 {{-- Retención: el «atrás» del navegador te sacaba del sitio de una (ver partial). --}}
 @include('partials.exit-intent')
+
+{{-- Capa de marca de Makai — la de Siebe (Samuel, repo urbatrix-siebe-lujo)
+     con la paleta, el logotipo y el copy de makairesidences.com, para que los
+     tres proyectos lleven la misma línea. Makai, como Siebe, es un solo
+     edificio con unidades: se quedan el hero (slider + Hoja), las tarjetas, la
+     ficha y el registro. Los renders del hero son los del slider de portada.
+     El header y el footer no se tocan: son los de Urbatrix.
+
+     Va la última a propósito: tiene que ganar a los <style> en línea de esta
+     misma vista. --}}
+<link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}">
+<script src="{{ asset('lujo/lujo.js') }}?v={{ @filemtime(public_path('lujo/lujo.js')) }}" defer></script>
+{{-- Lo que la capa no resuelve de tamaños (ficha en tablet, 320 px). --}}
+<link rel="stylesheet" href="{{ asset('css/ajustes-responsive.css') }}?v={{ @filemtime(public_path('css/ajustes-responsive.css')) }}">
+
+{{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
+@include('partials.lujo-acciones')
 
 </body>
 
