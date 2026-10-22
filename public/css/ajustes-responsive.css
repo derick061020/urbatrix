@@ -1,0 +1,92 @@
+/* ============================================================================
+   AJUSTES RESPONSIVE sobre la capa de marca
+   ============================================================================
+   Se carga justo detrás de public/lujo/lujo.css. La capa viene tal cual del
+   repo de Samuel y se deja así para poder seguir trayendo sus cambios; lo que
+   hay que corregirle de tamaños va aquí, con #moreInfoModal delante para ganar
+   a sus !important sin depender del orden.
+
+   Anchos revisados: 320, 375, 390, 414, 480, 768, 1024 (vertical y
+   horizontal), 1280, 1440, 1600 y 1920.
+   ========================================================================== */
+
+/* ── Ficha de la unidad en tablet ─────────────────────────────────────────
+   La capa fija las dos columnas (440 px de ficha + galería) a cualquier ancho
+   y pisa el apilado que style.css ya hacía por debajo de 900 px. En un iPad
+   (768, y el Pro en vertical, 1024 × 1366) la galería se quedaba en ~210 px:
+   la barra «Agregar a la lista · Aviso legal · Compartir · Descargar» partía
+   en dos líneas y «Descargar» se iba fuera.
+
+   En tablet vertical va apilada, como en el móvil: la foto arriba a todo lo
+   ancho, la ficha debajo y los dos botones fijos al pie; el conjunto hace
+   scroll de una pieza. */
+@media (min-width: 601px) and (max-width: 900px),
+       (min-width: 601px) and (max-width: 1180px) and (orientation: portrait){
+  #moreInfoModal.mt-overlay{ padding: 24px; }
+  #moreInfoModal .mt-shell{
+    max-width: 820px !important;
+    height: auto !important;
+    max-height: calc(100dvh - 48px) !important;
+  }
+  #moreInfoModal .mt-body{
+    display: flex !important;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  #moreInfoModal .mt-right{ order: -1; flex: none; min-height: 0; }
+  #moreInfoModal .mt-gallery{ flex: none; height: min(60vw, 540px); min-height: 0; }
+  #moreInfoModal .mt-left{
+    flex: none; min-height: 0;
+    border-right: 0 !important;
+  }
+  #moreInfoModal .mt-left-inner{ flex: none; overflow: visible; padding: 32px 40px 28px !important; }
+  #moreInfoModal .mt-cta-row{
+    position: sticky; bottom: 0; z-index: 5;
+    padding: 14px 40px !important;
+    box-shadow: 0 -10px 24px -18px rgba(25,25,25,.35);
+  }
+  #moreInfoModal .mt-thumbs{ flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  #moreInfoModal .mt-thumbs::-webkit-scrollbar{ display: none; }
+}
+
+/* A dos columnas en pantallas justas (portátil pequeño, iPad en horizontal):
+   ficha algo más estrecha para que la galería conserve sitio, y las pestañas
+   en una sola línea. */
+@media (min-width: 901px) and (max-width: 1280px){
+  #moreInfoModal .mt-body{ grid-template-columns: minmax(360px, 400px) minmax(0, 1fr) !important; }
+  #moreInfoModal .mt-left-inner{ padding: 28px 28px 24px !important; }
+  #moreInfoModal .mt-cta-row{ padding: 14px 28px !important; }
+  #moreInfoModal .mt-cta-row > button{ padding: 0 10px !important; letter-spacing: .1em !important; white-space: nowrap; }
+}
+@media (min-width: 601px){
+  #moreInfoModal .mt-tab{ white-space: nowrap; min-width: 0; }
+  #moreInfoModal .mt-tab > span{ overflow: hidden; text-overflow: ellipsis; }
+}
+@media (min-width: 601px) and (max-width: 1280px){
+  #moreInfoModal .mt-tab{ letter-spacing: .1em !important; padding-inline: 8px !important; }
+}
+
+/* Pantalla baja (portátil a 1280 × 720, tablet en horizontal): que la ficha
+   use el alto que hay en vez de dejar el pie de botones fuera. */
+@media (min-width: 901px) and (max-height: 760px){
+  #moreInfoModal.mt-overlay{ padding: 12px; }
+  #moreInfoModal .mt-shell{ height: calc(100dvh - 24px) !important; max-height: calc(100dvh - 24px) !important; }
+}
+
+/* ── Cuadrícula / Lista + mapa a 320 px ───────────────────────────────────
+   La fila mide 336 px y se salía 8 px por cada lado. Solo por debajo de
+   360 px: menos hueco y menos relleno; el diseño de la píldora no cambia. */
+@media (max-width: 359px){
+  .fg-toggle-container{ gap: 8px; }
+  .fg-toggle{ gap: 2px; }
+  .fg-toggle button{ min-width: 0; padding: 10px 12px; font-size: 15px; }
+}
+
+/* ── Buscador del filtro en escritorio ────────────────────────────────────
+   Mide 132 px fijos y con la letra de la capa el placeholder se quedaba en
+   «No. de unid». Donde la fila tiene sitio, el ancho justo para leerlo. */
+@media (min-width: 1180px){
+  .fg-filter-bar .fg-search{ width: 164px; }
+}

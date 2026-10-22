@@ -142,6 +142,8 @@
 
   @media (max-width:920px){ .qa{ grid-template-columns:1fr 1fr; } .channels{ grid-template-columns:1fr 1fr; } .cols{ grid-template-columns:1fr; } }
   @media (max-width:560px){ .qa{ grid-template-columns:1fr; } .channels{ grid-template-columns:1fr; } .hero h1{ font-size:27px; } .crumb{ display:none; } }
+  /* A 320 px la barra (volver + logo + idioma + avatar) medía 328: menos relleno y el logo cede. */
+  @media (max-width:360px){ .topbar .in{ padding:12px 14px; gap:10px; } .topbar .logo-img{ max-width:110px; height:auto; } }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
 
