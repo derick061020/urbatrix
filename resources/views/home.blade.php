@@ -3462,10 +3462,10 @@
           const btn     = document.getElementById('modalReserveBtn');
 
           if (textEl) {
-              textEl.textContent = isSold ? 'SOLD'
-                                : isReserved ? 'RESERVED'
-                                : isPending ? 'PENDING'
-                                : 'AVAILABLE';
+              textEl.textContent = isSold ? @json(__('SOLD'))
+                                : isReserved ? @json(__('RESERVED'))
+                                : isPending ? @json(__('PENDING'))
+                                : @json(__('AVAILABLE'));
           }
           if (badgeEl) {
               // override pill colors when not available
@@ -6656,6 +6656,8 @@
 <script>window.LUJO_PUBLICADO = true;</script>
 <link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}">
 <script src="{{ asset('lujo/lujo.js') }}?v={{ @filemtime(public_path('lujo/lujo.js')) }}" defer></script>
+{{-- Lo que la capa no resuelve de tamaños (ficha en tablet, 320 px). --}}
+<link rel="stylesheet" href="{{ asset('css/ajustes-responsive.css') }}?v={{ @filemtime(public_path('css/ajustes-responsive.css')) }}">
 
 {{-- Con sesión, las acciones reales vuelven a su sitio (ver el partial). --}}
 @include('partials.lujo-acciones')
