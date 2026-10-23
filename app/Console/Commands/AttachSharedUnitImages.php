@@ -27,7 +27,8 @@ class AttachSharedUnitImages extends Command
     protected $signature = 'units:shared-images
                             {--project= : Nombre del proyecto (por defecto el único que tenga unidades)}
                             {--dry-run : Sólo mostrar qué haría}
-                            {--remove : Quitar de las unidades las imágenes del repo en vez de agregarlas}';
+                            {--remove : Quitar de las unidades las imágenes del repo en vez de agregarlas}
+                            {--prune : Antes de agregar, quitar las del repo que ya no estén en el MANIFEST}';
 
     protected $description = 'Agrega a todas las unidades las imágenes compartidas de public/images/siebe (áreas comunes y renders genéricos)';
 
@@ -67,11 +68,19 @@ class AttachSharedUnitImages extends Command
         ['planos/planta-4.jpg',   'plans', 'Planta 4 · plano general',        'floor:4th'],
         ['planos/azotea.jpg',     'plans', 'Azotea y emplazamiento',          'floor:4th'],
 
-        // ── Edificio y entorno (pestaña Amenidades) ────────────────────────
-        ['comunes/01-fachada-atardecer.jpg',    'amenities', 'Fachada al atardecer', null],
-        ['comunes/02-fachada-hora-azul.jpg',    'amenities', 'Fachada · hora azul',  null],
-        ['comunes/03-fachada-diurna.jpg',       'amenities', 'Fachada de día',       null],
-        ['comunes/04-entorno.jpg',              'amenities', 'Entorno',              null],
+        // ── Edificio y áreas comunes (pestaña Amenidades) ──────────────────
+        // Las que mandó Miguel el 23 de octubre (las de antes eran cuatro
+        // fachadas viejas: «las fotos de amenidades son antiguas»). Al cambiar
+        // esta lista, correr con --prune para quitar las que ya no están.
+        ['comunes/01-fachada-lateral.jpg',   'amenities', 'Fachada',                null],
+        ['comunes/02-fachada-frontal.jpg',   'amenities', 'Fachada · entrada',      null],
+        ['comunes/03-lobby-acceso.jpg',      'amenities', 'Lobby · acceso',         null],
+        ['comunes/04-lobby.jpg',             'amenities', 'Lobby',                  null],
+        ['comunes/05-azotea-piscina.jpg',    'amenities', 'Azotea · piscina',       null],
+        ['comunes/06-azotea-comedor.jpg',    'amenities', 'Azotea · comedor',       null],
+        ['comunes/07-gimnasio.jpg',          'amenities', 'Gimnasio',               null],
+        ['comunes/08-azotea-barbacoa.jpg',   'amenities', 'Azotea · barbacoa',      null],
+        ['comunes/09-azotea-terraza.jpg',    'amenities', 'Azotea · terraza',       null],
     ];
 
     public function handle(): int
@@ -86,6 +95,10 @@ class AttachSharedUnitImages extends Command
 
         if ($this->option('remove')) {
             return $this->remove($project, $dry);
+        }
+
+        if ($this->option('prune')) {
+            $this->prune($project, $dry);
         }
 
         // Sólo los archivos que de verdad están en el repo.
@@ -170,6 +183,29 @@ class AttachSharedUnitImages extends Command
         $this->info(($dry ? 'Se quitarían' : 'Quitadas') . " {$n} imágenes del repo.");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Quita las imágenes del repo que ya no figuran en el MANIFEST (fotos
+     * sustituidas). Las subidas a mano y las que siguen en la lista quedan.
+     */
+    private function prune(Project $project, bool $dry): void
+    {
+        $keep = array_map(fn ($row) => self::BASE . $row[0], self::MANIFEST);
+        $q = UnitImage::whereIn('unit_id', $project->units()->select('id'))
+            ->where('path', 'like', self::BASE . '%')
+            ->whereNotIn('path', $keep);
+        $n = $q->count();
+
+        if (! $dry && $n > 0) {
+            DB::transaction(function () use ($q, $project) {
+                $q->delete();
+                foreach ($project->units()->get() as $unit) {
+                    $unit->forceFill(['images_count' => UnitImage::where('unit_id', $unit->id)->count()])->save();
+                }
+            });
+        }
+        $this->info(($dry ? 'Se quitarían' : 'Quitadas') . " {$n} imágenes que ya no están en la lista.");
     }
 
     /**
