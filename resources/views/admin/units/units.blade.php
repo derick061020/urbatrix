@@ -359,7 +359,7 @@
     window.fpSave = function () {
         const rows = Array.from(document.querySelectorAll('#fp-list .fp-row'));
         if (rows.some(r => r.dataset.uploading === '1')) {
-            fpAlert('Esperá a que termine la subida de la imagen.', 'err');
+            fpAlert('Espera a que termine la subida de la imagen.', 'err');
             return;
         }
 

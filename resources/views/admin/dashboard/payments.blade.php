@@ -37,7 +37,7 @@
                         <h4 class="font-semibold text-blue-900 mb-1">{{ __('Tu presupuesto se está preparando') }}</h4>
                         <p class="text-sm text-blue-800">
                             Nuestro equipo está armando el plan de pagos para tu unidad.
-                            En cuanto esté listo, lo verás acá con todas las cuotas y vencimientos.
+                            En cuanto esté listo, lo verás aquí con todas las cuotas y vencimientos.
                         </p>
                     </div>
                 </div>

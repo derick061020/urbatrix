@@ -1,3 +1,7 @@
+{{-- El selector de idioma se pinta aquí arriba y se imprime más abajo: su CSS
+     va por @push('styles'), y ese @stack está en el <head>. Incluido en la
+     barra lateral, el push llegaba tarde y el selector salía sin estilo. --}}
+@php $brkLangToggle = view('partials.language-toggle')->render(); @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -113,7 +117,7 @@
         </nav>
 
         <div class="rounded-xl bg-white border border-ink-200 p-2 mb-2 flex justify-center">
-            @include('partials.language-toggle')
+            {!! $brkLangToggle !!}
         </div>
 
         <div class="rounded-xl bg-white border border-ink-200 p-3 flex items-center gap-2.5">

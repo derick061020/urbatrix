@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Acuerdos').' — BAHÍA MAR')
-@section('page_title', __('Mi propiedad'))
-@section('page_breadcrumb', __('Mi propiedad').' · '.__('Acuerdos'))
+@section('page_title', __('Acuerdos'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Acuerdos'))
 @php $activeRoute = 'acuerdos'; @endphp
 
 @section('content')

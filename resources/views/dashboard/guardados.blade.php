@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Guardados — BAHÍA MAR'))
-@section('page_title', __('Mi Propiedad'))
-@section('page_breadcrumb', __('Mi Propiedad · Guardados'))
+@section('page_title', __('Guardados'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Guardados'))
 @php $activeRoute = 'guardados'; @endphp
 
 @push('styles')
@@ -568,7 +568,7 @@
             </div>
             <div class="mt-3 text-[15px] font-bold" style="color:#171717;">{{ __('Aún no tienes propiedades guardadas') }}</div>
             <p class="text-[12px] mt-1 max-w-md mx-auto" style="color:#717784;">
-                Tocá el corazón en cualquier unidad del listado para agregarla a tu lista de guardados y revisarla después.
+                Toca el corazón de cualquier unidad del listado para añadirla a tus guardados y revisarla después.
             </p>
             <a href="/" class="sv-empty-cta">
                 <i class="pi pi-arrow-right text-[11px]"></i> Ver unidades

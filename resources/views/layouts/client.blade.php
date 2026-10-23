@@ -339,10 +339,12 @@
                 <h1 class="font-display text-[18px] sm:text-[22px] font-semibold text-ink-950 leading-tight tracking-tight truncate">@yield('page_title', __('Mi Propiedad'))</h1>
                 <p class="text-[11px] sm:text-[12px] text-ink-500 leading-tight mt-0.5 truncate">@yield('page_breadcrumb', __('Mi Propiedad'))</p>
             </div>
-            <div class="topbar-date hidden md:flex items-center text-[12px] text-ink-500 whitespace-nowrap">
+            {{-- La fecha y el buscador ancho sólo con sitio: en tablet se comían el
+                 título de la página («Bienv…», «Mi Pro…»). --}}
+            <div class="topbar-date hidden xl:flex items-center text-[12px] text-ink-500 whitespace-nowrap">
                 {{ \Carbon\Carbon::now()->locale(app()->getLocale())->isoFormat(__('dddd, D [de] MMMM [de] YYYY')) }}
             </div>
-            <div class="topbar-search-wrap relative w-64 hidden md:block" data-search="client">
+            <div class="topbar-search-wrap relative w-52 lg:w-64 hidden md:block" data-search="client">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
                 <input id="global-search-input" type="text" placeholder="{{ __('Buscar documentos, pagos, secciones…') }}" class="topbar-search pr-3" autocomplete="off" />
                 <div id="global-search-dropdown" class="search-dropdown" role="listbox"></div>

@@ -30,17 +30,22 @@
     </div>
 
     <div class="crm-card">
+        {{-- Pestañas y buscador: antes eran botones sin acción (y «Promesas» no
+             correspondía a ningún tipo). Filtran por el data-apr de cada fila. --}}
         <div class="p-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
-            @foreach (['Todos','KYC','Promesas','Contratos','Pagos'] as $i => $tab)
-                <button class="crm-tab {{ $i === 0 ? 'active' : '' }}">{{ $tab }}</button>
-            @endforeach
-            <div class="ml-auto relative w-64">
+            <div class="apr-tabs flex items-center gap-2" role="tablist">
+                @foreach ([['todos', __('Todos')], ['kyc', 'KYC'], ['pagos', __('Pagos')], ['contrato', __('Contratos')], ['descuento', __('Descuentos y comisiones')], ['otros', __('Otros')]] as $i => [$key, $tab])
+                    <button type="button" class="crm-tab {{ $i === 0 ? 'active' : '' }}" data-apr-tab="{{ $key }}">{{ $tab }}</button>
+                @endforeach
+            </div>
+            <div class="sm:ml-auto relative w-full sm:w-64">
                 <i class="pi pi-search absolute top-1/2 -translate-y-1/2 left-3 text-ink-400"></i>
-                <input type="text" placeholder="Buscar…" class="crm-input pr-3">
+                <input type="text" id="apr-search" placeholder="{{ __('Buscar…') }}" class="crm-input pr-3">
             </div>
         </div>
 
-        <div class="divide-y divide-ink-100">
+        <div class="apr-rows divide-y divide-ink-100">
+            <div id="apr-none" class="px-5 py-8 text-center text-[12px] text-ink-500" hidden>{{ __('Nada en este filtro.') }}</div>
             @foreach($pendingUsersList as $u)
                 @php
                     $uInit = strtoupper(substr($u->first_name ?? $u->name ?? 'U', 0, 1) . substr($u->last_name ?? '', 0, 1));
@@ -49,7 +54,7 @@
                     $uBg = $uAv[$u->id % count($uAv)];
                     $uRole = $u->role === 'broker' ? 'Broker' : ($u->role === 'admin' ? 'Administrador' : 'Cliente');
                 @endphp
-                <div class="px-5 py-4 flex items-center gap-4">
+                <div class="apr-row px-5 py-4 flex items-center gap-4" data-apr="kyc">
                     <input type="checkbox" class="w-4 h-4 accent-brand">
                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $uBg }}">{{ $uInit ?: 'U' }}</div>
                     <div class="flex-1">
@@ -78,7 +83,7 @@
                     $kAv = ['#7cb8e7','#f3b04f','#a5b0c5','#cdd6df','#d6a3c6','#d56a6a'];
                     $kBg = $kAv[$k->id % count($kAv)];
                 @endphp
-                <div class="px-5 py-4 flex items-center gap-4">
+                <div class="apr-row px-5 py-4 flex items-center gap-4" data-apr="kyc">
                     <input type="checkbox" class="w-4 h-4 accent-brand">
                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $kBg }}">{{ $kInit ?: 'K' }}</div>
                     <div class="flex-1 min-w-0">
@@ -113,7 +118,7 @@
                     $pAv = ['#7cb8e7','#f3b04f','#a5b0c5','#cdd6df','#d6a3c6','#d56a6a'];
                     $pBg = $pAv[$p->id % count($pAv)];
                 @endphp
-                <div class="px-5 py-4 flex items-center gap-4">
+                <div class="apr-row px-5 py-4 flex items-center gap-4" data-apr="pagos">
                     <input type="checkbox" class="w-4 h-4 accent-brand">
                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $pBg }}">{{ $pInit ?: 'P' }}</div>
                     <div class="flex-1 min-w-0">
@@ -161,7 +166,7 @@
                     $bg = $av[$a->id % count($av)];
                     $init = strtoupper(substr($a->requested_by ?? 'A',0,2));
                 @endphp
-                <div class="px-5 py-4 flex items-center gap-4">
+                <div class="apr-row px-5 py-4 flex items-center gap-4" data-apr="{{ ['kyc' => 'kyc', 'pagos' => 'pagos', 'contrato' => 'contrato', 'descuento' => 'descuento', 'comision' => 'descuento'][strtolower($a->type ?? '')] ?? 'otros' }}">
                     <input type="checkbox" class="w-4 h-4 accent-brand">
                     <div class="crm-avatar crm-avatar-sm" style="background:{{ $bg }}">{{ $init }}</div>
                     <div class="flex-1">
@@ -187,6 +192,47 @@
         </div>
     </div>
 </div>
+
+<style>
+  /* Móvil: las pestañas en una fila con scroll y cada aprobación en dos
+     líneas (datos arriba, etiquetas y botones debajo); antes las etiquetas
+     se salían por la derecha. */
+  @media (max-width: 640px) {
+    .apr-tabs { overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 0 4px; }
+    .apr-tabs::-webkit-scrollbar { display: none; }
+    .apr-tabs .crm-tab { flex: none; }
+    .apr-row { flex-wrap: wrap; gap: 8px 10px; }
+    .apr-row > .flex-1 { flex: 1 1 calc(100% - 84px) !important; }  /* flex-1 de Tailwind va con !important */
+    .apr-row > .w-20 { width: auto; margin-left: auto; }
+  }
+</style>
+<script>
+(function () {
+  var tabs = document.querySelectorAll('[data-apr-tab]');
+  var rows = document.querySelectorAll('.apr-row');
+  var search = document.getElementById('apr-search');
+  var none = document.getElementById('apr-none');
+  var current = 'todos';
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    var shown = 0;
+    rows.forEach(function (r) {
+      var ok = (current === 'todos' || r.dataset.apr === current) && (!q || r.textContent.toLowerCase().indexOf(q) !== -1);
+      r.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    none.hidden = shown > 0 || rows.length === 0;
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.classList.toggle('active', x === t); });
+      current = t.dataset.aprTab;
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+})();
+</script>
 
 <dialog id="modal-nueva-aprob" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <form method="POST" action="{{ route('admin.crm.aprobaciones.store') }}" class="w-[520px] bg-white rounded-2xl overflow-hidden">@csrf

@@ -382,7 +382,7 @@
     window.payNow = async function () {
         clearError();
         const name = document.getElementById('card_name').value.trim();
-        if (!name) { showError('Ingresá el nombre del titular de la tarjeta.'); return; }
+        if (!name) { showError('Introduce el nombre del titular de la tarjeta.'); return; }
 
         setLoading(true);
         try {

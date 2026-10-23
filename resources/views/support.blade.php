@@ -144,6 +144,11 @@
   @media (max-width:560px){ .qa{ grid-template-columns:1fr; } .channels{ grid-template-columns:1fr; } .hero h1{ font-size:27px; } .crumb{ display:none; } }
   /* A 320 px la barra (volver + logo + idioma + avatar) medía 328: menos relleno y el logo cede. */
   @media (max-width:360px){ .topbar .in{ padding:12px 14px; gap:10px; } .topbar .logo-img{ max-width:110px; height:auto; } }
+  /* El botón del asistente flota encima del contenido: hueco al final de la
+     página para que no tape el último bloque, y en móvil sólo el icono
+     (tapaba «Contáctanos»). */
+  body{ padding-bottom:84px; }
+  @media (max-width:560px){ .assistant{ padding:12px; right:16px; bottom:16px; } .assistant .assistant-txt, .assistant .soon{ display:none; } }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
 
@@ -434,7 +439,7 @@
   <!-- asistente IA (fase 2) -->
   <div class="assistant" title="{{ __('Próximamente') }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 13v2M15 13v2"/></svg>
-    Asistente <span class="soon">{{ __('pronto') }}</span>
+    <span class="assistant-txt">{{ __('Asistente') }}</span> <span class="soon">{{ __('pronto') }}</span>
   </div>
 
 <script>

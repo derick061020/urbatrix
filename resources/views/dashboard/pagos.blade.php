@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Plan de pagos').' — BAHÍA MAR')
 @section('page_title', __('Plan de pagos'))
-@section('page_breadcrumb', __('Mi propiedad').' · '.__('Plan de pagos'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Plan de pagos'))
 @php $activeRoute = 'payments'; @endphp
 
 @section('content')

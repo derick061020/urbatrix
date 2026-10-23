@@ -439,7 +439,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <div class="form-section-title text-[11px] uppercase tracking-wider font-semibold text-ink-500">{{ __('Titulares adicionales') }}</div>
-                            <p class="text-[12px] text-ink-500 mt-1">{{ __('Agregá los datos de cada copropietario. Todos serán incluidos en los contratos.') }}</p>
+                            <p class="text-[12px] text-ink-500 mt-1">{{ __('Añade los datos de cada copropietario. Todos se incluirán en los contratos.') }}</p>
                         </div>
                         <button type="button" id="addCoBuyerBtn" onclick="addCoBuyerRow()" class="auth-btn auth-btn-ghost text-[12px] py-2 px-3">
                             <i class="pi pi-plus text-[11px]"></i> Agregar otro

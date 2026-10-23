@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Presupuesto — BAHÍA MAR'))
 @section('page_title', __('Presupuesto'))
-@section('page_breadcrumb', __('Mi Propiedad · Presupuesto'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Presupuesto'))
 @php $activeRoute = 'mi-propiedad'; @endphp
 
 @section('content')

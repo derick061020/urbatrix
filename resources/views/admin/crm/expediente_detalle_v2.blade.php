@@ -795,7 +795,7 @@ document.addEventListener('submit', async function(ev) {
     const file     = input?.files?.[0];
     const morph    = window.UploadMorph ? UploadMorph.of(input) : null;
 
-    if (!file) { crmToast('Seleccioná un archivo.', 'err'); return; }
+    if (!file) { crmToast('Selecciona un archivo.', 'err'); return; }
     const okConfirm = await crmConfirm({
         title: 'Subir versión firmada',
         body: 'Se subirá la versión firmada y quedará aprobada sin esperar la confirmación del cliente. ¿Continuar?',

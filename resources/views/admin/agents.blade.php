@@ -22,7 +22,7 @@
     @endif
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div class="text-[14px] font-semibold text-ink-700">{{ $totalBrokers }} brokers registrados</div>
+        <div class="text-[14px] font-semibold text-ink-700">{{ trans_choice(':count broker registrado|:count brokers registrados', $totalBrokers, ['count' => $totalBrokers]) }}</div>
         <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('modal-exportar-brokers').showModal()" class="crm-btn crm-btn-ghost"><i class="pi pi-upload"></i> {{ __('Exportar') }}</button>
             <button type="button" onclick="document.getElementById('modal-nuevo-broker').showModal()" class="crm-btn crm-btn-primary"><i class="pi pi-plus"></i> {{ __('Nuevo broker') }}</button>
@@ -242,7 +242,7 @@
             body.innerHTML = '<div class="text-center py-10">'
                 + '<div class="w-14 h-14 mx-auto rounded-xl bg-ink-100 flex items-center justify-center text-ink-500 mb-3"><i class="pi pi-file text-[22px]"></i></div>'
                 + '<div class="text-[13px] text-ink-600">{{ __('Este formato no admite vista previa.') }}</div>'
-                + '<div class="text-[12px] text-ink-400 mt-1">Usá el botón <b>Descargar</b> para abrirlo.</div></div>';
+                + '<div class="text-[12px] text-ink-400 mt-1">Usa el botón <b>Descargar</b> para abrirlo.</div></div>';
         }
         document.getElementById('brkDocPreview').showModal();
     }
