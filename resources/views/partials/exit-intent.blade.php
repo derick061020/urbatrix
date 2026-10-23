@@ -350,10 +350,20 @@
     });
   } catch (e) {}
 
-  // ── Disparador 2 · el cursor se va por arriba (sólo escritorio) ─────────
+  // ── Disparador 2 · el cursor va a la X de cerrar (sólo escritorio) ──────
+  // Antes saltaba con salir por cualquier punto del borde de arriba, y al
+  // entrar y registrarse —cursor a la barra de direcciones, a las pestañas—
+  // aparecía sin que nadie se fuera (Miguel, 23 de octubre: «solo debería
+  // aparecer cuando el usuario aproxime el cursor a la X de salida»). Ahora:
+  // por arriba, en el tercio derecho, que es donde está la X de la ventana, y
+  // no en los primeros 15 s de la página, que son los del registro.
+  var LLEGADA = Date.now();
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     document.addEventListener('mouseout', function (e) {
-      if (!e.relatedTarget && e.clientY <= 0) show();
+      if (e.relatedTarget || e.clientY > 0) return;
+      if (e.clientX < window.innerWidth * 2 / 3) return;
+      if (Date.now() - LLEGADA < 15000) return;
+      show();
     });
   }
 })();
