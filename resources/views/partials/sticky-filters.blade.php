@@ -130,6 +130,8 @@
   // que miden casi la pantalla entera.
   var NAV_HINTS = ['.nav-center', '[onclick*="toggleProfileMenu"]', '.lang-toggle', '[onclick*="toggleMenu"]'];
 
+  var topbar = null;   // el <nav> fijo, al que se pinta la banda (ver CSS)
+
   function topBarHeight() {
     for (var i = 0; i < NAV_HINTS.length; i++) {
       var el = document.querySelector(NAV_HINTS[i]);
@@ -138,11 +140,7 @@
         if (cs.position === 'fixed') {
           var h = el.getBoundingClientRect().height;
           // Una barra superior razonable; cualquier cosa más alta es otra pieza.
-          if (h > 0 && h <= 200) {
-            // Marcada para pintarle el fondo de la banda al pegarse (ver CSS).
-            el.classList.add('fg-sticky-topbar');
-            return h;
-          }
+          if (h > 0 && h <= 200) { topbar = el; return h; }
           break;
         }
         el = el.parentElement;
@@ -184,6 +182,10 @@
     [head, bar].forEach(function (el) {
       if (el) el.classList.toggle('is-sticky-first', el === primera);
     });
+    // La banda en la cabecera, sólo con la barra a la vista: en la portada de
+    // tipos de Bahía Mar la barra está oculta y el centinela queda «pegado»
+    // igualmente, así que pintaba la franja sobre la portada.
+    if (topbar) topbar.classList.toggle('fg-sticky-topbar', bar.offsetParent !== null);
 
     if (zone) {
       // Si la zona es transparente (puede pasar si otra capa la repinta), se
