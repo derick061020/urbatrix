@@ -284,15 +284,15 @@
         if (estado === 'available') {
           acciones.append(
             boton(t('Agendar videollamada', 'Book a video call'), 'lx-btn lx-btn--lleno', () => openAdvisorVideoCall(id)),
-            boton(t('Ver detalle', 'View details'), 'lx-btn', () => openMoreInfo(id)));
+            boton(t('Ver propiedad', 'View property'), 'lx-btn', () => openMoreInfo(id)));
         } else if (estado === 'reserved') {
           acciones.append(
             boton(t('Avísame si se libera', 'Notify me if released'), 'lx-btn lx-btn--lleno', () => registro.abrir('aviso', id)),
-            boton(t('Ver detalle', 'View details'), 'lx-btn', () => openMoreInfo(id)));
+            boton(t('Ver propiedad', 'View property'), 'lx-btn', () => openMoreInfo(id)));
         } else {
           acciones.append(
             boton(t('Avísame de reventas', 'Resale alerts'), 'lx-btn lx-btn--lleno', () => registro.abrir('aviso', id)),
-            boton(t('Ver detalle', 'View details'), 'lx-btn', () => openMoreInfo(id)));
+            boton(t('Ver propiedad', 'View property'), 'lx-btn', () => openMoreInfo(id)));
         }
       }
     });
