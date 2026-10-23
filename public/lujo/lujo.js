@@ -519,7 +519,7 @@
      La estructura de la propuesta de Miguel (referencias/miguel-2026-10-12),
      sin sus datos de ejemplo:
        foto con estado + vista · nombre · «Villa de N hab · Fase» ·
-       precio y $/m² · specs con etiqueta · acción principal + «Ver detalle».
+       precio y $/m² · specs con etiqueta · acción principal + «Ver propiedad».
      Fuera de su maqueta, porque no hay dato: fecha de entrega, «12 fotos ·
      tour 360°», el asesor con nombre y tiempo de respuesta, «solo quedan…»,
      la lista de espera con cifras y «1 de cada 5 reservas no se confirma».
@@ -628,7 +628,7 @@
         if (estado === 'available') {
           acciones.append(
             boton(t('Agendar videollamada', 'Book a video call'), 'lx-btn lx-btn--lleno', () => openAdvisorVideoCall(id)),
-            boton(t('Ver detalle', 'View details'), 'lx-btn', () => openMoreInfo(id)));
+            boton(t('Ver propiedad', 'View property'), 'lx-btn', () => openMoreInfo(id)));
         } else if (estado === 'reserved') {
           acciones.append(
             boton(t('Avísame si se libera', 'Notify me if released'), 'lx-btn lx-btn--lleno', () => registro.abrir('aviso', id)),
