@@ -771,7 +771,7 @@
                             <i class="pi pi-plus"></i> {{ __('Agregar ítem') }}
                         </button>
 
-                        <div id="cmEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay ítems. Agregá el primero para que aparezca en el menú del cliente.') }}</div>
+                        <div id="cmEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay ítems. Añade el primero para que aparezca en el menú del cliente.') }}</div>
                     </div>
                 </div>
 
@@ -792,7 +792,7 @@
                             <input type="file" id="hsFileInput" accept="image/*" multiple class="hidden" style="display:none;">
                         </label>
 
-                        <div id="hsEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay imágenes. Agregá la primera para que aparezca el slider en la portada.') }}</div>
+                        <div id="hsEmpty" class="st-row-desc" style="margin-top:10px; display:none;">{{ __('Todavía no hay imágenes. Añade la primera para que aparezca el slider en la portada.') }}</div>
                     </div>
                 </div>
                 @endif
@@ -981,7 +981,7 @@
                 notifications: ['Configuración de la cuenta', 'Elige qué notificaciones quieres recibir', 'Guardar cambios', false],
                 signature:     ['Firma del proyecto',        'Esta firma se usa para firmar los contratos a nombre de Siebe', 'Guardar firma', true],
                 menu:          ['Menú del cliente',          'Configurá los ítems (enlaces y documentos) que ve el cliente en su menú', 'Guardar menú', true],
-                slider:        ['Slider de portada',         'Subí las imágenes que se muestran en el carrusel debajo del hero de la portada', 'Guardar slider', true],
+                slider:        ['Slider de portada',         'Sube las imágenes que se muestran en el carrusel debajo del hero de la portada', 'Guardar slider', true],
             };
             const t = titles[activePane];
             document.querySelector('[data-st-title]').textContent = t[0];
@@ -1037,7 +1037,7 @@
         if (display) display.textContent = input.value || '—';
         row.classList.remove('editing');
         row.querySelector('.st-edit-wrap').classList.remove('open');
-        stShowAlert('Cambio listo. Recordá tocar "Guardar cambios" para aplicar.', 'ok', 2200);
+        stShowAlert('Cambio listo. Recuerda pulsar «Guardar cambios» para aplicarlo.', 'ok', 2200);
     };
 
     // Avatar
@@ -1127,13 +1127,13 @@
 
     window.st2faConfirm = async function(){
         const code = document.getElementById('st2faConfirmCode').value.trim();
-        if (code.length < 6) { stShowAlert('Ingresá el código de 6 dígitos.', 'err'); return; }
+        if (code.length < 6) { stShowAlert('Introduce el código de 6 dígitos.', 'err'); return; }
         try {
             const data = await st2faPost('{{ route('2fa.confirm') }}', { code });
             st2faEnabled = true;
             st2faSyncBadge();
             document.getElementById('st2faPanel').classList.remove('open');
-            stShowAlert('¡2FA activada! Guardá tus códigos de respaldo.', 'ok', 3000);
+            stShowAlert('¡2FA activada! Guarda tus códigos de respaldo.', 'ok', 3000);
             st2faRenderCodes(data.recovery_codes);
         } catch (e) { stShowAlert(e.message, 'err'); }
     };
@@ -1147,7 +1147,7 @@
 
     window.st2faDisable = function(){
         const password = document.getElementById('st2faDisablePwd').value;
-        if (!password) { stShowAlert('Ingresá tu contraseña para desactivar la 2FA.', 'err'); return; }
+        if (!password) { stShowAlert('Introduce tu contraseña para desactivar la 2FA.', 'err'); return; }
         st2faConfirm2({
             title: '{{ __("Desactivar autenticación 2FA") }}',
             text: '{{ __("Tu cuenta quedará protegida únicamente por la contraseña. Puedes volver a activarla cuando quieras.") }}',
@@ -1176,7 +1176,7 @@
     }
 
     window.st2faShowRecoveryCodes = async function(){
-        if (!st2faEnabled) { stShowAlert('Activá la 2FA antes de generar códigos de respaldo.', 'err'); return; }
+        if (!st2faEnabled) { stShowAlert('Activa la 2FA antes de generar códigos de respaldo.', 'err'); return; }
         try {
             const data = await st2faGet('{{ route('2fa.recovery') }}');
             st2faRenderCodes(data.recovery_codes);
@@ -1227,7 +1227,7 @@
             return;
         }
         if (activePane === 'security') {
-            stShowAlert('Usá los botones de cada apartado para aplicar cambios.', 'ok', 2200);
+            stShowAlert('Usa los botones de cada apartado para aplicar los cambios.', 'ok', 2200);
             return;
         }
         // Profile pane: split name → first/last
@@ -1249,7 +1249,7 @@
         const cur  = document.getElementById('stPwdCurrent').value;
         const nw   = document.getElementById('stPwdNew').value;
         const cnf  = document.getElementById('stPwdConfirm').value;
-        if (!cur || !nw || !cnf) { stShowAlert('Completá los tres campos.', 'err'); return; }
+        if (!cur || !nw || !cnf) { stShowAlert('Completa los tres campos.', 'err'); return; }
         if (nw.length < 8)       { stShowAlert('La nueva contraseña debe tener al menos 8 caracteres.', 'err'); return; }
         if (nw !== cnf)          { stShowAlert('La confirmación no coincide.', 'err'); return; }
         document.getElementById('stCurrentPwdInput').value = cur;
@@ -1568,7 +1568,7 @@
         const fd = new FormData();
 
         if (rows.some(r => r.dataset.uploading === '1')) {
-            stShowAlert('Esperá a que termine la subida del archivo.', 'err');
+            stShowAlert('Espera a que termine la subida del archivo.', 'err');
             return;
         }
 
@@ -1735,7 +1735,7 @@
     });
 
     window.hsSave = function(){
-        if (hsUploading > 0) { stShowAlert('Esperá a que terminen las subidas.', 'err'); return; }
+        if (hsUploading > 0) { stShowAlert('Espera a que terminen las subidas.', 'err'); return; }
 
         const fd = new FormData();
         hsData.forEach(src => fd.append('images[]', src));

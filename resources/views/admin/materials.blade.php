@@ -321,7 +321,7 @@
             body.innerHTML = '<div class="text-center py-10">'
                 + '<div class="w-14 h-14 mx-auto rounded-xl bg-ink-100 flex items-center justify-center text-ink-500 mb-3"><i class="pi pi-file text-[22px]"></i></div>'
                 + '<div class="text-[13px] text-ink-600">{{ __('Este formato no admite vista previa.') }}</div>'
-                + '<div class="text-[12px] text-ink-400 mt-1">Usá el botón <b>Descargar</b> para abrir el recurso.</div>'
+                + '<div class="text-[12px] text-ink-400 mt-1">Usa el botón <b>Descargar</b> para abrir el recurso.</div>'
                 + '</div>';
         }
         document.getElementById('matPreview').showModal();

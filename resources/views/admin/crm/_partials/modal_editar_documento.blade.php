@@ -127,7 +127,7 @@
     function edBeforeSubmit(form) {
         var upEl = document.getElementById('ed-uploading');
         if (upEl && upEl.value === '1') {
-            alert(@json(__('Esperá a que termine la subida del archivo.')));
+            alert(@json(__('Espera a que termine la subida del archivo.')));
             return false;
         }
         return true;

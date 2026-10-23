@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Mis documentos').' — SIEBE')
 @section('page_title', __('Mis documentos'))
-@section('page_breadcrumb', __('Mi propiedad').' · '.__('Documentos'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Documentos'))
 @php $activeRoute = 'documents'; @endphp
 
 @section('content')
@@ -94,7 +94,7 @@
     {{-- Header --}}
     <div>
         <h2 class="font-display text-[20px] font-semibold text-ink-950 leading-tight">{{ __('Tus documentos') }}</h2>
-        <p class="text-[13px] text-ink-500 mt-1">{!! __('Acá ves los documentos de tu expediente. Tus contratos y planes firmados están en :acuerdos.', ['acuerdos' => '<a href="'.route('dashboard.acuerdos').'" class="text-brand font-semibold hover:underline">'.__('Acuerdos').'</a>']) !!}</p>
+        <p class="text-[13px] text-ink-500 mt-1">{!! __('Aquí ves los documentos de tu expediente. Tus contratos y planes firmados están en :acuerdos.', ['acuerdos' => '<a href="'.route('dashboard.acuerdos').'" class="text-brand font-semibold hover:underline">'.__('Acuerdos').'</a>']) !!}</p>
     </div>
 
     {{-- ============ Documentos requeridos (solicitados por el equipo) ============ --}}
@@ -156,13 +156,13 @@
             <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-id-card"></i></div>
             <div class="flex-1">
                 <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos') }}</div>
-                <div class="text-[11px] text-ink-500">{{ __('Tus documetos usados en tu compra') }}</div>
+                <div class="text-[11px] text-ink-500">{{ __('Los documentos de identidad de tu compra') }}</div>
             </div>
             <span class="text-[11px] text-ink-500">{{ trans_choice('{0} :count archivos|{1} :count archivo|[2,*] :count archivos', $kycDocs->count(), ['count' => $kycDocs->count()]) }}</span>
         </div>
 
         @if($kycDocs->isEmpty())
-            <div class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('No subiste documentos de identidad todavía.') }}</div>
+            <div class="px-5 py-8 text-center text-[12px] text-ink-500">{{ __('Todavía no has subido documentos de identidad.') }}</div>
         @else
             <table class="w-full">
                 <thead class="bg-white">
@@ -212,7 +212,7 @@
                 <div class="w-8 h-8 rounded-full bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-cloud-upload"></i></div>
                 <div class="flex-1">
                     <div class="text-[14px] font-bold text-ink-950">{{ __('Documentos subidos') }}</div>
-                    <div class="text-[11px] text-ink-500">{{ __('Documentos que subiste a pedido del equipo.') }}</div>
+                    <div class="text-[11px] text-ink-500">{{ __('Documentos que has subido a petición del equipo.') }}</div>
                 </div>
             </div>
             <table class="w-full">

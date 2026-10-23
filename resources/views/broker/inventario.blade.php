@@ -34,7 +34,9 @@
                         @php
                             $key = strtoupper($u->status ?? 'AVAILABLE');
                             $badge = $stMap[$key] ?? ['—','bg-ink-100 text-ink-600'];
-                            $area = $u->total_area ?: $u->internal_area;
+                            // Interior, como la tarjeta y la ficha de la web: con el área total el
+                            // $/m² no coincidía (101: 4.257 aquí, 6.056 en la web).
+                            $area = $u->internal_area ?: $u->total_area;
                             $ppm  = ($area && $u->price) ? $u->price / $area : null;
                         @endphp
                         <tr>

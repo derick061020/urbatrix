@@ -422,7 +422,7 @@ document.querySelectorAll('.image-upload-container').forEach(function (uploadCon
 
     async function uploadFiles(files) {
         const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-        if (imageFiles.length === 0)  return showStatus('Seleccioná archivos de imagen válidos', 'error');
+        if (imageFiles.length === 0)  return showStatus('Selecciona archivos de imagen válidos', 'error');
         if (imageFiles.length > 10)   return showStatus('Máximo 10 imágenes por carga', 'error');
 
         uploadProgress.classList.remove('hidden');

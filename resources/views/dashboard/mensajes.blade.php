@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Mensajes — SIEBE'))
 @section('page_title', __('Mensajes'))
-@section('page_breadcrumb', __('Mi portal · Mensajes'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Mensajes'))
 @php $activeRoute = 'messages'; @endphp
 
 @section('content')
@@ -41,7 +41,12 @@
             @if($messages->isEmpty())
                 <div class="text-center text-[13px] text-ink-500 mt-10">
                     <i class="pi pi-comments text-[24px] text-ink-300 mb-3 block"></i>
-                    Aún no hay mensajes. Escribí abajo para iniciar la conversación con tu asesor.
+                    {{-- Sin reserva no hay caja de texto (ver abajo): no invitar a escribir. --}}
+                    @if($reservation)
+                        {{ __('Aún no hay mensajes. Escribe abajo para iniciar la conversación con tu asesor.') }}
+                    @else
+                        {{ __('Aún no hay mensajes. Cuando tengas una reserva activa podrás escribir aquí a tu asesor.') }}
+                    @endif
                 </div>
             @endif
 
@@ -90,7 +95,7 @@
             </form>
         @else
             <div class="px-4 py-3 border-t border-ink-100 text-center text-[12px] text-ink-500">
-                Necesitas una reserva activa para chatear con tu asesor.
+                {{ __('Necesitas una reserva activa para chatear con tu asesor.') }}
             </div>
         @endif
     </div>

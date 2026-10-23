@@ -2,4 +2,4 @@
 @section('title', __('Sesión expirada'))
 @section('code', '419')
 @section('heading', __('Tu sesión expiró'))
-@section('message', __('Por seguridad cerramos la sesión tras un rato de inactividad. Volvé a entrar y repetí la acción.'))
+@section('message', __('Por seguridad cerramos la sesión tras un rato de inactividad. Vuelve a entrar y repite la acción.'))
