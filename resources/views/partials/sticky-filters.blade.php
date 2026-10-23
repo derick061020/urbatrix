@@ -91,6 +91,20 @@
     top: calc(-1 * var(--fg-sticky-top, 88px));
   }
 
+  /* Lo mismo, pintado en la barra de arriba (el <nav> fijo a todo lo ancho,
+     transparente, con la píldora dentro). El pseudo de arriba no basta en el
+     iPhone: en móvil la barra lleva overflow-x: clip y Safari recorta también
+     lo que sobresale por arriba, así que entre la píldora y los filtros
+     quedaba una franja por la que pasaban las fotos (Derick, 23 de octubre:
+     «se ve un poco sucio»). Con el fondo en el propio <nav>, la píldora y los
+     filtros quedan sobre una sola banda, y no depende del recorte. */
+  /* !important porque el <nav> trae background:transparent en línea. */
+  body.has-sticky-filters.is-filters-stuck .fg-sticky-topbar {
+    background:
+      linear-gradient(var(--brand-soft-2, rgba(16,24,40,.04)), var(--brand-soft-2, rgba(16,24,40,.04))),
+      var(--fg-sticky-bg, #f2f5f8) !important;
+  }
+
   /* En pantallas estrechas sólo se fija la barra de filtros: la cinta de
      «volver» ocupa demasiado alto de un viewport de móvil. */
   @media (max-width: 760px) {
@@ -124,7 +138,11 @@
         if (cs.position === 'fixed') {
           var h = el.getBoundingClientRect().height;
           // Una barra superior razonable; cualquier cosa más alta es otra pieza.
-          if (h > 0 && h <= 200) return h;
+          if (h > 0 && h <= 200) {
+            // Marcada para pintarle el fondo de la banda al pegarse (ver CSS).
+            el.classList.add('fg-sticky-topbar');
+            return h;
+          }
           break;
         }
         el = el.parentElement;

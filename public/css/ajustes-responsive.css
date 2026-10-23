@@ -100,3 +100,11 @@
 @media (min-width: 1180px){
   .fg-filter-bar .fg-search{ width: 164px; }
 }
+
+/* ── «Filtros» en el iPhone ───────────────────────────────────────────────
+   Con la letra que pinta Safari la palabra no cabía en el botón y se leía
+   «Filtro». El botón nunca más estrecho que su texto; cede el buscador. */
+@media (max-width: 768px){
+  .fg-filter-bar .fg-filters-mobile-trigger{ flex: 0 0 auto; min-width: max-content; }
+  .fg-filter-bar .fg-search{ min-width: 0; }
+}
