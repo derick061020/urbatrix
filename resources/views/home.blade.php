@@ -957,7 +957,7 @@
     // Hooked to both the DOWNLOAD tab and the green CTA inside the share modal.
     window.downloadUnitSheet = function () {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
-        alert('{{ __("Primero abrí los detalles de una unidad.") }}');
+        alert('{{ __("Primero abre los detalles de una unidad.") }}');
         return;
       }
       const url = '/property-pdf/' + encodeURIComponent(currentOpenUnit);
@@ -4018,9 +4018,9 @@
       const note      = document.getElementById('advisorNote').value;
       const unitId    = document.getElementById('advisorModalUnitId').value || unitLabel;
 
-      if (!unitLabel) { showAdvisorAlert('Seleccioná una propiedad de interés.', 'err'); return false; }
+      if (!unitLabel) { showAdvisorAlert('Selecciona una propiedad de interés.', 'err'); return false; }
       if (!date)      { showAdvisorAlert('Indicá una fecha preferida.', 'err'); return false; }
-      if (!time)      { showAdvisorAlert('Elegí un horario disponible.', 'err'); return false; }
+      if (!time)      { showAdvisorAlert('Elige un horario disponible.', 'err'); return false; }
 
       hideAdvisorAlert();
       const submitBtn = document.getElementById('advisorSubmitBtn');
@@ -4079,7 +4079,7 @@
         document.getElementById('advisorFooter').style.display = 'none';
         document.getElementById('advisorSuccess').style.display = 'block';
       } catch (err) {
-        showAdvisorAlert('Error de red. Probá de nuevo.', 'err');
+        showAdvisorAlert('Error de red. Inténtalo de nuevo.', 'err');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Confirmar solicitud';
       }
@@ -4117,7 +4117,7 @@
     // print dialog so the user can "Save as PDF" / download.
     function sharePropertyPdf() {
       if (typeof currentOpenUnit === 'undefined' || !currentOpenUnit) {
-        alert('{{ __("Primero abrí los detalles de una unidad.") }}');
+        alert('{{ __("Primero abre los detalles de una unidad.") }}');
         return;
       }
       const recipient = prompt('¿Para quién es esta ficha? (opcional)', '');

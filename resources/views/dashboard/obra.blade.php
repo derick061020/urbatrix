@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Avance de Obra — MAKAI'))
-@section('page_title', __('Avance de Obra'))
-@section('page_breadcrumb', __('Mi Propiedad · Avance de Obra'))
+@section('page_title', __('Avance de obra'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Avance de obra'))
 @php $activeRoute = 'progress'; @endphp
 
 @section('content')

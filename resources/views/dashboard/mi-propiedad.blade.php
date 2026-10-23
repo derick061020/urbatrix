@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('title', __('Mi Propiedad').' — MAKAI')
-@section('page_title', __('Mi Propiedad'))
+@section('page_title', __('Mi propiedad'))
 @section('page_breadcrumb', ($reservation->unit->custom_id ?? $reservation->unit->name ?? __('Tu unidad')) . ' · Makai Residences')
 @php $activeRoute = 'mi-propiedad'; @endphp
 

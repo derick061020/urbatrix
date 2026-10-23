@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', __('Calendario — MAKAI'))
-@section('page_title', __('Mi Propiedad'))
-@section('page_breadcrumb', __('Mi Propiedad · Calendario'))
+@section('page_title', __('Calendario'))
+@section('page_breadcrumb', __('Mi portal').' · '.__('Calendario'))
 @php $activeRoute = 'calendario'; @endphp
 
 @section('content')
@@ -173,25 +173,26 @@
 
     {{-- Week grid --}}
     <div class="cli-card overflow-hidden">
-        <div class="px-3 py-2 flex items-center gap-2 border-b border-ink-100 bg-white">
-            <a href="?range={{ $range }}&start={{ $prevWeek }}" aria-label="{{ __('Anterior') }}" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[12px]"></i></a>
-            <a href="?range={{ $range }}&start={{ $nextWeek }}" aria-label="{{ __('Siguiente') }}" class="shrink-0 w-9 h-9 rounded-lg border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[12px]"></i></a>
-
-            {{-- Spacer matching the time column --}}
-            <div class="shrink-0" style="width:60px;"></div>
-
-            <div class="grid flex-1 text-[11px] text-ink-500 uppercase font-semibold tracking-wider" style="grid-template-columns: repeat({{ $dayCount }}, minmax(0,1fr));">
-                @foreach($days as $d)
-                    <div class="text-center px-1 py-1 {{ $d->isToday() ? 'text-ok-dark' : '' }}">
-                        <div class="flex items-center justify-center gap-1.5">
-                            @if($d->isToday())
-                                <span class="dot" style="background:#1fc16b"></span>
-                            @endif
-                            <span>{{ $d->locale(app()->getLocale())->isoFormat('ddd DD') }}</span>
-                        </div>
-                    </div>
-                @endforeach
+        {{-- Cabecera con las mismas columnas que la cuadrícula de abajo: las
+             flechas van en la columna de las horas. Antes iban delante, en la
+             misma fila, y empujaban los días: no caían encima de su columna y
+             en móvil se montaban («LUNMARMIÉ…»). El día, en dos líneas. --}}
+        <div class="grid border-b border-ink-100 bg-white" style="grid-template-columns: 60px repeat({{ $dayCount }}, minmax(0,1fr));">
+            <div class="flex items-center justify-center gap-1 py-2">
+                <a href="?range={{ $range }}&start={{ $prevWeek }}" aria-label="{{ __('Anterior') }}" class="shrink-0 w-6 h-7 rounded-md border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-left text-[11px]"></i></a>
+                <a href="?range={{ $range }}&start={{ $nextWeek }}" aria-label="{{ __('Siguiente') }}" class="shrink-0 w-6 h-7 rounded-md border border-ink-200 inline-flex items-center justify-center text-ink-500 hover:bg-ink-50"><i class="pi pi-angle-right text-[11px]"></i></a>
             </div>
+            @foreach($days as $d)
+                <div class="text-center px-0.5 py-2 text-ink-500 {{ $d->isToday() ? 'text-ok-dark' : '' }}">
+                    <div class="text-[10px] sm:text-[11px] uppercase font-semibold tracking-wider leading-none">{{ rtrim($d->locale(app()->getLocale())->isoFormat('ddd'), '.') }}</div>
+                    <div class="mt-1 text-[13px] font-semibold leading-none inline-flex items-center gap-1">
+                        @if($d->isToday())
+                            <span class="dot" style="background:#1fc16b"></span>
+                        @endif
+                        {{ $d->format('j') }}
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         {{-- Hour grid --}}
@@ -199,7 +200,7 @@
             {{-- Time column --}}
             <div class="bg-ink-50/40">
                 @foreach($hours as $h)
-                    <div class="h-24 border-b border-ink-100 text-[11px] text-ink-500 px-2 pt-1 font-semibold">{{ $h }} {{ $h >= 12 ? 'PM' : 'AM' }}</div>
+                    <div class="h-24 border-b border-ink-100 text-[11px] text-ink-500 px-2 pt-1 font-semibold">{{-- 13:00 en español; 1 PM en inglés (antes salía «13 PM»). --}}{{ app()->getLocale() === 'en' ? (($h % 12) ?: 12).' '.($h >= 12 ? 'PM' : 'AM') : sprintf('%02d:00', $h) }}</div>
                 @endforeach
             </div>
 
@@ -245,7 +246,7 @@
         <div class="cli-card p-10 text-center" id="empty-state">
             <div class="w-14 h-14 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto"><i class="pi pi-calendar text-[22px]"></i></div>
             <div class="mt-3 text-[15px] font-bold text-ink-950">{{ __('Tu calendario está vacío') }}</div>
-            <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">{{ __('Cuando tu asesor agende una videollamada o cuando se cargue una nueva cuota, vas a verla acá.') }}</p>
+            <p class="text-[12px] text-ink-500 mt-1 max-w-md mx-auto">{{ __('Cuando tu asesor agende una videollamada o se cargue una nueva cuota, la verás aquí.') }}</p>
         </div>
     @endif
 </div>

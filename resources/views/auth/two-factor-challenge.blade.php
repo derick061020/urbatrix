@@ -28,7 +28,7 @@
         </div>
         <h1 class="text-[22px] font-semibold text-[#171717]">{{ __('Verificación en dos pasos') }}</h1>
         <p class="text-[14px] text-[#717784] mt-1.5" id="tf-sub">
-            Ingresá el código de 6 dígitos de tu app de autenticación.
+            Introduce el código de 6 dígitos de tu app de autenticación.
         </p>
 
         @if ($errors->any())
@@ -87,8 +87,8 @@
             recForm.classList.toggle('hidden', !recovery);
             toggle.textContent = recovery ? 'Usar el código de la app' : 'Usar un código de respaldo';
             sub.textContent = recovery
-                ? 'Ingresá uno de tus códigos de respaldo de un solo uso.'
-                : 'Ingresá el código de 6 dígitos de tu app de autenticación.';
+                ? 'Introduce uno de tus códigos de respaldo de un solo uso.'
+                : 'Introduce el código de 6 dígitos de tu app de autenticación.';
             (recovery ? recForm : codeForm).querySelector('input').focus();
         });
     </script>

@@ -81,7 +81,7 @@
 
             <div class="text-[11px] text-ink-500 flex items-start gap-2">
                 <i class="pi pi-info-circle text-[11px] mt-0.5"></i>
-                <span>{{ __('La corrección queda registrada en la actividad del asesor. El estado de la cuota se recalcula con los montos que dejes acá.') }}</span>
+                <span>{{ __('La corrección queda registrada en la actividad del asesor. El estado de la cuota se recalcula con los importes que dejes aquí.') }}</span>
             </div>
         </div>
 
