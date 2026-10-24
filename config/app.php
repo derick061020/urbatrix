@@ -15,6 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // true: la Content Security Policy sólo avisa en consola, no bloquea (ver
+    // App\Http\Middleware\SecurityHeaders). Para salir del paso si algo se rompe.
+    'csp_report_only' => (bool) env('CSP_REPORT_ONLY', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
