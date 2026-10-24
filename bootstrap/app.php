@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // navegando en español. Ahí no hay sesión todavía; el middleware lo
         // contempla y se queda con la cookie o el Accept-Language.
         $middleware->prepend(\App\Http\Middleware\SetLocale::class);
+        // CSP y demás cabeceras de seguridad en todas las respuestas (también 404/500).
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         // SignNow posts to this webhook with its own signature; exempt from CSRF.
         // Apple posts the Sign In callback as a cross-site form_post; exempt it.
         $middleware->validateCsrfTokens(except: [
