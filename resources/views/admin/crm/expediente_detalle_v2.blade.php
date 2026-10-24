@@ -248,7 +248,7 @@
                                             <a href="{{ route('documents.download', $d->id) }}" class="crm-btn crm-btn-primary text-[11px] py-1 px-3 mr-1"><i class="pi pi-download text-[10px]"></i> {{ __('Descargar') }}</a>
                                         @endif
                                         @if($isRequested)
-                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm(@json(__('¿Eliminar esta solicitud de documento?')));">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
+                                            <form method="POST" action="{{ route('admin.crm.document.delete', $d->id) }}" class="inline m-0" onsubmit="return confirm({{ Js::from(__('¿Eliminar esta solicitud de documento?')) }});">@csrf<button type="submit" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3 text-err" title="{{ __('Eliminar solicitud') }}"><i class="pi pi-trash text-[10px]"></i></button></form>
                                         @endif
                                     </td>
                                 </tr>
@@ -301,7 +301,7 @@
                                     @endif
                                     <form method="POST" action="{{ route('admin.payments.approve', $p->id) }}" class="flex items-center gap-1 m-0">@csrf
                                         <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3" title="{{ __('Aprobar pago') }}"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>
-                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm(@json(__('¿Rechazar este pago?')));"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
+                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm({{ Js::from(__('¿Rechazar este pago?')) }});"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
                                     </form>
                                 </div>
                             </div>

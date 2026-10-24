@@ -2044,7 +2044,7 @@
               <span class="nav-hide-mobile" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1;">
                 @auth
                   <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ explode(' ', auth()->user()->name)[0] }}</span>
-                  <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ (auth()->user()->role ?? '') === 'admin' ? __('Admin') : __('Agente') }}</span>
+                  <span style="font-family:'Poppins',sans-serif;font-weight:500;font-size:9px;color:#99a0ae;letter-spacing:0.72px;text-transform:uppercase;">{{ ['admin' => __('Admin'), 'broker' => __('Broker')][auth()->user()->role ?? ''] ?? __('Cliente') }}</span>
                 @else
                   {{-- Sin sesión no hay a quién nombrar: se invita a entrar. --}}
                   <span style="font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--brand);">{{ __('Mi cuenta') }}</span>

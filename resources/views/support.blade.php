@@ -1,5 +1,11 @@
 @php
     $user = auth()->user();
+    // Lo que sale en la página viene de la reserva del usuario y de
+    // config/company.php. Antes era el mockup tal cual: «Tu compra · Unit C-301»
+    // a todo el mundo, dos solicitudes inventadas y un teléfono fijo.
+    $supReservation = $user ? \App\Models\Reservation::with('unit')->where('user_id', $user->id)->latest()->first() : null;
+    $supUnit  = $supReservation ? ($supReservation->unit->custom_id ?? $supReservation->unit->name ?? $supReservation->unit_name) : null;
+    $supPhone = trim((string) config('company.phone'));
     $userInitials = collect(explode(' ', trim($user->name ?? 'Cliente')))
         ->filter()
         ->take(2)
@@ -85,7 +91,7 @@
   .qa a span{ font-size:12.5px; font-weight:600; }
 
   /* channels */
-  .channels{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .channels{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
   .ch{ background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; flex-direction:column; gap:8px; }
   .ch .ci{ width:38px; height:38px; border-radius:10px; display:grid; place-items:center; } .ch .ci svg{ width:19px; height:19px; }
   .ch.wa .ci{ background:var(--wa-bg); color:#1a9e4b; } .ch.mail .ci{ background:var(--brand-bg); color:var(--brand-dark); } .ch.tel .ci{ background:var(--brand-bg); color:var(--brand-dark); } .ch.vid .ci{ background:var(--green-bg); color:#15803d; }
@@ -314,16 +320,20 @@
     <section class="ctx">
       <div class="ctx-head">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13z"/><path d="M9 21v-7h6v7"/></svg></div>
-        <div><div class="t">{{ __('Tu compra · Unit C-301') }}</div><div class="s">{{ __('Bahía Mar Residences · reserva activa') }}</div></div>
+        @if($supUnit)
+          <div><div class="t">{{ __('Tu compra · :unidad', ['unidad' => $supUnit]) }}</div><div class="s">{{ config('company.project') }}</div></div>
+        @else
+          <div><div class="t">{{ __('Tu compra') }}</div><div class="s">{{ __('Aún no tienes una reserva. Si ya hablaste con un asesor, aparecerá aquí en cuanto se registre.') }}</div></div>
+        @endif
         <span class="badge">{{ __('Ayuda sobre tu unidad') }}</span>
       </div>
       <div class="qa">
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>{{ __('Dudas de mi plan de pago') }}</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg><span>{{ __('Estado de mis documentos') }}</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>{{ __('Reprogramar una cuota') }}</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>{{ __('Hablar con mi asesor') }}</span></a>
+        <a href="{{ route('dashboard.payments') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>{{ __('Dudas de mi plan de pago') }}</span></a>
+        <a href="{{ route('dashboard.documents') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg><span>{{ __('Estado de mis documentos') }}</span></a>
+        <a href="{{ route('dashboard.messages') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>{{ __('Reprogramar una cuota') }}</span></a>
+        <a href="{{ route('dashboard.messages') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>{{ __('Hablar con mi asesor') }}</span></a>
         <a href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg><span>{{ __('Ver progreso de obra') }}</span></a>
-        <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>{{ __('Otra cosa') }}</span></a>
+        <a href="{{ '#nf' }}" onclick="document.getElementById('nf').classList.add('show')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>{{ __('Otra cosa') }}</span></a>
       </div>
     </section>
 
@@ -349,23 +359,25 @@
         <div class="ch mail">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
           <div class="cn">{{ __('Email') }}</div>
-          <div class="cv"><b>soporte@landmasscapital.com</b></div>
+          <div class="cv"><b>{{ config('company.support_email') ?: 'soporte@landmasscapital.com' }}</b></div>
           <div class="sla">{{ __('Respondemos en hasta 48 h hábiles') }}</div>
-          <a class="cta ghost" href="mailto:soporte@landmasscapital.com">{{ __('Escribir') }}</a>
+          <a class="cta ghost" href="mailto:{{ config('company.support_email') ?: 'soporte@landmasscapital.com' }}">{{ __('Escribir') }}</a>
         </div>
+        @if($supPhone)
         <div class="ch tel">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></div>
           <div class="cn">{{ __('Teléfono') }}</div>
-          <div class="cv"><b>+1 (849) 585-4171</b></div>
+          <div class="cv"><b>{{ $supPhone }}</b></div>
           <div class="sla">{{ __('Lun–Vie · horario AST') }}</div>
-          <a class="cta ghost" href="tel:+18495854171">{{ __('Llamar') }}</a>
+          <a class="cta ghost" href="tel:{{ preg_replace('/[^\d+]/', '', $supPhone) }}">{{ __('Llamar') }}</a>
         </div>
+        @endif
         <div class="ch vid">
           <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
           <div class="cn">{{ __('Videollamada') }}</div>
           <div class="cv">{{ __('Recorrido guiado con tu asesor') }}</div>
           <div class="sla">{{ __('Eliges día y hora') }}</div>
-          <a class="cta ghost">{{ __('Agendar') }}</a>
+          <a class="cta ghost" href="{{ url('/') }}">{{ __('Agendar') }}</a>
         </div>
       </div>
     </div>
@@ -393,8 +405,8 @@
 
         <div class="guias">
           <div class="eyebrow" style="margin-bottom:6px;">{{ __('Guías del proceso') }}</div>
-          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>{{ __('Cómo reservar tu unidad, paso a paso') }}</a>
-          <a class="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ __('Qué documentos necesitas (KYC)') }}</a>
+          <a class="guia" href="{{ url('/') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>{{ __('Cómo reservar tu unidad, paso a paso') }}</a>
+          <a class="guia" href="{{ route('dashboard.documents') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ __('Qué documentos necesitas (KYC)') }}</a>
           <a class="guia" href="{{ route('dashboard.progress') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>{{ __('Cómo seguir el avance de tu obra') }}</a>
         </div>
       </section>
@@ -405,33 +417,25 @@
           <span class="sec-title">{{ __('Mis solicitudes') }}</span>
         </div>
 
-        <div class="ticket">
-          <div class="tt"><span class="tid">SOP-112</span><span class="ts proc">{{ __('En proceso') }}</span></div>
-          <div class="tq">{{ __('Duda sobre la fecha de la cuota de mayo') }}</div>
-          <div class="tm">{{ __('Pago · creada hace 1 día · respondemos en hasta 48 h') }}</div>
-        </div>
-        <div class="ticket">
-          <div class="tt"><span class="tid">SOP-108</span><span class="ts done">{{ __('Resuelta') }}</span></div>
-          <div class="tq">{{ __('No podía descargar el plano de la unidad') }}</div>
-          <div class="tm">{{ __('Técnico · resuelta hace 4 días') }}</div>
-        </div>
+        <p style="font-size:13px; color:var(--muted); margin:0 0 14px;">{{ __('Aún no tienes solicitudes abiertas.') }}</p>
 
         <button class="btn-primary" onclick="document.getElementById('nf').classList.toggle('show');">{{ __('+ Nueva solicitud') }}</button>
         <div class="newform" id="nf">
           <label>{{ __('Tema') }}</label>
-          <select><option>{{ __('Pago') }}</option><option>{{ __('Documentos') }}</option><option>{{ __('Reserva') }}</option><option>{{ __('Técnico / cuenta') }}</option><option>{{ __('Legal') }}</option><option>{{ __('Otro') }}</option></select>
+          <select id="nf-tema"><option>{{ __('Pago') }}</option><option>{{ __('Documentos') }}</option><option>{{ __('Reserva') }}</option><option>{{ __('Técnico / cuenta') }}</option><option>{{ __('Legal') }}</option><option>{{ __('Otro') }}</option></select>
           <label>{{ __('Cuéntanos') }}</label>
-          <textarea placeholder="{{ __('Describe tu solicitud. Si es sobre tu unidad, ya la asociamos a Unit C-301.') }}"></textarea>
-          <button class="btn-primary">{{ __('Enviar solicitud') }}</button>
+          <textarea id="nf-texto" placeholder="{{ __('Describe tu solicitud.') }}"></textarea>
+          {{-- No hay bandeja de solicitudes todavía: se envía por correo a soporte,
+               con el tema, la unidad y la cuenta ya puestos. --}}
+          <button type="button" class="btn-primary" onclick="supEnviar()">{{ __('Enviar solicitud') }}</button>
         </div>
       </section>
     </div>
 
-    <!-- estado + nota honesta -->
-    <div class="statusbar"><span class="dot"></span> {{ __('Todos los sistemas operativos · estado en vivo') }}</div>
+    <!-- nota -->
     <div class="note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <span>Los plazos de respuesta son reales según horario laboral; para temas legales o de privacidad se aplican los canales y plazos específicos (legal@ / privacidad@landmasscapital.com). El estado del servicio refleja datos reales, no estimaciones.</span>
+      <span>Los plazos de respuesta son reales según horario laboral; para temas legales o de privacidad se aplican los canales y plazos específicos (legal@ / privacidad@landmasscapital.com).</span>
     </div>
 
   </div>
@@ -443,6 +447,15 @@
   </div>
 
 <script>
+  function supEnviar() {
+    var tema = document.getElementById('nf-tema').value;
+    var texto = document.getElementById('nf-texto').value.trim();
+    var unidad = @json($supUnit);
+    var cuenta = @json($user ? $user->email : null);
+    var cuerpo = texto + '\n\n' + (unidad ? @json(__('Unidad')) + ': ' + unidad + '\n' : '') + (cuenta ? @json(__('Cuenta')) + ': ' + cuenta : '');
+    location.href = 'mailto:' + @json(config('company.support_email') ?: 'soporte@landmasscapital.com') + '?subject=' + encodeURIComponent(@json(__('Solicitud de soporte')) + ' · ' + tema) + '&body=' + encodeURIComponent(cuerpo);
+  }
+
   // acordeón FAQ
   document.querySelectorAll('.faq-q').forEach(function(b){
     b.addEventListener('click', function(){ b.parentElement.classList.toggle('open'); });

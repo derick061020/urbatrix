@@ -68,7 +68,7 @@
         </div>
         <div class="sm:col-span-2">
             <label class="text-[12px] font-semibold text-ink-700">{{ __('Dirección') }}</label>
-            <input type="text" name="address" value="{{ old('address', $u->address ?? '') }}" placeholder="{{ __('Ej. 1A Launch Boulevard') }}" class="crm-input pl-3 mt-1">
+            <input type="text" name="address" value="{{ old('address', $u->address ?? '') }}" placeholder="{{ __('Ej. calle y número') }}" class="crm-input pl-3 mt-1">
         </div>
         <div>
             <label class="text-[12px] font-semibold text-ink-700">{{ __('Asesor asignado') }}</label>

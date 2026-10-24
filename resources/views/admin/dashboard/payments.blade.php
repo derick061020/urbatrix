@@ -93,7 +93,7 @@
                             'payment_type' => 'initial',
                             'formatted_amount' => '$' . number_format($breakdown['pago_inicial'], 2, '.', ','),
                             'receipt_path' => null,
-                            'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
+                            'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">'.__('Pendiente').'</span>'
                         ];
                         
                         // Pagos de construcción si hay
@@ -112,7 +112,7 @@
                                     'installment_number' => $i,
                                     'formatted_amount' => '$' . number_format($breakdown['cuota'], 2, '.', ','),
                                     'receipt_path' => null,
-                                    'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
+                                    'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">'.__('Pendiente').'</span>'
                                 ];
                             }
                         } elseif ($breakdown['pago_construccion'] > 0) {
@@ -124,7 +124,7 @@
                                 'payment_type' => 'construction',
                                 'formatted_amount' => '$' . number_format($breakdown['pago_construccion'], 2, '.', ','),
                                 'receipt_path' => null,
-                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
+                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">'.__('Pendiente').'</span>'
                             ];
                         }
                         
@@ -138,7 +138,7 @@
                                 'payment_type' => 'delivery',
                                 'formatted_amount' => '$' . number_format($breakdown['pago_entrega'], 2, '.', ','),
                                 'receipt_path' => null,
-                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{{ __('Pendiente') }}</span>'
+                                'status_label' => '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">'.__('Pendiente').'</span>'
                             ];
                         }
                     }

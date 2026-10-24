@@ -104,7 +104,7 @@
                                     @if($p->reservation_id)
                                         <a href="/dashboard?reservation={{ $p->reservation_id }}" class="text-xs border border-[#cdd5cf] rounded px-2 py-1 text-[#667b6a] hover:bg-[rgba(102,123,106,0.05)]">{{ __('Ver') }}</a>
                                     @endif
-                                    <form method="POST" action="{{ route('admin.crm.postventa.delete', $p) }}" onsubmit="return confirm(@json(__('¿Eliminar este caso?')))">
+                                    <form method="POST" action="{{ route('admin.crm.postventa.delete', $p) }}" onsubmit="return confirm({{ Js::from(__('¿Eliminar este caso?')) }})">
                                         @csrf @method('DELETE')
                                         <button class="text-xs border border-[#eebcbc] text-[#a83838] rounded px-2 py-1 hover:bg-[#fdf6f6]">{{ __('Eliminar') }}</button>
                                     </form>

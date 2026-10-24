@@ -15,9 +15,11 @@
   $projVal     = $unit->projected_value ? '+' . number_format((((float)$unit->projected_value / max($price,1)) - 1) * 100, 0) . '% año 1' : '—';
   $projYear    = $unit->projected_value_year ?: 'Q4 2026';
 
-  $floor       = $unit->floor ?: '1er Piso';
-  $direction   = $unit->direction ?: 'SE';
-  $outlook     = $unit->outlook ?: 'Vista al lago';
+  // Sin dato, sin texto: antes salían «1er Piso · Orientación SE · Vista al
+  // lago» en cualquier unidad que no los tuviera.
+  $floor       = $unit->floor ?: null;
+  $direction   = $unit->direction ?: null;
+  $outlook     = $unit->outlook ?: null;
   $bedrooms    = $unit->bedrooms ?: '—';
   $bathrooms   = $unit->bathrooms ?: '—';
   $parking     = $unit->parking_bays ?: '—';
@@ -36,9 +38,11 @@
   $ref         = 'REF ' . strtoupper(substr(md5($unit->id . $now->format('Ymd')), 0, 4)) . '-' . str_replace(' ', '', strtoupper($unitNum)) . '-' . $now->format('dm');
 
   $recipientName = request('to', 'Cliente');
-  $advisorName   = optional($unit->agent)->name ?? 'Carlos Ramírez Méndez';
-  $advisorEmail  = optional($unit->agent)->email ?? 'carlos.ramirez@landmasscapital.com';
-  $advisorPhone  = '+1 (809) 710-9044';
+  // El asesor de la unidad o, si no tiene, el equipo del proyecto. Antes un
+  // nombre, un correo y un teléfono de ejemplo.
+  $advisorName   = optional($unit->agent)->name ?? config('company.group');
+  $advisorEmail  = optional($unit->agent)->email ?? config('company.support_email');
+  $advisorPhone  = optional($unit->agent)->phone ?? config('company.phone');
   $advisorWA     = preg_replace('/\D+/', '', (string) config('company.whatsapp'));
   $advisorInitials = collect(explode(' ', $advisorName))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('');
 
@@ -292,7 +296,7 @@ body {
   </div>
   <div class="hero-info">
     <div class="hero-name">{{ $unitNum }}</div>
-    <div class="hero-sub">{{ $floor }} · Orientación {{ $direction }} · {{ $outlook }}</div>
+    <div class="hero-sub">{{ collect([$floor, $direction ? __('Orientación').' '.$direction : null, $outlook])->filter()->join(' · ') }}</div>
     <div class="hero-price-row">
       <span class="hero-price">{{ $priceFmt }}</span>
       <span class="hero-price-cur">USD</span>
@@ -426,7 +430,7 @@ body {
       <div class="cta-modes">{{ __('Presencial · Tour 360°') }}</div>
       <hr class="cta-rule">
       <div class="cta-desc">Recorre {{ $projectName }} desde donde estés o visítanos en obra.</div>
-      <a class="cta-link" href="#">Agendar →</a>
+      <a class="cta-link" href="{{ url('/') }}">{{ __('Agendar →') }}</a>
     </div>
   </div>
 </div>
@@ -457,7 +461,7 @@ body {
 </div><!-- /sheet-inner page 1 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Bahía Mar · Landmass') }}</div>
+  <div class="footer-contact">{{ collect([$advisorPhone, $advisorEmail])->filter()->join(' · ') }}<br>{{ __('Bahía Mar · Landmass') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 </div><!-- /sheet page 1 -->
@@ -498,16 +502,16 @@ body {
         </div>
       </div>
 
+      @if((float) $unit->levies > 0)
       <div class="sec-title" style="margin-top:14px">{{ __('Costos mensuales estimados') }}</div>
       <div class="costs-block">
-        <div class="costs-row"><span class="costs-dk">{{ __('Cuota de mantenimiento (HOA)') }}</span><span class="costs-dv">${{ $unit->levies ? number_format((float)$unit->levies, 0) : '310' }}</span></div>
-        <div class="costs-row"><span class="costs-dk">{{ __('Servicios públicos promedio') }}</span><span class="costs-dv">$180</span></div>
-        <div class="costs-row"><span class="costs-dk">{{ __('Seguro de la propiedad') }}</span><span class="costs-dv">$95</span></div>
-        <div class="costs-total"><span>{{ __('Total mensual estimado') }}</span><span>${{ number_format(((float)($unit->levies ?: 310)) + 180 + 95, 0) }} USD</span></div>
+        <div class="costs-row"><span class="costs-dk">{{ __('Cuota de mantenimiento (HOA)') }}</span><span class="costs-dv">${{ number_format((float) $unit->levies, 0) }}</span></div>
       </div>
+      @endif
     </div>
 
     <div>
+      @if((float) $unit->est_rental > 0)
       <div class="sec-title">{{ __('Rentabilidad Airbnb estimada') }}</div>
       <div class="airbnb-block">
         <div class="airbnb-header">
@@ -524,6 +528,8 @@ body {
           <span class="airbnb-total-val">${{ number_format(((float)($unit->est_rental ?: 7200)) * 12 * 0.65 / 1000, 0) }}K USD</span>
         </div>
       </div>
+
+      @endif
 
       <div class="sec-title" style="margin-top:14px">{{ __('Ubicación y entorno') }}</div>
       <div class="location-placeholder">{{ __('República Dominicana') }}</div>
@@ -569,9 +575,9 @@ body {
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Proyecto') }}</span><span class="dv">{{ $projectName }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Unidad') }}</span><span class="dv">{{ $unitNum }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook ?? '—' }}</span></div>
     </div>
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Precio USD') }}</span><span class="dv">{{ $priceFmt }}</span></div>
@@ -602,7 +608,7 @@ body {
 </div><!-- /sheet-inner page 2 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Bahía Mar · Landmass') }}</div>
+  <div class="footer-contact">{{ collect([$advisorPhone, $advisorEmail])->filter()->join(' · ') }}<br>{{ __('Bahía Mar · Landmass') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 
@@ -638,5 +644,15 @@ window.addEventListener('load', function () {
   setTimeout(fitSheetsAndPrint, 600);
 });
 </script>
+<script>
+  // La ficha es un A4 de 794 px: en un móvil se salía por la derecha. En
+  // pantalla se escala al ancho disponible; al imprimir no se toca (la regla
+  // sólo vale para @media screen).
+  (function () {
+    var fit = function () { document.documentElement.style.setProperty('--ficha-fit', Math.min(1, (Math.min(window.innerWidth, document.documentElement.clientWidth, screen.width) - 16) / 820)); };
+    fit(); window.addEventListener('resize', fit);
+  })();
+</script>
+<style>@media screen and (max-width: 840px) { html { zoom: var(--ficha-fit, 1); } }</style>
 </body>
 </html>

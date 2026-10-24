@@ -145,7 +145,7 @@
                             <button type="button" onclick="openDocumentPreview(@js($receiptPreviewPayload))" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver comprobante') }}"><i class="pi pi-eye text-[10px]"></i> {{ __('Ver') }}</button>
                         @endif
                         @if($r)
-                            <a href="{{ route('admin.crm.pagos', $r->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver expediente') }}"><i class="pi pi-folder text-[10px]"></i> {{ __('Expediente') }}</a>
+                            {{-- Al expediente del CRM (pestaña Pagos); admin.crm.pagos era la pantalla vieja, con otro menú y el logo roto. --}}<a href="{{ route('admin.crm.expediente.detalle', ['id' => $r->id, 'tab' => 'pagos']) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3" title="{{ __('Ver expediente') }}"><i class="pi pi-folder text-[10px]"></i> {{ __('Expediente') }}</a>
                         @endif
                         <form method="POST" action="{{ route('admin.payments.approve', $p->id) }}" class="m-0">@csrf
                             <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3" title="{{ __('Aprobar pago') }}"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>

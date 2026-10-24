@@ -47,6 +47,9 @@ class SearchController extends Controller
     /** Admin/broker live search across users, expedientes and units. */
     public function admin(Request $request)
     {
+        // Es un endpoint JSON (buscador / campana). Abierto a mano en el navegador
+        // enseñaba el JSON en bruto: se devuelve al panel.
+        if (! request()->expectsJson()) { return redirect()->route('admin.crm.dashboard'); }
         $q = trim((string) $request->query('q', ''));
         if ($q === '') {
             return response()->json(['groups' => []]);
@@ -139,6 +142,9 @@ class SearchController extends Controller
     /** Client live search across their own reservation, documents, payments, wishlist + nav. */
     public function client(Request $request)
     {
+        // Es un endpoint JSON (buscador / campana). Abierto a mano en el navegador
+        // enseñaba el JSON en bruto: se devuelve al panel.
+        if (! request()->expectsJson()) { return redirect()->route('dashboard'); }
         $q = trim((string) $request->query('q', ''));
         if ($q === '') {
             return response()->json(['groups' => []]);

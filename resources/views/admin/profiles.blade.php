@@ -363,11 +363,11 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
-                    <input type="text" name="phone" id="eu-phone" class="crm-input pl-3 mt-1" placeholder="+57 300 000 0000">
+                    <input type="text" name="phone" id="eu-phone" class="crm-input pl-3 mt-1" placeholder="{{ __('Con prefijo internacional, p. ej. +1 809 000 0000') }}">
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('País') }}</label>
-                    <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="{{ __('Colombia') }}">
+                    <input type="text" name="country" id="eu-country" class="crm-input pl-3 mt-1" placeholder="{{ __('País de residencia') }}">
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Proyecto de interés') }}</label>
