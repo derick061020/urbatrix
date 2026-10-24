@@ -322,7 +322,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/avance-obra', [AdminController::class, 'storeConstructionReport'])->name('admin.crm.avance-obra.store');
     Route::post('/crm/avance-obra/{report}/notify-monthly', [AdminController::class, 'notifyConstructionReportMonthly'])->name('admin.crm.avance-obra.notify');
     Route::get('/crm/plantillas',   [AdminController::class, 'crmPlantillas'])->name('admin.crm.plantillas');
-    Route::get('/crm/anuncios',     [AdminController::class, 'crmAnuncios'])->name('admin.crm.anuncios');
+    Route::get('/crm/anuncios',     [\App\Http\Controllers\CrmAnnouncementController::class, 'index'])->name('admin.crm.anuncios');
+    Route::post('/crm/anuncios',    [\App\Http\Controllers\CrmAnnouncementController::class, 'store'])->name('admin.crm.anuncios.store');
+    Route::put('/crm/anuncios/{announcement}',          [\App\Http\Controllers\CrmAnnouncementController::class, 'update'])->name('admin.crm.anuncios.update');
+    Route::post('/crm/anuncios/{announcement}/archive', [\App\Http\Controllers\CrmAnnouncementController::class, 'archive'])->name('admin.crm.anuncios.archive');
     Route::get('/crm/proyectos/{id}', [AdminController::class, 'crmProyectoDetalle'])->name('admin.crm.proyecto.detalle');
     Route::get('/crm/expedientes/{id}', [AdminController::class, 'crmExpedienteDetalle'])->name('admin.crm.expediente.detalle');
 

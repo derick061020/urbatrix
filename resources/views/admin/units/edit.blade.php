@@ -36,12 +36,12 @@
         <div class="flex-1 min-w-0">
             <div class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Unidad') }}</div>
             <div class="text-[20px] font-bold text-ink-950 leading-tight truncate">{{ $unit->custom_id ?? $unit->name }}</div>
-            <div class="text-[12px] text-ink-500 mt-0.5">{{ ucfirst($unit->type ?? '—') }} · ${{ number_format($unit->price ?? 0) }}</div>
+            <div class="text-[12px] text-ink-500 mt-0.5">{{-- La etiqueta del tipo («1 habitación»), no la clave («1_bed»). --}}{{ \App\Support\UnitOptions::map('types')[$unit->type] ?? ($unit->type ? ucfirst(str_replace('_', ' ', $unit->type)) : '—') }} · ${{ number_format($unit->price ?? 0) }}</div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <span class="crm-pill bg-{{ $sp[1] }}-soft text-{{ $sp[1] }}">{{ strtoupper($sp[0]) }}</span>
             <button type="submit" form="unit-edit-form" class="crm-btn crm-btn-primary"><i class="pi pi-save"></i> {{ __('Guardar cambios') }}</button>
-            <button type="submit" form="unit-delete-form" onclick="return confirm(@json(__('¿Eliminar esta unidad? Esta acción no se puede deshacer.')));" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
+            <button type="submit" form="unit-delete-form" onclick="return confirm({{ Js::from(__('¿Eliminar esta unidad? Esta acción no se puede deshacer.')) }});" class="crm-btn crm-btn-ghost text-err"><i class="pi pi-trash"></i> {{ __('Eliminar') }}</button>
         </div>
     </div>
 
@@ -304,9 +304,18 @@
         <i class="pi pi-check-circle text-ok"></i> <span data-save-text>{{ __('Guardado') }}</span>
     </span>
     <button type="button" id="unit-discard-btn" class="crm-btn crm-btn-ghost text-err text-[12px] py-1.5 px-3 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
-        <i class="pi pi-undo text-[11px]"></i> Descartar cambios
+        <i class="pi pi-undo text-[11px]"></i> <span class="unit-discard-txt">{{ __('Descartar cambios') }}</span>
     </button>
 </div>
+<style>
+  /* La barra de guardado flota abajo: hueco al final para que no tape el último
+     campo y, en móvil, más compacta (tapaba el precio). */
+  body { padding-bottom: 72px; }
+  @media (max-width: 640px) {
+    #unit-save-bar { right: 12px; bottom: 12px; padding: 6px 6px 6px 12px; }
+    #unit-save-bar .unit-discard-txt { display: none; }
+  }
+</style>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>

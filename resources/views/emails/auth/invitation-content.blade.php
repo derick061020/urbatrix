@@ -22,7 +22,7 @@
       <p style="margin:0 0 6px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#4a4a46;line-height:1.6;">{{ __('Hola') }} <strong style="color:#1a1a18;font-weight:600;">{{ $name }}</strong>,</p>
     @endif
     <p style="margin:0 0 24px 0;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:13px;color:#6a6a64;line-height:1.65;">
-      Nuestro equipo ha registrado una reserva a tu nombre@if($unitName) para <strong style="color:#1a1a18;font-weight:600;">{{ $unitName }}</strong>@endif.
+      Nuestro equipo ha registrado una reserva a tu nombre{{-- «nombre@if» no lo reconoce Blade (letra pegada) y el @endif rompía el correo --}}{!! $unitName ? ' para <strong style="color:#1a1a18;font-weight:600;">'.e($unitName).'</strong>' : '' !!}.
       Para acceder a tu portal y dar seguimiento al proceso, solo necesitas activar tu cuenta y crear una contraseña.
     </p>
 

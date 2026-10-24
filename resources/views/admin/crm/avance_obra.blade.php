@@ -19,7 +19,7 @@
         $overall = optional($latest)->overall_progress ?? (int) optional($activeProject)->progress ?? 0;
         $phases  = optional($latest)->phases ?: [];
         $unitsCount = optional($activeProject)->total_units ?? 0;
-        $location   = optional($activeProject)->location ?? 'Cap Cana · Punta Cana';
+        $location   = optional($activeProject)->location;   // sin valor inventado: sale la del proyecto o nada
         $statusMap = ['done' => '#1fc16b', 'active' => '#fa7319', 'pending' => '#cacfd8'];
     @endphp
 
@@ -64,7 +64,7 @@
                     </div>
                     <div>
                         <div class="text-[14px] font-semibold text-ink-900">{{ __('Avance global de obra') }}</div>
-                        <div class="text-[12px] text-ink-500">{{ $unitsCount ? $unitsCount.' unidades · ' : '' }}{{ $location }}</div>
+                        <div class="text-[12px] text-ink-500">{{ collect([$unitsCount ? trans_choice(':count unidad|:count unidades', $unitsCount, ['count' => $unitsCount]) : null, $location])->filter()->join(' · ') }}</div>
                         <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $deliveryGlobal }}</div>
                     </div>
                 </div>
@@ -189,7 +189,7 @@
             {{-- Proyecto (fijo) --}}
             <div class="px-4 py-2.5 rounded-lg bg-ink-50 border border-ink-100 text-[12px] text-ink-600">
                 Proyecto: <span class="font-semibold text-ink-900">{{ optional($activeProject)->name ?? config('company.project') }}</span>
-                <span class="text-ink-400"> · {{ $location }}</span>
+                @if($location)<span class="text-ink-400"> · {{ $location }}</span>@endif
             </div>
 
             {{-- Período + Tipo --}}

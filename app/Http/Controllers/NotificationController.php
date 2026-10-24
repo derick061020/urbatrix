@@ -23,6 +23,9 @@ class NotificationController extends Controller
     /** GET /admin/notifications */
     public function admin()
     {
+        // Es un endpoint JSON (buscador / campana). Abierto a mano en el navegador
+        // enseñaba el JSON en bruto: se devuelve al panel.
+        if (! request()->expectsJson()) { return redirect()->route('admin.crm.dashboard'); }
         /** @var \App\Models\User $u */
         $u = Auth::user();
         $isBroker = $u->isBroker();
@@ -140,6 +143,9 @@ class NotificationController extends Controller
     /** GET /dashboard/notifications */
     public function client()
     {
+        // Es un endpoint JSON (buscador / campana). Abierto a mano en el navegador
+        // enseñaba el JSON en bruto: se devuelve al panel.
+        if (! request()->expectsJson()) { return redirect()->route('dashboard'); }
         $userId = Auth::id();
         $items  = collect();
 
