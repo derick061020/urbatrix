@@ -2774,7 +2774,6 @@ class AdminController extends Controller
 
         return back()->with('success', __('Configuración de canales guardada.'));
     }
-    public function crmAnuncios()        { return view('admin.crm.anuncios'); }
 
     /* =====================================================================
      | Control de comunicaciones por proyecto

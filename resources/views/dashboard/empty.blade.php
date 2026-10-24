@@ -2,7 +2,7 @@
 @section('title', __('Bienvenido — SIEBE'))
 @section('page_title', __('Bienvenido'))
 @section('page_breadcrumb', __('Aún sin propiedad'))
-@php $activeRoute = 'mi-propiedad'; @endphp
+@php $activeRoute = $activeRoute ?? 'mi-propiedad'; @endphp  {{-- desde Plan de pagos llega 'payments' --}}
 
 @section('content')
 <div class="p-7">

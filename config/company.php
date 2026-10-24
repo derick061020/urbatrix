@@ -36,6 +36,10 @@ return [
     // (Miguel, 11 de octubre).
     'site'          => env('COMPANY_SITE', 'https://sieberesidences.com'),
 
+    // La promesa de compraventa sólo se genera con la plantilla ya adaptada a
+    // la sociedad de Siebe (hoy lleva los datos legales de Makai).
+    'promise_enabled' => (bool) env('COMPANY_PROMISE_ENABLED', false),
+
     // WhatsApp de contacto, solo dígitos (formato de wa.me).
     // Vacío a propósito: el que había era el de Duna/Makai y los botones
     // llevaban a su chat. Mientras esté vacío, los botones de WhatsApp

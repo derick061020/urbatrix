@@ -15,9 +15,11 @@
   $projVal     = $unit->projected_value ? '+' . number_format((((float)$unit->projected_value / max($price,1)) - 1) * 100, 0) . '% año 1' : '—';
   $projYear    = $unit->projected_value_year ?: 'Q4 2026';
 
-  $floor       = $unit->floor ?: '1er Piso';
-  $direction   = $unit->direction ?: 'SE';
-  $outlook     = $unit->outlook ?: 'Vista al lago';
+  // Sin dato, sin texto: antes salían «1er Piso · Orientación SE · Vista al
+  // lago» en cualquier unidad que no los tuviera.
+  $floor       = $unit->floor ?: null;
+  $direction   = $unit->direction ?: null;
+  $outlook     = $unit->outlook ?: null;
   $bedrooms    = $unit->bedrooms ?: '—';
   $bathrooms   = $unit->bathrooms ?: '—';
   $parking     = $unit->parking_bays ?: '—';
@@ -36,9 +38,11 @@
   $ref         = 'REF ' . strtoupper(substr(md5($unit->id . $now->format('Ymd')), 0, 4)) . '-' . str_replace(' ', '', strtoupper($unitNum)) . '-' . $now->format('dm');
 
   $recipientName = request('to', 'Cliente');
-  $advisorName   = optional($unit->agent)->name ?? 'Carlos Ramírez Méndez';
-  $advisorEmail  = optional($unit->agent)->email ?? 'carlos.ramirez@siebedevelopment.com';
-  $advisorPhone  = '+1 (809) 710-9044';
+  // El asesor de la unidad o, si no tiene, el equipo del proyecto. Antes un
+  // nombre, un correo y un teléfono de ejemplo.
+  $advisorName   = optional($unit->agent)->name ?? config('company.group');
+  $advisorEmail  = optional($unit->agent)->email ?? config('company.support_email');
+  $advisorPhone  = optional($unit->agent)->phone ?? config('company.phone');
   $advisorWA     = preg_replace('/\D+/', '', (string) config('company.whatsapp'));
   $advisorInitials = collect(explode(' ', $advisorName))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('');
 
@@ -256,10 +260,7 @@ body {
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-logo">
-    <svg class="hdr-isotipo" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="13" cy="13" r="11" stroke="#F1EDE3" stroke-width="1.5"/>
-      <path d="M8 17V9l5 5 5-5v8" stroke="#F1EDE3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </svg>
+    <img class="hdr-isotipo" src="{{ asset('images/brand/siebe-logo-mark.svg') }}" alt="">
     <div class="hdr-wordmark">
       <div class="hdr-name">{{ strtoupper($projectName) }}</div>
       <div class="hdr-dev">{{ $devName }}</div>
@@ -286,7 +287,7 @@ body {
   </div>
   <div class="hero-info">
     <div class="hero-name">{{ $unitNum }}</div>
-    <div class="hero-sub">{{ $floor }} · Orientación {{ $direction }} · {{ $outlook }}</div>
+    <div class="hero-sub">{{ collect([$floor, $direction ? __('Orientación').' '.$direction : null, $outlook])->filter()->join(' · ') }}</div>
     <div class="hero-price-row">
       <span class="hero-price">{{ $priceFmt }}</span>
       <span class="hero-price-cur">USD</span>
@@ -420,7 +421,7 @@ body {
       <div class="cta-modes">{{ __('Presencial · Tour 360°') }}</div>
       <hr class="cta-rule">
       <div class="cta-desc">Recorre {{ $projectName }} desde donde estés o visítanos en Aruba.</div>
-      <a class="cta-link" href="#">Agendar →</a>
+      <a class="cta-link" href="{{ url('/') }}">{{ __('Agendar →') }}</a>
     </div>
   </div>
 </div>
@@ -435,7 +436,7 @@ body {
       <div class="advisor-name">{{ $advisorName }}</div>
       <div class="advisor-contact">
         {{ $advisorEmail }}<br>
-        siebedevelopment.com · Aruba, R.D.
+        {{ config('company.website') }} · {{ config('company.location') }}
       </div>
     </div>
     <div class="advisor-cta">
@@ -451,7 +452,7 @@ body {
 </div><!-- /sheet-inner page 1 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Aruba · República Dominicana') }}</div>
+  <div class="footer-contact">{{ collect([$advisorPhone, $advisorEmail])->filter()->join(' · ') }}<br>{{ config('company.location') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 </div><!-- /sheet page 1 -->
@@ -472,36 +473,19 @@ body {
 </div>
 
 <div class="section" style="padding-top:20px">
-  <div class="two-col">
+  {{-- Sin costes la columna de la izquierda queda vacía: una sola columna. --}}
+  <div class="two-col" @unless((float) $unit->levies > 0) style="grid-template-columns:1fr" @endunless>
     <div>
-      <div class="sec-title">{{ __('Beneficios fiscales y legales') }}</div>
-      <div class="confotur-card">
-        <div class="confotur-header">
-          <div class="confotur-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
-            </svg>
-          </div>
-          <div class="confotur-title">{{ __('Proyecto acogido a CONFOTUR') }}</div>
-        </div>
-        <div class="confotur-text">{{ __('Exención del impuesto de transferencia (3%) al momento de la compra y exoneración total del Impuesto al Patrimonio Inmobiliario (IPI 1% anual) durante 15 años. Aplica para inversores nacionales y extranjeros.') }}</div>
-        <div class="confotur-badges">
-          <div class="confotur-badge"><div class="confotur-badge-title">CONFOTUR</div><div class="confotur-badge-sub">{{ __('Exención fiscal') }}</div></div>
-          <div class="confotur-badge"><div class="confotur-badge-title">Ley 189-11</div><div class="confotur-badge-sub">{{ __('Fideicomiso bancario') }}</div></div>
-          <div class="confotur-badge"><div class="confotur-badge-title">{{ __('RNI Registrado') }}</div><div class="confotur-badge-sub">{{ __('Catastro nacional') }}</div></div>
-        </div>
-      </div>
-
-      <div class="sec-title" style="margin-top:14px">{{ __('Costos mensuales estimados') }}</div>
+      @if((float) $unit->levies > 0)
+      <div class="sec-title">{{ __('Costos mensuales estimados') }}</div>
       <div class="costs-block">
-        <div class="costs-row"><span class="costs-dk">{{ __('Cuota de mantenimiento (HOA)') }}</span><span class="costs-dv">${{ $unit->levies ? number_format((float)$unit->levies, 0) : '310' }}</span></div>
-        <div class="costs-row"><span class="costs-dk">{{ __('Servicios públicos promedio') }}</span><span class="costs-dv">$180</span></div>
-        <div class="costs-row"><span class="costs-dk">{{ __('Seguro de la propiedad') }}</span><span class="costs-dv">$95</span></div>
-        <div class="costs-total"><span>{{ __('Total mensual estimado') }}</span><span>${{ number_format(((float)($unit->levies ?: 310)) + 180 + 95, 0) }} USD</span></div>
+        <div class="costs-row"><span class="costs-dk">{{ __('Cuota de mantenimiento (HOA)') }}</span><span class="costs-dv">${{ number_format((float) $unit->levies, 0) }}</span></div>
       </div>
+      @endif
     </div>
 
     <div>
+      @if((float) $unit->est_rental > 0)
       <div class="sec-title">{{ __('Rentabilidad Airbnb estimada') }}</div>
       <div class="airbnb-block">
         <div class="airbnb-header">
@@ -519,14 +503,10 @@ body {
         </div>
       </div>
 
+      @endif
+
       <div class="sec-title" style="margin-top:14px">{{ __('Ubicación y entorno') }}</div>
-      <div class="location-placeholder">{{ __('Aruba · Punta Cana · República Dominicana') }}</div>
-      <div class="distances-grid">
-        <div class="dist-row"><span class="dist-label">{{ __('Playa Juanillo') }}</span><span class="dist-time">3 min</span></div>
-        <div class="dist-row"><span class="dist-label">{{ __('Aeropuerto PUJ') }}</span><span class="dist-time">15 min</span></div>
-        <div class="dist-row"><span class="dist-label">{{ __('Punta Espada Golf') }}</span><span class="dist-time">5 min</span></div>
-        <div class="dist-row"><span class="dist-label">{{ __('Supermercado') }}</span><span class="dist-time">7 min</span></div>
-      </div>
+      <div class="location-placeholder">{{ optional($unit->project)->location ?: config('company.location') }}</div>
     </div>
   </div>
 </div>
@@ -536,15 +516,14 @@ body {
   <div class="sec-title">{{ __('Amenidades incluidas') }}</div>
   <div class="amenities-list">
     @php
+      // Las del edificio de Siebe (las fotos de amenidades): la lista era la de Makai.
       $amenities = [
-        ['label' => 'Piscina infinita', 'path' => '<path d="M2 6c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M2 12c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M2 18c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/>'],
-        ['label' => 'Gimnasio premium', 'path' => '<line x1="8" y1="12" x2="16" y2="12"/><line x1="5" y1="8" x2="5" y2="16"/><line x1="19" y1="8" x2="19" y2="16"/>'],
-        ['label' => 'Restaurante', 'path' => '<line x1="8" y1="2" x2="8" y2="22"/><path d="M6 2v5a2 2 0 0 0 4 0V2"/><path d="M18 2v4a4 4 0 0 1-2 3.46V22"/>'],
-        ['label' => 'Beach Club', 'path' => '<circle cx="12" cy="7" r="3"/><path d="M2 16c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/>'],
-        ['label' => 'Seguridad 24/7', 'path' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>'],
-        ['label' => 'Conserjería', 'path' => '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'],
-        ['label' => 'Parking cubierto', 'path' => '<path d="M5 17H3a1 1 0 0 1-1-1V9l3-6h14l3 6v7a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'],
-        ['label' => 'Jardines tropicales', 'path' => '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>'],
+        ['label' => __('Piscina en la azotea'), 'path' => '<path d="M2 6c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M2 12c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M2 18c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/>'],
+        ['label' => __('Gimnasio'), 'path' => '<line x1="8" y1="12" x2="16" y2="12"/><line x1="5" y1="8" x2="5" y2="16"/><line x1="19" y1="8" x2="19" y2="16"/>'],
+        ['label' => __('Terraza en la azotea'), 'path' => '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>'],
+        ['label' => __('Zona de barbacoa'), 'path' => '<line x1="8" y1="2" x2="8" y2="22"/><path d="M6 2v5a2 2 0 0 0 4 0V2"/><path d="M18 2v4a4 4 0 0 1-2 3.46V22"/>'],
+        ['label' => __('Lobby'), 'path' => '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'],
+        ['label' => __('Parking'), 'path' => '<path d="M5 17H3a1 1 0 0 1-1-1V9l3-6h14l3 6v7a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'],
       ];
     @endphp
     @foreach($amenities as $a)
@@ -563,9 +542,9 @@ body {
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Proyecto') }}</span><span class="dv">{{ $projectName }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Unidad') }}</span><span class="dv">{{ $unitNum }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook ?? '—' }}</span></div>
     </div>
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Precio USD') }}</span><span class="dv">{{ $priceFmt }}</span></div>
@@ -596,7 +575,7 @@ body {
 </div><!-- /sheet-inner page 2 -->
 <div class="footer">
   <div class="footer-brand">{{ strtoupper($projectName) }} · {{ strtoupper($devName) }}</div>
-  <div class="footer-contact">{{ $advisorPhone }} · {{ $advisorEmail }}<br>{{ __('Aruba · República Dominicana') }}</div>
+  <div class="footer-contact">{{ collect([$advisorPhone, $advisorEmail])->filter()->join(' · ') }}<br>{{ config('company.location') }}</div>
   <div class="footer-disc">Documento referencial preparado para {{ $recipientName }}. Validez 30 días naturales. Ref: {{ $ref }}</div>
 </div>
 
@@ -632,5 +611,15 @@ window.addEventListener('load', function () {
   setTimeout(fitSheetsAndPrint, 600);
 });
 </script>
+<script>
+  // La ficha es un A4 de 794 px: en un móvil se salía por la derecha. En
+  // pantalla se escala al ancho disponible; al imprimir no se toca (la regla
+  // sólo vale para @media screen).
+  (function () {
+    var fit = function () { document.documentElement.style.setProperty('--ficha-fit', Math.min(1, (Math.min(window.innerWidth, document.documentElement.clientWidth, screen.width) - 16) / 820)); };
+    fit(); window.addEventListener('resize', fit);
+  })();
+</script>
+<style>@media screen and (max-width: 840px) { html { zoom: var(--ficha-fit, 1); } }</style>
 </body>
 </html>

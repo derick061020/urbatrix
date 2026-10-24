@@ -119,9 +119,9 @@
                         <th>{{ __('Unidad') }}</th>
                         <th>{{ __('Tipo') }}</th>
                         <th>{{ __('Planta') }}</th>
-                        <th>{{ __('Camas/Baños') }}</th>
-                        <th>{{ __('Sqft Int.') }}</th>
-                        <th>{{ __('Sqft Terraza') }}</th>
+                        <th>{{ __('Hab./Baños') }}</th>
+                        <th>{{ __('Int. m²') }}</th>
+                        <th>{{ __('Terraza m²') }}</th>
                         <th>{{ __('Precio') }}</th>
                         <th>{{ __('Vistas') }}</th>
                         <th>{{ __('Estado') }}</th>

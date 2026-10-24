@@ -6,21 +6,30 @@
 
 @section('content')
 @php
-    $delivery = optional($report)->estimated_delivery ?: 'Q4 2026';
-    $overall  = optional($report)->overall_progress ?? 52;
-    $projName = optional(optional($report)->project)->name ?? 'Siebe Residences';
+    // Sólo datos reales. Sin informe publicado se enseñaba un avance de
+    // ejemplo (52 %, cimentación terminada en junio de 2025, entrega Q4 2026)
+    // y una ubicación heredada de otro proyecto.
+    $project  = optional($report)->project
+             ?? optional(optional($reservation)->unit)->project
+             ?? \App\Models\Project::orderBy('id')->first();
+    $delivery = optional($report)->estimated_delivery;
+    $overall  = (int) (optional($report)->overall_progress ?? optional($project)->progress ?? 0);
+    $projName = optional($project)->name ?? 'Siebe Residences';
+    $location = optional($project)->location;
 @endphp
 <div class="p-4 sm:p-6 lg:p-7 space-y-5">
 
+    @if($delivery)
     <div class="px-4 py-3 rounded-xl bg-ink-100/60 border border-ink-200">
-        <div class="text-[14px] font-bold text-ok-dark">Entrega estimada {{ $delivery }}</div>
+        <div class="text-[14px] font-bold text-ok-dark">{{ __('Entrega estimada :fecha', ['fecha' => $delivery]) }}</div>
     </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {{-- Progreso general --}}
         <div class="cli-card overflow-hidden">
-            <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ $projName }} — Progreso general</div>
+            <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ $projName }} — {{ __('Progreso general') }}</div>
             <div class="p-5">
                 <div class="flex items-center gap-5 mb-5">
                     <div class="relative w-28 h-28 shrink-0">
@@ -34,8 +43,8 @@
                     </div>
                     <div>
                         <div class="text-[14px] font-semibold text-ink-950">{{ __('Avance global de obra') }}</div>
-                        <div class="text-[12px] text-ink-500">{{ __('Aruba · Punta Cana') }}</div>
-                        <div class="text-[11px] text-ink-400 mt-1">Entrega estimada {{ $delivery }}</div>
+                        @if($location)<div class="text-[12px] text-ink-500">{{ $location }}</div>@endif
+                        @if($delivery)<div class="text-[11px] text-ink-400 mt-1">{{ __('Entrega estimada :fecha', ['fecha' => $delivery]) }}</div>@endif
                     </div>
                 </div>
 
@@ -56,16 +65,12 @@
                                 ];
                             })->all();
                         } else {
-                            $stages = [
-                                ['Cimentación',   100, '#1fc16b', 'Jun 2025',  true ],
-                                ['Estructura',    100, '#1fc16b', 'Dic 2025',  true ],
-                                ['Mampostería',    75, '#fa7319', 'En curso',  false, 'curso'],
-                                ['Instalaciones',  40, '#fa7319', 'En curso',  false, 'curso'],
-                                ['Acabados',        0, '#cacfd8', 'Q3 2026',   false],
-                                ['Entrega',         0, '#cacfd8', 'Q4 2026',   false],
-                            ];
+                            $stages = [];
                         }
                     @endphp
+                    @if(empty($stages))
+                        <div class="text-[12px] text-ink-500 py-2">{{ __('Todavía no se han publicado las fases de la obra. Te avisaremos por correo con el primer reporte.') }}</div>
+                    @endif
                     @foreach($stages as $s)
                         <div>
                             <div class="flex items-center justify-between text-[13px] mb-1.5">

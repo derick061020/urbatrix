@@ -244,6 +244,14 @@ class DocumentDataHelper
             ],
         ][$type];
 
+        // La plantilla de la promesa es todavía la de Makai: nombra a IGUANAS LAKE
+        // CONDO & RESIDENCES, S.R.L., su RNC y su domicilio en Santo Domingo. Hasta
+        // tener los datos legales de la sociedad de Siebe no se genera; el
+        // interruptor es COMPANY_PROMISE_ENABLED (config/company.php).
+        if ($type === 'purchase_promise' && ! config('company.promise_enabled')) {
+            throw new \RuntimeException(__('la promesa de compraventa está pendiente de los datos legales de la sociedad. Contacta con el equipo.'));
+        }
+
         $data = ($config['data'])();
         $view = view($config['view'], $data);
 

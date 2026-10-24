@@ -161,16 +161,21 @@
             <div class="px-5 py-3 bg-ink-50/60 border-b border-ink-100 text-[14px] font-bold text-ink-950">{{ __('Detalles de tu unidad') }}</div>
             <div class="divide-y divide-ink-100">
                 @php
-                    $details = [
+                    // Campos reales de la unidad; la fila sin dato no sale. Antes los huecos
+                    // se rellenaban con un ejemplo («959 sqft», «Lake Facing»), las áreas
+                    // iban en sqft y la terraza salía de expense_1.
+                    $u = $reservation->unit;
+                    $m2 = fn ($v) => ($v !== null && (float) $v > 0) ? rtrim(rtrim(number_format((float) $v, 2, ',', '.'), '0'), ',').' m²' : null;
+                    $details = array_values(array_filter([
                         [__('Unidad'),    $unidad],
-                        [__('Piso'),      __('Planta').' '.($reservation->unit->floor ?? '1')],
-                        [__('Tipo'),      ($reservation->unit->layout ?? '1 Bed + Family Room')],
-                        [__('Interior'),  ($reservation->unit->internal_area ?? '959').' sqft'],
-                        [__('Terraza'),   ($reservation->unit->expense_1 ?? '207').' sqft'],
-                        [__('Vista'),     ($reservation->unit->outlook ?? 'Lake Facing')],
-                        [__('Proyecto'),  'Siebe Residences'],
-                        [__('Ubicación'), 'Aruba · RD'],
-                    ];
+                        [__('Piso'),      $u?->floor ? \App\Support\UnitOptions::floorPhrase($u->floor) : null],
+                        [__('Tipo'),      $u?->layout],
+                        [__('Interior'),  $m2($u?->internal_area)],
+                        [__('Terraza'),   $m2($u?->external_area)],
+                        [__('Vista'),     $u?->outlook],
+                        [__('Proyecto'),  $u?->project?->name ?? config('company.project')],
+                        [__('Ubicación'), $u?->project?->location ?: config('company.location')],
+                    ], fn ($d) => filled($d[1])));
                 @endphp
                 @foreach($details as $d)
                     <div class="px-5 py-3 flex items-center justify-between">
@@ -203,7 +208,7 @@
             {{-- Plan de pagos card --}}
             <a href="{{ route('dashboard.payments') }}" class="cli-card p-4 block hover:shadow-card transition-shadow">
                 <div class="text-right text-[10px] uppercase tracking-wider font-semibold text-ink-400">{{ __('Próximo pago') }}</div>
-                <div class="text-right font-display text-[22px] font-bold text-ink-950 mt-1">${{ number_format($nextPay->amount ?? 44650, 2) }}</div>
+                <div class="text-right font-display text-[22px] font-bold text-ink-950 mt-1">@if($nextPay)${{ number_format($nextPay->amount, 2) }}@else<span class="text-[15px] text-ink-500">{{ __('Sin cuotas pendientes') }}</span>@endif</div>
                 <div class="flex items-center gap-3 mt-3 pt-3 border-t border-ink-100">
                     <div class="w-10 h-10 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600"><i class="pi pi-credit-card"></i></div>
                     <div class="flex-1">
@@ -211,20 +216,25 @@
                         <div class="text-[11px] text-ink-500">{{ __('Consulta tus cuotas') }}</div>
                     </div>
                 </div>
-                <div class="text-[10px] uppercase tracking-wider font-semibold text-warn-dark mt-2">{{ __('Vence') }} {{ $nextPay && $nextPay->due_date ? $nextPay->due_date->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMMM YYYY' : 'MMMM D, YYYY') : '31 Mayo 2026' }}</div>
+                <div class="text-[10px] uppercase tracking-wider font-semibold text-warn-dark mt-2">@if($nextPay && $nextPay->due_date){{ __('Vence') }} {{ $nextPay->due_date->locale(app()->getLocale())->isoFormat(app()->getLocale()==='es' ? 'D MMMM YYYY' : 'MMMM D, YYYY') }}@endif</div>
             </a>
 
             {{-- Asesor card --}}
             <div class="cli-card p-4">
                 <div class="flex items-center gap-3">
-                    <div class="cli-avatar" style="background:#2b2b1a">{{ strtoupper(substr($advisor->name ?? 'CM', 0, 2)) }}</div>
+                    <div class="cli-avatar" style="background:#2b2b1a">{{ $advisor ? strtoupper(substr($advisor->name, 0, 2)) : '' }}@unless($advisor)<i class="pi pi-user"></i>@endunless</div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? 'Carlos Méndez' }}</div>
-                        <div class="text-[11px] text-ok-dark flex items-center gap-1"><span class="dot bg-ok"></span> {{ __('Disponible ahora') }}</div>
+                        <div class="text-[14px] font-bold text-ink-950">{{ $advisor->name ?? __('Tu asesor') }}</div>
+                        <div class="text-[11px] text-ink-500">{{ $advisor ? __('Tu asesor') : __('Te asignaremos uno en breve') }}</div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-ink-100">
-                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $advisor->phone ?? '18095550101') }}" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-2"><i class="pi pi-whatsapp"></i> WhatsApp</a>
+                <div class="grid grid-flow-col auto-cols-fr gap-2 mt-3 pt-3 border-t border-ink-100">
+                    {{-- Sin un número real (el del asesor o el del proyecto) no hay botón: antes
+                         enlazaba a un número de ejemplo. --}}
+                    @php $advWa = preg_replace('/\D/', '', (string) ($advisor->phone ?? config('company.whatsapp'))); @endphp
+                    @if($advWa)
+                    <a href="https://wa.me/{{ $advWa }}" target="_blank" class="cli-btn cli-btn-ghost text-[12px] py-2"><i class="pi pi-whatsapp"></i> WhatsApp</a>
+                    @endif
                     <a href="{{ route('dashboard.messages') }}" class="cli-btn cli-btn-primary text-[12px] py-2"><i class="pi pi-comment text-[12px]"></i> {{ __('Chat') }}</a>
                 </div>
             </div>

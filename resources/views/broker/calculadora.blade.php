@@ -22,7 +22,7 @@
             {{-- Inputs --}}
             <div class="space-y-3.5">
                 <div><label class="brk-lbl">{{ __('Precio del inmueble') }}</label><div class="brk-inp"><span>$</span><input id="c_precio" type="number" value="400000" step="1000"></div></div>
-                <div><label class="brk-lbl">{{ __('Descuento aprobado') }}</label><div class="brk-inp"><input id="c_desc" type="number" value="0" step="0.5"><span>%</span></div><div class="text-[10.5px] text-ink-400 mt-1">{{ __('CONFOTUR no reduce la base.') }}</div></div>
+                <div><label class="brk-lbl">{{ __('Descuento aprobado') }}</label><div class="brk-inp"><input id="c_desc" type="number" value="0" step="0.5"><span>%</span></div>{{-- Aquí ponía «CONFOTUR no reduce la base»: es un régimen dominicano, no aplica en Aruba. --}}</div>
                 <div><label class="brk-lbl">{{ __('Tu comisión') }}</label><div class="brk-inp"><input id="c_com" type="number" value="{{ rtrim(rtrim(number_format($rate,2),'0'),'.') }}" step="0.1"><span>%</span></div></div>
                 <div><label class="brk-lbl">{{ __('Pago inicial') }}</label><div class="brk-inp"><input id="c_ini" type="number" value="20" min="20" step="1"><span>%</span></div><div class="text-[10.5px] text-ink-400 mt-1">{{ __('Mínimo 20%.') }}</div></div>
             </div>

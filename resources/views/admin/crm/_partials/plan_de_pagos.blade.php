@@ -231,7 +231,7 @@
             @if($isSent)
                 <form method="POST" action="{{ route('admin.crm.budget.revert', $r->id) }}" class="m-0" onclick="event.stopPropagation();">
                     @csrf
-                    <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm(@json(__('¿Revertir a borrador? El cliente dejará de verlo.')));"><i class="pi pi-undo"></i> {{ __('Revertir') }}</button>
+                    <button type="submit" class="crm-btn crm-btn-ghost text-err" onclick="return confirm({{ Js::from(__('¿Revertir a borrador? El cliente dejará de verlo.')) }});"><i class="pi pi-undo"></i> {{ __('Revertir') }}</button>
                 </form>
             @endif
         </div>

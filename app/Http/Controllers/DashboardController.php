@@ -132,7 +132,7 @@ class DashboardController extends Controller
     public function payments(Request $request)
     {
         $reservation = $this->resolveReservation($request);
-        if (! $reservation) return view('dashboard.empty');
+        if (! $reservation) return view('dashboard.empty', ['activeRoute' => 'payments']);
         return view('dashboard.pagos', [
             'activeRoute' => 'payments',
             'reservation' => $reservation,

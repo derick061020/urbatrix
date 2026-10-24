@@ -44,7 +44,7 @@
             [__('Precio total'),     '$'.number_format($precio, 0),   'text-ink-950'],
             [__('Total pagado'),     '$'.number_format($pagado, 0),   'text-ink-950'],
             [__('Balance pendiente'),'$'.number_format($saldo, 0),    'text-ink-950'],
-            [__('Próxima cuota'),    '$'.number_format($nextPay->amount ?? 2694, 0),  'text-ok-dark'],
+            [__('Próxima cuota'),    $nextPay ? '$'.number_format($nextPay->amount, 0) : '—',  'text-ok-dark'],
         ]; @endphp
         @foreach($kpis as $k)
             <div class="cli-card p-4">
@@ -294,7 +294,7 @@
                         <td class="px-5 py-3.5 text-[13px] font-semibold text-ink-950">{{ $p->display_label }}</td>
                         <td class="px-3 py-3.5 text-[13px] font-bold text-ok-dark">${{ number_format($p->amount, 0) }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ optional($p->paid_at)->format('Y-m-d') }}</td>
-                        <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? 'Wire Transfer' }}</td>
+                        <td class="px-3 py-3.5 text-[12px] text-ink-700">{{ $p->payment_method ?? __('Transferencia') }}</td>
                         <td class="px-3 py-3.5 text-[12px] text-ink-500">
                             <button type="button" onclick="openReceiptModal('{{ route('payments.receipt', $p) }}', '{{ route('payments.receipt.sign', $p) }}', {{ $p->receipt_signed_at ? 'true' : 'false' }})" class="text-brand font-semibold hover:underline">{{ __('Comprobante') }}</button>
                             @if($p->receipt_path)

@@ -111,7 +111,7 @@
             <h3 class="text-[14px] font-semibold text-ink-900 m-0">{{ __('Comunicaciones de marketing') }}</h3>
             <p class="text-[12px] text-ink-500 m-0 mt-1">
                 Novedades, lanzamientos y promociones. No se controlan aquí: dependen del
-                <strong>{{ __('consentimiento del comprador') }}</strong> (casilla opcional, revocable), conforme a CAN-SPAM, GDPR y Ley 172-13.
+                <strong>{{ __('consentimiento del comprador') }}</strong> (casilla opcional, revocable), conforme a CAN-SPAM, GDPR y la normativa de protección de datos de Aruba.
             </p>
         </div>
     </div>

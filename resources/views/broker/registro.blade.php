@@ -60,7 +60,7 @@
 
                 <div class="flex items-start gap-3 bg-warn-soft border border-warn/20 rounded-xl p-3">
                     <input type="checkbox" name="consent" value="1" id="cons" class="w-4 h-4 mt-0.5 accent-brand" {{ old('consent') ? 'checked' : '' }}>
-                    <label for="cons" class="text-[12px] text-ink-600">{{ __('Confirmo que el cliente me autorizó a registrar sus datos (Ley 172-13).') }}</label>
+                    <label for="cons" class="text-[12px] text-ink-600">{{ __('Confirmo que el cliente me autorizó a registrar sus datos (normativa de protección de datos aplicable).') }}</label>
                 </div>
 
                 <div class="flex gap-2.5 pt-1">

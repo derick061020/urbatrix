@@ -48,7 +48,22 @@
       .brk-input:focus { border-color:#2b2b1a; box-shadow:0 0 0 3px rgba(43,43,26,.18); }
       .brk-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:600; line-height:1; letter-spacing:.04em; text-transform:uppercase; }
       .brk-avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff; background:#2b2b1a; }
-      @media (max-width:1023px){ #brk-sidebar{ display:none !important; } }
+      /* Por debajo de 1024 px la barra lateral era display:none y no había otro
+         menú: en móvil y tablet el broker no podía cambiar de sección. Ahora es
+         un panel deslizante que abre el botón de la cabecera. */
+      #brk-menu-btn, #brk-backdrop { display:none; }
+      @media (max-width:1023px){
+        /* !important: las utilidades de Tailwind del <aside> (sticky, w-[220px],
+           h-[…]) van con !important y lo dejaban ocupando sitio. */
+        #brk-sidebar{ position:fixed !important; top:0 !important; left:0; bottom:0; height:100vh !important; height:100dvh !important; z-index:50; width:260px !important;
+                      padding:12px; background:#f4f4f4; box-shadow:0 0 40px rgba(10,13,20,.18);
+                      transform:translateX(-105%); transition:transform .25s ease; }
+        #brk-sidebar.open{ transform:none; }
+        #brk-backdrop.open{ display:block; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:40; }
+        #brk-menu-btn{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; flex:none;
+                       border:1px solid #eaecf0; border-radius:8px; background:#fff; color:#525866; }
+      }
+      @media (prefers-reduced-motion:reduce){ #brk-sidebar{ transition:none; } }
     </style>
     {{-- Componente de subida animado: registra su CSS/JS en los stacks --}}
     @include('partials.upload-morph')
@@ -56,6 +71,7 @@
     @stack('styles')
 </head>
 <body id="brk-root">
+<div id="brk-backdrop" onclick="brkMenu(false)"></div>
 <div class="min-h-screen flex p-2 sm:p-3 gap-2 sm:gap-3">
 
     {{-- SIDEBAR --}}
@@ -134,7 +150,8 @@
 
     {{-- MAIN --}}
     <div class="flex-1 min-w-0 flex flex-col">
-        <header id="brk-topbar" class="rounded-xl bg-white border border-ink-200 px-4 sm:px-6 py-3 flex items-center gap-4 mb-3">
+        <header id="brk-topbar" class="rounded-xl bg-white border border-ink-200 px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-4 mb-3">
+            <button id="brk-menu-btn" type="button" onclick="brkMenu(true)" aria-label="{{ __('Menú') }}" aria-controls="brk-sidebar"><i class="pi pi-bars"></i></button>
             <div class="min-w-0">
                 <div class="font-display text-[16px] font-bold text-ink-950 leading-tight">@yield('page_title', __('Portal Broker'))</div>
                 <div class="text-[11px] text-ink-500">@yield('page_breadcrumb', __('Siebe Property Group'))</div>
@@ -155,6 +172,13 @@
         </main>
     </div>
 </div>
+<script>
+  function brkMenu(abrir) {
+    document.getElementById('brk-sidebar').classList.toggle('open', abrir);
+    document.getElementById('brk-backdrop').classList.toggle('open', abrir);
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') brkMenu(false); });
+</script>
 @stack('scripts')
 </body>
 </html>

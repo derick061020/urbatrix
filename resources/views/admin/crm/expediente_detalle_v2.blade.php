@@ -323,7 +323,7 @@
                                     @endif
                                     <form method="POST" action="{{ route('admin.payments.approve', $p->id) }}" class="flex items-center gap-1 m-0">@csrf
                                         <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3" title="{{ __('Aprobar pago') }}"><i class="pi pi-check text-[10px]"></i> {{ __('Aprobar') }}</button>
-                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm(@json(__('¿Rechazar este pago?')));"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
+                                        <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-err text-[11px] py-1 px-3" title="{{ __('Rechazar pago') }}" onclick="return confirm({{ Js::from(__('¿Rechazar este pago?')) }});"><i class="pi pi-times text-[10px]"></i> {{ __('Rechazar') }}</button>
                                     </form>
                                 </div>
                             </div>

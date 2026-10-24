@@ -92,11 +92,11 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('Teléfono') }}</label>
-                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="cli-input pl-3 mt-1" placeholder="+57 300 000 0000">
+                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('Con prefijo internacional, p. ej. +1 809 000 0000') }}">
                 </div>
                 <div class="sm:col-span-2">
                     <label class="text-[12px] font-semibold text-ink-700">{{ __('País') }}</label>
-                    <input type="text" name="country" value="{{ old('country', $user->country) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('Colombia') }}">
+                    <input type="text" name="country" value="{{ old('country', $user->country) }}" class="cli-input pl-3 mt-1" placeholder="{{ __('País de residencia') }}">
                 </div>
             </div>
         </div>

@@ -94,7 +94,7 @@
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Precio') }}</span><span class="font-semibold text-ink-900" id="propPrice">—</span></div>
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Inicial 20%') }}</span><span class="font-semibold text-ink-900" id="propIni">—</span></div>
                     <div class="flex justify-between text-[13px] py-1"><span class="text-ink-500">{{ __('Saldo (construcción + entrega)') }}</span><span class="font-semibold text-ink-900" id="propRest">—</span></div>
-                    <p class="text-[10.5px] text-ink-400 mt-2">{{ __('Simulación informativa, no vinculante. CONFOTUR aplica exención fiscal al comprador.') }}</p>
+                    <p class="text-[10.5px] text-ink-400 mt-2">{{ __('Simulación informativa, no vinculante.') }}</p>
                 </div>
             </div>
         </div>

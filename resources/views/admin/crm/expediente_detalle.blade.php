@@ -658,7 +658,7 @@
                 </button>
                 <button type="submit" name="action" value="send"
                         class="bg-[#667b6a] text-white rounded px-4 py-2 text-sm font-semibold hover:bg-[#5a6d5e]"
-                        onclick="return confirm(@json(__('¿Enviar el presupuesto al cliente? Una vez enviado podrá verlo en su dashboard.')));"
+                        onclick="return confirm({{ Js::from(__('¿Enviar el presupuesto al cliente? Una vez enviado podrá verlo en su dashboard.')) }});"
                         @if($isAnyDocumentSigned) disabled @endif>
                     Enviar al cliente
                 </button>
@@ -670,7 +670,7 @@
                 @csrf
                 <button type="submit"
                         class="text-xs text-[#a83838] hover:underline"
-                        onclick="return confirm(@json(__('¿Revertir el presupuesto a borrador? El cliente dejará de verlo.')));">
+                        onclick="return confirm({{ Js::from(__('¿Revertir el presupuesto a borrador? El cliente dejará de verlo.')) }});">
                     ← Revertir a borrador
                 </button>
             </form>
