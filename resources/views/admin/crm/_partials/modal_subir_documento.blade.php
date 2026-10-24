@@ -41,7 +41,7 @@
             </div>
             <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Nombre del documento') }}</label>
-                <input type="text" name="title" required placeholder="{{ __('KYC — Carlos Méndez') }}" class="crm-input pl-3 mt-1">
+                <input type="text" name="title" required placeholder="{{ __('KYC — Nombre del cliente') }}" class="crm-input pl-3 mt-1">
             </div>
             <div>
                 <label class="text-[12px] font-semibold text-ink-700">{{ __('Archivo') }}</label>

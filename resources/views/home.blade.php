@@ -340,16 +340,7 @@
               <p class="mt-b-micro">{{ __('Reference estimate, not guaranteed.') }}</p>
             </div>
 
-            <!-- D · CONFOTUR (factual) -->
-            <div class="mt-block mt-block--gold mt-investment-only">
-              <div class="mt-b-head">
-                <span class="mt-b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
-                <span class="mt-eyebrow">{{ __('CONFOTUR benefits') }}</span>
-              </div>
-              <div class="mt-b-value">{{ __('15-year property-tax exemption + 0% transfer tax') }}</div>
-              <p class="mt-b-body">{{ __('CONFOTUR-approved project: save the 3% transfer tax') }} (<span id="modalConfoturSavings">—</span>) {{ __('plus the annual property tax for 15 years.') }}</p>
-              <p class="mt-b-micro">{{ __('Benefit subject to Law 158-01 (CONFOTUR) and the project\'s current qualification.') }}</p>
-            </div>
+            {{-- Aquí iba el bloque «CONFOTUR» de Makai: régimen fiscal dominicano, no aplica en Aruba. --}}
 
             <!-- Investment commentary (optional, from DB) -->
             <div class="mt-compare mt-investment-only" id="modalCompare" style="display:none;">
@@ -3054,10 +3045,6 @@
                   rentBlock.style.display = '';
               } else { rentBlock.style.display = 'none'; }
           }
-
-          // D · CONFOTUR — ahorro de transferencia (3% del precio)
-          const confSav = document.getElementById('modalConfoturSavings');
-          if (confSav) confSav.textContent = unit.price ? '~$' + number_format(Number(unit.price) * 0.03, 0, ',', ',') : '~3%';
 
           // 1 · Tu espacio — interiores + terraza
           const spaceBlock = document.getElementById('modalSpaceBlock');

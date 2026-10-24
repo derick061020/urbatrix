@@ -90,7 +90,7 @@
                 <div class="flex-1">
                     <div class="text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold">{{ $proyecto->developer ?? 'Siebe Property Group' }}</div>
                     <div class="font-display text-[28px] sm:text-[34px] font-semibold leading-tight mt-1">{{ $proyecto->name }}</div>
-                    <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?? 'Aruba · Punta Cana' }}</div>
+                    <div class="text-[12px] opacity-85 mt-1 flex items-center gap-1.5"><i class="pi pi-map-marker text-[11px] text-err"></i> {{ $proyecto->location ?: config('company.location') }}</div>
                 </div>
                 <div class="text-right">
                     @php $updatedAt = optional($latestReport)->published_at ?? $proyecto->updated_at; @endphp

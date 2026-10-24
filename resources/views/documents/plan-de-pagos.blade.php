@@ -339,7 +339,7 @@ body {
 
   <div class="footer">
     <div class="footer-l">{{ __('SIEBE · Siebe Property Group') }}</div>
-    <div class="footer-c">+1 (809) 710-9044 · info@siebedevelopment.com · Aruba, R.D.</div>
+    <div class="footer-c">{{ collect([config('company.phone'), config('company.support_email'), config('company.location')])->filter()->implode(' · ') }}</div>
     <div class="footer-r"><span class="f">{{ $referencia }}</span> {{ __('· Validez 30 días naturales') }}</div>
   </div>
 </div>

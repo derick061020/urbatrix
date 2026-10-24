@@ -737,7 +737,7 @@
                         {{-- Entidad / cargo --}}
                         <div style="margin-bottom:6px;">
                             <div class="st-row-label" style="font-size:12px; margin-bottom:6px;">{{ __('Entidad / representación') }}</div>
-                            <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="{{ __('Ej: En Rep. De IGUANAS LAKE CONDO & RESIDENCES, S.R.L.') }}"
+                            <input type="text" id="psSignerEntity" value="{{ $stSigEntity }}" placeholder="{{ __('Ej: En representación de') }} {{ config('company.legal_name') }}"
                                    style="width:100%; max-width:420px; border:1px solid #eaecf0; border-radius:9px; padding:9px 12px; font-size:13px; color:#222530;">
                             <div class="st-row-desc" style="margin-top:6px;">{{ __('Si dejas estos campos vacíos, el contrato usa los datos por defecto del documento.') }}</div>
                         </div>
