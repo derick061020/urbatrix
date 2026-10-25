@@ -10,7 +10,10 @@
   function attr(name) { return (host.getAttribute(name) || '').trim(); }
   function isFalta(v) { return v === '' || v.toUpperCase() === 'FALTA'; }
 
-  var esPrueba = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var esPrueba = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+    // Añadido: la web de Bahía Mar aún es una demo interna y no hay política de
+    // privacidad (Derick, 24 oct). La vista pone data-demo="1" mientras falte.
+    || host.getAttribute('data-demo') === '1';
 
   var responsable = attr('data-responsable');
   var politica = attr('data-politica-url');

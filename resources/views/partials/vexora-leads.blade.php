@@ -1,12 +1,12 @@
 {{--
   Chatbot y formulario de leads de Vexora (Izan), grupo «Izan Chatbot Landmass».
   Los dos hablan con n8n.vexoraia.com, que está en el connect-src de la CSP.
-  El formulario sólo sale con company.privacy_url: sin política su script no se
-  pinta fuera de localhost y la sección quedaría vacía.
+  Sin company.privacy_url el script del formulario no se pinta fuera de
+  localhost. Mientras la web sea una demo interna (Derick, 24 oct: «estamos en
+  demo aún») va con data-demo="1"; al poner la URL, el modo demo se quita solo.
 --}}
 @php $vxPrivacidad = (string) config('company.privacy_url'); @endphp
 
-@if ($vxPrivacidad !== '')
 <section class="vx-leads" id="solicita-informacion">
   <div class="vx-leads-in">
     <div id="landmass-formulario"
@@ -15,11 +15,11 @@
          data-politica-url="{{ $vxPrivacidad }}"
          data-tipologias="Villa A,Villa B,Villa C,Villa D,Villa E"
          data-mercado="rd"
-         data-proyecto="Bahía Mar"></div>
+         data-proyecto="Bahía Mar"
+         @if ($vxPrivacidad === '') data-demo="1" @endif></div>
   </div>
 </section>
 <script src="/landmass-formulario.js" defer></script>
-@endif
 
 <script src="/chatbot-bahiamar.js" data-privacidad="{{ $vxPrivacidad }}"></script>
 
