@@ -33,11 +33,6 @@ return [
     // (Miguel, 11 de octubre).
     'site'          => env('COMPANY_SITE', 'https://bahiamarterrenas.com'),
 
-    // Política de privacidad de Landmass (URL https). La piden el chatbot y el
-    // formulario de leads de Vexora. Mientras falte, el formulario va en modo
-    // demo (la web aún es interna, Derick 24 oct); al ponerla, se quita solo.
-    'privacy_url'   => env('COMPANY_PRIVACY_URL', ''),
-
     // WhatsApp de contacto, solo dígitos (formato de wa.me).
     // Vacío a propósito: el que había era el de Duna/Makai y los botones
     // llevaban a su chat. Mientras esté vacío, los botones de WhatsApp

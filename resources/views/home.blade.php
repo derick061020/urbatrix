@@ -3004,8 +3004,6 @@
 
     </div>
 
-    @include('partials.vexora-leads')
-
     <!-- Footer -->
     <footer class="fg-footer" data-node-id="124:3620">
       <div class="fg-footer-content" data-node-id="124:3621">

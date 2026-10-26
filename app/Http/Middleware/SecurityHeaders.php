@@ -35,9 +35,7 @@ class SecurityHeaders
         // Storage, Firebase…) y algunas URL las guarda el admin: cualquier https.
         'img-src'         => ["'self'", 'data:', 'blob:', 'https:'],
         'media-src'       => ["'self'", 'blob:', 'https:'],
-        'connect-src'     => ["'self'", 'https://api.stripe.com', 'https://cdn.jsdelivr.net',
-                              // Chatbot y formulario de leads de Vexora (Bahía Mar).
-                              'https://n8n.vexoraia.com'],
+        'connect-src'     => ["'self'", 'https://api.stripe.com', 'https://cdn.jsdelivr.net'],
         // Stripe y los documentos que el admin enlaza en el menú del cliente.
         'frame-src'       => ["'self'", 'https:'],
         'worker-src'      => ["'self'", 'blob:'],
