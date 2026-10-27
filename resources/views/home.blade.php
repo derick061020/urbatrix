@@ -241,8 +241,7 @@
               </div>
               <div class="mt-price-meta">
                 <span class="warning">{{ __('Reserve from $5,000') }}</span>
-                <span class="sep"></span>
-                <span class="muted">{{ __('Not refundable') }}</span>
+                {{-- «No reembolsable» fuera: irá en las políticas (Miguel, 27 oct). --}}
               </div>
             </div>
 
@@ -2912,48 +2911,19 @@
           if (amenRow && amenVal) {
               const amenities = unit.amenities || [];
               if (Array.isArray(amenities) && amenities.length > 0) {
-                  const amenityIcons = {
-                      'pool': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>',
-                      'gym': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6 20v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M18 11V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5"/></svg>',
-                      'beach_club': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M12 2v20"/><path d="M4 12c0-4 3-7 8-7s8 3 8 7"/></svg>',
-                      'restaurant': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
-                      'spa': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>',
-                      'tennis': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2v20"/><path d="M4.93 4.93l14.14 14.14"/><path d="M19.07 4.93L4.93 19.07"/></svg>',
-                      'golf': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 13v8"/><path d="M9 6l3-4 3 4"/></svg>',
-                      'security': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-                      'parking': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15V9"/><path d="M17 15V9"/></svg>',
-                      'concierge': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-                      'playground': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
-                      'bbq': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M6 12v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/><path d="M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>',
-                  };
-                  const amenityLabels = {
-                      'pool': 'Pool',
-                      'gym': 'Gym',
-                      'beach_club': 'Beach Club',
-                      'restaurant': 'Restaurant',
-                      'spa': 'Spa',
-                      'tennis': 'Tennis Court',
-                      'golf': 'Golf Course',
-                      'security': '24/7 Security',
-                      'parking': 'Parking',
-                      'concierge': 'Concierge',
-                      'playground': 'Playground',
-                      'bbq': 'BBQ Area',
-                  };
-                  const amenityBenefits = {
-                      'pool': @json(__('oceanfront pool')),
-                      'gym': @json(__('fully equipped, on-site')),
-                      'beach_club': @json(__('direct beach access')),
-                      'restaurant': @json(__('dining steps away')),
-                      'spa': @json(__('wellness & rest')),
-                      'tennis': @json(__('on-site court')),
-                      'golf': @json(__('golf within the community')),
-                      'security': @json(__('round-the-clock peace of mind')),
-                      'parking': @json(__('private parking')),
-                      'concierge': @json(__('concierge service')),
-                      'playground': @json(__('space for the kids')),
-                      'bbq': @json(__('shared BBQ area')),
-                  };
+                  // Iconos, nombres (traducidos) y una línea de beneficio salen del
+                  // catálogo de amenidades del panel: antes iban aquí fijos, en
+                  // inglés y con las de Makai («oceanfront pool»).
+                  const amenityIcons = {{ Js::from(\App\Support\UnitOptions::amenityIcons()) }};
+                  const amenityLabels = {{ Js::from(\App\Support\UnitOptions::map('amenities')) }};
+                  const amenityBenefits = {{ Js::from([
+                      'pool'    => __('con vistas, en la última planta'),
+                      'gym'     => __('totalmente equipado, en el edificio'),
+                      'rooftop' => __('comedor y zona lounge al aire libre'),
+                      'bbq'     => __('barbacoa compartida en la azotea'),
+                      'lobby'   => __('acceso acristalado y recepción'),
+                      'parking' => __('plaza en el propio edificio'),
+                  ]) }};
                   let html = '<div class="mt-amenities-grid">';
                   let renderedAmenities = 0;
                   amenities.forEach(key => {

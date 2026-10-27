@@ -47,26 +47,24 @@ class UnitOptions
                 ['value' => '5th',    'label' => '5°'],
                 ['value' => '6th',    'label' => '6°'],
             ],
+            // La «característica» de la lista de precios de Siebe (Miguel, 27 oct).
+            // Antes estaban las vistas de Makai (golf, lago, mar), que aquí no existen.
             'outlooks' => [
-                ['value' => 'golf_course', 'label' => 'Vista al campo de golf'],
-                ['value' => 'lake',        'label' => 'Vista al lago'],
-                ['value' => 'ocean_lake',  'label' => 'Vista al mar y al lago'],
-                ['value' => 'ocean',       'label' => 'Vista al mar'],
-                ['value' => 'mountain',    'label' => 'Vista a la montaña'],
+                ['value' => 'garden_terrace', 'label' => 'Terraza jardín'],
+                ['value' => 'garden_view',    'label' => 'Vista al jardín'],
+                ['value' => 'lock_off',       'label' => 'Lock-off'],
+                ['value' => 'lock_off_roof',  'label' => 'Lock-off con roof top'],
             ],
+            // Las del edificio de Siebe, las de las fotos de amenidades (Miguel,
+            // 27 oct: «agregar todas estas amenidades a todas las fichas»). Antes
+            // era la lista de Makai (club de playa, golf, tenis…).
             'amenities' => [
-                ['value' => 'pool',        'label' => 'Pool',          'icon' => 'pool'],
-                ['value' => 'gym',         'label' => 'Gym',           'icon' => 'gym'],
-                ['value' => 'beach_club',  'label' => 'Beach Club',    'icon' => 'beach_club'],
-                ['value' => 'restaurant',  'label' => 'Restaurant',    'icon' => 'restaurant'],
-                ['value' => 'spa',         'label' => 'Spa',           'icon' => 'spa'],
-                ['value' => 'tennis',      'label' => 'Tennis Court',  'icon' => 'tennis'],
-                ['value' => 'golf',        'label' => 'Golf Course',   'icon' => 'golf'],
-                ['value' => 'security',    'label' => '24/7 Security', 'icon' => 'security'],
-                ['value' => 'parking',     'label' => 'Parking',       'icon' => 'parking'],
-                ['value' => 'concierge',   'label' => 'Concierge',     'icon' => 'concierge'],
-                ['value' => 'playground',  'label' => 'Playground',    'icon' => 'playground'],
-                ['value' => 'bbq',         'label' => 'BBQ Area',      'icon' => 'bbq'],
+                ['value' => 'pool',    'label' => 'Piscina en la azotea', 'icon' => 'pool'],
+                ['value' => 'gym',     'label' => 'Gimnasio',             'icon' => 'gym'],
+                ['value' => 'rooftop', 'label' => 'Terraza en la azotea', 'icon' => 'rooftop'],
+                ['value' => 'bbq',     'label' => 'Zona de barbacoa',     'icon' => 'bbq'],
+                ['value' => 'lobby',   'label' => 'Lobby',                'icon' => 'lobby'],
+                ['value' => 'parking', 'label' => 'Aparcamiento',         'icon' => 'parking'],
             ],
         ];
     }
@@ -220,6 +218,8 @@ class UnitOptions
             'concierge'   => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
             'playground'  => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
             'bbq'         => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M6 12v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"/><path d="M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>',
+            'rooftop'     => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9h20"/><path d="M4 9V6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"/><path d="M8 9v11"/><path d="M16 9v11"/><path d="M5 20h14"/></svg>',
+            'lobby'       => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17"/><path d="M12 3v18"/><path d="M9.5 12h.01"/><path d="M14.5 12h.01"/></svg>',
             'check'       => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
         ];
     }

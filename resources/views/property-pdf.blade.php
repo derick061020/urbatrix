@@ -13,15 +13,19 @@
 
   $roi         = $unit->roi_percent ? number_format((float) $unit->roi_percent, 1) . '%' : '—';
   $projVal     = $unit->projected_value ? '+' . number_format((((float)$unit->projected_value / max($price,1)) - 1) * 100, 0) . '% año 1' : '—';
-  $projYear    = $unit->projected_value_year ?: 'Q4 2026';
+  // Sin fecha de entrega cargada no se inventa una (ponía «Q4 2026» fija).
+  $projYear    = $unit->projected_value_year ?: null;
 
   // Sin dato, sin texto: antes salían «1er Piso · Orientación SE · Vista al
   // lago» en cualquier unidad que no los tuviera.
-  $floor       = $unit->floor ?: null;
+  // Planta y característica legibles: salían las claves («4th», «lock_off_roof»).
+  $floor       = $unit->floor ? \App\Support\UnitOptions::floorPhrase($unit->floor) : null;
+  $feature     = $unit->custom_1 ?: ($unit->outlook ? (\App\Support\UnitOptions::map('outlooks')[$unit->outlook] ?? null) : null);
+  $stage       = $unit->custom_2 ?: null;
   $direction   = $unit->direction ?: null;
-  $outlook     = $unit->outlook ?: null;
+  $outlook     = $feature;
   $bedrooms    = $unit->bedrooms ?: '—';
-  $bathrooms   = $unit->bathrooms ?: '—';
+  $bathrooms   = $unit->bathrooms ? rtrim(rtrim(number_format((float) $unit->bathrooms, 1, '.', ''), '0'), '.') : '—';
   $parking     = $unit->parking_bays ?: '—';
 
   $reserveAmt  = '$5,000';
@@ -292,7 +296,7 @@ body {
       <span class="hero-price">{{ $priceFmt }}</span>
       <span class="hero-price-cur">USD</span>
     </div>
-    <div class="hero-price-sub">{{ $pricePerM2 }} / m² interior · Entrega {{ $projYear }}</div>
+    <div class="hero-price-sub">{{ $pricePerM2 }} / m² interior @if($projYear) · {{ __('Entrega') }} {{ $projYear }} @endif</div>
     @if($unit->roi_percent)
     <div class="hero-roi">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -380,7 +384,7 @@ body {
       <div class="payment-pct">{{ $finalPct }}%</div>
       <div class="payment-label">{{ __('Contraentrega') }}</div>
       <div class="payment-amount">{{ $finalAmt }}</div>
-      <div class="payment-timing">{{ $projYear }}</div>
+      <div class="payment-timing">{{ $projYear ?: __('A la entrega') }}</div>
     </div>
   </div>
 </div>
@@ -388,16 +392,34 @@ body {
 <!-- METRICS -->
 <div class="section">
   <div class="metrics-row">
+    {{-- ROI y plusvalía sólo con dato; si no, la característica y la etapa
+         de la lista de precios (antes dos recuadros con «—»). --}}
+    @if($unit->roi_percent)
     <div class="metric-card">
       <div class="metric-card-lbl">{{ __('ROI Anual Estimado') }}</div>
       <div class="metric-card-val">{{ $roi }}</div>
       <div class="metric-card-sub">{{ __('Mercado actual') }}</div>
     </div>
+    @else
+    <div class="metric-card">
+      <div class="metric-card-lbl">{{ __('Característica') }}</div>
+      <div class="metric-card-val" style="font-size:18px">{{ $feature ?: '—' }}</div>
+      <div class="metric-card-sub">{{ __('Plano') }} {{ $unit->layout ?: '—' }}</div>
+    </div>
+    @endif
+    @if($unit->projected_value)
     <div class="metric-card">
       <div class="metric-card-lbl">{{ __('Plusvalía Proyectada') }}</div>
       <div class="metric-card-val green">{{ $projVal }}</div>
       <div class="metric-card-sub">{{ __('A la entrega vs precio actual') }}</div>
     </div>
+    @else
+    <div class="metric-card">
+      <div class="metric-card-lbl">{{ __('Superficie total') }}</div>
+      <div class="metric-card-val" style="font-size:18px">{{ $unit->total_area ? number_format((float) $unit->total_area, 2).' m²' : '—' }}</div>
+      <div class="metric-card-sub">{{ __('Interior + terraza') }}{{ $stage ? ' · '.$stage : '' }}</div>
+    </div>
+    @endif
     <div class="metric-card">
       <div class="metric-card-lbl">{{ __('Disponibilidad') }}</div>
       <div class="metric-card-val blue">{{ $unit->status === 'AVAILABLE' || $unit->status === 'available' ? 'Disponible' : ucfirst(strtolower($unit->status)) }}</div>
@@ -413,7 +435,7 @@ body {
       <div class="cta-label">{{ __('Asegura tu unidad') }}</div>
       <div class="cta-amount">{{ $reserveAmt }}<span class="cta-amount-cur"> USD</span></div>
       <hr class="cta-rule">
-      <div class="cta-desc">{{ __('Bloquea el precio actual. Reserva totalmente reembolsable en los primeros 30 días.') }}</div>
+      <div class="cta-desc">{{ __('Bloquea el precio actual de la unidad.') }}</div>
       <a class="cta-link" href="https://wa.me/{{ $advisorWA }}?text=Hola%2C+quiero+reservar+la+unidad+{{ urlencode($unitNum) }}">{{ __('Iniciar reserva →') }}</a>
     </div>
     <div class="cta-box cta-visit">
@@ -543,14 +565,14 @@ body {
       <div class="detail-row"><span class="dk">{{ __('Proyecto') }}</span><span class="dv">{{ $projectName }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Unidad') }}</span><span class="dv">{{ $unitNum }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor ?? '—' }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Orientación') }}</span><span class="dv">{{ $direction ?? '—' }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Vista') }}</span><span class="dv">{{ $outlook ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Plano') }}</span><span class="dv">{{ $unit->layout ?: '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Característica') }}</span><span class="dv">{{ $feature ?? '—' }}</span></div>
     </div>
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Precio USD') }}</span><span class="dv">{{ $priceFmt }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Precio / m²') }}</span><span class="dv">{{ $pricePerM2 }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('ROI estimado') }}</span><span class="dv">{{ $roi }} anual</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Entrega estimada') }}</span><span class="dv">{{ $projYear }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Superficie total') }}</span><span class="dv">{{ $unit->total_area ? number_format((float) $unit->total_area, 2).' m²' : '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Etapa') }}</span><span class="dv">{{ $stage ?? '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Reserva mínima') }}</span><span class="dv">{{ $reserveAmt }} USD</span></div>
     </div>
   </div>
