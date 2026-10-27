@@ -1898,7 +1898,7 @@ class AdminController extends Controller
         $items = Approval::with('reservation')->orderBy('created_at', 'desc')->get();
 
         $pendingUsers = \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')
-            ? User::where('verification_status', 'pending')->orderBy('created_at', 'desc')->get()
+            ? User::with('brokerProfile')->where('verification_status', 'pending')->orderBy('created_at', 'desc')->get()
             : collect();
 
         // Pending KYC documents (one per reservation) — show as approval rows with 3 actions
@@ -2938,6 +2938,16 @@ class AdminController extends Controller
 
         $user->update(['verification_status' => $data['decision']]);
 
+        // Ficha de alta del broker: aprobada queda verificada; rechazada vuelve a
+        // ser editable para que corrija y la envíe otra vez.
+        if ($profile = $user->brokerProfile) {
+            $profile->update([
+                'status'      => $data['decision'] === 'approved' ? 'verificado' : 'rechazado',
+                'reviewed_at' => now(),
+                'reviewed_by' => auth()->id(),
+            ]);
+        }
+
         // Also approve/reject any pending Documents from the registration
         if ($user->kyc_id_document) {
             Document::where('file_path', 'like', 'onboarding/'.$user->id.'/%')
@@ -2957,7 +2967,7 @@ class AdminController extends Controller
                         name: $user->first_name ?: \Illuminate\Support\Str::before((string) ($user->name ?? ''), ' ') ?: (string) $user->name,
                         status: $data['decision'],
                         reason: (string) $request->input('notes', ''),
-                        actionUrl: $data['decision'] === 'rejected' ? url('/form') : '',
+                        actionUrl: $data['decision'] === 'rejected' ? url($user->role === 'broker' ? '/broker/alta' : '/form') : '',
                     )
                 );
             } catch (\Throwable $e) {
@@ -2966,6 +2976,23 @@ class AdminController extends Controller
         }
 
         return back()->with('success', "Usuario {$user->name} marcado como {$data['decision']}.");
+    }
+
+    /* ───── Ficha de alta del broker (vista del admin) ───── */
+    public function brokerAlta(User $user)
+    {
+        $profile = $user->brokerProfile;
+        abort_unless($profile, 404);
+
+        return view('admin.crm.broker_alta', compact('user', 'profile'));
+    }
+
+    public function brokerAltaDoc(User $user, string $key)
+    {
+        $path = $user->brokerProfile?->docs[$key] ?? null;
+        abort_unless($path && \Illuminate\Support\Facades\Storage::disk('local')->exists($path), 404);
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $key . '-' . \Illuminate\Support\Str::slug($user->name) . '.' . pathinfo($path, PATHINFO_EXTENSION));
     }
 
     /* ───── Acciones rápidas desde modales del CRM ───── */

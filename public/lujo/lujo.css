@@ -770,3 +770,17 @@
   .fg-units-grid > .fg-card.lx-entra{ animation: none !important; }
   .lx-progreso{ display: none !important; }
 }
+
+/* Centro de la cabecera: «N DE 18 UNIDADES VENDIDAS» iba en Poppins 700 con
+   tracking de botón, y debajo un «N usuarios activos» que el original rellena
+   con una cifra inventada cuando hay pocos visitantes. Mismo trato que en Bahía
+   Mar: una línea fina de rótulo y sin el contador (Miguel, 26 oct: «esta
+   tipología de letra no es la de la plataforma»). */
+.nav-center .nav-online{ display: none !important; }
+.nav-center > span:first-child{
+  font-family: var(--lx-font-ui) !important;
+  font-weight: 400 !important;
+  font-size: 11px !important;
+  letter-spacing: var(--lx-track-eyebrow) !important;
+  color: var(--lx-faint) !important;
+}

@@ -54,6 +54,38 @@ return [
         'instagram' => env('COMPANY_INSTAGRAM', ''),
     ],
 
+    // Ficha de alta del broker (/broker/alta). Comisión y retenciones: null =
+    // no se muestran (en Siebe la comisión va por broker, en su ficha de Agent,
+    // y no hay un régimen de retenciones confirmado). Los documentos siguen el
+    // KYC de Siebe Group (normativa del Banco Central de Aruba).
+    'broker_alta' => [
+        'tax_id_label' => 'Número de identificación fiscal (Tax ID)',
+        'phone_ph'     => '+297 000 0000',
+        'currency_ph'  => 'USD / EUR / AWG…',
+        'law_note'     => 'Siebe Group está obligada a verificar tu identidad según las normas del Banco Central de Aruba (prevención del blanqueo de capitales).',
+        'kinds' => [
+            'broker' => ['commission' => null, 'tax_note' => null],
+            'agency' => ['commission' => null, 'tax_note' => null],
+        ],
+        'docs' => [
+            'broker' => [
+                'id_doc'   => 'Documento de identidad válido (pasaporte o cédula)',
+                'address'  => 'Prueba de domicilio (extracto bancario, censo o factura de servicios)',
+                'bank_ref' => 'Carta de referencia bancaria',
+                'pro_ref'  => 'Carta de referencia profesional',
+            ],
+            'agency' => [
+                'coc'          => 'Extracto de la Cámara de Comercio (de menos de 3 meses)',
+                'articles'     => 'Escritura de constitución y estatutos',
+                'shareholders' => 'Registro de accionistas',
+                'rep_id'       => 'Documento de identidad del representante',
+                'ubo'          => 'Identidad y prueba de domicilio de los beneficiarios finales (más del 25 %)',
+                'bank_ref'     => 'Carta de referencia bancaria',
+                'pro_ref'      => 'Carta de referencia profesional',
+            ],
+        ],
+    ],
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Siebe Property Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),

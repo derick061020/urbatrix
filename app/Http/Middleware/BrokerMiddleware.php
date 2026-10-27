@@ -24,6 +24,15 @@ class BrokerMiddleware
             abort(403, __('Acceso exclusivo para brokers.'));
         }
 
+        // Quien se registró solo como broker (pendiente de verificar) rellena
+        // primero la ficha de alta; los que da de alta el admin ya están aprobados.
+        if ($user->role === 'broker' && ! $user->is_admin
+            && in_array($user->verification_status ?? null, ['pending', 'rejected'], true)
+            && ! $request->routeIs('broker.alta', 'broker.alta.store')
+            && ! optional($user->brokerProfile)->isSubmitted()) {
+            return redirect()->route('broker.alta');
+        }
+
         return $next($request);
     }
 }

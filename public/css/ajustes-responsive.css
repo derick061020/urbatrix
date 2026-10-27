@@ -108,3 +108,54 @@
   .fg-filter-bar .fg-filters-mobile-trigger{ flex: 0 0 auto; min-width: max-content; }
   .fg-filter-bar .fg-search{ min-width: 0; }
 }
+
+/* ── Ficha de la unidad en móvil estrecho (Z Fold plegado, 344 px) ─────────
+   «Agregar a la lista · Aviso legal · Compartir · Descargar» no cabía en una
+   línea y «Descargar» quedaba fuera de la pantalla (Miguel, 26 oct). Por
+   debajo de 420 px: cuatro columnas iguales con el icono encima del texto. */
+@media (max-width: 420px){
+  #moreInfoModal .mt-tabs{ display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #moreInfoModal .mt-tab{
+    flex-direction: column !important; justify-content: center; gap: 4px !important;
+    min-width: 0; padding: 9px 3px !important;
+    font-size: 9px !important; letter-spacing: .06em !important; line-height: 1.2 !important;
+    white-space: normal !important; text-align: center;
+  }
+  #moreInfoModal .mt-tab > span{ white-space: normal; }
+}
+
+/* ── Ficha de la unidad en horizontal con poca altura ─────────────────────
+   Móvil girado (iPhone 844 × 390, Z Fold plegado 882 × 344): caía en el
+   apilado de tablet y la galería, de 60vw de alto, llenaba toda la pantalla;
+   no se veían ni los datos ni los botones. Con menos de 560 px de alto, dos
+   columnas como en escritorio: la ficha con su scroll y los botones al pie. */
+@media (min-width: 601px) and (max-height: 560px) and (orientation: landscape){
+  #moreInfoModal.mt-overlay{ padding: 8px !important; }
+  #moreInfoModal .mt-shell{ max-width: none !important; height: calc(100dvh - 16px) !important; max-height: none !important; }
+  #moreInfoModal .mt-body{
+    display: grid !important; grid-template-columns: minmax(280px, 44%) minmax(0, 1fr) !important;
+    overflow: hidden !important; min-height: 0;
+  }
+  #moreInfoModal .mt-right{ order: 0 !important; min-height: 0; display: flex; flex-direction: column; }
+  #moreInfoModal .mt-gallery{ flex: 1 1 auto !important; height: auto !important; min-height: 0 !important; }
+  #moreInfoModal .mt-thumbs{ display: none !important; }
+  #moreInfoModal .mt-left{ min-height: 0; overflow: hidden; display: flex !important; flex-direction: column; }
+  #moreInfoModal .mt-left-inner{ flex: 1 1 auto !important; min-height: 0; overflow-y: auto !important; padding: 16px 20px !important; }
+  #moreInfoModal .mt-cta-row{ position: static !important; padding: 10px 14px !important; gap: 8px !important; box-shadow: none !important; }
+  #moreInfoModal .mt-cta-row > button{
+    flex: 1 1 0 !important; min-width: 0 !important; height: 44px !important; padding: 0 8px !important;
+    font-size: 10px !important; letter-spacing: .08em !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+}
+/* Y si además es estrecho (móvil pequeño girado, 667 × 375): los botones en
+   dos líneas en vez de cortados, y la barra de acciones con el icono encima. */
+@media (min-width: 601px) and (max-width: 760px) and (max-height: 560px) and (orientation: landscape){
+  #moreInfoModal .mt-cta-row > button{ white-space: normal !important; line-height: 1.15 !important; text-overflow: clip; }
+  #moreInfoModal .mt-tabs{ display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #moreInfoModal .mt-tab{
+    flex-direction: column !important; justify-content: center; gap: 3px !important;
+    padding: 7px 3px !important; font-size: 9px !important; letter-spacing: .06em !important;
+    line-height: 1.2 !important; white-space: normal !important; text-align: center;
+  }
+  #moreInfoModal .mt-tab > span{ white-space: normal; }
+}

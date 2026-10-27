@@ -60,7 +60,7 @@
                     <div class="flex-1">
                         <div class="text-[13px] font-semibold text-ink-900">{{ trim(($u->first_name ?? '').' '.($u->last_name ?? '')) ?: $u->name }}</div>
                         <div class="text-[11px] text-ink-500 mt-0.5">
-                            Nuevo registro · {{ $u->email }} · {{ $uRole }}
+                            Nuevo registro · {{ $u->email }} · {{ $u->brokerProfile?->isAgency() ? __('Agencia') : $uRole }}
                             @if($u->kyc_id_document) · <i class="pi pi-paperclip"></i> documento adjunto @endif
                         </div>
                     </div>
@@ -68,6 +68,9 @@
                     <span class="crm-pill bg-warn-soft text-warn">MEDIA</span>
                     <span class="crm-pill bg-warn-soft text-warn">PENDIENTE</span>
                     <span class="text-[10px] text-ink-400 w-20 text-right">{{ $u->created_at?->diffForHumans() }}</span>
+                    @if($u->brokerProfile)
+                        <a href="{{ route('admin.users.broker-alta', $u->id) }}" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ $u->brokerProfile->isSubmitted() ? __('Ver ficha') : __('Ficha sin enviar') }}</a>
+                    @endif
                     <form method="POST" action="{{ route('admin.users.verify-kyc', $u->id) }}" class="flex items-center gap-1 m-0">@csrf
                         <button type="submit" name="decision" value="approved" class="crm-btn crm-btn-primary text-[11px] py-1 px-3">{{ __('Aprobar') }}</button>
                         <button type="submit" name="decision" value="rejected" class="crm-btn crm-btn-ghost text-[11px] py-1 px-3">{{ __('Rechazar') }}</button>

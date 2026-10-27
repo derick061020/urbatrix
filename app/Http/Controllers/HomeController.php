@@ -219,7 +219,16 @@ class HomeController extends Controller
                 'project',
             ])
             ->where('public', true)
-            ->findOrFail($unitId);
+            // Como /api/units/{id}: el modal abre las unidades por su custom_id
+            // («A-001») y aquí sólo se buscaba el id numérico, así que la ficha
+            // daba 404 y «Descargar ficha» no hacía nada (Miguel, 26 oct).
+            ->where(function ($q) use ($unitId) {
+                $q->where('custom_id', $unitId);
+                if (is_numeric($unitId)) {
+                    $q->orWhere('id', $unitId);
+                }
+            })
+            ->firstOrFail();
 
         return view('property-pdf', compact('unit'));
     }

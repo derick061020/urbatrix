@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Agent;
 use App\Models\BrokerMaterial;
+use App\Models\BrokerProfile;
 use App\Models\Deal;
 use App\Models\Project;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BrokerController extends Controller
@@ -475,5 +477,86 @@ class BrokerController extends Controller
             $document->file_path,
             $document->title . '.' . strtolower($document->format)
         );
+    }
+
+    /* =================================================================
+     * Ficha de alta (Miguel, 26 oct: «me registré como broker y no me lleva
+     * al área de broker» + la ficha Popup_Alta_Broker). Cuatro pasos en una
+     * página: tipo, datos, fiscal y bancario, documentos. Al enviarla queda
+     * «en revisión» y el admin la aprueba desde Aprobaciones.
+     * ================================================================= */
+
+    public function alta()
+    {
+        $user    = Auth::user();
+        $profile = $user->brokerProfile ?? new BrokerProfile(['kind' => 'broker', 'status' => 'borrador']);
+
+        return view('broker.alta', [
+            'user'      => $user,
+            'profile'   => $profile,
+            'idOnFile'  => (bool) $user->kyc_id_document,
+            'readOnly'  => $profile->isSubmitted(),
+        ]);
+    }
+
+    public function altaStore(Request $request)
+    {
+        $user    = Auth::user();
+        $profile = $user->brokerProfile ?? new BrokerProfile(['user_id' => $user->id]);
+        abort_if($profile->isSubmitted(), 403, __('Tu alta ya está enviada.'));
+
+        $kind = $request->input('kind') === 'agency' ? 'agency' : 'broker';
+        $docs = BrokerProfile::requiredDocs($kind);
+        $have = (array) ($profile->docs ?? []);
+
+        $rules = [
+            'kind'               => ['required', 'in:broker,agency'],
+            'data.nombre'        => ['required', 'string', 'max:150'],
+            'data.apellido'      => ['nullable', 'string', 'max:150'],
+            'data.email'         => ['required', 'email', 'max:150'],
+            'data.tel'           => ['required', 'string', 'max:50'],
+            'data.pais'          => ['required', 'string', 'max:80'],
+            'data.direccion'     => ['nullable', 'string', 'max:255'],
+            'data.licencia'      => ['nullable', 'string', 'max:80'],
+            'data.web'           => ['nullable', 'string', 'max:255'],
+            'fiscal.tax_id'      => ['required', 'string', 'max:60'],
+            'fiscal.banco'       => ['required', 'string', 'max:120'],
+            'fiscal.cuenta'      => ['required', 'string', 'max:60'],
+            'fiscal.swift'       => ['required', 'string', 'max:20'],
+            'fiscal.titular'     => ['required', 'string', 'max:150'],
+            'fiscal.moneda'      => ['nullable', 'string', 'max:10'],
+            'consent'            => ['accepted'],
+        ];
+        // El documento de identidad ya subido en el registro cuenta como entregado.
+        $idOnFile = (bool) $user->kyc_id_document;
+        foreach ($docs as $key => $label) {
+            $given = ! empty($have[$key]) || ($idOnFile && in_array($key, ['id_doc', 'rep_id'], true));
+            $rules['docs.' . $key] = [$given ? 'nullable' : 'required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png'];
+        }
+        $data = $request->validate($rules, [], collect($docs)->mapWithKeys(fn ($l, $k) => ['docs.' . $k => __($l)])->all());
+
+        foreach ($docs as $key => $label) {
+            if ($file = $request->file('docs.' . $key)) {
+                // Disco local (no el público): estos papeles sólo los ve el admin.
+                $have[$key] = $file->storeAs('broker-alta/' . $user->id, $key . '.' . strtolower($file->getClientOriginalExtension()), 'local');
+            }
+        }
+
+        $profile->fill([
+            'kind'         => $kind,
+            'data'         => $data['data'],
+            'fiscal'       => $data['fiscal'],
+            'docs'         => array_intersect_key($have, $docs),
+            'status'       => 'en_revision',
+            'submitted_at' => now(),
+            'reviewed_at'  => null,
+            'reviewed_by'  => null,
+        ])->save();
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) {
+            $user->update(['verification_status' => 'pending']);
+        }
+
+        return redirect()->route('broker.alta')->with('success', __('¡Alta enviada! Te avisaremos por email en cuanto quede verificada.'));
     }
 }
