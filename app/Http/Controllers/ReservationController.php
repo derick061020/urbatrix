@@ -210,6 +210,7 @@ class ReservationController extends Controller
         $cdd->kyc_docs = $docs;
         $cdd->addLog('El comprador ha subido su documento de identidad para el screening.');
         $cdd->save();
+        \App\Http\Controllers\CddController::alertCompliance($reservation, 'Documento de identidad recibido: hay que hacer el screening de sanciones, PEP y medios adversos antes del depósito.');
 
         return back()->with('success', __('Documento recibido. Te avisaremos por email en cuanto puedas completar el pago.'));
     }

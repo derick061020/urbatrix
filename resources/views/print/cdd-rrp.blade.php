@@ -69,6 +69,7 @@
     <h2>{{ __('Evaluación') }}</h2>
     <table>
         <tr><td>{{ __('Screening (sanciones, PEP, medios adversos)') }}</td><td>{{ $cdd->screening_status }} · {{ $who($cdd->screened_by) }} · {{ $f($cdd->screened_at) }}<br><span class="muted">{{ $cdd->screening_notes }}</span></td></tr>
+        <tr><td>{{ __('Depósito a nombre del comprador') }}</td><td>{{ $cdd->payment_checked_at ? ($cdd->payment_name_ok ? __('Sí') : __('No: en investigación')).' · '.$f($cdd->payment_checked_at) : '—' }}@if($cdd->payment_notes)<br><span class="muted">{{ $cdd->payment_notes }}</span>@endif</td></tr>
         <tr><td>{{ __('Perfil de riesgo') }}</td><td>{{ $cdd->risk_rating ?? '—' }}<br><span class="muted">{{ $cdd->risk_notes }}</span></td></tr>
         <tr><td>{{ __('Consejo de cumplimiento') }}</td><td>{{ $cdd->cdd_decision }} · {{ $who($cdd->cdd_decided_by) }} · {{ $f($cdd->cdd_decided_at) }}<br><span class="muted">{{ $cdd->cdd_notes }}</span></td></tr>
         <tr><td>{{ __('Director de ventas') }}</td><td>{{ $cdd->manager_decision }} · {{ $who($cdd->manager_decided_by) }} · {{ $f($cdd->manager_decided_at) }}@if($cdd->deviation_note)<br><span class="muted">{{ __('Desviación motivada:') }} {{ $cdd->deviation_note }}</span>@endif</td></tr>

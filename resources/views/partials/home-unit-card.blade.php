@@ -41,6 +41,8 @@
              data-filter-bedrooms="{{ $beds }}"
              data-filter-direction="{{ strtoupper($unit->direction ?? '') }}"
              data-filter-outlook="{{ $unit->outlook ?? '' }}"
+             data-lx-layout="{{ $unit->layout ?? '' }}"
+             data-lx-feature="{{ $unit->custom_1 ?? '' }}"
              data-filter-price="{{ (float) $unit->price }}"
              data-filter-area="{{ (float) ($unit->internal_area ?? 0) }}"
              data-filter-status="{{ $st }}"

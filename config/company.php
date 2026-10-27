@@ -98,6 +98,8 @@ return [
         'fiu_threshold_awg'        => 500000,
         'awg_per_usd'              => 1.79,       // paridad fija del florín
         'retention_years'          => 10,
+        // A quién se avisa por email cuando hay un screening o un KYC por revisar.
+        'compliance_email'         => env('COMPANY_CDD_EMAIL'),
     ],
 
     // Firmante autorizado de los comprobantes

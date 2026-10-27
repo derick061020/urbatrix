@@ -46,11 +46,12 @@
                     @endif
                 </td>
                 <td>{{ isset($floorDisplay) ? $floorDisplay($unit->floor) : ($unit->floor ? ucfirst($unit->floor) : __('Ground')) }}</td>
-                <td>{{ ($unit->bedrooms ?? 0) }} {{ __('Bed') }}</td>
+                {{-- Tipología y característica de la lista de precios (T4 · Lock-off); Siebe no tiene orientación. --}}
+                <td>{{ $unit->layout ?: ($unit->bedrooms ?? 0).' '.__('Bed') }}</td>
                 <td>
-                    {{ strtoupper($unit->direction ?? '—') }}
-                    @if($unit->outlook)
-                        <div style="font-size:10px;color:#a3a3a3;line-height:1.2;">{{ $outlookLabels[$unit->outlook] ?? $unit->outlook }}</div>
+                    {{ $unit->outlook ? __($outlookLabels[$unit->outlook] ?? $unit->outlook) : ($unit->custom_1 ?: '—') }}
+                    @if($unit->direction)
+                        <div style="font-size:10px;color:#a3a3a3;line-height:1.2;">{{ strtoupper($unit->direction) }}</div>
                     @endif
                 </td>
                 <td>{{ ($unit->bedrooms ?? 0) }} / {{ (float) ($unit->bathrooms ?? 0) }}</td>

@@ -2371,11 +2371,11 @@
               <th>{{ __('Unit') }}</th>
               <th>{{ __('Status') }}</th>
               <th>{{ __('Floor') }}</th>
-              <th>{{ __('Type') }}</th>
-              <th>{{ __('Direction') }}</th>
+              <th>{{ __('Tipología') }}</th>
+              <th>{{ __('Característica') }}</th>
               <th>{{ __('Bed/Bath') }}</th>
-              <th>{{ __('Int sqft') }}</th>
-              <th>{{ __('Ext sqft') }}</th>
+              <th>{{ __('Interior') }}</th>
+              <th>{{ __('Terraza') }}</th>
               <th>{{ __('Price') }}</th>
               <th></th>
             </tr>

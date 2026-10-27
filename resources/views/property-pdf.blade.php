@@ -20,7 +20,11 @@
   // lago» en cualquier unidad que no los tuviera.
   // Planta y característica legibles: salían las claves («4th», «lock_off_roof»).
   $floor       = $unit->floor ? \App\Support\UnitOptions::floorPhrase($unit->floor) : null;
-  $feature     = $unit->custom_1 ?: ($unit->outlook ? (\App\Support\UnitOptions::map('outlooks')[$unit->outlook] ?? null) : null);
+  // El catálogo primero («Vista al jardín», traducible); si no, el texto de la lista de precios.
+  $feature     = ($unit->outlook ? (\App\Support\UnitOptions::map('outlooks')[$unit->outlook] ?? null) : null) ?: ($unit->custom_1 ?: null);
+  $feature     = $feature ? __($feature) : null;
+  // Pies², como en la lista de precios de Siebe (factor estándar, el de su columna de terraza).
+  $sqft        = fn ($m2) => (float) $m2 > 0 ? number_format((float) $m2 * 10.7639, 0, '.', ',').' ft²' : null;
   $stage       = $unit->custom_2 ?: null;
   $direction   = $unit->direction ?: null;
   $outlook     = $feature;
@@ -341,19 +345,24 @@ body {
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h5a3 3 0 0 1 0 6H9"/>
       </svg>
+      @if($unit->parking_bays)
       <div class="spec-val">{{ $parking }}</div><div class="spec-lbl">{{ __('Parking') }}</div>
+      @else
+      {{-- Sin parqueo asignado (Siebe): la planta, que sí está en la lista de precios. --}}
+      <div class="spec-val">{{ $unit->floor ? (int) $unit->floor : '—' }}</div><div class="spec-lbl">{{ __('Piso') }}</div>
+      @endif
     </div>
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M13 3h8v8"/><path d="M21 3l-8 8"/><path d="M11 21H3v-8"/><path d="M3 21l8-8"/>
       </svg>
-      <div class="spec-val">{{ $intArea ? $intArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Interior') }}</div>
+      <div class="spec-val">{{ $intArea ? $intArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Interior') }}@if($sqft($intArea)) · {{ $sqft($intArea) }}@endif</div>
     </div>
     <div class="spec-item">
       <svg class="spec-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 15V10a7 7 0 0 1 14 0v5"/><path d="M3 15h18"/><path d="M3 21h18"/>
       </svg>
-      <div class="spec-val">{{ $extArea ? $extArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Terraza') }}</div>
+      <div class="spec-val">{{ $extArea ? $extArea . ' m²' : '—' }}</div><div class="spec-lbl">{{ __('Terraza') }}@if($sqft($extArea)) · {{ $sqft($extArea) }}@endif</div>
     </div>
   </div>
 </div>
@@ -404,7 +413,7 @@ body {
     <div class="metric-card">
       <div class="metric-card-lbl">{{ __('Característica') }}</div>
       <div class="metric-card-val" style="font-size:18px">{{ $feature ?: '—' }}</div>
-      <div class="metric-card-sub">{{ __('Plano') }} {{ $unit->layout ?: '—' }}</div>
+      <div class="metric-card-sub">{{ __('Tipología') }} {{ $unit->layout ?: '—' }}</div>
     </div>
     @endif
     @if($unit->projected_value)
@@ -565,13 +574,16 @@ body {
       <div class="detail-row"><span class="dk">{{ __('Proyecto') }}</span><span class="dv">{{ $projectName }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Unidad') }}</span><span class="dv">{{ $unitNum }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Piso') }}</span><span class="dv">{{ $floor ?? '—' }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Plano') }}</span><span class="dv">{{ $unit->layout ?: '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Tipología') }}</span><span class="dv">{{ $unit->layout ?: '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Característica') }}</span><span class="dv">{{ $feature ?? '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Dormitorios / baños') }}</span><span class="dv">{{ $bedrooms }} / {{ $bathrooms }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Interior') }}</span><span class="dv">{{ $intArea ? number_format((float) $intArea, 2).' m² · '.$sqft($intArea) : '—' }}</span></div>
     </div>
     <div class="details-col">
       <div class="detail-row"><span class="dk">{{ __('Precio USD') }}</span><span class="dv">{{ $priceFmt }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Precio / m²') }}</span><span class="dv">{{ $pricePerM2 }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Superficie total') }}</span><span class="dv">{{ $unit->total_area ? number_format((float) $unit->total_area, 2).' m²' : '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Terraza') }}</span><span class="dv">{{ $extArea ? number_format((float) $extArea, 2).' m² · '.$sqft($extArea) : '—' }}</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Superficie total') }}</span><span class="dv">{{ $unit->total_area ? number_format((float) $unit->total_area, 2).' m² · '.$sqft($unit->total_area) : '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Etapa') }}</span><span class="dv">{{ $stage ?? '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Reserva mínima') }}</span><span class="dv">{{ $reserveAmt }} USD</span></div>
     </div>

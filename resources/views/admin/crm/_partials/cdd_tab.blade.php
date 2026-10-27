@@ -92,6 +92,26 @@
             </div>
             <div class="text-[11px] text-ink-500 mt-1">{{ $who($cdd->screened_by) }} · {{ $fecha($cdd->screened_at) }} @if($cdd->screening_notes) · {{ $cdd->screening_notes }} @endif</div>
         @endif
+
+        {{-- El depósito debería llegar a nombre del que reserva; si no, se investiga. --}}
+        @if($cdd->screeningCleared())
+            <div class="mt-4 pt-3 border-t border-ink-100 flex flex-col sm:flex-row sm:items-center gap-2">
+                <div class="flex-1 text-[12.5px]"><b>{{ __('Depósito a nombre del comprador') }}</b>
+                    <div class="text-[11px] text-ink-500">{{ $reservation->paid_at ? __('Depósito recibido el :f.', ['f' => $fecha($reservation->paid_at)]) : __('Aún sin depósito.') }} {{ __('Si lo paga otra persona, cumplimiento tiene que investigarlo.') }}</div>
+                </div>
+                @if($cdd->payment_checked_at)
+                    <div class="text-right">
+                        <span class="text-[12px] font-semibold {{ $cdd->payment_name_ok ? 'text-ok-dark' : 'text-err' }}">{{ $cdd->payment_name_ok ? __('Sí, a su nombre') : __('No: en investigación') }}</span>
+                        @if($cdd->payment_notes)<div class="text-[11px] text-ink-500">{{ $cdd->payment_notes }}</div>@endif
+                    </div>
+                @elseif($reservation->paid_at)
+                    <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" class="flex flex-wrap gap-2 m-0">@csrf<input type="hidden" name="action" value="payment">
+                        <input name="payment_notes" placeholder="{{ __('Titular del pago (opcional)') }}" class="crm-input pl-3 sm:w-56">
+                        <button name="payment_name_ok" value="1" class="crm-btn crm-btn-primary">{{ __('Sí') }}</button>
+                        <button name="payment_name_ok" value="0" class="crm-btn crm-btn-ghost text-err">{{ __('No, investigar') }}</button></form>
+                @endif
+            </div>
+        @endif
     </div>
 
     {{-- 2 · KYC y riesgo --}}
@@ -223,7 +243,7 @@
                 </div>
             </form>
         @elseif($cdd->manager_decision !== 'pendiente')
-            <div class="text-[12px] font-semibold {{ $cdd->manager_decision === 'aprobado' ? 'text-ok-dark' : 'text-err' }}">{{ __('Venta :d', ['d' => $cdd->manager_decision]) }}</div>
+            <div class="text-[12px] font-semibold {{ $cdd->manager_decision === 'aprobado' ? 'text-ok-dark' : 'text-err' }}">{{ $cdd->manager_decision === 'aprobado' ? __('Venta aprobada') : __('Venta rechazada') }}</div>
             <div class="text-[11px] text-ink-500">{{ $who($cdd->manager_decided_by) }} · {{ $fecha($cdd->manager_decided_at) }} @if($cdd->manager_notes) · {{ $cdd->manager_notes }} @endif</div>
             @if($cdd->deviation_note)<div class="text-[11px] text-warn mt-1">{{ __('Desviación motivada:') }} {{ $cdd->deviation_note }}</div>@endif
         @endif
@@ -237,9 +257,12 @@
                 <div class="flex-1 text-[12.5px]"><b>{{ __('Contrato de compraventa firmado') }}</b><div class="text-[11px] text-ink-500">{{ __('Cumplimiento debe recibir la copia firmada cuanto antes.') }}</div></div>
                 @if($cdd->spa_signed_at)
                     <span class="text-[12px] text-ok-dark font-semibold">{{ $fecha($cdd->spa_signed_at) }}</span>
+                    @include('admin.crm._partials.cdd_copia', ['key' => 'contrato_firmado', 'action' => 'spa', 'date' => ['spa_signed_at', $cdd->spa_signed_at]])
                 @elseif($cdd->saleApproved())
-                    <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" class="flex gap-2 m-0">@csrf<input type="hidden" name="action" value="spa">
-                        <input type="date" name="spa_signed_at" max="{{ today()->toDateString() }}" required class="crm-input pl-3 w-auto"><button class="crm-btn crm-btn-primary">{{ __('Registrar') }}</button></form>
+                    <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" enctype="multipart/form-data" class="flex flex-wrap gap-2 m-0">@csrf<input type="hidden" name="action" value="spa">
+                        <input type="date" name="spa_signed_at" max="{{ today()->toDateString() }}" required class="crm-input pl-3 w-auto">
+                        <input type="file" name="spa_file" accept=".pdf,.jpg,.jpeg,.png" class="text-[11px] max-w-[200px]" title="{{ __('Copia firmada (PDF)') }}">
+                        <button class="crm-btn crm-btn-primary">{{ __('Registrar') }}</button></form>
                 @endif
             </div>
             <div class="py-3 flex flex-col sm:flex-row sm:items-center gap-2">
@@ -270,9 +293,12 @@
                 <div class="flex-1 text-[12.5px]"><b>{{ __('Escritura de compraventa') }}</b><div class="text-[11px] text-ink-500">{{ __('Con la fecha, se genera el informe final de riesgo para el archivo (mínimo 10 años).') }}</div></div>
                 @if($cdd->deed_date)
                     <span class="text-[12px] text-ok-dark font-semibold">{{ $fecha($cdd->deed_date) }}</span>
+                    @include('admin.crm._partials.cdd_copia', ['key' => 'escritura', 'action' => 'deed', 'date' => ['deed_date', $cdd->deed_date]])
                 @elseif($cdd->predeed_reviewed_at)
-                    <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" class="flex gap-2 m-0">@csrf<input type="hidden" name="action" value="deed">
-                        <input type="date" name="deed_date" required class="crm-input pl-3 w-auto"><button class="crm-btn crm-btn-primary">{{ __('Registrar') }}</button></form>
+                    <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" enctype="multipart/form-data" class="flex flex-wrap gap-2 m-0">@csrf<input type="hidden" name="action" value="deed">
+                        <input type="date" name="deed_date" required class="crm-input pl-3 w-auto">
+                        <input type="file" name="deed_file" accept=".pdf,.jpg,.jpeg,.png" class="text-[11px] max-w-[200px]" title="{{ __('Copia de la escritura (PDF)') }}">
+                        <button class="crm-btn crm-btn-primary">{{ __('Registrar') }}</button></form>
                 @endif
             </div>
         </div>

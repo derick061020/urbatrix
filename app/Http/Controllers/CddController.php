@@ -52,6 +52,18 @@ class CddController extends Controller
                     : 'Screening: coincidencia real. La venta no puede seguir; informar a CBA y FIU.');
                 break;
 
+            // El depósito, a nombre del que reserva; si no, cumplimiento lo investiga.
+            case 'payment':
+                $d = $request->validate([
+                    'payment_name_ok' => 'required|boolean',
+                    'payment_notes'   => 'nullable|string|max:2000',
+                ]);
+                $cdd->fill($d + ['payment_checked_at' => now()]);
+                $cdd->addLog($d['payment_name_ok']
+                    ? 'Depósito recibido a nombre del comprador.'
+                    : 'Alerta: el depósito no llegó a nombre del comprador. Cumplimiento lo investiga.');
+                break;
+
             case 'request_kyc':
                 $d = $request->validate(['buyer_type' => 'required|in:natural,legal']);
                 abort_unless($cdd->screeningCleared(), 422, __('Primero hay que completar el screening sin coincidencias.'));
@@ -77,6 +89,10 @@ class CddController extends Controller
                 abort_unless(in_array($cdd->kyc_status, ['enviado', 'revisado'], true), 422, __('El comprador aún no ha enviado el formulario KYC.'));
                 $cdd->fill($d + ['kyc_status' => 'revisado', 'cdd_decided_at' => now(), 'cdd_decided_by' => $uid]);
                 $cdd->addLog('Cumplimiento: perfil de riesgo ' . $d['risk_rating'] . ', comprador ' . $d['cdd_decision'] . '.');
+                // «Approve/reject the potential buyer(s) through the portal and via email.»
+                if ($cdd->getOriginal('cdd_decision') !== $d['cdd_decision']) {
+                    $this->notify($reservation, $d['cdd_decision'] === 'aprobado' ? 'approved' : 'rejected');
+                }
                 break;
 
             case 'manager':
@@ -91,14 +107,19 @@ class CddController extends Controller
                     return back()->withErrors(['deviation_note' => __('Para desviarte del consejo de cumplimiento hay que motivarlo y documentar la consulta.')])->withInput();
                 }
                 $cdd->fill($d + ['manager_decided_at' => now(), 'manager_decided_by' => $uid]);
-                $cdd->addLog('Director de ventas: venta ' . $d['manager_decision'] . '.' . (filled($d['deviation_note'] ?? null) ? ' Desviación motivada.' : ''));
+                $cdd->addLog('Director de ventas: venta ' . ($d['manager_decision'] === 'aprobado' ? 'aprobada' : 'rechazada') . '.' . (filled($d['deviation_note'] ?? null) ? ' Desviación motivada.' : ''));
                 break;
 
             case 'spa':
-                $d = $request->validate(['spa_signed_at' => 'required|date|before_or_equal:today']);
+                $d = $request->validate([
+                    'spa_signed_at' => 'required|date|before_or_equal:today',
+                    'spa_file'      => 'nullable|file|max:20480|mimes:pdf,jpg,jpeg,png',
+                ]);
                 abort_unless($cdd->saleApproved(), 422, __('El contrato sólo se firma con el KYC aprobado por cumplimiento y por el director de ventas.'));
-                $cdd->fill($d);
-                $cdd->addLog('Contrato de compraventa firmado el ' . $d['spa_signed_at'] . '.');
+                $cdd->fill(['spa_signed_at' => $d['spa_signed_at']]);
+                // Subir la copia después reenvía la misma fecha: sin repetir la entrada.
+                if ($cdd->isDirty('spa_signed_at')) $cdd->addLog('Contrato de compraventa firmado el ' . $d['spa_signed_at'] . '.');
+                $this->storeDoc($cdd, $request, 'spa_file', 'contrato_firmado');
                 break;
 
             case 'fiu':
@@ -115,10 +136,14 @@ class CddController extends Controller
                 break;
 
             case 'deed':
-                $d = $request->validate(['deed_date' => 'required|date']);
+                $d = $request->validate([
+                    'deed_date' => 'required|date',
+                    'deed_file' => 'nullable|file|max:20480|mimes:pdf,jpg,jpeg,png',
+                ]);
                 abort_unless($cdd->predeed_reviewed_at, 422);
-                $cdd->fill($d);
-                $cdd->addLog('Escritura firmada el ' . $d['deed_date'] . '. Expediente CDD archivado.');
+                $cdd->fill(['deed_date' => $d['deed_date']]);
+                if ($cdd->isDirty('deed_date')) $cdd->addLog('Escritura firmada el ' . $d['deed_date'] . '. Expediente CDD archivado.');
+                $this->storeDoc($cdd, $request, 'deed_file', 'escritura');
                 break;
 
             default:
@@ -129,6 +154,16 @@ class CddController extends Controller
 
         return redirect()->route('admin.crm.expediente.detalle', ['id' => $reservation->id, 'tab' => 'cumplimiento'])
             ->with('success', __('Cumplimiento actualizado.'));
+    }
+
+    /** Copia firmada del contrato o de la escritura, que cumplimiento tiene que archivar. */
+    private function storeDoc(CddFile $cdd, Request $request, string $input, string $key): void
+    {
+        if (! $request->hasFile($input)) return;
+        $docs = (array) ($cdd->kyc_docs ?? []);
+        $docs[$key][] = $request->file($input)->store('cdd/' . $cdd->reservation_id . '/' . $key, 'local');
+        $cdd->kyc_docs = $docs;
+        $cdd->addLog('Copia archivada: ' . ($key === 'escritura' ? 'escritura' : 'contrato firmado') . '.');
     }
 
     public function doc(Reservation $reservation, string $key, int $i = 0)
@@ -252,8 +287,26 @@ class CddController extends Controller
         ]);
         $cdd->addLog('El comprador ha enviado el formulario KYC.');
         $cdd->save();
+        self::alertCompliance($reservation, 'Formulario KYC enviado: hay que revisarlo y preparar el perfil de riesgo.');
 
         return redirect()->route('dashboard.cumplimiento')->with('success', __('Formulario enviado. El equipo de cumplimiento lo revisará y te avisará si necesita algo más.'));
+    }
+
+    /**
+     * Aviso al equipo de cumplimiento («the CDD Associate is alerted»). Además
+     * de la campana del CRM, un email a COMPANY_CDD_EMAIL si está puesto.
+     */
+    public static function alertCompliance(Reservation $reservation, string $text): void
+    {
+        $to = config('company.cdd.compliance_email');
+        if (! $to) return;
+        $who = trim($reservation->first_name . ' ' . $reservation->last_name) . ' · ' . ($reservation->unit_name ?? $reservation->unit?->name ?? '');
+        $url = route('admin.crm.expediente.detalle', ['id' => $reservation->id, 'tab' => 'cumplimiento']);
+        try {
+            Mail::raw("$text\n\n$who\n$url", fn ($m) => $m->to($to)->subject('Cumplimiento · ' . $who));
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo avisar a cumplimiento: ' . $e->getMessage());
+        }
     }
 
     private function notify(Reservation $reservation, string $kind, string $note = '', ?string $url = null): void

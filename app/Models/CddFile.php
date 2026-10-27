@@ -15,6 +15,7 @@ class CddFile extends Model
     protected $fillable = [
         'reservation_id', 'buyer_type',
         'screening_status', 'screening_notes', 'screened_at', 'screened_by',
+        'payment_name_ok', 'payment_notes', 'payment_checked_at',
         'kyc_status', 'kyc_form', 'kyc_docs', 'info_request', 'kyc_requested_at', 'kyc_submitted_at',
         'risk_rating', 'risk_notes', 'cdd_decision', 'cdd_notes', 'cdd_decided_at', 'cdd_decided_by',
         'manager_decision', 'manager_notes', 'deviation_note', 'manager_decided_at', 'manager_decided_by',
@@ -27,6 +28,8 @@ class CddFile extends Model
         'kyc_docs'            => 'array',
         'log'                 => 'array',
         'screened_at'         => 'datetime',
+        'payment_name_ok'     => 'boolean',
+        'payment_checked_at'  => 'datetime',
         'kyc_requested_at'    => 'datetime',
         'kyc_submitted_at'    => 'datetime',
         'cdd_decided_at'      => 'datetime',

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\View;
  *  - kind "request": tiene que rellenar su formulario KYC en el portal.
  *  - kind "info":    cumplimiento pide información adicional ($note).
  *  - kind "cleared": verificación previa superada; ya puede pagar la reserva.
+ *  - kind "approved" / "rejected": decisión de cumplimiento sobre su KYC.
  */
 class CddMail extends Mailable
 {
@@ -33,6 +34,8 @@ class CddMail extends Mailable
         return new Envelope(subject: match ($this->kind) {
             'info'    => 'Necesitamos algo más para tu verificación · ' . $project,
             'cleared' => 'Ya puedes completar tu reserva · ' . $project,
+            'approved' => 'Tu verificación KYC está aprobada · ' . $project,
+            'rejected' => 'Sobre tu verificación KYC · ' . $project,
             default   => 'Completa tu formulario «Conozca a su cliente» · ' . $project,
         });
     }
@@ -44,10 +47,12 @@ class CddMail extends Mailable
         ])->render();
 
         $html = View::make('emails.crm.wrapper', [
-            'docLabel'  => 'KYC · ' . (['info' => 'Información adicional', 'cleared' => 'Verificación superada'][$this->kind] ?? 'Formulario'),
+            'docLabel'  => 'KYC · ' . (['info' => 'Información adicional', 'cleared' => 'Verificación superada', 'approved' => 'Aprobado', 'rejected' => 'Resultado'][$this->kind] ?? 'Formulario'),
             'preheader' => match ($this->kind) {
                 'info'    => 'El equipo de cumplimiento necesita información adicional.',
                 'cleared' => 'Hemos verificado tu identidad: ya puedes pagar el depósito de tu reserva.',
+                'approved' => 'Cumplimiento ha aprobado tu verificación KYC.',
+                'rejected' => 'Cumplimiento ha revisado tu verificación KYC.',
                 default   => 'Rellena tu formulario KYC en tu portal para continuar con tu compra.',
             },
             'content'   => $inner,

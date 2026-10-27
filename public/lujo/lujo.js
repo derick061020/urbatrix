@@ -49,6 +49,7 @@
     planta:   '<path d="M3 20h18M5 20V8l7-4 7 4v12M9 20v-5h6v5M9 11h.01M15 11h.01"/>',
     tipo:     '<path d="M4 5h16v14H4zM4 10h9M13 5v14M13 14h7"/>',
     rasgo:    '<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4l-5.2 2.7 1-5.8L3.5 9.2l5.9-.9z"/>',
+    etapa:    '<path d="M4 20h16M6 20V9h4v11M14 20V4h4v16M10 13h4"/>',
   };
   const svg = n => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONO[n]}</svg>`;
 
@@ -256,6 +257,9 @@
       }
       const sub = $('.fg-card-subtitle', card);
       if (sub && d.filterBedrooms) sub.textContent = [habitaciones(d.filterBedrooms), planta(d.filterFloor)].filter(Boolean).join(' · ');
+      // Tipología y característica de la lista de precios («T4 · Lock-off»).
+      const extra = [d.lxLayout, rasgo({ outlook: d.filterOutlook, custom_1: d.lxFeature })].filter(Boolean).join(' · ');
+      if (sub && extra) sub.after(el('div', 'lx-rasgo', extra));
 
       // Reserva desde $5,000: la condición real del banner, bajo el precio.
       const banner = $('.fg-reserve-banner', card);
@@ -461,21 +465,28 @@
       ['hab', t('Habitaciones', 'Bedrooms'), u.bedrooms],
       ['banos', t('Baños', 'Bathrooms'), u.bathrooms && Number(u.bathrooms)],
       ['planta', t('Planta', 'Floor'), planta(u.floor)],
-      ['tipo', t('Plano', 'Layout'), u.layout],
+      ['tipo', t('Tipología', 'Typology'), u.layout],
       // La característica de la lista de precios, traducida si está en el
       // catálogo («Terraza jardín»); si no, el texto tal cual (custom_1).
-      ['rasgo', t('Característica', 'Feature'), (OPC.outlooks || {})[u.outlook] || u.custom_1],
-      ['interior', t('Interior', 'Interior'), m2(u.internal_area)],
-      ['terraza', t('Terraza', 'Terrace'), m2(u.external_area)],
-      ['total', t('Total', 'Total'), m2(u.total_area)],
+      ['rasgo', t('Característica', 'Feature'), rasgo(u)],
+      // La etapa de la lista de precios vive en custom_2 como «Etapa 1».
+      ['etapa', t('Etapa', 'Stage'), String(u.custom_2 || '').replace(/^\s*(etapa|phase|stage)\s*/i, '')],
+      ['interior', t('Interior', 'Interior'), m2ft(u.internal_area)],
+      ['terraza', t('Terraza', 'Terrace'), m2ft(u.external_area)],
+      ['total', t('Total', 'Total'), m2ft(u.total_area)],
     ].filter(([, , v]) => v && v !== '0' && Number(v) !== 0),
   };
   // es-ES no agrupa los números de cuatro cifras («$6056 / m²» junto a «$4,263/mes»):
   // mismo formato que el resto de cifras de la ficha, como en Bahía Mar.
   const num = (v, dec = 0) => Number(v).toLocaleString(ES ? 'es-DO' : 'en-US', { maximumFractionDigits: dec });
   const m2 = v => (Number(v) > 0 ? `${num(v, 2)} m²` : null);
+  // Con los pies² al lado, como la lista de precios de Siebe. Factor estándar:
+  // la columna de terraza del Excel lo usa; la de interior trae 10,674 (errata).
+  const SQFT = 10.7639;
+  const m2ft = v => (Number(v) > 0 ? `${num(v, 2)} m² <small>· ${num(Number(v) * SQFT)} ft²</small>` : null);
 
   const OPC = window.LX_OPCIONES || {};
+  const rasgo = u => (OPC.outlooks || {})[u.outlook] || u.custom_1 || '';
   // Amenidades del edificio (Miguel, 27 oct: «agregar todas estas amenidades a
   // todas las fichas»). La capa oculta el bloque original, así que van aquí.
   const amenidades = u => {
