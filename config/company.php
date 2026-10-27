@@ -11,6 +11,9 @@
 
 return [
 
+    // Color de marca para piezas que se inyectan fuera de los layouts (salvavidas).
+    'accent'       => env('COMPANY_ACCENT', '#074540'),
+    'salvavidas'   => (bool) env('COMPANY_SALVAVIDAS', true),
     'brand'        => env('COMPANY_BRAND', 'BAHÍA MAR'),
     'project'      => env('COMPANY_PROJECT', 'Bahía Mar'),
     'group'        => env('COMPANY_GROUP', 'BAHÍA MAR'),
