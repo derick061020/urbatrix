@@ -760,7 +760,10 @@
   function interceptarAcceso() {
     // Con muro (?clon-con-muro, el recorrido del anónimo) el popup del sitio
     // pasa a ser este. Sin muro se queda mudo, como lo dejó servir.py.
-    if (document.body.hasAttribute('data-guest')) window.openGuestModal = () => registro.abrir();
+    // Solo al anónimo: con sesión iniciada, «Reservar», la videollamada y
+    // guardar tienen que hacer lo suyo (crear la reserva y pasar al pago).
+    if (!document.body.hasAttribute('data-guest')) return;
+    window.openGuestModal = () => registro.abrir();
     window.openReservePage = id => registro.abrir('reserve', id || abierta());
     window.openAdvisorVideoCall = id => registro.abrir('videocall', id || abierta());
     window.toggleModalWishlist = () => registro.abrir('wishlist', abierta());
