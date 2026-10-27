@@ -214,21 +214,19 @@ class HomeController extends Controller
      */
     public function propertyPdf($unitId)
     {
-        $unit = Unit::with([
+        $base = fn () => Unit::with([
                 'images' => function ($q) { $q->orderBy('sort_order'); },
                 'project',
             ])
-            ->where('public', true)
-            // Como /api/units/{id}: el modal abre las unidades por su custom_id
-            // («A-001») y aquí sólo se buscaba el id numérico, así que la ficha
-            // daba 404 y «Descargar ficha» no hacía nada (Miguel, 26 oct).
-            ->where(function ($q) use ($unitId) {
-                $q->where('custom_id', $unitId);
-                if (is_numeric($unitId)) {
-                    $q->orWhere('id', $unitId);
-                }
-            })
-            ->firstOrFail();
+            ->where('public', true);
+        // Como /api/units/{id}: el modal abre las unidades por su custom_id
+        // («A-001») y aquí sólo se buscaba el id numérico, así que la ficha
+        // daba 404 y «Descargar ficha» no hacía nada (Miguel, 26 oct). Al final,
+        // por su nombre: en Siebe no hay custom_id y un enlace /property-pdf/401
+        // buscaba el id 401.
+        $unit = $base()->where('custom_id', $unitId)->first()
+             ?? (is_numeric($unitId) ? $base()->whereKey($unitId)->first() : null)
+             ?? $base()->where('name', $unitId)->firstOrFail();
 
         return view('property-pdf', compact('unit'));
     }

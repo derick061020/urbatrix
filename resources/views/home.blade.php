@@ -5245,13 +5245,13 @@
         const advisorBlock = document.createElement('div');
         advisorBlock.style.cssText = 'padding:0.5rem 0.75rem 0.75rem 0.75rem;display:flex;flex-direction:column;align-items:center;gap:0.4rem;';
         advisorBlock.innerHTML = `
-          <div class="advisor-live" role="button" tabindex="0" title="Chatear ahora con el administrador" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}" style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:rgb(34,150,80);font-weight:600;cursor:pointer;">
+          <div class="advisor-live" role="button" tabindex="0" title="{{ __('Chatear ahora con el administrador') }}" onclick="window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='{{ route('dashboard.messages', ['urgent' => 1]) }}';}" style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:rgb(34,150,80);font-weight:600;cursor:pointer;">
             <span class="advisor-dot" style="width:7px;height:7px;border-radius:50%;background:rgb(34,197,94);"></span>
-            <span>Tu asesor está disponible ahora mismo</span>
+            <span>{{ __('Tu asesor está disponible ahora mismo') }}</span>
           </div>
           <button onclick="openAdvisorVideoCall('${unit.id}')" style="display:inline-flex;align-items:center;gap:6px;background:white;color:rgb(98,84,65);border:1px solid rgb(218,211,200);border-radius:0.5rem;padding:5px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.02em;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="rgb(180,134,72)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-            Agendar una Videollamada
+            {{ __('Agendar una Videollamada') }}
           </button>
         `;
         div.appendChild(advisorBlock);
