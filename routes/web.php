@@ -66,6 +66,12 @@ Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update
 Route::get('/', [HomeController::class, 'index']);
 
 // Reservation routes
+// Salvavidas: tickets con captura desde el botón flotante (también el anónimo).
+Route::post('/salvavidas/tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->middleware('throttle:10,1')->name('salvavidas.store');
+Route::get('/salvavidas/tickets', [\App\Http\Controllers\SupportTicketController::class, 'mine'])->name('salvavidas.mine');
+Route::get('/salvavidas/sin-leer', [\App\Http\Controllers\SupportTicketController::class, 'unread'])->name('salvavidas.unread');
+Route::get('/salvavidas/tickets/{ticket}/{key}', [\App\Http\Controllers\SupportTicketController::class, 'file'])->name('salvavidas.file');
+
 Route::post('/reservations', [ReservationController::class, 'store']);
 Route::get('/form', [ReservationController::class, 'showForm']);
 Route::post('/reservations/update', [ReservationController::class, 'update']);
@@ -321,6 +327,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::get('/crm/postventa',    [AdminController::class, 'crmPostventa'])->name('admin.crm.postventa');
     Route::get('/crm/aprobaciones', [AdminController::class, 'crmAprobaciones'])->name('admin.crm.aprobaciones');
     Route::get('/crm/tareas',       [AdminController::class, 'crmTareas'])->name('admin.crm.tareas');
+    Route::get('/crm/tickets',           [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('admin.crm.tickets');
+    Route::post('/crm/tickets/{ticket}', [\App\Http\Controllers\SupportTicketController::class, 'update'])->name('admin.crm.tickets.update');
     Route::get('/crm/pagos/{id}', [AdminController::class, 'crmPagos'])->name('admin.crm.pagos');
 
     // CRM nuevas páginas (sin backend, sólo vista)

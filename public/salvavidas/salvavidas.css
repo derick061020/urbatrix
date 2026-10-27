@@ -1,0 +1,167 @@
+/* Salvavidas (public/salvavidas/salvavidas.js). Todo bajo #salvavidas para que
+   ni Tailwind ni la capa de lujo ni el CSS de cada página lo alteren. */
+#salvavidas, #salvavidas * { box-sizing: border-box; }
+#salvavidas {
+  --sv-accent: #2b2b1a;
+  --sv-ink: #18181b; --sv-muted: #6b6b70; --sv-line: #e7e7ea; --sv-soft: #f5f5f6;
+  --sv-ok: #18794e; --sv-err: #c0352b;
+  --sv-z: 2147483000;
+  font: 400 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--sv-ink);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: normal; text-transform: none; text-align: left;
+}
+#salvavidas button { font: inherit; color: inherit; margin: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+#salvavidas svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+#salvavidas [hidden] { display: none !important; }
+#salvavidas.is-hidden { visibility: hidden; }
+
+/* ── Botones flotantes ───────────────────────────────────────────────────── */
+#salvavidas .sv-fab-wrap {
+  position: fixed; z-index: calc(var(--sv-z) + 2);
+  left: var(--sv-left, max(16px, env(safe-area-inset-left))); bottom: var(--sv-bottom, max(16px, env(safe-area-inset-bottom)));
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+#salvavidas .sv-fab {
+  position: relative; display: grid; place-items: center; border: 0; border-radius: 50%; padding: 0;
+  box-shadow: 0 6px 18px rgba(0,0,0,.22), 0 1px 3px rgba(0,0,0,.18);
+  transition: transform .2s ease, opacity .2s ease, background-color .2s ease;
+}
+#salvavidas .sv-fab--main { width: 52px; height: 52px; background: var(--sv-accent); color: #fff; }
+#salvavidas .sv-fab--main svg { width: 26px; height: 26px; }
+#salvavidas .sv-fab--main:hover { transform: scale(1.06); }
+#salvavidas .sv-fab:focus-visible { outline: 3px solid color-mix(in srgb, var(--sv-accent) 45%, #fff); outline-offset: 2px; }
+#salvavidas .sv-ico { display: grid; place-items: center; transition: transform .25s ease, opacity .2s ease; grid-area: 1 / 1; }
+#salvavidas .sv-ico--close { opacity: 0; transform: rotate(-90deg) scale(.6); }
+#salvavidas.is-open .sv-ico--buoy { opacity: 0; transform: rotate(90deg) scale(.6); }
+#salvavidas.is-open .sv-ico--close { opacity: 1; transform: none; }
+#salvavidas .sv-fab--mine {
+  width: 44px; height: 44px; background: #fff; color: var(--sv-accent);
+  opacity: 0; transform: translateY(18px) scale(.5); pointer-events: none;
+}
+#salvavidas.is-open .sv-fab--mine { opacity: 1; transform: none; pointer-events: auto; }
+#salvavidas .sv-fab--mine:hover { background: var(--sv-soft); }
+#salvavidas .sv-fab--mine::after {
+  content: attr(aria-label); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%);
+  white-space: nowrap; background: var(--sv-ink); color: #fff; font-size: 12px; font-weight: 600;
+  padding: 5px 10px; border-radius: 6px; pointer-events: none; opacity: 0; transition: opacity .15s;
+}
+#salvavidas.is-open .sv-fab--mine:hover::after, #salvavidas.is-open .sv-fab--mine:focus-visible::after { opacity: 1; }
+#salvavidas .sv-dot {
+  position: absolute; top: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%;
+  background: #e5484d; border: 2px solid #fff;
+}
+#salvavidas.is-open .sv-fab--main .sv-dot { display: none; }
+
+/* ── Capturando: spinner en el botón ─────────────────────────────────────── */
+#salvavidas .sv-ico--spin { opacity: 0; }
+#salvavidas.is-capturing .sv-ico--buoy, #salvavidas.is-capturing .sv-ico--close { opacity: 0; }
+#salvavidas.is-capturing .sv-ico--spin { opacity: 1; }
+#salvavidas.is-capturing .sv-fab--main { cursor: progress; }
+#salvavidas .sv-spin {
+  display: block; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff;
+  animation: svSpin .8s linear infinite;
+}
+@keyframes svSpin { to { transform: rotate(360deg); } }
+#salvavidas .sv-chip {
+  border: 0; border-radius: 999px; padding: 7px 13px; background: var(--sv-soft); color: var(--sv-ink);
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
+}
+#salvavidas .sv-chip--ghost { border: 1px dashed #c9c9ce; }
+#salvavidas .sv-chip--block { display: block; width: 100%; padding: 12px; border-radius: 10px; }
+
+/* ── Panel (formulario, enviado, mis tickets) ────────────────────────────── */
+#salvavidas .sv-panel {
+  position: fixed; z-index: calc(var(--sv-z) + 1);
+  left: calc(var(--sv-left, max(16px, env(safe-area-inset-left))) + 64px); bottom: var(--sv-bottom, max(16px, env(safe-area-inset-bottom)));
+  width: 390px; max-width: calc(100vw - 96px); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
+  display: flex; flex-direction: column; background: #fff; border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.08); overflow: hidden;
+  animation: svIn .2s ease;
+}
+@keyframes svIn { from { opacity: 0; transform: translateY(10px); } }
+#salvavidas .sv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 14px 12px 18px; border-bottom: 1px solid var(--sv-line); }
+#salvavidas .sv-head b { font-size: 15px; font-weight: 700; }
+#salvavidas .sv-x { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--sv-muted); padding: 0; }
+#salvavidas .sv-x:hover { background: var(--sv-soft); color: var(--sv-ink); }
+#salvavidas .sv-body { padding: 14px 18px 18px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px; margin: 0; }
+#salvavidas .sv-foot { padding: 12px 18px 16px; border-top: 1px solid var(--sv-line); }
+#salvavidas .sv-note { background: #fff6e5; color: #8a5300; border-radius: 10px; padding: 9px 12px; font-size: 12.5px; }
+#salvavidas .sv-shot { margin: 0; border: 1px solid var(--sv-line); border-radius: 10px; overflow: hidden; background: var(--sv-soft); }
+#salvavidas .sv-shot img { display: block; width: 100%; max-height: 200px; object-fit: contain; background: repeating-conic-gradient(#f1f1f3 0 25%, #fff 0 50%) 0 0 / 16px 16px; }
+#salvavidas .sv-shot figcaption { display: flex; justify-content: flex-end; gap: 14px; padding: 7px 12px; border-top: 1px solid var(--sv-line); background: #fff; }
+#salvavidas .sv-link { border: 0; background: none; padding: 0; color: var(--sv-accent); font-weight: 600; font-size: 12.5px; text-decoration: underline; text-underline-offset: 2px; }
+#salvavidas .sv-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; margin: 0; }
+#salvavidas .sv-field > span { font-size: 12.5px; font-weight: 600; color: var(--sv-ink); }
+#salvavidas .sv-row { display: flex; gap: 10px; flex-wrap: wrap; }
+#salvavidas .sv-row .sv-field { flex: 1 1 150px; }
+#salvavidas textarea, #salvavidas input:not([type=file]) {
+  width: 100%; margin: 0; font: inherit; font-size: 16px; color: var(--sv-ink); background: #fff;
+  border: 1px solid #d6d6db; border-radius: 10px; padding: 9px 11px; outline: none; box-shadow: none;
+}
+@media (min-width: 768px) { #salvavidas textarea, #salvavidas input:not([type=file]) { font-size: 14px; } }
+#salvavidas textarea { resize: vertical; min-height: 92px; }
+#salvavidas textarea:focus, #salvavidas input:focus { border-color: var(--sv-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sv-accent) 18%, transparent); }
+#salvavidas .sv-drop {
+  display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px dashed #c9c9ce; border-radius: 10px;
+  color: var(--sv-muted); font-size: 12.5px; cursor: pointer; background: var(--sv-soft); margin: 0;
+}
+#salvavidas .sv-drop:hover, #salvavidas .sv-drop.is-over { border-color: var(--sv-accent); color: var(--sv-ink); }
+#salvavidas .sv-files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+#salvavidas .sv-files:empty { display: none; }
+#salvavidas .sv-files li { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 10px; border: 1px solid var(--sv-line); border-radius: 8px; font-size: 12.5px; }
+#salvavidas .sv-files li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#salvavidas .sv-files li small { color: var(--sv-muted); }
+#salvavidas .sv-files li button { display: grid; place-items: center; width: 26px; height: 26px; border: 0; background: none; border-radius: 6px; color: var(--sv-muted); padding: 0; }
+#salvavidas .sv-files li button svg { width: 14px; height: 14px; }
+#salvavidas .sv-err { color: var(--sv-err); background: #fdecea; border-radius: 10px; padding: 9px 12px; font-size: 12.5px; }
+#salvavidas .sv-send {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  border: 0; border-radius: 10px; padding: 12px 16px; background: var(--sv-accent); color: #fff; font-weight: 600; font-size: 14px;
+}
+#salvavidas .sv-send svg { width: 18px; height: 18px; }
+#salvavidas .sv-send:disabled { opacity: .6; cursor: progress; }
+#salvavidas .sv-done { align-items: center; text-align: center; padding: 22px 22px 22px; }
+#salvavidas .sv-done p { margin: 0; color: var(--sv-muted); }
+#salvavidas .sv-ok { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #e8f7ee; color: var(--sv-ok); }
+#salvavidas .sv-ok svg { width: 28px; height: 28px; stroke-width: 2.4; }
+#salvavidas .sv-code { font-size: 20px; font-weight: 700; letter-spacing: .04em; }
+#salvavidas .sv-muted { color: var(--sv-muted); }
+#salvavidas .sv-empty { text-align: center; color: var(--sv-muted); padding: 26px 8px; }
+#salvavidas .sv-empty svg { width: 34px; height: 34px; opacity: .55; }
+#salvavidas .sv-empty p { margin: 8px 0 0; }
+
+#salvavidas .sv-tickets { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+#salvavidas .sv-ticket { border: 1px solid var(--sv-line); border-radius: 12px; padding: 12px; }
+#salvavidas .sv-ticket-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+#salvavidas .sv-ticket-top b { font-size: 13px; }
+#salvavidas .sv-ticket-top small { margin-left: auto; color: var(--sv-muted); font-size: 11.5px; }
+#salvavidas .sv-pill { font-size: 11px; font-weight: 600; border-radius: 99px; padding: 2px 8px; background: var(--sv-soft); color: var(--sv-muted); }
+#salvavidas .sv-pill--abierto { background: #fff3e0; color: #a75100; }
+#salvavidas .sv-pill--en_curso { background: #e6f0ff; color: #1d4ed8; }
+#salvavidas .sv-pill--resuelto { background: #e8f7ee; color: var(--sv-ok); }
+#salvavidas .sv-pill--new { background: #fde8e8; color: #c0352b; }
+#salvavidas .sv-ticket-txt { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; font-size: 13px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+#salvavidas .sv-ticket-files { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#salvavidas .sv-thumb { display: block; width: 64px; height: 46px; border-radius: 6px; overflow: hidden; border: 1px solid var(--sv-line); }
+#salvavidas .sv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#salvavidas .sv-att { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 5px 9px; border-radius: 6px; background: var(--sv-soft); color: var(--sv-ink); font-size: 12px; text-decoration: none; }
+#salvavidas .sv-att svg { width: 13px; height: 13px; }
+#salvavidas .sv-att span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+#salvavidas .sv-reply { margin-top: 10px; padding: 9px 11px; border-radius: 10px; background: color-mix(in srgb, var(--sv-accent) 8%, #fff); border-left: 3px solid var(--sv-accent); }
+#salvavidas .sv-reply small { color: var(--sv-muted); font-size: 11.5px; font-weight: 600; }
+#salvavidas .sv-reply p { margin: 3px 0 0; white-space: pre-wrap; word-break: break-word; font-size: 13px; }
+
+/* Móvil: el panel como hoja inferior a todo lo ancho, por encima de los botones. */
+@media (max-width: 560px) {
+  #salvavidas .sv-fab--main { width: 48px; height: 48px; }
+  #salvavidas .sv-fab--main svg { width: 24px; height: 24px; }
+  #salvavidas .sv-fab--mine::after { display: none; }
+  #salvavidas .sv-panel {
+    left: 0; right: 0; bottom: 0; width: auto; max-width: none; border-radius: 18px 18px 0 0;
+    max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); padding-bottom: env(safe-area-inset-bottom);
+    z-index: calc(var(--sv-z) + 3);
+  }
+}
+
+@media print { #salvavidas { display: none !important; } }

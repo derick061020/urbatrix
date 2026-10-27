@@ -11,6 +11,9 @@
 
 return [
 
+    // Color de marca para piezas que se inyectan fuera de los layouts (salvavidas).
+    'accent'       => env('COMPANY_ACCENT', '#2b2b1a'),
+    'salvavidas'   => (bool) env('COMPANY_SALVAVIDAS', true),
     'brand'        => env('COMPANY_BRAND', 'SIEBE'),
     'project'      => env('COMPANY_PROJECT', 'Siebe Residences'),
     'group'        => env('COMPANY_GROUP', 'Siebe Property Group'),
