@@ -175,7 +175,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="text-center text-[12px] text-ink-500 py-8">{{ __('No hay expedientes. Crea uno con') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Nueva reserva') }}</button>.</td></tr>
+                        <tr><td colspan="9" class="text-left sm:text-center text-[12px] text-ink-500 py-8 px-5">{{ __('No hay expedientes. Crea uno con') }} <button type="button" onclick="document.getElementById('modal-nueva-reserva').showModal()" class="text-brand font-semibold hover:underline">{{ __('Nueva reserva') }}</button>.</td></tr>
                     @endforelse
                 </tbody>
             </table>

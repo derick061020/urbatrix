@@ -71,17 +71,17 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-4">
-        <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#1fc16b">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades disponibles') }}</div>
+    <div class="grid grid-cols-3 gap-2 sm:gap-4">
+        <div class="crm-card p-3 sm:p-4 border-t-[3px]" style="border-top-color:#1fc16b">
+            <div class="text-[9px] sm:text-[10px] uppercase tracking-normal sm:tracking-wide font-semibold text-ink-400">{{ __('Unidades disponibles') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countAvailable }}</div>
         </div>
-        <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#fa7319">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades reservadas') }}</div>
+        <div class="crm-card p-3 sm:p-4 border-t-[3px]" style="border-top-color:#fa7319">
+            <div class="text-[9px] sm:text-[10px] uppercase tracking-normal sm:tracking-wide font-semibold text-ink-400">{{ __('Unidades reservadas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countReserved }}</div>
         </div>
-        <div class="crm-card p-4 border-t-[3px]" style="border-top-color:#5c7c68">
-            <div class="text-[10px] uppercase tracking-wide font-semibold text-ink-400">{{ __('Unidades vendidas') }}</div>
+        <div class="crm-card p-3 sm:p-4 border-t-[3px]" style="border-top-color:#5c7c68">
+            <div class="text-[9px] sm:text-[10px] uppercase tracking-normal sm:tracking-wide font-semibold text-ink-400">{{ __('Unidades vendidas') }}</div>
             <div class="text-[26px] font-bold text-ink-900 leading-tight mt-1">{{ $countSold }}</div>
         </div>
     </div>
@@ -144,7 +144,7 @@
                             <td><input type="checkbox" class="w-4 h-4 accent-brand unit-select" value="{{ $u->id }}"></td>
                             <td class="text-[13px] font-semibold text-ink-900">{{ $u->custom_id ?? $u->name }}</td>
                             <td class="text-[12px] text-ink-700">{{ $u->layout ?? $u->type ?? '—' }}</td>
-                            <td class="text-[12px] text-ink-700">{{ $u->floor ?? '—' }}</td>
+                            <td class="text-[12px] text-ink-700">{{ filled($u->floor) ? \App\Support\UnitOptions::floorShort($u->floor) : '—' }}</td>
                             <td class="text-[12px] text-ink-700">{{ $u->bedrooms ?? '—' }}B · {{ $u->bathrooms ?? '—' }}Ba</td>
                             <td class="text-[12px] text-ink-700">{{ $u->internal_area ?? '—' }}</td>
                             <td class="text-[12px] text-ink-700">{{ $u->external_area ?? '—' }}</td>

@@ -578,7 +578,7 @@
                     {{-- Social buttons — icon only --}}
                     <div class="flex gap-3 mb-5">
                         {{-- Apple sign-in temporarily disabled --}}
-                        <a href="{{ route('auth.google') }}" class="auth-btn-social" title="{{ __('Registrarse con Google') }}">
+                        <a href="{{ route('auth.google', array_filter(['perfil' => request('perfil')])) }}" class="auth-btn-social" title="{{ __('Registrarse con Google') }}">
                             <svg width="20" height="20" viewBox="0 0 24 24">
                                 <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 16.42 6.5l3.27-3.27A11.97 11.97 0 0 0 1.31 7.41z"/>
                                 <path fill="#34A853" d="M16.04 18.01A7.36 7.36 0 0 1 12 19.1a7.08 7.08 0 0 1-6.72-4.82L1.29 17.41A12 12 0 0 0 12 24c2.93 0 5.73-1.04 7.83-3z"/>

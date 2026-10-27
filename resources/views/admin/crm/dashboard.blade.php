@@ -21,6 +21,13 @@
     .esc-age.warn { color:#fa7319; background:#fff3eb; }
     .esc-age.ok   { color:#717784; background:#f2f5f8; }
     .esc-item:hover { background:#fafbfc; }
+    /* Z Fold plegado (344 px): con la etiqueta de 74 px fijos el botón saltaba
+       de línea y quedaba entre la etiqueta y el título. */
+    @media (max-width: 380px) {
+        .esc-ty { width:auto; padding:3px 6px; }
+        .esc-item { column-gap:8px !important; }
+    }
+
     .esc-tab { font-size:11.5px; font-weight:600; color:#525866; background:none; border:0; border-radius:8px; padding:6px 10px; cursor:pointer; }
     .esc-tab.on { background:#eef2ef; color:#4a6354; }
     .esc-tab .n { color:#99a0ae; }
@@ -121,7 +128,7 @@
                     <div class="font-display text-[26px] font-bold text-ink-950 leading-none">{{ $k['n'] }}</div>
                     <div class="text-[13px] font-medium text-ink-700 mt-2">{{ $k['label'] }}</div>
                 </div>
-                <div class="px-4 py-1.5 bg-ink-50 border-t border-ink-100 text-[10px] tracking-wider font-semibold uppercase truncate {{ ($k['ok'] ?? false) ? 'text-ok-dark' : 'text-ink-500' }}">{{ $k['sub'] }}</div>
+                <div class="px-4 py-1.5 bg-ink-50 border-t border-ink-100 text-[10px] tracking-wider font-semibold uppercase leading-snug sm:truncate {{ ($k['ok'] ?? false) ? 'text-ok-dark' : 'text-ink-500' }}">{{ $k['sub'] }}</div>
             </a>
         @endforeach
     </div>

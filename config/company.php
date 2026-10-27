@@ -45,6 +45,38 @@ return [
         'instagram' => env('COMPANY_INSTAGRAM', 'https://www.instagram.com/makairesidences/'),
     ],
 
+    // Ficha de alta del broker (/broker/alta), de la que pasó Miguel el 26 oct
+    // (Popup_Alta_Broker.html). Comisión null = no se muestra.
+    // Los porcentajes (4 % / 6 %) eran los de Bahía Mar: en Makai no se
+    // muestran hasta confirmarlos; la comisión va en la ficha de cada Agent.
+    'broker_alta' => [
+        'tax_id_label' => 'RNC / Cédula',
+        'phone_ph'     => '+1 (809) 000-0000',
+        'currency_ph'  => 'USD / DOP / EUR…',
+        'law_note'     => 'Cumplimiento de la Ley 155-17 (prevención de lavado de activos). Acredita tu identidad profesional antes de operar.',
+        'kinds' => [
+            'broker' => ['commission' => null, 'tax_note' => 'Retenciones de ley (18 % ITBIS + 10 % ISR).'],
+            'agency' => ['commission' => null, 'tax_note' => 'Retención del 30 % del ITBIS.'],
+        ],
+        'docs' => [
+            'broker' => [
+                'id_doc'   => 'Documento de identidad (pasaporte o cédula)',
+                'bank_ref' => 'Carta de referencia bancaria',
+                'pro_ref'  => 'Carta de referencia profesional',
+            ],
+            'agency' => [
+                'registro'    => 'Certificado de Registro Mercantil vigente',
+                'rnc_cert'    => 'Certificación de inscripción en el RNC',
+                'articles'    => 'Estatutos sociales vigentes',
+                'designacion' => 'Documento de designación del representante',
+                'rep_id'      => 'Identidad del representante',
+                'acciones'    => 'Lista de suscripción y pago de acciones',
+                'bank_ref'    => 'Carta de referencia bancaria',
+                'pro_ref'     => 'Carta de referencia profesional',
+            ],
+        ],
+    ],
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Duna Development Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),

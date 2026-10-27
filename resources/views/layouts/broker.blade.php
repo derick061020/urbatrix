@@ -130,6 +130,11 @@
             <a href="{{ route('broker.contrato') }}" class="brk-nav-link {{ ($activeRoute ?? '') === 'contrato' ? 'active' : '' }}">
                 <i class="pi pi-file-edit"></i> {{ __('Mi contrato') }}
             </a>
+            @if(auth()->user()->brokerProfile)
+                <a href="{{ route('broker.alta') }}" class="brk-nav-link {{ request()->routeIs('broker.alta') ? 'active' : '' }}">
+                    <i class="pi pi-id-card"></i> {{ __('Mi alta') }}
+                </a>
+            @endif
         </nav>
 
         <div class="rounded-xl bg-white border border-ink-200 p-2 mb-2 flex justify-center">
@@ -167,6 +172,13 @@
             @endif
             @if(session('error'))
                 <div class="m-4 px-4 py-2 rounded-lg bg-err-soft text-err text-[12px]">{{ session('error') }}</div>
+            @endif
+            @php $brkAlta = auth()->user()->brokerProfile; @endphp
+            @if($brkAlta && $brkAlta->status === 'en_revision' && ! request()->routeIs('broker.alta'))
+                <div class="m-4 px-4 py-2.5 rounded-lg bg-warn-soft text-warn-dark text-[12px] flex items-center gap-2">
+                    <i class="pi pi-clock"></i>
+                    <span>{{ __('Tu alta está en revisión. Te avisaremos por email en cuanto quede verificada para operar.') }}</span>
+                </div>
             @endif
             @yield('content')
         </main>

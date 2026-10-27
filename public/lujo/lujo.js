@@ -459,7 +459,8 @@
       ['total', t('Total', 'Total'), m2(u.total_area)],
     ].filter(([, , v]) => v && v !== '0' && Number(v) !== 0),
   };
-  const num = (v, dec = 0) => Number(v).toLocaleString(ES ? 'es-ES' : 'en-US', { maximumFractionDigits: dec });
+  // es-ES no agrupa los números de cuatro cifras («$6056 / m²»): mismo formato que el resto de la ficha.
+  const num = (v, dec = 0) => Number(v).toLocaleString(ES ? 'es-DO' : 'en-US', { maximumFractionDigits: dec });
   const m2 = v => (Number(v) > 0 ? `${num(v, 2)} m²` : null);
 
   function pintarFicha(u) {

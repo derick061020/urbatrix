@@ -180,6 +180,16 @@ class AuthController extends Controller
 
         $user = User::create($userAttrs);
 
+        // «Agencia» y «broker» comparten el rol broker: el tipo se guarda en su
+        // ficha de alta, que rellena nada más entrar (/broker/alta).
+        if ($userAttrs['role'] === 'broker') {
+            \App\Models\BrokerProfile::create([
+                'user_id' => $user->id,
+                'kind'    => $data['role'] === 'agency' ? 'agency' : 'broker',
+                'data'    => ['nombre' => $data['full_name'], 'email' => $data['email'], 'tel' => $data['phone']],
+            ]);
+        }
+
         // Persist uploaded onboarding docs + remember id_front path on the user
         if ($hasDocs) {
             $folder = 'onboarding/'.$user->id;
