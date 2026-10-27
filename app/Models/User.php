@@ -179,6 +179,12 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    /** Ficha de alta (sólo brokers que se registran solos; los que da de alta el admin no la tienen). */
+    public function brokerProfile()
+    {
+        return $this->hasOne(\App\Models\BrokerProfile::class);
+    }
+
     public function isBroker(): bool
     {
         return $this->role === 'broker';

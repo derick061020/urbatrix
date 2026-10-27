@@ -13,7 +13,7 @@
     $group    = config('company.group', 'BAHÍA MAR');
     $location = config('company.location', 'República Dominicana');
     $email    = config('company.support_email', 'hello@landmasscapital.com');
-    $phone    = config('company.phone', '+1 849 499 2578');
+    $phone    = config('company.phone');
     $website   = config('company.website', 'landmasscapital.com');
     $docLabel  = $docLabel ?? '';
     $preheader = $preheader ?? '';

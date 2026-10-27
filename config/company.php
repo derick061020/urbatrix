@@ -17,13 +17,17 @@ return [
     'location'     => env('COMPANY_LOCATION', 'República Dominicana'),
 
     // Emisor de los comprobantes
-    'legal_name'   => env('COMPANY_LEGAL_NAME', 'IGUANAS LAKE CONDO & RESIDENCE SRL'),
-    'rnc'          => env('COMPANY_RNC', ''),
-    'address'      => env('COMPANY_ADDRESS', 'República Dominicana'),
+    // Landmass Capital, con los datos que pasó Miguel el 22 oct (grupo «Izan
+    // Chatbot Landmass»). Antes ponía la sociedad de Makai (IGUANAS LAKE).
+    'legal_name'   => env('COMPANY_LEGAL_NAME', 'Landmass Capital'),
+    'rnc'          => env('COMPANY_RNC', '133-04860-9'),
+    'address'      => env('COMPANY_ADDRESS', 'Edificio Cedro, Punta Cana Village · Blvd. 1ro. de Noviembre, Oficinas 2008/2009 · Punta Cana 23000'),
 
     // Contacto
     'support_email' => env('COMPANY_SUPPORT_EMAIL', 'hello@landmasscapital.com'),
-    'phone'         => env('COMPANY_PHONE', '+1 849 499 2578'),
+    // Único número de contacto de Bahía Mar, también el del WhatsApp (Miguel,
+    // 26 oct: «poner ese número en todas las secciones … como único número»).
+    'phone'         => env('COMPANY_PHONE', '+1 829 599 7785'),
     'website'       => env('COMPANY_WEBSITE', 'landmasscapital.com'),
 
     // Web pública del proyecto. Ojo, no es la misma que `website`, que es la
@@ -33,11 +37,10 @@ return [
     // (Miguel, 11 de octubre).
     'site'          => env('COMPANY_SITE', 'https://bahiamarterrenas.com'),
 
-    // WhatsApp de contacto, solo dígitos (formato de wa.me).
-    // Vacío a propósito: el que había era el de Duna/Makai y los botones
-    // llevaban a su chat. Mientras esté vacío, los botones de WhatsApp
-    // salen desactivados en vez de llevar al sitio equivocado.
-    'whatsapp'      => env('COMPANY_WHATSAPP', ''),
+    // WhatsApp de contacto, solo dígitos (formato de wa.me). El de Bahía Mar
+    // que dio Miguel el 26 oct; antes estaba vacío porque el heredado era el
+    // de Duna/Makai. Vacío = los botones de WhatsApp salen desactivados.
+    'whatsapp'      => env('COMPANY_WHATSAPP', '18295997785'),
 
     // Perfiles sociales del proyecto (URL completa). Vacío = el icono del
     // pie sale apagado y sin enlace, en vez de no hacer nada al pulsarlo,
@@ -45,6 +48,36 @@ return [
     'social' => [
         'facebook'  => env('COMPANY_FACEBOOK', ''),
         'instagram' => env('COMPANY_INSTAGRAM', ''),
+    ],
+
+    // Ficha de alta del broker (/broker/alta), de la que pasó Miguel el 26 oct
+    // (Popup_Alta_Broker.html). Comisión null = no se muestra.
+    'broker_alta' => [
+        'tax_id_label' => 'RNC / Cédula',
+        'phone_ph'     => '+1 (809) 000-0000',
+        'currency_ph'  => 'USD / DOP / EUR…',
+        'law_note'     => 'Cumplimiento de la Ley 155-17 (prevención de lavado de activos). Acredita tu identidad profesional antes de operar.',
+        'kinds' => [
+            'broker' => ['commission' => 4, 'tax_note' => 'Retenciones de ley (18 % ITBIS + 10 % ISR).'],
+            'agency' => ['commission' => 6, 'tax_note' => 'Retención del 30 % del ITBIS.'],
+        ],
+        'docs' => [
+            'broker' => [
+                'id_doc'   => 'Documento de identidad (pasaporte o cédula)',
+                'bank_ref' => 'Carta de referencia bancaria',
+                'pro_ref'  => 'Carta de referencia profesional',
+            ],
+            'agency' => [
+                'registro'    => 'Certificado de Registro Mercantil vigente',
+                'rnc_cert'    => 'Certificación de inscripción en el RNC',
+                'articles'    => 'Estatutos sociales vigentes',
+                'designacion' => 'Documento de designación del representante',
+                'rep_id'      => 'Identidad del representante',
+                'acciones'    => 'Lista de suscripción y pago de acciones',
+                'bank_ref'    => 'Carta de referencia bancaria',
+                'pro_ref'     => 'Carta de referencia profesional',
+            ],
+        ],
     ],
 
     // Firmante autorizado de los comprobantes

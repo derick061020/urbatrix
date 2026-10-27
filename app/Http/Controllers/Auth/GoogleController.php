@@ -17,6 +17,17 @@ class GoogleController extends Controller
      */
     public function redirect()
     {
+        // «Soy broker» en el popup de acceso llega con ?perfil=broker: si se
+        // registra con Google, la cuenta nueva tiene que nacer como broker y no
+        // como cliente (Miguel, 26 oct: «me registré como broker y no me lleva
+        // al área de broker»).
+        $perfil = strtolower((string) request()->query('perfil', ''));
+        if (in_array($perfil, ['broker', 'agency'], true)) {
+            session(['google_perfil' => $perfil]);
+        } else {
+            session()->forget('google_perfil');
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
@@ -45,15 +56,27 @@ class GoogleController extends Controller
                 }
             } else {
                 // Create new user
-                $user = User::create([
+                $perfil = session()->pull('google_perfil');
+                $attrs = [
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $avatarPath,
                     'password' => bcrypt(Str::random(32)), // Random password
                     'email_verified_at' => now(),
-                    'role' => 'user',
-                ]);
+                    'role' => $perfil ? 'broker' : 'user',
+                ];
+                if ($perfil && \Illuminate\Support\Facades\Schema::hasColumn('users', 'verification_status')) {
+                    $attrs['verification_status'] = 'pending';
+                }
+                $user = User::create($attrs);
+                if ($perfil) {
+                    \App\Models\BrokerProfile::create([
+                        'user_id' => $user->id,
+                        'kind'    => $perfil,
+                        'data'    => ['nombre' => $user->name, 'email' => $user->email],
+                    ]);
+                }
             }
 
             // Update last_seen

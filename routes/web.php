@@ -177,6 +177,8 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('broker')->middleware(['broker'])->group(function () {
     Route::get('/',            [BrokerController::class, 'index'])->name('broker.home');
     Route::get('/dashboard',   [BrokerController::class, 'dashboard'])->name('broker.dashboard');
+    Route::get('/alta',        [BrokerController::class, 'alta'])->name('broker.alta');
+    Route::post('/alta',       [BrokerController::class, 'altaStore'])->name('broker.alta.store');
     Route::get('/cartera',     [BrokerController::class, 'cartera'])->name('broker.cartera');
     Route::get('/registro',    [BrokerController::class, 'registro'])->name('broker.registro');
     Route::post('/registro',   [BrokerController::class, 'registroStore'])->name('broker.registro.store');
@@ -331,6 +333,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // KYC verification (approve/reject user registration docs)
     Route::post('/users/{userId}/verify-kyc', [AdminController::class, 'verifyUserKyc'])->name('admin.users.verify-kyc');
+    Route::get('/users/{user}/alta-broker', [AdminController::class, 'brokerAlta'])->name('admin.users.broker-alta');
+    Route::get('/users/{user}/alta-broker/{key}', [AdminController::class, 'brokerAltaDoc'])->name('admin.users.broker-alta.doc');
 
     // Edit a user's profile from the Usuarios page
     Route::post('/users/{userId}', [AdminController::class, 'updateUser'])->name('admin.users.update');
