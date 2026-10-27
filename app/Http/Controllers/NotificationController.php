@@ -103,6 +103,26 @@ class NotificationController extends Controller
                 }
             }
 
+            // Diligencia debida (CDD): screenings por hacer y formularios KYC por revisar.
+            if (\App\Models\CddFile::enabled()) {
+                $pend = \App\Models\CddFile::with('reservation')
+                    ->where(fn ($q) => $q->where('screening_status', 'pendiente')->orWhere('kyc_status', 'enviado'))
+                    ->latest('updated_at')->limit(10)->get();
+                foreach ($pend as $c) {
+                    if (! $c->reservation) continue;
+                    $screen = $c->screening_status === 'pendiente';
+                    $items->push([
+                        'id'         => 'cdd-'.$c->id.'-'.($screen ? 's' : 'k'),
+                        'icon'       => 'pi-shield',
+                        'color'      => 'amber',
+                        'title'      => $screen ? __('Screening de sanciones y PEP pendiente') : __('Formulario KYC por revisar'),
+                        'body'       => trim($c->reservation->first_name.' '.$c->reservation->last_name).' · '.($c->reservation->unit_name ?? ''),
+                        'created_at' => $c->updated_at,
+                        'url'        => route('admin.crm.expediente.detalle', ['id' => $c->reservation_id, 'tab' => 'cumplimiento']),
+                    ]);
+                }
+            }
+
             // Solicitudes de código de exportación pendientes
             $exportRequests = ExportAuthorization::with('requester')
                 ->whereNull('used_at')

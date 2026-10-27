@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [ReservationController::class, 'showCheckout']);
     Route::post('/checkout/payment-intent', [ReservationController::class, 'createPaymentIntent']);
     Route::post('/checkout/confirm', [ReservationController::class, 'confirmPayment']);
+    Route::post('/checkout/identificacion', [ReservationController::class, 'uploadScreeningId'])->name('checkout.screening-id');
 });
 
 // Dashboard route (protected)
@@ -161,6 +162,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Calendario
     Route::get('/dashboard/calendario', [DashboardController::class, 'calendario'])->name('dashboard.calendario');
+    // KYC / diligencia debida de Siebe Group (CddController)
+    Route::get('/dashboard/cumplimiento',  [\App\Http\Controllers\CddController::class, 'clientShow'])->name('dashboard.cumplimiento');
+    Route::post('/dashboard/cumplimiento', [\App\Http\Controllers\CddController::class, 'clientSubmit'])->name('dashboard.cumplimiento.submit');
 
     // Videollamadas (Google Meet)
     Route::get('/api/meetings/availability', [MeetingController::class, 'availability'])->name('meetings.availability');
@@ -330,6 +334,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::post('/crm/anuncios/{announcement}/archive', [\App\Http\Controllers\CrmAnnouncementController::class, 'archive'])->name('admin.crm.anuncios.archive');
     Route::get('/crm/proyectos/{id}', [AdminController::class, 'crmProyectoDetalle'])->name('admin.crm.proyecto.detalle');
     Route::get('/crm/expedientes/{id}', [AdminController::class, 'crmExpedienteDetalle'])->name('admin.crm.expediente.detalle');
+    Route::post('/crm/expedientes/{reservation}/cdd', [\App\Http\Controllers\CddController::class, 'update'])->name('admin.crm.cdd.update');
+    Route::get('/crm/expedientes/{reservation}/cdd/informe', [\App\Http\Controllers\CddController::class, 'report'])->name('admin.crm.cdd.report');
+    Route::get('/crm/expedientes/{reservation}/cdd/doc/{key}/{i?}', [\App\Http\Controllers\CddController::class, 'doc'])->whereNumber('i')->name('admin.crm.cdd.doc');
 
     // KYC verification (approve/reject user registration docs)
     Route::post('/users/{userId}/verify-kyc', [AdminController::class, 'verifyUserKyc'])->name('admin.users.verify-kyc');

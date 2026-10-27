@@ -26,17 +26,18 @@
 
     {{-- Client header --}}
     <div class="crm-card p-5">
-        <div class="flex items-start gap-4">
-            <a href="{{ route('admin.crm.expedientes') }}" class="w-10 h-10 rounded-full border border-ink-200 flex items-center justify-center text-ink-600 hover:bg-ink-50"><i class="pi pi-arrow-left text-[12px]"></i></a>
-            <div class="crm-avatar" style="width:64px;height:64px;font-size:22px;background:#7cb8e7">{{ $initial }}</div>
-            <div class="flex-1">
+        <div class="flex flex-wrap items-start gap-3 sm:gap-4">
+            <a href="{{ route('admin.crm.expedientes') }}" class="shrink-0 w-10 h-10 rounded-full border border-ink-200 flex items-center justify-center text-ink-600 hover:bg-ink-50"><i class="pi pi-arrow-left text-[12px]"></i></a>
+            <div class="crm-avatar shrink-0" style="width:64px;height:64px;font-size:22px;background:#7cb8e7">{{ $initial }}</div>
+            <div class="flex-1 min-w-[180px]">
                 <div class="text-[22px] font-bold text-ink-900 leading-tight">{{ $fullName }}</div>
-                <div class="text-[12px] text-ink-500 mt-1">
-                    {{ $reservation->country ?? 'Rep. Dominicana' }} &nbsp;·&nbsp; {{ $email }} &nbsp;·&nbsp; {{ $phone }}
+                <div class="text-[12px] text-ink-500 mt-1 break-words">
+                    {{ $reservation->country ?: '—' }} &nbsp;·&nbsp; {{ $email }} &nbsp;·&nbsp; {{ $phone }}
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="crm-pill bg-ink-100 text-ink-600">Asesor: <span class="font-bold ml-1 text-ink-900">{{ $reservation->user?->name ?? 'Sin asignar' }}</span></span>
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                {{-- El asesor es el agente de la unidad; aquí salía el propio cliente ($reservation->user). --}}
+                <span class="crm-pill bg-ink-100 text-ink-600">{{ __('Asesor') }}: <span class="font-bold ml-1 text-ink-900">{{ $reservation->unit?->agent?->name ?? __('Sin asignar') }}</span></span>
                 <span class="crm-pill bg-{{ $estadoColor }}-soft text-{{ $estadoColor }}">● {{ $estado }}</span>
             </div>
         </div>
@@ -68,6 +69,7 @@
                     ['historial','Historial'],
                     ['comunicaciones','Comunicaciones'],
                 ];
+                if (\App\Models\CddFile::enabled()) $tabs[] = ['cumplimiento', __('Cumplimiento')];
             @endphp
             @foreach($tabs as $tdata)
                 <a href="?tab={{ $tdata[0] }}" class="crm-tab-line {{ $tab === $tdata[0] ? 'active' : '' }}">{{ $tdata[1] }}</a>
@@ -537,6 +539,10 @@
                         @endforelse
                     </div>
                 </div>
+
+            {{-- ============ CUMPLIMIENTO (CDD) ============ --}}
+            @elseif($tab === 'cumplimiento' && \App\Models\CddFile::enabled())
+                @include('admin.crm._partials.cdd_tab')
 
             {{-- ============ COMUNICACIONES ============ --}}
             @elseif($tab === 'comunicaciones')

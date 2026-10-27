@@ -99,6 +99,11 @@ class Reservation extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function cdd()
+    {
+        return $this->hasOne(\App\Models\CddFile::class);
+    }
+
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');

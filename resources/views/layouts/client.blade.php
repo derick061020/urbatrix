@@ -291,6 +291,13 @@
                 <i class="pi pi-credit-card"></i> {{ __('Plan de pagos') }}
                 @if($pendingPays > 0)<span class="badge-count">{{ $pendingPays }}</span>@endif
             </a>
+            @if(\App\Models\CddFile::enabled())
+                @php $cliCdd = \App\Models\CddFile::whereHas('reservation', fn ($q) => $q->where('user_id', $uid))->whereIn('kyc_status', ['solicitado', 'info_adicional'])->count(); @endphp
+                <a href="{{ route('dashboard.cumplimiento') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'cumplimiento' ? 'active' : '' }}">
+                    <i class="pi pi-shield"></i> {{ __('Verificación KYC') }}
+                    @if($cliCdd > 0)<span class="badge-count">{{ $cliCdd }}</span>@endif
+                </a>
+            @endif
             <a href="{{ route('dashboard.guardados') }}" class="cli-nav-link {{ ($activeRoute ?? '') === 'guardados' ? 'active' : '' }}">
                 <i class="pi pi-heart"></i> {{ __('Guardados') }}
                 @if($savedCount > 0)<span class="badge-count" style="background:#2b2b1a">{{ $savedCount }}</span>@endif

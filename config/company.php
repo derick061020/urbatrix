@@ -86,6 +86,17 @@ return [
         ],
     ],
 
+    // Diligencia debida (CDD/KYC) de Siebe Group, según su «Flow Chart CDD
+    // Process» (Miguel, 26 oct: «todo esto ha de estar online en Siebe»).
+    'cdd' => [
+        'enabled'                  => (bool) env('COMPANY_CDD_ENABLED', true),
+        // El screening de sanciones/PEP va antes de aceptar el depósito.
+        'screening_before_deposit' => (bool) env('COMPANY_CDD_SCREENING_FIRST', true),
+        'fiu_threshold_awg'        => 500000,
+        'awg_per_usd'              => 1.79,       // paridad fija del florín
+        'retention_years'          => 10,
+    ],
+
     // Firmante autorizado de los comprobantes
     'signer_name'   => env('COMPANY_SIGNER_NAME', 'Siebe Property Group'),
     'signer_title'  => env('COMPANY_SIGNER_TITLE', 'Departamento de Finanzas'),

@@ -118,6 +118,13 @@ class ReservationController extends Controller
     private function currentReservation()
     {
         $data = session('reservation');
+        // Sin sesión (vuelve desde el email «ya puedes completar tu reserva»
+        // de la verificación previa): su última reserva aún sin pagar.
+        if (!$data && Auth::check()) {
+            return Reservation::where('user_id', Auth::id())
+                ->where('status', 'pending_payment')->whereNull('paid_at')
+                ->latest()->first();
+        }
         if (!$data) return null;
 
         $id = is_array($data) ? ($data['id'] ?? null) : ($data->id ?? null);
@@ -162,9 +169,49 @@ class ReservationController extends Controller
         }
 
         $unit = Unit::find($reservation->unit_id);
+
+        // Siebe (CDD): el screening de sanciones y PEP va antes de aceptar el
+        // depósito. Mientras no esté limpio, en vez del pago se enseña la
+        // verificación previa y la reserva se guarda una semana.
+        if ($cdd = $this->pendingScreening($reservation)) {
+            if ($reservation->expires_at->lt(now()->addDays(6))) {
+                $reservation->update(['expires_at' => now()->addDays(7)]);
+            }
+            return view('checkout-verificacion', compact('reservation', 'unit', 'cdd'));
+        }
+
         $stripeKey = config('services.stripe.key');
 
         return view('checkout', compact('reservation', 'unit', 'stripeKey'));
+    }
+
+    /** Expediente CDD con el screening aún sin limpiar, o null si se puede cobrar. */
+    private function pendingScreening(Reservation $reservation): ?\App\Models\CddFile
+    {
+        if (! \App\Models\CddFile::enabled() || ! config('company.cdd.screening_before_deposit')) {
+            return null;
+        }
+        $cdd = $reservation->cdd ?? $reservation->cdd()->create([]);
+
+        return $cdd->screeningCleared() ? null : $cdd;
+    }
+
+    /** Documento de identidad para el screening, subido desde la verificación previa. */
+    public function uploadScreeningId(Request $request)
+    {
+        $reservation = $this->currentReservation();
+        abort_unless($reservation && ($cdd = $this->pendingScreening($reservation)), 404);
+        $request->validate(['ids' => 'required|array|max:4', 'ids.*' => 'file|max:10240|mimes:pdf,jpg,jpeg,png']);
+
+        $docs = (array) ($cdd->kyc_docs ?? []);
+        foreach ($request->file('ids') as $file) {
+            $docs['reserva_id'][] = $file->store('cdd/' . $reservation->id . '/reserva_id', 'local');
+        }
+        $cdd->kyc_docs = $docs;
+        $cdd->addLog('El comprador ha subido su documento de identidad para el screening.');
+        $cdd->save();
+
+        return back()->with('success', __('Documento recibido. Te avisaremos por email en cuanto puedas completar el pago.'));
     }
 
     /**
@@ -176,6 +223,9 @@ class ReservationController extends Controller
         $reservation = $this->currentReservation();
         if (!$reservation || $reservation->status !== 'pending_payment') {
             return response()->json(['success' => false, 'message' => __('Reserva no encontrada o ya procesada.')], 422);
+        }
+        if ($this->pendingScreening($reservation)) {
+            return response()->json(['success' => false, 'message' => __('Antes de aceptar el depósito hay que completar la verificación de identidad.')], 422);
         }
 
         $secret = config('services.stripe.secret');
@@ -235,6 +285,9 @@ class ReservationController extends Controller
         $reservation = $this->currentReservation();
         if (!$reservation) {
             return response()->json(['success' => false, 'message' => __('Reserva no encontrada.')], 422);
+        }
+        if (! $reservation->paid_at && $this->pendingScreening($reservation)) {
+            return response()->json(['success' => false, 'message' => __('Antes de aceptar el depósito hay que completar la verificación de identidad.')], 422);
         }
 
         // Idempotent: already paid → just succeed

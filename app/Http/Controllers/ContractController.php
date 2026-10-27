@@ -581,6 +581,12 @@ class ContractController extends Controller
             return back()->with('error', __('El presupuesto aún no fue enviado por el equipo.'));
         }
 
+        // CDD de Siebe: el contrato de compraventa sólo con el KYC aprobado por
+        // cumplimiento y por el director de ventas.
+        if (\App\Models\CddFile::enabled() && ! optional($reservation->cdd)->saleApproved()) {
+            return back()->with('error', __('El contrato de compraventa se prepara cuando cumplimiento y el director de ventas han aprobado el KYC.'));
+        }
+
         try {
             // Render the printable HTML view (open in browser → "Descargar PDF")
             return \App\Helpers\DocumentDataHelper::renderAndStore($reservation, 'purchase_promise');
