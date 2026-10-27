@@ -459,7 +459,9 @@
       ['banos', t('Baños', 'Bathrooms'), u.bathrooms && Number(u.bathrooms)],
       ['planta', t('Planta', 'Floor'), planta(u.floor)],
       ['tipo', t('Plano', 'Layout'), u.layout],
-      ['rasgo', t('Tipo', 'Type'), u.custom_1],
+      // La característica de la lista de precios, traducida si está en el
+      // catálogo («Terraza jardín»); si no, el texto tal cual (custom_1).
+      ['rasgo', t('Característica', 'Feature'), (OPC.outlooks || {})[u.outlook] || u.custom_1],
       ['interior', t('Interior', 'Interior'), m2(u.internal_area)],
       ['terraza', t('Terraza', 'Terrace'), m2(u.external_area)],
       ['total', t('Total', 'Total'), m2(u.total_area)],
@@ -469,6 +471,18 @@
   // mismo formato que el resto de cifras de la ficha, como en Bahía Mar.
   const num = (v, dec = 0) => Number(v).toLocaleString(ES ? 'es-DO' : 'en-US', { maximumFractionDigits: dec });
   const m2 = v => (Number(v) > 0 ? `${num(v, 2)} m²` : null);
+
+  const OPC = window.LX_OPCIONES || {};
+  // Amenidades del edificio (Miguel, 27 oct: «agregar todas estas amenidades a
+  // todas las fichas»). La capa oculta el bloque original, así que van aquí.
+  const amenidades = u => {
+    const keys = Array.isArray(u.amenities) ? u.amenities : [];
+    const nombres = OPC.amenities || {};
+    const items = keys.filter(k => nombres[k]);
+    if (!items.length) return '';
+    return `<p class="lx-eyebrow lx-ficha-sub">${t('Amenidades del edificio', 'Building amenities')}</p>
+      <ul class="lx-ficha-amen">${items.map(k => `<li>${(OPC.icons || {})[k] || ''}<span>${nombres[k]}</span></li>`).join('')}</ul>`;
+  };
 
   function pintarFicha(u) {
     const modal = $('#moreInfoModal');
@@ -504,7 +518,8 @@
       <div class="lx-ficha-plan" data-slot-plan></div>
       ${desc.length > 24 ? `<p class="lx-ficha-desc">${desc}</p>` : ''}
       <p class="lx-eyebrow lx-ficha-sub">${FICHA.datos}</p>
-      <dl class="lx-ficha-datos">${FICHA.filas(u).map(([i, k, v]) => `<div><dt>${svg(i)}${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+      <dl class="lx-ficha-datos">${FICHA.filas(u).map(([i, k, v]) => `<div><dt>${svg(i)}${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      ${amenidades(u)}`;
     // El precio, el selector de moneda y el simulador son los nodos del
     // sitio, movidos: así siguen respondiendo sin duplicar lógica.
     const slot = $('[data-slot-precio]', caja);

@@ -809,3 +809,9 @@
 @media (prefers-reduced-motion: reduce){
   .fg-units-grid > .fg-card .fg-card-availability.advisor-live .dot{ animation: none !important; }
 }
+
+/* Amenidades del edificio en la ficha (lujo.js → amenidades()). */
+.lx-ficha-amen{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lx-ficha-amen li{ display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--lx-hair); border-radius: 10px; font-size: 13px; color: var(--lx-text, #191919); }
+.lx-ficha-amen svg{ width: 18px; height: 18px; flex: none; color: var(--lx-body); }
+@media (max-width: 380px){ .lx-ficha-amen{ grid-template-columns: 1fr; } }

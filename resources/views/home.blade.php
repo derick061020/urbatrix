@@ -5933,6 +5933,13 @@
      Va la última a propósito: tiene que ganar a los <style> en línea de esta
      misma vista. --}}
 <link rel="stylesheet" href="{{ asset('lujo/lujo.css') }}?v={{ @filemtime(public_path('lujo/lujo.css')) }}">
+{{-- Catálogo del panel para la ficha de la capa (lujo.js): amenidades y
+     características con su nombre ya traducido. --}}
+<script>window.LX_OPCIONES = {{ Js::from([
+    'amenities' => \App\Support\UnitOptions::map('amenities'),
+    'icons'     => \App\Support\UnitOptions::amenityIcons(),
+    'outlooks'  => \App\Support\UnitOptions::map('outlooks'),
+]) }};</script>
 <script src="{{ asset('lujo/lujo.js') }}?v={{ @filemtime(public_path('lujo/lujo.js')) }}" defer></script>
 {{-- Lo que la capa no resuelve de tamaños (ficha en tablet, 320 px). --}}
 <link rel="stylesheet" href="{{ asset('css/ajustes-responsive.css') }}?v={{ @filemtime(public_path('css/ajustes-responsive.css')) }}">
