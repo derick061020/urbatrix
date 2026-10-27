@@ -53,11 +53,7 @@
 }
 #salvavidas.is-open .sv-fab--main .sv-dot { display: none; }
 
-/* ── Capturando: spinner en el botón ─────────────────────────────────────── */
-#salvavidas .sv-ico--spin { opacity: 0; }
-#salvavidas.is-capturing .sv-ico--buoy, #salvavidas.is-capturing .sv-ico--close { opacity: 0; }
-#salvavidas.is-capturing .sv-ico--spin { opacity: 1; }
-#salvavidas.is-capturing .sv-fab--main { cursor: progress; }
+/* ── Spinner y botones secundarios ──────────────────────────────────────── */
 #salvavidas .sv-spin {
   display: block; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff;
   animation: svSpin .8s linear infinite;
@@ -69,6 +65,12 @@
 }
 #salvavidas .sv-chip--ghost { border: 1px dashed #c9c9ce; }
 #salvavidas .sv-chip--block { display: block; width: 100%; padding: 12px; border-radius: 10px; }
+
+#salvavidas .sv-spin--dark { border-color: #dcdce0; border-top-color: var(--sv-accent); width: 18px; height: 18px; }
+#salvavidas .sv-shot--wait {
+  display: flex; align-items: center; justify-content: center; gap: 10px; height: 120px;
+  color: var(--sv-muted); font-size: 13px;
+}
 
 /* ── Panel (formulario, enviado, mis tickets) ────────────────────────────── */
 #salvavidas .sv-panel {

@@ -65,7 +65,7 @@
     <div class="sv-fab-wrap">
       <button type="button" class="sv-fab sv-fab--mine" data-sv="mine" aria-label="${T.mine}" title="${T.mine}" tabindex="-1">${ICON.list}<span class="sv-dot" hidden></span></button>
       <button type="button" class="sv-fab sv-fab--main" data-sv="main" aria-label="${T.main}" title="${T.main}" aria-expanded="false">
-        <span class="sv-ico sv-ico--buoy">${ICON.buoy}</span><span class="sv-ico sv-ico--close">${ICON.close}</span><span class="sv-ico sv-ico--spin"><span class="sv-spin"></span></span><span class="sv-dot" hidden></span>
+        <span class="sv-ico sv-ico--buoy">${ICON.buoy}</span><span class="sv-ico sv-ico--close">${ICON.close}</span><span class="sv-dot" hidden></span>
       </button>
     </div>`;
   document.body.appendChild(root);
@@ -91,17 +91,21 @@
     if (panel) { panel.remove(); panel = null; }
     if (shotUrl) URL.revokeObjectURL(shotUrl);
     shot = shotUrl = null;
+    shotJob = null;
+    shotState = 'none';
     files = [];
     setOpen(false);
   }
 
   btnMain.addEventListener('click', () => {
-    if (state === 'idle') capture();
-    else if (state !== 'capturing') reset();
+    if (state === 'idle') { openForm(); snapshot(); }
+    else reset();
   });
+  // La librería se descarga al acercarse al botón, no al tocarlo.
+  ['pointerenter', 'touchstart', 'focus'].forEach(ev => btnMain.addEventListener(ev, () => loadLib().catch(() => {}), { once: true, passive: true }));
   btnMine.addEventListener('click', () => openMine());
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && state !== 'idle' && state !== 'capturing') { e.stopPropagation(); reset(); }
+    if (e.key === 'Escape' && state !== 'idle') { e.stopPropagation(); reset(); }
   }, true);
 
   // ── 1. Captura de lo que se ve ahora mismo ────────────────────────────────
@@ -120,49 +124,91 @@
     return libPromise;
   }
 
-  // Lo que queda fuera de la pantalla no se clona ni se pinta. La librería copia
-  // los estilos de cada SVG, y con cientos de tarjetas (Makai) la captura de la
-  // página entera tardaba 40 s; así son unos pocos.
-  function fuera(el) {
-    if (el === document.body || el === document.documentElement || el.tagName === 'HEAD' || el.closest?.('head')) return false;
-    const b = el.getBoundingClientRect();
-    if (!b.width && !b.height) return false;   // display:contents y similares: sus hijos sí se ven
-    return b.bottom < 0 || b.top > window.innerHeight || b.right < 0 || b.left > window.innerWidth;
+  // Se salta lo que no se ve y no sostiene lo que sí: lo oculto (display:none:
+  // el mapa, la vista de lista, los modales cerrados), lo que queda entero por
+  // debajo de la pantalla y las capas fijas transparentes. Lo de arriba se
+  // conserva aunque no se vea: quitarlo haría subir la página en la copia.
+  // La librería copia los estilos de cada SVG, y en Makai, con 8.500 nodos SVG
+  // ocultos, la captura tardaba 55 s; así, 1-2 s.
+  // Se decide ANTES de llamar a html2canvas: la librería lleva la ventana a
+  // (0, 0) para clonar, y medir durante el clonado daba posiciones falsas.
+  function invisibles() {
+    const fuera = new WeakSet();
+    const H = window.innerHeight;
+    const SKIP = { SCRIPT: 1, STYLE: 1, LINK: 1, META: 1, TEMPLATE: 1, NOSCRIPT: 1 };
+    // true si el elemento (o algo dentro) se ve. Un header fijo puede vivir
+    // dentro de algo que ya no se ve, así que se mira dentro antes de quitar.
+    function seVe(el) {
+      if (el === root) { fuera.add(el); return false; }
+      const b = el.getBoundingClientRect();
+      const sinTam = !b.width && !b.height;
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none') { fuera.add(el); return false; }
+      if ((cs.position === 'fixed' || cs.position === 'absolute') && (cs.opacity === '0' || cs.visibility === 'hidden')) { fuera.add(el); return false; }
+      let alguno = false;
+      for (const c of el.children) if (!SKIP[c.tagName] && seVe(c)) alguno = true;
+      if (!sinTam && b.top > H && !alguno) { fuera.add(el); return false; }
+      return true;
+    }
+    for (const c of document.body.children) if (!SKIP[c.tagName]) seVe(c);
+    return fuera;
   }
 
-  async function capture() {
-    if (panel) { panel.remove(); panel = null; }
-    state = 'capturing';
-    setOpen(true);
-    root.classList.add('is-capturing');
-    btnMain.setAttribute('aria-label', T.capturing);
-    let ok = false;
-    try {
+  // El formulario sale al instante y la captura se hace detrás (el propio
+  // salvavidas queda fuera de la foto). Enviar espera a que termine.
+  let shotJob = null, shotState = 'none';   // none · pending · ready · failed
+  function snapshot() {
+    shotState = 'pending';
+    paintShot();
+    const job = shotJob = (async () => {
+      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
       const html2canvas = await loadLib();
       const w = document.documentElement.clientWidth, hh = window.innerHeight;
-      const scale = Math.min(window.devicePixelRatio || 1, 2);
+      const sx = window.scrollX, sy = window.scrollY;
+      const fuera = invisibles();
       const canvas = await Promise.race([
         html2canvas(document.body, {
-          x: window.scrollX, y: window.scrollY, width: w, height: hh,
-          windowWidth: w, windowHeight: hh, scrollX: window.scrollX, scrollY: window.scrollY,
-          scale, useCORS: true, logging: false, imageTimeout: 6000,
+          x: sx, y: sy, width: w, height: hh,
+          windowWidth: w, windowHeight: hh, scrollX: sx, scrollY: sy,
+          scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, imageTimeout: 4000,
           backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
-          // El propio salvavidas no sale en la foto.
-          ignoreElements: el => el.id === 'salvavidas' || fuera(el),
+          ignoreElements: el => fuera.has(el),
         }),
-        new Promise((_, ko) => setTimeout(() => ko(new Error('timeout')), 25000)),
+        new Promise((_, ko) => setTimeout(() => ko(new Error('timeout')), 12000)),
       ]);
-      shot = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
-      ok = !!shot;
-    } catch (e) {
+      return await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.88));
+    })().then(blob => {
+      if (job !== shotJob) return;
+      if (shotUrl) URL.revokeObjectURL(shotUrl);
+      shot = blob || null;
+      shotUrl = shot ? URL.createObjectURL(shot) : null;
+      shotState = shot ? 'ready' : 'failed';
+    }, e => {
+      if (job !== shotJob) return;
       console.warn('[salvavidas] captura', e);
       shot = null;
-    }
-    root.classList.remove('is-capturing');
-    if (state !== 'capturing') return;   // lo cerró mientras tanto
+      shotState = 'failed';
+    }).finally(() => { if (job === shotJob) paintShot(); });
+    return job;
+  }
+  function dropShot() {
+    shotJob = null;
     if (shotUrl) URL.revokeObjectURL(shotUrl);
-    shotUrl = shot ? URL.createObjectURL(shot) : null;
-    openForm(ok ? null : T.shotFail);
+    shot = shotUrl = null;
+    shotState = 'none';
+    paintShot();
+  }
+  function paintShot() {
+    const box = panel && panel.querySelector('[data-sv="shotbox"]');
+    if (!box) return;
+    if (shotState === 'pending') {
+      box.innerHTML = `<div class="sv-shot sv-shot--wait"><span class="sv-spin sv-spin--dark"></span>${T.capturing}</div>`;
+    } else if (shotState === 'ready') {
+      box.innerHTML = `<figure class="sv-shot"><img src="${shotUrl}" alt="${T.shot}"><figcaption><button type="button" class="sv-link" data-sv="retake">${T.retake}</button><button type="button" class="sv-link" data-sv="dropshot">${T.remove}</button></figcaption></figure>`;
+    } else {
+      box.innerHTML = (shotState === 'failed' ? `<div class="sv-note">${esc(T.shotFail)}</div>` : '')
+        + `<button type="button" class="sv-chip sv-chip--ghost sv-chip--block" data-sv="retake">${T.addShot}</button>`;
+    }
   }
 
   // ── 3. Formulario ─────────────────────────────────────────────────────────
@@ -175,7 +221,7 @@
     return panel;
   }
 
-  function openForm(notice) {
+  function openForm() {
     state = 'form';
     setOpen(true);
     const p = openPanel('sv-panel--form');
@@ -183,9 +229,7 @@
     p.innerHTML = `
       <div class="sv-head"><b>${T.title}</b><button type="button" class="sv-x" data-sv="close" aria-label="${T.close}">${ICON.close}</button></div>
       <form class="sv-body" novalidate>
-        ${notice ? `<div class="sv-note">${esc(notice)}</div>` : ''}
-        ${shotUrl ? `<figure class="sv-shot"><img src="${shotUrl}" alt="${T.shot}"><figcaption><button type="button" class="sv-link" data-sv="retake">${T.retake}</button><button type="button" class="sv-link" data-sv="dropshot">${T.remove}</button></figcaption></figure>`
-                  : `<button type="button" class="sv-chip sv-chip--ghost sv-chip--block" data-sv="retake">${T.addShot}</button>`}
+        <div data-sv="shotbox"></div>
         <label class="sv-field"><span>${T.comment}</span><textarea name="comment" rows="4" maxlength="5000" placeholder="${T.commentPh}" required></textarea></label>
         ${CFG.auth ? '' : `
           <div class="sv-row">
@@ -208,15 +252,11 @@
     const drop = p.querySelector('.sv-drop');
 
     p.querySelector('[data-sv="close"]').addEventListener('click', reset);
-    p.querySelectorAll('[data-sv="retake"]').forEach(b => b.addEventListener('click', () => { keepForm(form); capture(); }));
-    const dropShot = p.querySelector('[data-sv="dropshot"]');
-    if (dropShot) dropShot.addEventListener('click', () => {
-      keepForm(form);
-      if (shotUrl) URL.revokeObjectURL(shotUrl);
-      shot = shotUrl = null;
-      openForm();
+    p.querySelector('[data-sv="shotbox"]').addEventListener('click', e => {
+      if (e.target.closest('[data-sv="retake"]')) snapshot();
+      else if (e.target.closest('[data-sv="dropshot"]')) dropShot();
     });
-    restoreForm(form);
+    paintShot();
 
     function addFiles(list_) {
       showErr('');
@@ -253,14 +293,15 @@
       const fd = new FormData();
       fd.append('comment', comment);
       if (!CFG.auth) { fd.append('email', form.email.value.trim()); if (form.name.value.trim()) fd.append('name', form.name.value.trim()); }
+      const send = form.querySelector('.sv-send');
+      send.disabled = true;
+      send.textContent = T.sending;
+      if (shotState === 'pending' && shotJob) await shotJob;
       if (shot) fd.append('screenshot', shot, 'captura.' + (shot.type === 'image/jpeg' ? 'jpg' : 'png'));
       files.forEach(f => fd.append('attachments[]', f, f.name));
       fd.append('page_url', location.href.slice(0, 2048));
       fd.append('page_title', (document.title || '').slice(0, 255));
       fd.append('viewport', window.innerWidth + 'x' + window.innerHeight);
-      const send = form.querySelector('.sv-send');
-      send.disabled = true;
-      send.textContent = T.sending;
       try {
         const r = await fetch(CFG.urls.store, {
           method: 'POST', body: fd, credentials: 'same-origin',
@@ -271,7 +312,6 @@
           const first = d.errors ? Object.values(d.errors)[0] : null;
           throw new Error((first && first[0]) || d.message || T.err);
         }
-        saved = null;
         done(d.code);
       } catch (ex) {
         showErr(ex.message && ex.message !== 'Failed to fetch' ? ex.message : T.err);
@@ -282,21 +322,11 @@
     setTimeout(() => form.comment.focus({ preventScroll: true }), 30);
   }
 
-  // Lo escrito sobrevive a «Repetir» la captura.
-  let saved = null;
-  function keepForm(form) {
-    saved = { comment: form.comment.value, name: form.name?.value, email: form.email?.value };
-  }
-  function restoreForm(form) {
-    if (!saved) return;
-    form.comment.value = saved.comment || '';
-    if (form.name && saved.name) form.name.value = saved.name;
-    if (form.email && saved.email) form.email.value = saved.email;
-  }
-
   function done(code) {
     if (shotUrl) URL.revokeObjectURL(shotUrl);
     shot = shotUrl = null;
+    shotJob = null;
+    shotState = 'none';
     files = [];
     const p = openPanel('sv-panel--done');
     p.innerHTML = `
@@ -322,7 +352,7 @@
       <div class="sv-body"><div class="sv-muted">${T.loading}</div></div>
       <div class="sv-foot"><button type="button" class="sv-send" data-sv="new">${ICON.buoy}${T.newTicket}</button></div>`;
     p.querySelector('[data-sv="close"]').addEventListener('click', reset);
-    p.querySelector('[data-sv="new"]').addEventListener('click', () => { p.remove(); panel = null; capture(); });
+    p.querySelector('[data-sv="new"]').addEventListener('click', () => { p.remove(); panel = null; openForm(); snapshot(); });
     const body = p.querySelector('.sv-body');
     try {
       const r = await fetch(CFG.urls.mine, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
@@ -369,7 +399,7 @@
     }
     if (!fijo) return;
     const f = fijo.getBoundingClientRect();
-    if (f.height > window.innerHeight * 0.6 && f.width < 420 && f.left < 40) {
+    if (f.height > window.innerHeight * 0.6 && f.width < Math.min(420, window.innerWidth * 0.45) && f.left < 40 && f.right + 80 < window.innerWidth) {
       root.style.setProperty('--sv-left', Math.round(f.right + 16) + 'px');
     } else if (f.top > window.innerHeight * 0.55) {
       root.style.setProperty('--sv-bottom', Math.round(window.innerHeight - f.top + 12) + 'px');
