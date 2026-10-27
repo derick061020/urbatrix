@@ -35,7 +35,9 @@ class SecurityHeaders
         // Storage, Firebase…) y algunas URL las guarda el admin: cualquier https.
         'img-src'         => ["'self'", 'data:', 'blob:', 'https:'],
         'media-src'       => ["'self'", 'blob:', 'https:'],
-        'connect-src'     => ["'self'", 'https://api.stripe.com', 'https://cdn.jsdelivr.net'],
+        // fonts.googleapis: Stripe Elements descarga con fetch la hoja de la fuente
+        // del formulario de pago (opción «fonts» del checkout).
+        'connect-src'     => ["'self'", 'https://api.stripe.com', 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
         // Stripe y los documentos que el admin enlaza en el menú del cliente.
         'frame-src'       => ["'self'", 'https:'],
         'worker-src'      => ["'self'", 'blob:'],
