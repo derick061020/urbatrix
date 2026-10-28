@@ -168,6 +168,19 @@ class ReservationController extends Controller
             return redirect('/form');
         }
 
+        // Siebe: en Aruba no se cobra depósito al reservar. La reserva es el
+        // formulario KYC con sus documentos, en el portal del comprador.
+        if (\App\Models\CddFile::kycAtReservation()) {
+            $reservation->update([
+                'user_id'         => $reservation->user_id ?: Auth::id(),
+                'reservation_fee' => 0,
+                'expires_at'      => now()->addDays((int) config('company.cdd.kyc_hold_days', 7)),
+            ]);
+            \App\Models\CddFile::requestAtReservation($reservation);
+
+            return redirect()->route('dashboard.cumplimiento', ['reservation' => $reservation->id]);
+        }
+
         $unit = Unit::find($reservation->unit_id);
 
         // Siebe (CDD): el screening de sanciones y PEP va antes de aceptar el

@@ -2906,5 +2906,15 @@
   "Copia :n": "Copia :n",
   "Subir copia": "Subir copia",
   "Venta aprobada": "Venta aprobada",
-  "Venta rechazada": "Venta rechazada"
+  "Venta rechazada": "Venta rechazada",
+  "Reserva sin depósito": "Reserva sin depósito",
+  "Sin depósito": "Sin depósito",
+  "Envía tu verificación KYC y la unidad queda apartada para ti.": "Envía tu verificación KYC y la unidad queda apartada para ti.",
+  "apartada cuando el comprador envía su KYC": "apartada cuando el comprador envía su KYC",
+  "Para reservar la unidad no se paga ningún depósito: envía este formulario con los documentos y la unidad queda apartada para ti mientras el equipo de cumplimiento lo revisa.": "Para reservar la unidad no se paga ningún depósito: envía este formulario con los documentos y la unidad queda apartada para ti mientras el equipo de cumplimiento lo revisa.",
+  "¿Cómo compras?": "¿Cómo compras?",
+  "Compro a mi nombre (persona física)": "Compro a mi nombre (persona física)",
+  "Compro a través de una sociedad (persona jurídica)": "Compro a través de una sociedad (persona jurídica)",
+  "Hemos recibido tu formulario y la unidad queda apartada para ti. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.": "Hemos recibido tu formulario y la unidad queda apartada para ti. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.",
+  "El perfil de riesgo y la decisión de cumplimiento se dan después del screening (paso 1), con los datos de este formulario.": "El perfil de riesgo y la decisión de cumplimiento se dan después del screening (paso 1), con los datos de este formulario."
 }

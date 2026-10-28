@@ -311,8 +311,8 @@ body {
     @endif
   </div>
   <div class="hero-reserve">
-    <div class="reserve-lbl">{{ __('Reserva desde') }}</div>
-    <div class="reserve-amt">{{ $reserveAmt }} <span class="reserve-cur">USD</span></div>
+    <div class="reserve-lbl">{{ __('Reserva') }}</div>
+    <div class="reserve-amt">{{ __('Sin depósito') }}</div>
   </div>
 </div>
 
@@ -442,9 +442,9 @@ body {
   <div class="cta-duo">
     <div class="cta-box cta-reserve">
       <div class="cta-label">{{ __('Asegura tu unidad') }}</div>
-      <div class="cta-amount">{{ $reserveAmt }}<span class="cta-amount-cur"> USD</span></div>
+      <div class="cta-amount">{{ __('Sin depósito') }}</div>
       <hr class="cta-rule">
-      <div class="cta-desc">{{ __('Bloquea el precio actual de la unidad.') }}</div>
+      <div class="cta-desc">{{ __('Envía tu verificación KYC y la unidad queda apartada para ti.') }}</div>
       <a class="cta-link" href="https://wa.me/{{ $advisorWA }}?text=Hola%2C+quiero+reservar+la+unidad+{{ urlencode($unitNum) }}">{{ __('Iniciar reserva →') }}</a>
     </div>
     <div class="cta-box cta-visit">
@@ -585,7 +585,7 @@ body {
       <div class="detail-row"><span class="dk">{{ __('Terraza') }}</span><span class="dv">{{ $extArea ? number_format((float) $extArea, 2).' m² · '.$sqft($extArea) : '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Superficie total') }}</span><span class="dv">{{ $unit->total_area ? number_format((float) $unit->total_area, 2).' m² · '.$sqft($unit->total_area) : '—' }}</span></div>
       <div class="detail-row"><span class="dk">{{ __('Etapa') }}</span><span class="dv">{{ $stage ?? '—' }}</span></div>
-      <div class="detail-row"><span class="dk">{{ __('Reserva mínima') }}</span><span class="dv">{{ $reserveAmt }} USD</span></div>
+      <div class="detail-row"><span class="dk">{{ __('Reserva') }}</span><span class="dv">{{ __('Sin depósito') }}</span></div>
     </div>
   </div>
 </div>

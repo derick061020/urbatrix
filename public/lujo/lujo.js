@@ -261,7 +261,7 @@
       const extra = [d.lxLayout, rasgo({ outlook: d.filterOutlook, custom_1: d.lxFeature })].filter(Boolean).join(' · ');
       if (sub && extra) sub.after(el('div', 'lx-rasgo', extra));
 
-      // Reserva desde $5,000: la condición real del banner, bajo el precio.
+      // La condición de reserva del banner («sin depósito» en Siebe), bajo el precio.
       const banner = $('.fg-reserve-banner', card);
       const precio = $('.fg-card-price', card);
       if (banner && precio && estado === 'available') precio.after(el('div', 'lx-reserva', banner.textContent.trim()));

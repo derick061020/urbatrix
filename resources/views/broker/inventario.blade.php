@@ -58,7 +58,7 @@
         </div>
         <div class="px-5 py-3 border-t border-ink-100 flex items-start gap-2.5 bg-info-soft/40">
             <i class="pi pi-info-circle text-info mt-0.5"></i>
-            <p class="text-[11px] text-ink-600 m-0">{{ __('Disponibilidad real en tiempo real. Una unidad solo queda') }} <b>{{ __('bloqueada con una reserva con depósito') }}</b>{{ __('; hasta entonces sigue disponible.') }}</p>
+            <p class="text-[11px] text-ink-600 m-0">{{ __('Disponibilidad real en tiempo real. Una unidad solo queda') }} <b>{{ __('apartada cuando el comprador envía su KYC') }}</b>{{ __('; hasta entonces sigue disponible.') }}</p>
         </div>
     </div>
 </div>

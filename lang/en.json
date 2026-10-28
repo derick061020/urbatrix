@@ -3348,5 +3348,15 @@
   "Copia :n": "Copy :n",
   "Subir copia": "Upload copy",
   "Venta aprobada": "Sale approved",
-  "Venta rechazada": "Sale rejected"
+  "Venta rechazada": "Sale rejected",
+  "Reserva sin depósito": "Reserve with no deposit",
+  "Sin depósito": "No deposit",
+  "Envía tu verificación KYC y la unidad queda apartada para ti.": "Send your KYC verification and the unit is held for you.",
+  "apartada cuando el comprador envía su KYC": "held when the buyer sends their KYC",
+  "Para reservar la unidad no se paga ningún depósito: envía este formulario con los documentos y la unidad queda apartada para ti mientras el equipo de cumplimiento lo revisa.": "No deposit is paid to reserve the unit: send this form with the documents and the unit is held for you while the compliance team reviews it.",
+  "¿Cómo compras?": "How are you buying?",
+  "Compro a mi nombre (persona física)": "In my own name (natural person)",
+  "Compro a través de una sociedad (persona jurídica)": "Through a company (legal entity)",
+  "Hemos recibido tu formulario y la unidad queda apartada para ti. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.": "We have received your form and the unit is held for you. The compliance team is reviewing it and will let you know if anything else is needed.",
+  "El perfil de riesgo y la decisión de cumplimiento se dan después del screening (paso 1), con los datos de este formulario.": "The risk profile and compliance decision come after the screening (step 1), using the data in this form."
 }

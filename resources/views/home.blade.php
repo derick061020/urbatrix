@@ -240,7 +240,7 @@
                 </span>
               </div>
               <div class="mt-price-meta">
-                <span class="warning">{{ __('Reserve from $5,000') }}</span>
+                <span class="warning">{{ __('Reserva sin depósito') }}</span>
                 {{-- «No reembolsable» fuera: irá en las políticas (Miguel, 27 oct). --}}
               </div>
             </div>
@@ -5214,7 +5214,7 @@
               : `<div style="display:inline-block;text-align:right;">
                   <span style="display:block;font-weight:800;background:linear-gradient(to bottom right,rgb(210,182,144),rgb(107,80,43));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.1rem;">$${number_format(unit.price, 0, ' ', ' ')}</span>
                   ${pricePerSqft}
-                  <span style="display:block;font-size:0.6rem;color:rgb(180,134,72);font-weight:600;line-height:1.2;margin-top:1px;">Reserva desde $5000</span>
+                  <span style="display:block;font-size:0.6rem;color:rgb(180,134,72);font-weight:600;line-height:1.2;margin-top:1px;">{{ __('Reserva sin depósito') }}</span>
                   ${unit.discount && unit.discount > 0
                     ? `<button title="Válido hasta el 30 de abril" style="background:rgb(34,197,94);color:white;font-size:0.65rem;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;line-height:1.4;font-weight:600;margin-top:3px;">UNLOCK <b>$${number_format(unit.discount, 0, ' ', ' ')}</b><br>DISCOUNT</button>`
                     : ''

@@ -103,7 +103,7 @@
               </div>
 
               <!-- Gold "RESERVE FROM $5000" banner -->
-              <div class="fg-reserve-banner" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('Reserve from $5000') }}</div>
+              <div class="fg-reserve-banner" onclick="openMoreInfo('{{ $unitId }}')" style="cursor:pointer">{{ __('Reserva sin depósito') }}</div>
 
               @if($isSold)
                 <!-- SOLD overlay (Figma 125:5048) -->

@@ -76,7 +76,9 @@
     @elseif (! $editable)
         @php
             [$icon, $tone, $title, $text] = match (true) {
-                $status === 'enviado' => ['pi-clock', 'bg-warn-soft text-warn', __('Formulario en revisión'), __('Hemos recibido tu formulario. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.')],
+                $status === 'enviado' => ['pi-clock', 'bg-warn-soft text-warn', __('Formulario en revisión'), \App\Models\CddFile::kycAtReservation()
+                    ? __('Hemos recibido tu formulario y la unidad queda apartada para ti. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.')
+                    : __('Hemos recibido tu formulario. El equipo de cumplimiento lo está revisando y te avisará si necesita algo más.')],
                 $status === 'revisado' && $cdd->cdd_decision === 'aprobado' => ['pi-verified', 'bg-ok-soft text-ok', __('Verificación completada'), __('Tu verificación KYC está aprobada. No necesitas hacer nada más por ahora.')],
                 $status === 'revisado' => ['pi-info-circle', 'bg-ink-100 text-ink-600', __('Verificación revisada'), __('El equipo de cumplimiento ha revisado tu expediente. Tu asesor se pondrá en contacto contigo.')],
                 default => ['pi-shield', 'bg-ink-100 text-ink-600', __('Verificación pendiente de iniciar'), __('Cuando el equipo de cumplimiento te pida el formulario «Conozca a su cliente», lo rellenarás aquí. Te avisaremos por email.')],
@@ -91,6 +93,13 @@
     @else
         <div class="cli-card p-5 sm:p-6">
             <div class="cdd-h">{{ __('Formulario «Conozca a su cliente»') }} · {{ $type === 'legal' ? __('Persona jurídica') : __('Persona física') }}</div>
+            @if (\App\Models\CddFile::kycAtReservation() && $status === 'solicitado' && ! $cdd->kyc_submitted_at)
+                <div class="cdd-note bg-ink-50 text-ink-700 mt-3"><i class="pi pi-home mt-0.5"></i><div>{{ __('Para reservar la unidad no se paga ningún depósito: envía este formulario con los documentos y la unidad queda apartada para ti mientras el equipo de cumplimiento lo revisa.') }}</div></div>
+                <div class="cdd-opts mt-3" role="radiogroup" aria-label="{{ __('¿Cómo compras?') }}">
+                    <a href="?reservation={{ $r->id }}&tipo=natural" class="cdd-opt {{ $type === 'natural' ? 'font-semibold' : '' }}" style="{{ $type === 'natural' ? 'border-color:#2b2b1a;background:#f7f7f2' : '' }}"><i class="pi pi-user"></i> {{ __('Compro a mi nombre (persona física)') }}</a>
+                    <a href="?reservation={{ $r->id }}&tipo=legal" class="cdd-opt {{ $type === 'legal' ? 'font-semibold' : '' }}" style="{{ $type === 'legal' ? 'border-color:#2b2b1a;background:#f7f7f2' : '' }}"><i class="pi pi-building"></i> {{ __('Compro a través de una sociedad (persona jurídica)') }}</a>
+                </div>
+            @endif
             <p class="cdd-sub">{{ __('Nuestro procedimiento «Conozca a su cliente» es un requisito previo para prestarte nuestros servicios. Toda la información que pedimos la exige la ley y la normativa del Banco Central de Aruba. Siebe Group puede pedir información adicional para verificar tu identidad, el origen de los fondos y del patrimonio, y cualquier otra documentación necesaria.') }}</p>
             @if ($status === 'info_adicional' && $cdd->info_request)
                 <div class="cdd-note bg-warn-soft text-warn-dark"><i class="pi pi-exclamation-triangle mt-0.5"></i><div><b>{{ __('El equipo de cumplimiento necesita:') }}</b> {{ $cdd->info_request }}</div></div>
@@ -99,10 +108,12 @@
                 <div class="cdd-note bg-err-soft text-err mt-3" role="alert"><i class="pi pi-exclamation-circle mt-0.5"></i><div>{{ __('Revisa los campos marcados.') }} {{ $errors->first() }}</div></div>
             @endif
             <div class="cdd-sect">{{ __('Datos de la unidad') }}</div>
-            <dl class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[13px]">
+            <dl class="grid grid-cols-1 {{ (float) $r->reservation_fee > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2' }} gap-3 text-[13px]">
                 <div class="border border-ink-200 rounded-lg px-3 py-2"><dt class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Unidad') }}</dt><dd class="font-semibold text-ink-900">{{ $r->unit?->custom_id ?? $r->unit_name ?? '—' }}</dd></div>
                 <div class="border border-ink-200 rounded-lg px-3 py-2"><dt class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Precio de compra') }}</dt><dd class="font-semibold text-ink-900">{{ $precio ? '$'.number_format($precio) : '—' }}</dd></div>
+                @if ((float) $r->reservation_fee > 0)
                 <div class="border border-ink-200 rounded-lg px-3 py-2"><dt class="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">{{ __('Importe de la reserva') }}</dt><dd class="font-semibold text-ink-900">{{ $r->reservation_fee ? '$'.number_format((float) $r->reservation_fee) : '—' }}</dd></div>
+                @endif
             </dl>
         </div>
 

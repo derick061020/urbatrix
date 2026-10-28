@@ -43,7 +43,7 @@ class CddController extends Controller
                 ]);
                 $cdd->fill($d + ['screened_at' => now(), 'screened_by' => $uid]);
                 // Reserva web a la espera del screening: ya puede pagar el depósito.
-                if ($d['screening_status'] === 'limpio' && $reservation->status === 'pending_payment' && ! $reservation->paid_at) {
+                if ($d['screening_status'] === 'limpio' && ! CddFile::kycAtReservation() && $reservation->status === 'pending_payment' && ! $reservation->paid_at) {
                     $reservation->update(['expires_at' => now()->addHours(48)]);
                     $this->notify($reservation, 'cleared', '', url('/checkout'));
                 }
@@ -87,6 +87,7 @@ class CddController extends Controller
                     'cdd_notes'    => 'nullable|string|max:2000',
                 ]);
                 abort_unless(in_array($cdd->kyc_status, ['enviado', 'revisado'], true), 422, __('El comprador aún no ha enviado el formulario KYC.'));
+                abort_unless($cdd->screeningCleared(), 422, __('Primero hay que completar el screening sin coincidencias.'));
                 $cdd->fill($d + ['kyc_status' => 'revisado', 'cdd_decided_at' => now(), 'cdd_decided_by' => $uid]);
                 $cdd->addLog('Cumplimiento: perfil de riesgo ' . $d['risk_rating'] . ', comprador ' . $d['cdd_decision'] . '.');
                 // «Approve/reject the potential buyer(s) through the portal and via email.»
@@ -197,6 +198,13 @@ class CddController extends Controller
     {
         abort_unless(CddFile::enabled(), 404);
         $reservation = $this->clientReservation($request);
+        // Reserva web sin depósito: el propio comprador elige si compra como
+        // persona física o a través de una sociedad, mientras no lo haya enviado.
+        $tipo = $request->query('tipo');
+        if ($reservation?->cdd && in_array($tipo, ['natural', 'legal'], true)
+            && $reservation->cdd->kyc_status === 'solicitado' && ! $reservation->cdd->kyc_submitted_at) {
+            $reservation->cdd->update(['buyer_type' => $tipo]);
+        }
 
         return view('dashboard.cumplimiento', [
             'reservation' => $reservation,
@@ -287,9 +295,38 @@ class CddController extends Controller
         ]);
         $cdd->addLog('El comprador ha enviado el formulario KYC.');
         $cdd->save();
+        if (CddFile::kycAtReservation()) $this->holdUnit($reservation, $cdd);
         self::alertCompliance($reservation, 'Formulario KYC enviado: hay que revisarlo y preparar el perfil de riesgo.');
 
         return redirect()->route('dashboard.cumplimiento')->with('success', __('Formulario enviado. El equipo de cumplimiento lo revisará y te avisará si necesita algo más.'));
+    }
+
+    /**
+     * Sin depósito, la reserva se hace con el KYC: al enviarlo, la unidad queda
+     * apartada mientras cumplimiento lo revisa (si nadie la tenía ya).
+     */
+    private function holdUnit(Reservation $reservation, CddFile $cdd): void
+    {
+        $unit = $reservation->unit;
+        if (! $unit) return;
+        $days = (int) config('company.cdd.kyc_hold_days', 7);
+        $status = strtoupper((string) $unit->status);
+        $free = $status === 'AVAILABLE'
+            || ($status === 'RESERVED' && (int) $unit->reserved_by_reservation_id === (int) $reservation->id);
+        if ($free) {
+            $unit->update([
+                'status'                     => 'RESERVED',
+                'reserved_until'             => now()->addDays($days),
+                'reserved_by_reservation_id' => $reservation->id,
+            ]);
+            $cdd->addLog("Unidad apartada $days días mientras cumplimiento revisa el KYC.");
+        } else {
+            $cdd->addLog('Ojo: la unidad ya estaba apartada para otra reserva; no se ha bloqueado.');
+        }
+        $cdd->save();
+        if ($reservation->status === 'pending_payment') {
+            $reservation->update(['status' => 'pending', 'expires_at' => now()->addDays($days)]);
+        }
     }
 
     /**

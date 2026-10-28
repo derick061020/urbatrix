@@ -94,7 +94,7 @@
         @endif
 
         {{-- El depósito debería llegar a nombre del que reserva; si no, se investiga. --}}
-        @if($cdd->screeningCleared())
+        @if($cdd->screeningCleared() && ($reservation->paid_at || ! \App\Models\CddFile::kycAtReservation()))
             <div class="mt-4 pt-3 border-t border-ink-100 flex flex-col sm:flex-row sm:items-center gap-2">
                 <div class="flex-1 text-[12.5px]"><b>{{ __('Depósito a nombre del comprador') }}</b>
                     <div class="text-[11px] text-ink-500">{{ $reservation->paid_at ? __('Depósito recibido el :f.', ['f' => $fecha($reservation->paid_at)]) : __('Aún sin depósito.') }} {{ __('Si lo paga otra persona, cumplimiento tiene que investigarlo.') }}</div>
@@ -115,7 +115,7 @@
     </div>
 
     {{-- 2 · KYC y riesgo --}}
-    <div class="crm-card p-5 {{ $cdd->screeningCleared() ? '' : 'opacity-60' }}">
+    <div class="crm-card p-5 {{ $cdd->screeningCleared() || $cdd->kyc_status !== 'no_solicitado' ? '' : 'opacity-60' }}">
         <div class="flex items-center gap-2 mb-1"><span class="crm-pill bg-ink-100 text-ink-700">2</span><div class="text-[14px] font-semibold text-ink-900">{{ __('Formulario KYC, revisión y perfil de riesgo') }}</div></div>
         <p class="text-[12px] text-ink-500 mb-3">{{ __('El comprador rellena el formulario en su portal. Cumplimiento lo revisa, pide lo que falte y prepara el perfil de riesgo de la unidad.') }}</p>
 
@@ -206,6 +206,9 @@
                     <textarea name="info_request" rows="2" required class="crm-input pl-3 py-2" placeholder="{{ __('Qué falta o qué hay que aclarar (lo verá el comprador)') }}"></textarea>
                     <button class="crm-btn crm-btn-ghost">{{ __('Enviar al comprador') }}</button>
                 </form>
+                @if(! $cdd->screeningCleared())
+                <div class="border border-ink-200 rounded-lg p-3 text-[12px] text-ink-600">{{ __('El perfil de riesgo y la decisión de cumplimiento se dan después del screening (paso 1), con los datos de este formulario.') }}</div>
+                @else
                 <form method="POST" action="{{ route('admin.crm.cdd.update', $reservation->id) }}" class="border border-ink-200 rounded-lg p-3 space-y-2 m-0">@csrf
                     <input type="hidden" name="action" value="review">
                     <div class="text-[12px] font-semibold text-ink-800">{{ __('Perfil de riesgo y decisión de cumplimiento') }}</div>
@@ -220,6 +223,7 @@
                     </div>
                     <div class="text-[11px] text-ink-500">{{ __('El rechazo es excepcional: coincidencia real en sanciones o falta de cooperación.') }}</div>
                 </form>
+                @endif
             </div>
         @endif
         @if($cdd->cdd_decision !== 'pendiente')

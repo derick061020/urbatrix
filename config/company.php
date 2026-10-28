@@ -95,6 +95,11 @@ return [
         'enabled'                  => (bool) env('COMPANY_CDD_ENABLED', true),
         // El screening de sanciones/PEP va antes de aceptar el depósito.
         'screening_before_deposit' => (bool) env('COMPANY_CDD_SCREENING_FIRST', true),
+        // En Aruba no se puede cobrar un depósito al reservar: «Reservar» pide
+        // el KYC con sus documentos y la unidad queda apartada mientras
+        // cumplimiento lo revisa. Con true vuelve el checkout con Stripe.
+        'reservation_deposit'      => (bool) env('COMPANY_CDD_DEPOSIT', false),
+        'kyc_hold_days'            => 7,
         'fiu_threshold_awg'        => 500000,
         'awg_per_usd'              => 1.79,       // paridad fija del florín
         'retention_years'          => 10,

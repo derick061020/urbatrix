@@ -50,6 +50,25 @@ class CddFile extends Model
         return (bool) config('company.cdd.enabled');
     }
 
+    /** Sin depósito al reservar (Aruba): la reserva es el formulario KYC. */
+    public static function kycAtReservation(): bool
+    {
+        return self::enabled() && ! config('company.cdd.reservation_deposit');
+    }
+
+    /** Pide el KYC al comprador nada más reservar, si aún no se le había pedido. */
+    public static function requestAtReservation(Reservation $reservation): self
+    {
+        $cdd = $reservation->cdd ?? $reservation->cdd()->create([])->fresh();
+        if (($cdd->kyc_status ?? 'no_solicitado') === 'no_solicitado') {
+            $cdd->fill(['buyer_type' => $cdd->buyer_type ?: 'natural', 'kyc_status' => 'solicitado', 'kyc_requested_at' => now()]);
+            $cdd->addLog('Reserva web: formulario KYC pedido al reservar (sin depósito).');
+            $cdd->save();
+        }
+
+        return $cdd;
+    }
+
     /** Precio de compra en florines (AWG), para el umbral de la FIU. */
     public function purchaseAwg(): float
     {
