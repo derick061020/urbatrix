@@ -2899,5 +2899,12 @@
   "Anuncio publicado.": "Anuncio publicado.",
   "Anuncio actualizado.": "Anuncio actualizado.",
   "Anuncio archivado.": "Anuncio archivado.",
-  "Anuncio recuperado.": "Anuncio recuperado."
+  "Anuncio recuperado.": "Anuncio recuperado.",
+  "Broker y agencia": "Broker y agencia",
+  "Quién trajo al cliente. Se guarda en su reserva más reciente.": "Quién trajo al cliente. Se guarda en su reserva más reciente.",
+  "Nombre del broker": "Nombre del broker",
+  "Nombre de la agencia": "Nombre de la agencia",
+  "Este cliente ya está registrado: :n (:e). Elígelo en «Cliente existente».": "Este cliente ya está registrado: :n (:e). Elígelo en «Cliente existente».",
+  "Este cliente ya está registrado:": "Este cliente ya está registrado:",
+  "Usar este cliente": "Usar este cliente"
 }

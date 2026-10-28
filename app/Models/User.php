@@ -110,6 +110,31 @@ class User extends Authenticatable
         return static::normalizeExtraEmails($this->extra_emails, $this->email);
     }
 
+    /** Nombre comparable: sin tildes, mayúsculas ni espacios de más. */
+    public static function nameKey(?string $name): string
+    {
+        return preg_replace('/\s+/', ' ', trim(\Illuminate\Support\Str::lower(\Illuminate\Support\Str::ascii((string) $name))));
+    }
+
+    /**
+     * Cliente ya dado de alta con alguno de esos correos (principal o
+     * adicional) o con el mismo nombre completo. Para no registrarlo dos veces.
+     */
+    public static function findDuplicateClient(?string $name, array $emails): ?self
+    {
+        $emails = array_values(array_filter(array_map(fn ($e) => \Illuminate\Support\Str::lower(trim((string) $e)), $emails)));
+        $key = static::nameKey($name);
+        if (! $emails && $key === '') return null;
+
+        return static::where('role', 'user')->get()->first(function (self $u) use ($emails, $key) {
+            $mine = array_map(fn ($e) => \Illuminate\Support\Str::lower($e), $u->allEmails());
+            $full = trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? ''));
+
+            return array_intersect($emails, $mine)
+                || ($key !== '' && in_array($key, [static::nameKey($u->name), static::nameKey($full)], true));
+        });
+    }
+
     /** Correo principal + adicionales, en ese orden. */
     public function allEmails(): array
     {

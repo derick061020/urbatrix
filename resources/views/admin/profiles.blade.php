@@ -294,6 +294,9 @@
                                             data-name="{{ $u->name }}"
                                             data-email="{{ $u->email }}"
                                             data-extra="{{ json_encode($u->extraEmails()) }}"
+                                            data-reservation="{{ $r?->id }}"
+                                            data-broker="{{ $r?->broker_name }}"
+                                            data-agency="{{ $r?->agency }}"
                                             data-phone="{{ $u->phone }}"
                                             data-country="{{ $u->country }}"
                                             data-role="{{ $u->role }}"
@@ -387,6 +390,26 @@
                 </div>
             </div>
 
+            {{-- Origen de la operación (vive en la reserva, no en el usuario):
+                 si se escribió mal al darlo de alta, se corrige aquí. --}}
+            <div id="eu-origen" class="border-t border-ink-100 pt-4">
+                <input type="hidden" name="reservation_id" id="eu-reservation">
+                <div class="text-[13px] font-semibold text-ink-900 mb-1">{{ __('Broker y agencia') }}</div>
+                <div class="text-[11px] text-ink-500 mb-3">{{ __('Quién trajo al cliente. Se guarda en su reserva más reciente.') }}</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Broker') }}</label>
+                        <input type="text" name="broker_name" id="eu-broker" list="eu-brokers" maxlength="255" class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre del broker') }}">
+                    </div>
+                    <div>
+                        <label class="text-[12px] font-semibold text-ink-700">{{ __('Agencia') }}</label>
+                        <input type="text" name="agency" id="eu-agency" list="eu-agencies" maxlength="255" class="crm-input pl-3 mt-1" placeholder="{{ __('Nombre de la agencia') }}">
+                    </div>
+                </div>
+                <datalist id="eu-brokers">@foreach(\App\Models\Reservation::whereNotNull('broker_name')->distinct()->orderBy('broker_name')->pluck('broker_name') as $v)<option value="{{ $v }}">@endforeach</datalist>
+                <datalist id="eu-agencies">@foreach(\App\Models\Reservation::whereNotNull('agency')->distinct()->orderBy('agency')->pluck('agency') as $v)<option value="{{ $v }}">@endforeach</datalist>
+            </div>
+
             <div class="border-t border-ink-100 pt-4">
                 <div class="text-[13px] font-semibold text-ink-900 mb-1">{{ __('Restablecer contraseña') }}</div>
                 <div class="text-[11px] text-ink-500 mb-3">{{ __('Déjalo en blanco para no cambiarla.') }}</div>
@@ -425,6 +448,11 @@
         document.getElementById('eu-role').value    = d.role || 'user';
         document.getElementById('eu-project').value = d.project || '';
         euSetExtraEmails(d.extra);
+        // Sin reserva no hay dónde guardar broker y agencia.
+        document.getElementById('eu-reservation').value = d.reservation || '';
+        document.getElementById('eu-broker').value      = d.broker || '';
+        document.getElementById('eu-agency').value      = d.agency || '';
+        document.getElementById('eu-origen').hidden     = !d.reservation;
         f.querySelector('input[name=password]').value = '';
         f.querySelector('input[name=password_confirmation]').value = '';
         document.getElementById('modal-editar-usuario').showModal();

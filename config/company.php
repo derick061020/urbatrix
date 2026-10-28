@@ -11,6 +11,9 @@
 
 return [
 
+    // Color de marca para piezas que se inyectan fuera de los layouts (salvavidas).
+    'accent'       => env('COMPANY_ACCENT', '#5c7c68'),
+    'salvavidas'   => (bool) env('COMPANY_SALVAVIDAS', true),
     'brand'        => env('COMPANY_BRAND', 'MAKAI'),
     'project'      => env('COMPANY_PROJECT', 'Makai Residences'),
     'group'        => env('COMPANY_GROUP', 'Duna Development Group'),

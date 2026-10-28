@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // SetLocale corre en todas las rutas web (resuelve sesión/cookie -> App::setLocale).
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+            // El salvavidas (botón de tickets) en todas las páginas HTML.
+            \App\Http\Middleware\InjectSalvavidas::class,
         ]);
         // Y también en la pila global, que es la única que corre cuando NINGUNA
         // ruta coincide: sin esto el 404 lo pintaba el manejador de excepciones

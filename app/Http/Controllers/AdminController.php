@@ -3047,6 +3047,13 @@ class AdminController extends Controller
 
         $unit = Unit::find($data['unit_id']);
 
+        // Un cliente nuevo que ya existe se queda como está: se avisa y se
+        // elige en «Cliente existente», en vez de duplicarlo (Ernesto, Makai).
+        if ($data['client_mode'] === 'new'
+            && ($dup = User::findDuplicateClient($data['cliente_nombre'] ?? null, array_merge([$data['cliente_email'] ?? null], $data['cliente_emails_extra'] ?? [])))) {
+            return back()->withInput()->withErrors(['cliente_dup' => __('Este cliente ya está registrado: :n (:e). Elígelo en «Cliente existente».', ['n' => $dup->name, 'e' => $dup->email])]);
+        }
+
         // Resuelve (o crea) la cuenta del cliente y obtiene sus datos.
         // En modo "new" se crea el usuario y se le envía un correo de invitación
         // para que active su cuenta y cree su contraseña.
@@ -4827,7 +4834,19 @@ class AdminController extends Controller
             'avatar'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_avatar' => ['nullable', 'boolean'],
             'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
+            // Broker y agencia viven en la reserva: se corrigen desde aquí.
+            'reservation_id' => ['nullable', 'integer'],
+            'broker_name'    => ['nullable', 'string', 'max:255'],
+            'agency'         => ['nullable', 'string', 'max:255'],
         ]);
+
+        if (! empty($data['reservation_id'])) {
+            $res = Reservation::where('id', $data['reservation_id'])->where('user_id', $user->id)->first();
+            $res?->update([
+                'broker_name' => trim((string) ($data['broker_name'] ?? '')) ?: null,
+                'agency'      => trim((string) ($data['agency'] ?? '')) ?: null,
+            ]);
+        }
 
         if (!empty($data['password'])) {
             $user->password = $data['password']; // hashed via casts

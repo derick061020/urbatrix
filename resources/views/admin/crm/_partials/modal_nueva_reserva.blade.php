@@ -1,4 +1,14 @@
 {{-- ====== Modal: Nueva reserva ====== --}}
+@php
+    // En Usuarios no llegaba $clients y «Cliente existente» salía vacío.
+    $nrClients = $clients ?? \App\Models\User::where('role', 'user')->orderBy('name')->get(['id', 'name', 'first_name', 'last_name', 'email', 'extra_emails']);
+    $nrDupIndex = $nrClients->map(fn ($c) => [
+        'id'     => $c->id,
+        'label'  => ($c->name ?: trim(($c->first_name ?? '').' '.($c->last_name ?? ''))).' — '.$c->email,
+        'names'  => array_values(array_unique(array_filter([\App\Models\User::nameKey($c->name), \App\Models\User::nameKey(trim(($c->first_name ?? '').' '.($c->last_name ?? '')))]))),
+        'emails' => array_map('strtolower', $c->allEmails()),
+    ])->values();
+@endphp
 <dialog id="modal-nueva-reserva" class="rounded-2xl p-0 backdrop:bg-black/40 m-auto">
     <form method="POST" action="{{ route('admin.crm.reservation.create') }}" class="w-[520px] bg-white rounded-2xl overflow-hidden" data-nueva-reserva>
         @csrf
@@ -10,6 +20,9 @@
             <button type="button" onclick="this.closest('dialog').close()" class="text-ink-400 hover:text-ink-700 p-1"><i class="pi pi-times text-[12px]"></i></button>
         </div>
         <div class="p-6 space-y-4">
+            @error('cliente_dup')
+                <div class="px-4 py-3 rounded-lg bg-err-soft border border-err/30 text-err text-[12px] flex gap-2" data-dup-server><i class="pi pi-exclamation-circle mt-0.5"></i><div>{{ $message }}</div></div>
+            @enderror
 
             {{-- ── Selector de modo de cliente ── --}}
             <div class="grid grid-cols-2 gap-1 p-1 bg-ink-100 rounded-xl text-[12px] font-semibold">
@@ -30,7 +43,7 @@
                     <input type="hidden" name="user_id" data-combobox-value disabled>
                     <input type="text" data-combobox-search autocomplete="off" placeholder="{{ __('Escribe nombre o email…') }}" class="crm-input pl-3" disabled>
                     <ul data-combobox-list class="hidden absolute z-30 left-0 right-0 mt-1 max-h-56 overflow-auto bg-white border border-ink-200 rounded-lg shadow-lg">
-                        @foreach($clients ?? [] as $c)
+                        @foreach($nrClients as $c)
                             @php $clabel = ($c->name ?: trim(($c->first_name ?? '').' '.($c->last_name ?? ''))).' — '.$c->email; @endphp
                             <li data-value="{{ $c->id }}" data-label="{{ $clabel }}" class="px-3 py-2 text-[13px] text-ink-700 hover:bg-ink-50 cursor-pointer">{{ $clabel }}</li>
                         @endforeach
@@ -54,6 +67,13 @@
                     <button type="button" data-add-email class="inline-flex items-center gap-1 text-[12px] font-semibold text-brand hover:underline mt-2">
                         <i class="pi pi-plus text-[10px]"></i> {{ __('Agregar otro correo') }}
                     </button>
+
+                    {{-- Aviso en vivo si el cliente ya existe (mismo correo o mismo nombre). --}}
+                    <div data-dup-warn hidden class="mt-2 px-3 py-2 rounded-lg bg-warn-soft text-warn text-[12px]">
+                        <i class="pi pi-exclamation-triangle text-[11px] mr-1"></i>
+                        <span data-dup-text></span>
+                        <button type="button" data-dup-use class="font-semibold underline ml-1">{{ __('Usar este cliente') }}</button>
+                    </div>
 
                     <p class="text-[11px] text-ink-500 mt-1.5"><i class="pi pi-envelope text-[10px] mr-1"></i> {{ __('Se enviará una invitación al correo principal para que active su cuenta y cree su contraseña.') }}</p>
                 </div>
@@ -272,8 +292,43 @@
         row.querySelector('input').focus();
     });
 
-    btns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
+    // ── Cliente ya registrado: aviso en vivo y no deja enviarlo como nuevo ──
+    const DUP = @json($nrDupIndex);
+    const nameKey = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const dupWarn = form.querySelector('[data-dup-warn]');
+    let dupHit = null;
+    function checkDup() {
+        if (hidden.value !== 'new') { dupHit = null; dupWarn.hidden = true; return; }
+        const nm = nameKey(form.querySelector('[name="cliente_nombre"]').value);
+        const mails = Array.from(form.querySelectorAll('[name="cliente_email"], [name="cliente_emails_extra[]"]'))
+            .map(i => i.value.trim().toLowerCase()).filter(Boolean);
+        dupHit = DUP.find(c => (nm && c.names.includes(nm)) || mails.some(m => c.emails.includes(m))) || null;
+        dupWarn.hidden = !dupHit;
+        if (dupHit) form.querySelector('[data-dup-text]').textContent = '{{ __('Este cliente ya está registrado:') }} ' + dupHit.label + '.';
+    }
+    form.addEventListener('input', e => { if (e.target.matches('[data-new-input]')) checkDup(); });
+    form.querySelector('[data-dup-use]').addEventListener('click', () => {
+        if (!dupHit) return;
+        setMode('existing');
+        existingValue.value = dupHit.id;
+        existingSearch.value = dupHit.label;
+        dupHit = null; dupWarn.hidden = true;
+    });
+    form.addEventListener('submit', e => {
+        checkDup();
+        if (dupHit) { e.preventDefault(); dupWarn.scrollIntoView({ block: 'nearest' }); }
+    });
+
+    btns.forEach(b => b.addEventListener('click', () => { setMode(b.dataset.modeBtn); checkDup(); }));
     setMode('new');
+
+    // Volvió con «ya está registrado» del servidor: se reabre con lo escrito.
+    if (form.querySelector('[data-dup-server]')) {
+        form.querySelector('[name="cliente_nombre"]').value = @json(old('cliente_nombre', ''));
+        form.querySelector('[name="cliente_email"]').value = @json(old('cliente_email', ''));
+        document.getElementById('modal-nueva-reserva').showModal();
+        checkDup();
+    }
 })();
 
 // Sube el comprobante de la seña por chunks (~512 KB) para evitar el 413.

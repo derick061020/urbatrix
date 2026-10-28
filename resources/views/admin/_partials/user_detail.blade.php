@@ -23,6 +23,7 @@
         'id' => $user->id, 'first' => $user->first_name, 'last' => $user->last_name,
         'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone,
         'country' => $user->country, 'role' => $user->role, 'extra' => $extraEmails,
+        'reservation' => $reservation?->id, 'broker' => $reservation?->broker_name, 'agency' => $reservation?->agency,
     ]);
 @endphp
 

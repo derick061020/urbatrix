@@ -365,6 +365,7 @@
                 $pendingKycDocsCount = $isBroker ? 0 : \App\Models\Document::where('document_type', 'kyc')->where('status', 'pending')->whereNotNull('reservation_id')->count();
                 $aprobacionesCount = $isBroker ? 0 : (\App\Models\Approval::where('status', 'pendiente')->count() + $pendingUsersCount + $pendingKycDocsCount);
                 $tareasCount = $isBroker ? 0 : \App\Models\Task::whereIn('status', ['pendiente', 'en_proceso', 'vencida'])->count();
+                $ticketsCount = ($isBroker || ! \Illuminate\Support\Facades\Schema::hasTable('support_tickets')) ? 0 : \App\Models\SupportTicket::where('status', 'abierto')->count();
             @endphp
             <a href="{{ route('admin.crm.expedientes') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.expedientes' ? 'active' : '' }}">
                 <i class="pi pi-folder"></i> {{ __('Expedientes') }} @if($expedientesCount > 0)<span class="badge-count">{{ $expedientesCount }}</span>@endif
@@ -423,6 +424,9 @@
                 </a>
                 <a href="{{ route('admin.crm.tareas') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.tareas' ? 'active' : '' }}">
                     <i class="pi pi-check"></i> {{ __('Tareas') }} @if($tareasCount > 0)<span class="badge-count">{{ $tareasCount }}</span>@endif
+                </a>
+                <a href="{{ route('admin.crm.tickets') }}" class="crm-nav-link {{ ($activeRoute ?? '') === 'crm.tickets' ? 'active' : '' }}">
+                    <i class="pi pi-ticket"></i> {{ __('Tickets') }} @if($ticketsCount > 0)<span class="badge-count">{{ $ticketsCount }}</span>@endif
                 </a>
             @endunless
         </nav>
